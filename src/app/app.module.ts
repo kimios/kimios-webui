@@ -4,9 +4,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatButtonModule, MatIconModule } from '@angular/material';
+// import { MatOptionModule } from '@angular/material';
+// import { MatSelectModule } from '@angular/material';
 import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { TranslateModule } from '@ngx-translate/core';
 import 'hammerjs';
+import { APP_INITIALIZER } from '@angular/core';
 
 import { FuseModule } from '@fuse/fuse.module';
 import { FuseSharedModule } from '@fuse/shared.module';
@@ -25,6 +28,7 @@ import { LoggedInGuard } from 'app/logged-in.guard';
 import { HomeComponent } from './main/pages/home/home.component';
 import {UserService} from './user.service';
 import {AppRoutingModule} from './app-routing.module';
+import {AppConfig} from './services/app.config.service';
 
 
 @NgModule({
@@ -50,6 +54,8 @@ import {AppRoutingModule} from './app-routing.module';
         // Material
         MatButtonModule,
         MatIconModule,
+        // MatOptionModule,
+        // MatSelectModule,
 
         // Fuse modules
         FuseModule.forRoot(fuseConfig),
@@ -66,7 +72,12 @@ import {AppRoutingModule} from './app-routing.module';
     bootstrap   : [
         AppComponent
     ],
-    providers: [UserService, LoggedInGuard]
+    providers: [
+        UserService,
+        LoggedInGuard,
+        AppConfig,
+        { provide: APP_INITIALIZER, useFactory: (config: AppConfig) => () => config.load(), deps: [AppConfig], multi: true }
+    ]
 })
 export class AppModule
 {

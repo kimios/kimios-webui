@@ -7,6 +7,12 @@ import { fuseAnimations } from '@fuse/animations';
 import { Router } from '@angular/router';
 
 import { UserService } from 'app/user.service';
+import { AuthenticationSourceService } from 'app/services/authentication-source.service';
+
+export interface AuthenticationSource {
+    value: string;
+    viewValue: string;
+}
 
 @Component({
     selector     : 'login',
@@ -19,6 +25,8 @@ export class LoginComponent implements OnInit
 {
     loginForm: FormGroup;
 
+    authenticationSources: AuthenticationSource[];
+
     /**
      * Constructor
      *
@@ -29,7 +37,8 @@ export class LoginComponent implements OnInit
         private _fuseConfigService: FuseConfigService,
         private _formBuilder: FormBuilder,
         private userService: UserService,
-        private router: Router
+        private router: Router,
+        private authenticationSourcesService: AuthenticationSourceService
     )
     {
         // Configure the layout
@@ -62,8 +71,11 @@ export class LoginComponent implements OnInit
     {
         this.loginForm = this._formBuilder.group({
             email   : ['', [Validators.required, Validators.email]],
-            password: ['', Validators.required]
+            password: ['', Validators.required],
+            authenticationSource: ['', Validators.required]
         });
+
+        this.authenticationSources = this.authenticationSourcesService.retrieveAuthenticationSources();
     }
 
     onSubmit(email: string, password: string): void {
