@@ -14,9 +14,9 @@ import { FuseProgressBarModule, FuseSidebarModule, FuseThemeOptionsModule } from
 
 import { fuseConfig } from 'app/fuse-config';
 
-import { FakeDbService } from 'app/fake-db/fake-db.service';
+// import { FakeDbService } from 'app/fake-db/fake-db.service';
 import { AppComponent } from 'app/app.component';
-import { AppStoreModule } from 'app/store/store.module';
+// import { AppStoreModule } from 'app/store/store.module';
 import { LayoutModule } from 'app/layout/layout.module';
 import { SampleModule } from 'app/main/sample/sample.module';
 import { LoginModule } from 'app/main/pages/authentication/login/login.module';
@@ -39,10 +39,10 @@ import {AppRoutingModule} from './app-routing.module';
         AppRoutingModule,
 
         TranslateModule.forRoot(),
-        InMemoryWebApiModule.forRoot(FakeDbService, {
+        /*InMemoryWebApiModule.forRoot(FakeDbService, {
             delay             : 0,
             passThruUnknownUrl: true
-        }),
+        }),*/
 
         // Material moment date module
         MatMomentDateModule,
