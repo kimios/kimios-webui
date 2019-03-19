@@ -21,6 +21,14 @@
                 "kebab-case",
                 "camelCase"
             ]
-        ]
+        ],
+        "max-line-length": {
+            "options": [250]
+        }
+    },
+    "jsRules": {
+        "max-line-length": {
+            "options": [250]
+        }
     }
 }
