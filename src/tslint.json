@@ -24,7 +24,8 @@
         ],
         "max-line-length": {
             "options": [250]
-        }
+        },
+        "import-spacing": false
     },
     "jsRules": {
         "max-line-length": {
