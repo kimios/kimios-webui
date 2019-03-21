@@ -1,14 +1,14 @@
 // logged-in.guard.ts
-import { Injectable } from '@angular/core';
-import { Router, CanActivate } from '@angular/router';
-import { UserService } from './user.service';
+import {Injectable} from '@angular/core';
+import {CanActivate, Router} from '@angular/router';
+import {SessionService} from 'app/services/session.service';
 
 @Injectable()
 export class LoggedInGuard implements CanActivate {
-    constructor(private user: UserService, public router: Router) {}
+    constructor(private sessionService: SessionService, public router: Router) {}
 
     canActivate(): boolean {
-        if (this.user.isLoggedIn()) {
+        if (this.sessionService.isActive()) {
             return true;
         } else {
             this.router.navigate(['login']);

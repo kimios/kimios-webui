@@ -22,13 +22,14 @@ import {SampleModule} from 'app/main/sample/sample.module';
 import {LoginModule} from 'app/main/pages/authentication/login/login.module';
 
 import {LoggedInGuard} from 'app/logged-in.guard';
-import {HomeComponent} from './main/pages/home/home.component';
-import {UserService} from './user.service';
-import {AppRoutingModule} from './app-routing.module';
-import {AppConfig} from './services/app.config.service';
+import {HomeComponent} from 'app/main/pages/home/home.component';
+import {UserService} from 'app/user.service';
+import {AppRoutingModule} from 'app/app-routing.module';
+import {AppConfig} from 'app/services/app.config.service';
 import {ApiModule as KimiosApiModule} from 'app/kimios-client-api/api.module';
 import {BASE_PATH} from 'app/kimios-client-api/variables';
-import {APP_CONFIG} from './app-config/config';
+import {APP_CONFIG} from 'app/app-config/config';
+import {SessionService} from 'app/services/session.service';
 
 @NgModule({
     declarations: [
@@ -75,6 +76,7 @@ import {APP_CONFIG} from './app-config/config';
     providers: [
         UserService,
         LoggedInGuard,
+        SessionService,
         AppConfig,
         {
             provide: APP_INITIALIZER,

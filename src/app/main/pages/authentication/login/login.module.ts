@@ -6,6 +6,7 @@ import { FuseSharedModule } from '@fuse/shared.module';
 
 import { LoginComponent } from 'app/main/pages/authentication/login/login.component';
 import {SecurityService} from 'app/kimios-client-api';
+import {SessionService} from 'app/services/session.service';
 
 const routes = [
     {
@@ -35,7 +36,8 @@ const routes = [
         LoginComponent
     ],
     providers: [
-        SecurityService
+        SecurityService,
+        SessionService
     ]
 })
 export class LoginModule
