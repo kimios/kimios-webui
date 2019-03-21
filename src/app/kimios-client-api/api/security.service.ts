@@ -19,9 +19,9 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 import { Observable }                                        from 'rxjs/Observable';
 
 import { AuthenticationSource } from '../model/authenticationSource';
-import { DMEntitySecurity } from '../model/dMEntitySecurity';
+// import { DMEntitySecurity } from '../model/dMEntitySecurity';
 import { Group } from '../model/group';
-import { SecurityEntity } from '../model/securityEntity';
+// import { SecurityEntity } from '../model/securityEntity';
 import { TaskInfo } from '../model/taskInfo';
 import { User } from '../model/user';
 
@@ -237,7 +237,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): void; };
+        let formParams: void | { append(param: string, value: any): void };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -305,7 +305,7 @@ export class SecurityService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDMEntitySecurities(sessionId?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntitySecurity>>;
+/*    public getDMEntitySecurities(sessionId?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntitySecurity>>;
     public getDMEntitySecurities(sessionId?: string, dmEntityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntitySecurity>>>;
     public getDMEntitySecurities(sessionId?: string, dmEntityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntitySecurity>>>;
     public getDMEntitySecurities(sessionId?: string, dmEntityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
@@ -344,7 +344,7 @@ export class SecurityService {
                 reportProgress: reportProgress
             }
         );
-    }
+    }*/
 
     /**
      * 
@@ -354,6 +354,7 @@ export class SecurityService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
+/*
     public getDefaultDMEntitySecurities(sessionId?: string, objectType?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntitySecurity>>;
     public getDefaultDMEntitySecurities(sessionId?: string, objectType?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntitySecurity>>>;
     public getDefaultDMEntitySecurities(sessionId?: string, objectType?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntitySecurity>>>;
@@ -394,6 +395,7 @@ export class SecurityService {
             }
         );
     }
+*/
 
     /**
      * 
@@ -826,55 +828,56 @@ export class SecurityService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<SecurityEntity>>;
-    public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SecurityEntity>>>;
-    public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SecurityEntity>>>;
-    public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    /*
+        public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<SecurityEntity>>;
+        public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SecurityEntity>>>;
+        public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SecurityEntity>>>;
+        public searchSecurityEntities(sessionId?: string, searchText?: string, userSource?: string, entType?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
 
 
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (searchText !== undefined && searchText !== null) {
-            queryParameters = queryParameters.set('searchText', <any>searchText);
-        }
-        if (userSource !== undefined && userSource !== null) {
-            queryParameters = queryParameters.set('userSource', <any>userSource);
-        }
-        if (entType !== undefined && entType !== null) {
-            queryParameters = queryParameters.set('entType', <any>entType);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<SecurityEntity>>(`${this.basePath}/security/search-entities`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
+            let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+            if (sessionId !== undefined && sessionId !== null) {
+                queryParameters = queryParameters.set('sessionId', <any>sessionId);
             }
-        );
-    }
+            if (searchText !== undefined && searchText !== null) {
+                queryParameters = queryParameters.set('searchText', <any>searchText);
+            }
+            if (userSource !== undefined && userSource !== null) {
+                queryParameters = queryParameters.set('userSource', <any>userSource);
+            }
+            if (entType !== undefined && entType !== null) {
+                queryParameters = queryParameters.set('entType', <any>entType);
+            }
 
+            let headers = this.defaultHeaders;
+
+            // to determine the Accept header
+            let httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+            if (httpHeaderAcceptSelected != undefined) {
+                headers = headers.set('Accept', httpHeaderAcceptSelected);
+            }
+
+            // to determine the Content-Type header
+            const consumes: string[] = [
+            ];
+
+            return this.httpClient.get<Array<SecurityEntity>>(`${this.basePath}/security/search-entities`,
+                {
+                    params: queryParameters,
+                    withCredentials: this.configuration.withCredentials,
+                    headers: headers,
+                    observe: observe,
+                    reportProgress: reportProgress
+                }
+            );
+        }
+    */
     /**
      * Start Kimios Session
      * Start Kimios Session
@@ -919,7 +922,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): void; };
+        let formParams: void | { append(param: string, value: any): void };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -983,7 +986,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): void; };
+        let formParams: void | { append(param: string, value: any): void };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -1117,7 +1120,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: { append(param: string, value: any): void; };
+        let formParams: void | { append(param: string, value: any): void };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {

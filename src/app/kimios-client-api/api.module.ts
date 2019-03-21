@@ -3,20 +3,20 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 
-import { AdministrationService } from './api/administration.service';
-import { DocumentService } from './api/document.service';
+// import { AdministrationService } from './api/administration.service';
+// import { DocumentService } from './api/document.service';
 import { DocumentVersionService } from './api/documentVersion.service';
 import { FiletransferService } from './api/filetransfer.service';
 import { FolderService } from './api/folder.service';
 import { InformationService } from './api/information.service';
-import { LogService } from './api/log.service';
+// import { LogService } from './api/log.service';
 import { NotificationService } from './api/notification.service';
-import { ReportingService } from './api/reporting.service';
-import { RuleService } from './api/rule.service';
+// import { ReportingService } from './api/reporting.service';
+// import { RuleService } from './api/rule.service';
 import { SearchService } from './api/search.service';
 import { SecurityService } from './api/security.service';
 import { ShareService } from './api/share.service';
-import { StudioService } from './api/studio.service';
+// import { StudioService } from './api/studio.service';
 import { WorkspaceService } from './api/workspace.service';
 
 @NgModule({
@@ -24,20 +24,20 @@ import { WorkspaceService } from './api/workspace.service';
   declarations: [],
   exports:      [],
   providers: [
-    AdministrationService,
-    DocumentService,
+//    AdministrationService,
+//    DocumentService,
     DocumentVersionService,
     FiletransferService,
     FolderService,
     InformationService,
-    LogService,
+//    LogService,
     NotificationService,
-    ReportingService,
-    RuleService,
+//    ReportingService,
+//    RuleService,
     SearchService,
     SecurityService,
     ShareService,
-    StudioService,
+//    StudioService,
     WorkspaceService ]
 })
 export class ApiModule {
