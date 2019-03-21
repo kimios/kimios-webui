@@ -10,19 +10,14 @@
 
             <div class="title">LOGIN TO YOUR ACCOUNT</div>
 
-            <form name="loginForm" [formGroup]="loginForm" novalidate>
+            <form name="loginForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
                 <mat-form-field appearance="outline">
-                    <mat-label>Email</mat-label>
-                    <input matInput formControlName="email">
-                    <mat-icon matSuffix class="secondary-text">mail</mat-icon>
-                    <mat-error *ngIf="loginForm.get('email').hasError('required')">
-                        Email is required
-                    </mat-error>
-                    <mat-error
-                        *ngIf="!loginForm.get('email').hasError('required') &&
-                                loginForm.get('email').hasError('email')">
-                        Please enter a valid email address
+                    <mat-label>Login</mat-label>
+                    <input matInput formControlName="login">
+                    <mat-icon matSuffix class="secondary-text">login</mat-icon>
+                    <mat-error>
+                        Login is required
                     </mat-error>
                 </mat-form-field>
 
@@ -37,7 +32,7 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label>Domain name:</mat-label>
-                    <mat-select placeholder="Domain name"  [(value)]="selectedValue" name="authenticationSource">
+                    <mat-select placeholder="Domain name" formControlName="authenticationSource">
                         <mat-option *ngFor="let source of authenticationSources" [value]="source.name">
                             {{source.name}}
                         </mat-option>
@@ -60,7 +55,7 @@
                 </div>
 
                 <button mat-raised-button color="accent" class="submit-button" aria-label="LOG IN"
-                        [disabled]="loginForm.invalid">
+                        [disabled]="loginForm.invalid" type="submit">
                     LOGIN
                 </button>
 

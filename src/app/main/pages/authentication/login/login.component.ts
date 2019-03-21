@@ -1,5 +1,5 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {FuseConfigService} from '@fuse/services/config.service';
 import {fuseAnimations} from '@fuse/animations';
@@ -19,9 +19,13 @@ import {AuthenticationSource} from '../../../../kimios-client-api';
 })
 export class LoginComponent implements OnInit
 {
-    loginForm: FormGroup;
-
     authenticationSources: Array<AuthenticationSource>;
+
+    loginForm = new FormGroup({
+        login: new FormControl(''),
+        password: new FormControl(''),
+        authenticationSource: new FormControl('')
+    });
 
     /**
      * Constructor
@@ -66,7 +70,7 @@ export class LoginComponent implements OnInit
     ngOnInit(): void
     {
         this.loginForm = this._formBuilder.group({
-            email   : ['', [Validators.required, Validators.email]],
+            login   : ['', Validators.required],
             password: ['', Validators.required],
             authenticationSource: ['', Validators.required]
         });
@@ -78,11 +82,17 @@ export class LoginComponent implements OnInit
         );
     }
 
-    onSubmit(email: string, password: string): void {
-        this.userService.login(email, password).subscribe((result) => {
-            if (result) {
-                this.router.navigate(['']);
-            }
-        });
+    onSubmit(): void {
+        this.securityService
+            .startSession(
+                this.loginForm.get('login').value,
+                this.loginForm.get('authenticationSource').value,
+                this.loginForm.get('password').value
+            )
+            .subscribe((result) => {
+                if (result) {
+                    this.router.navigate(['']);
+                }
+            });
     }
 }
