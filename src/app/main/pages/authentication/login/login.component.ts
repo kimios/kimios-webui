@@ -1,18 +1,14 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import { FuseConfigService } from '@fuse/services/config.service';
-import { fuseAnimations } from '@fuse/animations';
+import {FuseConfigService} from '@fuse/services/config.service';
+import {fuseAnimations} from '@fuse/animations';
 
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 
-import { UserService } from 'app/user.service';
-import { AuthenticationSourceService } from 'app/services/authentication-source.service';
-
-export interface AuthenticationSource {
-    value: string;
-    viewValue: string;
-}
+import {UserService} from 'app/user.service';
+import {SecurityService} from 'app/kimios-client-api/api/api';
+import {AuthenticationSource} from '../../../../kimios-client-api';
 
 @Component({
     selector     : 'login',
@@ -25,7 +21,7 @@ export class LoginComponent implements OnInit
 {
     loginForm: FormGroup;
 
-    authenticationSources: AuthenticationSource[];
+    authenticationSources: Array<AuthenticationSource>;
 
     /**
      * Constructor
@@ -38,7 +34,7 @@ export class LoginComponent implements OnInit
         private _formBuilder: FormBuilder,
         private userService: UserService,
         private router: Router,
-        private authenticationSourcesService: AuthenticationSourceService
+        private securityService: SecurityService
     )
     {
         // Configure the layout
@@ -75,7 +71,11 @@ export class LoginComponent implements OnInit
             authenticationSource: ['', Validators.required]
         });
 
-        this.authenticationSources = this.authenticationSourcesService.retrieveAuthenticationSources();
+        this.securityService.getAuthenticationSources().subscribe(
+            (sources) => {
+                this.authenticationSources = sources;
+            }
+        );
     }
 
     onSubmit(email: string, password: string): void {

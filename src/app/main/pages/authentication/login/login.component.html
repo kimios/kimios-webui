@@ -38,8 +38,8 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Domain name:</mat-label>
                     <mat-select placeholder="Domain name"  [(value)]="selectedValue" name="authenticationSource">
-                        <mat-option *ngFor="let source of authenticationSources" [value]="source.value">
-                            {{source.viewValue}}
+                        <mat-option *ngFor="let source of authenticationSources" [value]="source.name">
+                            {{source.name}}
                         </mat-option>
                     </mat-select>
                     <mat-icon matSuffix class="secondary-text">vpn_key</mat-icon>
@@ -65,23 +65,6 @@
                 </button>
 
             </form>
-
-            <div class="separator">
-                <span class="text">OR</span>
-            </div>
-
-            <button mat-raised-button class="google">
-                Log in with Google
-            </button>
-
-            <button mat-raised-button class="facebook">
-                Log in with Facebook
-            </button>
-
-            <div class="register" fxLayout="column" fxLayoutAlign="center center">
-                <span class="text">Don't have an account?</span>
-                <a class="link" [routerLink]="'/pages/auth/register'">Create an account</a>
-            </div>
 
         </div>
 
