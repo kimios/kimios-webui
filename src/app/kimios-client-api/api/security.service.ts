@@ -62,9 +62,9 @@ export class SecurityService {
 
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -106,10 +106,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param dmEntityId 
+     *
+     *
+     * @param sessionId
+     * @param dmEntityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -155,10 +155,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param dmEntityId 
+     *
+     *
+     * @param sessionId
+     * @param dmEntityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -206,7 +206,7 @@ export class SecurityService {
     /**
      * End Kimios Session
      * Start Kimios Session
-     * @param sessionId 
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -237,7 +237,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: void | { append(param: string, value: any): void };
+        let formParams: any | { append(param: string, value: any): any };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -262,8 +262,8 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -298,10 +298,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param dmEntityId 
+     *
+     *
+     * @param sessionId
+     * @param dmEntityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -347,10 +347,10 @@ export class SecurityService {
     }*/
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param objectType 
+     *
+     *
+     * @param sessionId
+     * @param objectType
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -398,11 +398,11 @@ export class SecurityService {
 */
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param groupId 
-     * @param userSource 
+     *
+     *
+     * @param sessionId
+     * @param groupId
+     * @param userSource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -452,10 +452,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param userSource 
+     *
+     *
+     * @param sessionId
+     * @param userSource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -501,9 +501,9 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -545,10 +545,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param userSource 
+     *
+     *
+     * @param sessionId
+     * @param userSource
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -594,10 +594,10 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param dmEntityId 
+     *
+     *
+     * @param sessionId
+     * @param dmEntityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -643,9 +643,9 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -687,9 +687,9 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -731,9 +731,9 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -775,9 +775,9 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -819,12 +819,12 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param searchText 
-     * @param userSource 
-     * @param entType 
+     *
+     *
+     * @param sessionId
+     * @param searchText
+     * @param userSource
+     * @param entType
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -881,9 +881,9 @@ export class SecurityService {
     /**
      * Start Kimios Session
      * Start Kimios Session
-     * @param userName 
-     * @param userSource 
-     * @param password 
+     * @param userName
+     * @param userSource
+     * @param password
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -922,7 +922,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: void | { append(param: string, value: any): void };
+        let formParams: any | { append(param: string, value: any): any };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -932,13 +932,13 @@ export class SecurityService {
         }
 
         if (userName !== undefined) {
-            formParams = formParams.append('userName', <any>userName) || formParams;
+            formParams = formParams.append('userName', <any>userName);
         }
         if (userSource !== undefined) {
-            formParams = formParams.append('userSource', <any>userSource) || formParams;
+            formParams = formParams.append('userSource', <any>userSource);
         }
         if (password !== undefined) {
-            formParams = formParams.append('password', <any>password) || formParams;
+            formParams = formParams.append('password', <any>password);
         }
 
         return this.httpClient.post<string>(`${this.basePath}/security/startSession`,
@@ -955,7 +955,7 @@ export class SecurityService {
     /**
      * Start Kimios Session from an external Token
      * Start Kimios Session from an external Token
-     * @param externalToken 
+     * @param externalToken
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -986,7 +986,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: void | { append(param: string, value: any): void };
+        let formParams: any | { append(param: string, value: any): any };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -996,7 +996,7 @@ export class SecurityService {
         }
 
         if (externalToken !== undefined) {
-            formParams = formParams.append('externalToken', <any>externalToken) || formParams;
+            formParams = formParams.append('externalToken', <any>externalToken);
         }
 
         return this.httpClient.post<string>(`${this.basePath}/security/startSessionWithToken`,
@@ -1011,8 +1011,8 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1049,8 +1049,8 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1087,11 +1087,11 @@ export class SecurityService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param xmlStream 
-     * @param objectType 
+     *
+     *
+     * @param sessionId
+     * @param xmlStream
+     * @param objectType
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1120,7 +1120,7 @@ export class SecurityService {
 
         const canConsumeForm = this.canConsumeForm(consumes);
 
-        let formParams: void | { append(param: string, value: any): void };
+        let formParams: any | { append(param: string, value: any): any };
         let useForm = false;
         let convertFormParamsToString = false;
         if (useForm) {
@@ -1130,13 +1130,13 @@ export class SecurityService {
         }
 
         if (sessionId !== undefined) {
-            formParams = formParams.append('sessionId', <any>sessionId) || formParams;
+            formParams = formParams.append('sessionId', <any>sessionId);
         }
         if (xmlStream !== undefined) {
-            formParams = formParams.append('xmlStream', <any>xmlStream) || formParams;
+            formParams = formParams.append('xmlStream', <any>xmlStream);
         }
         if (objectType !== undefined) {
-            formParams = formParams.append('objectType', <any>objectType) || formParams;
+            formParams = formParams.append('objectType', <any>objectType);
         }
 
         return this.httpClient.post<any>(`${this.basePath}/security/updateDefaultDMEntitySecurities`,
