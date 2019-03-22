@@ -123,6 +123,7 @@ export class LoginComponent implements OnInit
                     if (token != null) {
                         this._zone.run(() => {
                             this.sessionService.sessionToken = token;
+                            this.sessionService.sessionAlive = true;
                             this.router.navigate(['']);
                         });
                     }
