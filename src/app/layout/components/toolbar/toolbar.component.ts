@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Subject } from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
@@ -8,6 +8,8 @@ import { FuseConfigService } from '@fuse/services/config.service';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
 
 import { navigation } from 'app/navigation/navigation';
+import {User} from '../../../kimios-client-api';
+import {SessionService} from '../../../services/session.service';
 
 @Component({
     selector     : 'toolbar',
@@ -26,6 +28,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
     selectedLanguage: any;
     userStatusOptions: any[];
 
+    user: User = null;
+
     // Private
     private _unsubscribeAll: Subject<any>;
 
@@ -39,7 +43,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
     constructor(
         private _fuseConfigService: FuseConfigService,
         private _fuseSidebarService: FuseSidebarService,
-        private _translateService: TranslateService
+        private _translateService: TranslateService,
+        private sessionService: SessionService
     )
     {
         // Set the defaults
@@ -110,6 +115,13 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
         // Set the selected language from default languages
         this.selectedLanguage = _.find(this.languages, {'id': this._translateService.currentLang});
+
+        this.sessionService.retrieveUserData()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(
+                (user) => this.user = user,
+                (error) => this.user = null
+            );
     }
 
     /**

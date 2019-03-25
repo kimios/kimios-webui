@@ -51,4 +51,8 @@ export class SessionService implements OnDestroy {
     set sessionAlive(alive: boolean) {
         this._sessionAlive = alive;
     }
+
+    retrieveUserData(): Observable<User> {
+        return this.securityService.getUser(this.sessionToken);
+    }
 }
