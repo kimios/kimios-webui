@@ -22,7 +22,6 @@ import {SampleModule} from 'app/main/sample/sample.module';
 import {LoginModule} from 'app/main/pages/authentication/login/login.module';
 
 import {LoggedInGuard} from 'app/logged-in.guard';
-import {HomeComponent} from 'app/main/pages/home/home.component';
 import {UserService} from 'app/user.service';
 import {AppRoutingModule} from 'app/app-routing.module';
 import {AppConfig} from 'app/services/app.config.service';
@@ -30,17 +29,19 @@ import {ApiModule as KimiosApiModule} from 'app/kimios-client-api/api.module';
 import {BASE_PATH} from 'app/kimios-client-api/variables';
 import {APP_CONFIG} from 'app/app-config/config';
 import {SessionService} from 'app/services/session.service';
+import {CookieService} from 'ngx-cookie-service';
+import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
+import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
 
 @NgModule({
     declarations: [
         AppComponent,
-        HomeComponent
+        FileDetailComponent
     ],
     imports     : [
         BrowserModule,
         BrowserAnimationsModule,
         HttpClientModule,
-        AppRoutingModule,
 
         TranslateModule.forRoot(),
         /*InMemoryWebApiModule.forRoot(FakeDbService, {
@@ -68,7 +69,10 @@ import {SessionService} from 'app/services/session.service';
         LayoutModule,
         SampleModule,
         LoginModule,
-        KimiosApiModule
+        KimiosApiModule,
+        FileManagerModule,
+
+        AppRoutingModule
     ],
     bootstrap   : [
         AppComponent
@@ -85,7 +89,8 @@ import {SessionService} from 'app/services/session.service';
         {
             provide: BASE_PATH,
             useValue: APP_CONFIG.KIMIOS_API_BASE_PATH
-        }
+        },
+        CookieService
     ]
 })
 export class AppModule
