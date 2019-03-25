@@ -1,6 +1,7 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {SecurityService} from '../kimios-client-api';
+import {SecurityService, User} from '../kimios-client-api';
 import { CookieService } from 'ngx-cookie-service';
+import {Observable, of} from 'rxjs';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -16,9 +17,6 @@ export class SessionService implements OnDestroy {
         private securityService: SecurityService,
         private cookieService: CookieService
     ) {
-    }
-
-    init(): void {
         this.intervalId = window.setInterval(
             () => this.setSessionAlive(),
             5000
