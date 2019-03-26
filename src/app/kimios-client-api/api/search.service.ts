@@ -72,10 +72,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public bonitaServiceImplAddCommentGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<CommentWrapper>;
-    public bonitaServiceImplAddCommentGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<CommentWrapper>>;
-    public bonitaServiceImplAddCommentGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<CommentWrapper>>;
-    public bonitaServiceImplAddCommentGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public addComment(sessionId?: string, taskId?: number, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<CommentWrapper>;
+    public addComment(sessionId?: string, taskId?: number, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<CommentWrapper>>;
+    public addComment(sessionId?: string, taskId?: number, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<CommentWrapper>>;
+    public addComment(sessionId?: string, taskId?: number, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -121,420 +121,13 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
-     * @param start 
-     * @param limit 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public bonitaServiceImplGetAssignedTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
-    public bonitaServiceImplGetAssignedTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
-    public bonitaServiceImplGetAssignedTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
-    public bonitaServiceImplGetAssignedTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (start !== undefined && start !== null) {
-            queryParameters = queryParameters.set('start', <any>start);
-        }
-        if (limit !== undefined && limit !== null) {
-            queryParameters = queryParameters.set('limit', <any>limit);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TasksResponse>(`${this.basePath}/tasks/getAssignedTasks`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplGetCommentsGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<CommentWrapper>>;
-    public bonitaServiceImplGetCommentsGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<CommentWrapper>>>;
-    public bonitaServiceImplGetCommentsGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<CommentWrapper>>>;
-    public bonitaServiceImplGetCommentsGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (taskId !== undefined && taskId !== null) {
-            queryParameters = queryParameters.set('taskId', <any>taskId);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<CommentWrapper>>(`${this.basePath}/tasks/getComments`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param start 
-     * @param limit 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplGetPendingTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
-    public bonitaServiceImplGetPendingTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
-    public bonitaServiceImplGetPendingTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
-    public bonitaServiceImplGetPendingTasksGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (start !== undefined && start !== null) {
-            queryParameters = queryParameters.set('start', <any>start);
-        }
-        if (limit !== undefined && limit !== null) {
-            queryParameters = queryParameters.set('limit', <any>limit);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TasksResponse>(`${this.basePath}/processes/getPendingTasks`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplGetProcessesGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<ProcessWrapper>>;
-    public bonitaServiceImplGetProcessesGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<ProcessWrapper>>>;
-    public bonitaServiceImplGetProcessesGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<ProcessWrapper>>>;
-    public bonitaServiceImplGetProcessesGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Array<ProcessWrapper>>(`${this.basePath}/processes/getProcesses`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param processInstanceId 
-     * @param start 
-     * @param limit 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplGetTasksByInstanceGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
-    public bonitaServiceImplGetTasksByInstanceGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
-    public bonitaServiceImplGetTasksByInstanceGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
-    public bonitaServiceImplGetTasksByInstanceGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (processInstanceId !== undefined && processInstanceId !== null) {
-            queryParameters = queryParameters.set('processInstanceId', <any>processInstanceId);
-        }
-        if (start !== undefined && start !== null) {
-            queryParameters = queryParameters.set('start', <any>start);
-        }
-        if (limit !== undefined && limit !== null) {
-            queryParameters = queryParameters.set('limit', <any>limit);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<TasksResponse>(`${this.basePath}/tasks/getTasksByInstance`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplHideTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public bonitaServiceImplHideTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public bonitaServiceImplHideTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public bonitaServiceImplHideTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (taskId !== undefined && taskId !== null) {
-            queryParameters = queryParameters.set('taskId', <any>taskId);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/tasks/hideTask`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplReleaseTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public bonitaServiceImplReleaseTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public bonitaServiceImplReleaseTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public bonitaServiceImplReleaseTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (taskId !== undefined && taskId !== null) {
-            queryParameters = queryParameters.set('taskId', <any>taskId);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/tasks/releaseTask`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public bonitaServiceImplTakeTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public bonitaServiceImplTakeTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public bonitaServiceImplTakeTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public bonitaServiceImplTakeTaskGetOrgKimiosWebservicesBonitaImpl(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (taskId !== undefined && taskId !== null) {
-            queryParameters = queryParameters.set('taskId', <any>taskId);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/tasks/takeTask`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public searchServiceImplAdvancedSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public searchServiceImplAdvancedSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public searchServiceImplAdvancedSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public searchServiceImplAdvancedSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public advancedSaveSearchQuery(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public advancedSaveSearchQuery(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public advancedSaveSearchQuery(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public advancedSaveSearchQuery(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -574,23 +167,15 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
-     * @param virtualPath 
-     * @param requestId 
+     * @param xmlStream 
+     * @param dmEntityId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplAdvancedSearchDocumentsExportPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'body', reportProgress?: boolean): Observable<InputStream>;
-    public searchServiceImplAdvancedSearchDocumentsExportPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InputStream>>;
-    public searchServiceImplAdvancedSearchDocumentsExportPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InputStream>>;
-    public searchServiceImplAdvancedSearchDocumentsExportPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
+    public advancedSearch(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Document>>;
+    public advancedSearch(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Document>>>;
+    public advancedSearch(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Document>>>;
+    public advancedSearch(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -599,30 +184,18 @@ export class SearchService {
         if (sessionId !== undefined && sessionId !== null) {
             queryParameters = queryParameters.set('sessionId', <any>sessionId);
         }
-        if (start !== undefined && start !== null) {
-            queryParameters = queryParameters.set('start', <any>start);
+        if (xmlStream !== undefined && xmlStream !== null) {
+            queryParameters = queryParameters.set('xmlStream', <any>xmlStream);
         }
-        if (pageSize !== undefined && pageSize !== null) {
-            queryParameters = queryParameters.set('pageSize', <any>pageSize);
-        }
-        if (sortField !== undefined && sortField !== null) {
-            queryParameters = queryParameters.set('sortField', <any>sortField);
-        }
-        if (sortDir !== undefined && sortDir !== null) {
-            queryParameters = queryParameters.set('sortDir', <any>sortDir);
-        }
-        if (virtualPath !== undefined && virtualPath !== null) {
-            queryParameters = queryParameters.set('virtualPath', <any>virtualPath);
-        }
-        if (requestId !== undefined && requestId !== null) {
-            queryParameters = queryParameters.set('requestId', <any>requestId);
+        if (dmEntityId !== undefined && dmEntityId !== null) {
+            queryParameters = queryParameters.set('dmEntityId', <any>dmEntityId);
         }
 
         let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            'text/csv'
+            'application/json'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -631,11 +204,9 @@ export class SearchService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
-            'application/json'
         ];
 
-        return this.httpClient.post<InputStream>(`${this.basePath}/search/advanced/csv`,
-            null,
+        return this.httpClient.get<Array<Document>>(`${this.basePath}/search/advancedSearch`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
@@ -660,10 +231,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplAdvancedSearchDocumentsPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
-    public searchServiceImplAdvancedSearchDocumentsPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
-    public searchServiceImplAdvancedSearchDocumentsPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
-    public searchServiceImplAdvancedSearchDocumentsPostOrgKimiosWebservicesImpl(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -731,15 +302,23 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
-     * @param xmlStream 
-     * @param dmEntityId 
+     * @param start 
+     * @param pageSize 
+     * @param sortField 
+     * @param sortDir 
+     * @param virtualPath 
+     * @param requestId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplAdvancedSearchGetOrgKimiosWebservicesImpl(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Document>>;
-    public searchServiceImplAdvancedSearchGetOrgKimiosWebservicesImpl(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Document>>>;
-    public searchServiceImplAdvancedSearchGetOrgKimiosWebservicesImpl(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Document>>>;
-    public searchServiceImplAdvancedSearchGetOrgKimiosWebservicesImpl(sessionId?: string, xmlStream?: string, dmEntityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public advancedSearchDocumentsExport(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'body', reportProgress?: boolean): Observable<InputStream>;
+    public advancedSearchDocumentsExport(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InputStream>>;
+    public advancedSearchDocumentsExport(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InputStream>>;
+    public advancedSearchDocumentsExport(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
 
 
 
@@ -748,18 +327,30 @@ export class SearchService {
         if (sessionId !== undefined && sessionId !== null) {
             queryParameters = queryParameters.set('sessionId', <any>sessionId);
         }
-        if (xmlStream !== undefined && xmlStream !== null) {
-            queryParameters = queryParameters.set('xmlStream', <any>xmlStream);
+        if (start !== undefined && start !== null) {
+            queryParameters = queryParameters.set('start', <any>start);
         }
-        if (dmEntityId !== undefined && dmEntityId !== null) {
-            queryParameters = queryParameters.set('dmEntityId', <any>dmEntityId);
+        if (pageSize !== undefined && pageSize !== null) {
+            queryParameters = queryParameters.set('pageSize', <any>pageSize);
+        }
+        if (sortField !== undefined && sortField !== null) {
+            queryParameters = queryParameters.set('sortField', <any>sortField);
+        }
+        if (sortDir !== undefined && sortDir !== null) {
+            queryParameters = queryParameters.set('sortDir', <any>sortDir);
+        }
+        if (virtualPath !== undefined && virtualPath !== null) {
+            queryParameters = queryParameters.set('virtualPath', <any>virtualPath);
+        }
+        if (requestId !== undefined && requestId !== null) {
+            queryParameters = queryParameters.set('requestId', <any>requestId);
         }
 
         let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            'application/json'
+            'text/csv'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -768,9 +359,11 @@ export class SearchService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
+            'application/json'
         ];
 
-        return this.httpClient.get<Array<Document>>(`${this.basePath}/search/advancedSearch`,
+        return this.httpClient.post<InputStream>(`${this.basePath}/search/advanced/csv`,
+            null,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
@@ -789,10 +382,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplDeleteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public searchServiceImplDeleteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public searchServiceImplDeleteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public searchServiceImplDeleteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteSearchQuery(sessionId?: string, searchQueryId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -843,10 +436,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplExecuteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
-    public searchServiceImplExecuteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
-    public searchServiceImplExecuteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
-    public searchServiceImplExecuteSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public executeSearchQuery(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
+    public executeSearchQuery(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
+    public executeSearchQuery(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
+    public executeSearchQuery(sessionId?: string, searchQueryId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -908,14 +501,117 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
+     * @param start 
+     * @param limit 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getAssignedTasks(sessionId?: string, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
+    public getAssignedTasks(sessionId?: string, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
+    public getAssignedTasks(sessionId?: string, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
+    public getAssignedTasks(sessionId?: string, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (start !== undefined && start !== null) {
+            queryParameters = queryParameters.set('start', <any>start);
+        }
+        if (limit !== undefined && limit !== null) {
+            queryParameters = queryParameters.set('limit', <any>limit);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<TasksResponse>(`${this.basePath}/tasks/getAssignedTasks`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param taskId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getComments(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<CommentWrapper>>;
+    public getComments(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<CommentWrapper>>>;
+    public getComments(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<CommentWrapper>>>;
+    public getComments(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (taskId !== undefined && taskId !== null) {
+            queryParameters = queryParameters.set('taskId', <any>taskId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<CommentWrapper>>(`${this.basePath}/tasks/getComments`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
      * @param path 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplGetDMentityFromPathGetOrgKimiosWebservicesImpl(sessionId?: string, path?: string, observe?: 'body', reportProgress?: boolean): Observable<DMEntity>;
-    public searchServiceImplGetDMentityFromPathGetOrgKimiosWebservicesImpl(sessionId?: string, path?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntity>>;
-    public searchServiceImplGetDMentityFromPathGetOrgKimiosWebservicesImpl(sessionId?: string, path?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntity>>;
-    public searchServiceImplGetDMentityFromPathGetOrgKimiosWebservicesImpl(sessionId?: string, path?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDMentityFromPath(sessionId?: string, path?: string, observe?: 'body', reportProgress?: boolean): Observable<DMEntity>;
+    public getDMentityFromPath(sessionId?: string, path?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntity>>;
+    public getDMentityFromPath(sessionId?: string, path?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntity>>;
+    public getDMentityFromPath(sessionId?: string, path?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -961,10 +657,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplGetPathFromDMEntityGetOrgKimiosWebservicesImpl(sessionId?: string, entityId?: number, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public searchServiceImplGetPathFromDMEntityGetOrgKimiosWebservicesImpl(sessionId?: string, entityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public searchServiceImplGetPathFromDMEntityGetOrgKimiosWebservicesImpl(sessionId?: string, entityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public searchServiceImplGetPathFromDMEntityGetOrgKimiosWebservicesImpl(sessionId?: string, entityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getPathFromDMEntity(sessionId?: string, entityId?: number, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getPathFromDMEntity(sessionId?: string, entityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getPathFromDMEntity(sessionId?: string, entityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getPathFromDMEntity(sessionId?: string, entityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -1006,13 +702,219 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
+     * @param start 
+     * @param limit 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplListAvailableSearchFieldsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
-    public searchServiceImplListAvailableSearchFieldsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
-    public searchServiceImplListAvailableSearchFieldsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
-    public searchServiceImplListAvailableSearchFieldsGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getPendingTasks(sessionId?: string, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
+    public getPendingTasks(sessionId?: string, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
+    public getPendingTasks(sessionId?: string, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
+    public getPendingTasks(sessionId?: string, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (start !== undefined && start !== null) {
+            queryParameters = queryParameters.set('start', <any>start);
+        }
+        if (limit !== undefined && limit !== null) {
+            queryParameters = queryParameters.set('limit', <any>limit);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<TasksResponse>(`${this.basePath}/processes/getPendingTasks`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getProcesses(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<ProcessWrapper>>;
+    public getProcesses(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<ProcessWrapper>>>;
+    public getProcesses(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<ProcessWrapper>>>;
+    public getProcesses(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<ProcessWrapper>>(`${this.basePath}/processes/getProcesses`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param processInstanceId 
+     * @param start 
+     * @param limit 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getTasksByInstance(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'body', reportProgress?: boolean): Observable<TasksResponse>;
+    public getTasksByInstance(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TasksResponse>>;
+    public getTasksByInstance(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TasksResponse>>;
+    public getTasksByInstance(sessionId?: string, processInstanceId?: number, start?: number, limit?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (processInstanceId !== undefined && processInstanceId !== null) {
+            queryParameters = queryParameters.set('processInstanceId', <any>processInstanceId);
+        }
+        if (start !== undefined && start !== null) {
+            queryParameters = queryParameters.set('start', <any>start);
+        }
+        if (limit !== undefined && limit !== null) {
+            queryParameters = queryParameters.set('limit', <any>limit);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<TasksResponse>(`${this.basePath}/tasks/getTasksByInstance`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param taskId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public hideTask(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public hideTask(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public hideTask(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public hideTask(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (taskId !== undefined && taskId !== null) {
+            queryParameters = queryParameters.set('taskId', <any>taskId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/tasks/hideTask`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public listAvailableSearchFields(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public listAvailableSearchFields(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public listAvailableSearchFields(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public listAvailableSearchFields(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -1053,10 +955,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplListMySearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
-    public searchServiceImplListMySearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
-    public searchServiceImplListMySearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
-    public searchServiceImplListMySearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listMySearchQueries(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
+    public listMySearchQueries(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
+    public listMySearchQueries(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
+    public listMySearchQueries(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -1097,10 +999,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplListPublicSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
-    public searchServiceImplListPublicSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
-    public searchServiceImplListPublicSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
-    public searchServiceImplListPublicSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listPublicSearchQueries(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
+    public listPublicSearchQueries(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
+    public listPublicSearchQueries(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
+    public listPublicSearchQueries(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -1141,10 +1043,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplListSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
-    public searchServiceImplListSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
-    public searchServiceImplListSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
-    public searchServiceImplListSearchQueriesGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listSearchQueries(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SearchRequest>>;
+    public listSearchQueries(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SearchRequest>>>;
+    public listSearchQueries(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SearchRequest>>>;
+    public listSearchQueries(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -1186,10 +1088,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplLoadSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'body', reportProgress?: boolean): Observable<SearchRequest>;
-    public searchServiceImplLoadSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchRequest>>;
-    public searchServiceImplLoadSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchRequest>>;
-    public searchServiceImplLoadSearchQueryGetOrgKimiosWebservicesImpl(sessionId?: string, searchQueryId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public loadSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'body', reportProgress?: boolean): Observable<SearchRequest>;
+    public loadSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchRequest>>;
+    public loadSearchQuery(sessionId?: string, searchQueryId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchRequest>>;
+    public loadSearchQuery(sessionId?: string, searchQueryId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -1240,84 +1142,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplQuickSearchExportGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<InputStream>;
-    public searchServiceImplQuickSearchExportGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InputStream>>;
-    public searchServiceImplQuickSearchExportGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InputStream>>;
-    public searchServiceImplQuickSearchExportGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (query !== undefined && query !== null) {
-            queryParameters = queryParameters.set('query', <any>query);
-        }
-        if (dmEntityId !== undefined && dmEntityId !== null) {
-            queryParameters = queryParameters.set('dmEntityId', <any>dmEntityId);
-        }
-        if (start !== undefined && start !== null) {
-            queryParameters = queryParameters.set('start', <any>start);
-        }
-        if (pageSize !== undefined && pageSize !== null) {
-            queryParameters = queryParameters.set('pageSize', <any>pageSize);
-        }
-        if (sortField !== undefined && sortField !== null) {
-            queryParameters = queryParameters.set('sortField', <any>sortField);
-        }
-        if (sortDir !== undefined && sortDir !== null) {
-            queryParameters = queryParameters.set('sortDir', <any>sortDir);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'text/csv'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<InputStream>(`${this.basePath}/search/quick/csv`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param query 
-     * @param dmEntityId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public searchServiceImplQuickSearchGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
-    public searchServiceImplQuickSearchGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
-    public searchServiceImplQuickSearchGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
-    public searchServiceImplQuickSearchGetOrgKimiosWebservicesImpl(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public quickSearch(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
+    public quickSearch(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
+    public quickSearch(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
+    public quickSearch(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -1379,6 +1207,129 @@ export class SearchService {
      * 
      * 
      * @param sessionId 
+     * @param query 
+     * @param dmEntityId 
+     * @param start 
+     * @param pageSize 
+     * @param sortField 
+     * @param sortDir 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public quickSearchExport(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<InputStream>;
+    public quickSearchExport(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InputStream>>;
+    public quickSearchExport(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InputStream>>;
+    public quickSearchExport(sessionId?: string, query?: string, dmEntityId?: number, start?: number, pageSize?: number, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (query !== undefined && query !== null) {
+            queryParameters = queryParameters.set('query', <any>query);
+        }
+        if (dmEntityId !== undefined && dmEntityId !== null) {
+            queryParameters = queryParameters.set('dmEntityId', <any>dmEntityId);
+        }
+        if (start !== undefined && start !== null) {
+            queryParameters = queryParameters.set('start', <any>start);
+        }
+        if (pageSize !== undefined && pageSize !== null) {
+            queryParameters = queryParameters.set('pageSize', <any>pageSize);
+        }
+        if (sortField !== undefined && sortField !== null) {
+            queryParameters = queryParameters.set('sortField', <any>sortField);
+        }
+        if (sortDir !== undefined && sortDir !== null) {
+            queryParameters = queryParameters.set('sortDir', <any>sortDir);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'text/csv'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<InputStream>(`${this.basePath}/search/quick/csv`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param taskId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public releaseTask(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public releaseTask(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public releaseTask(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public releaseTask(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (taskId !== undefined && taskId !== null) {
+            queryParameters = queryParameters.set('taskId', <any>taskId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/tasks/releaseTask`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
      * @param id 
      * @param name 
      * @param sortField 
@@ -1386,10 +1337,10 @@ export class SearchService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchServiceImplSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public searchServiceImplSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public searchServiceImplSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public searchServiceImplSaveSearchQueryPostOrgKimiosWebservicesImpl(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public saveSearchQuery(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public saveSearchQuery(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public saveSearchQuery(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public saveSearchQuery(sessionId?: string, id?: number, name?: string, sortField?: string, sortDir?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -1431,6 +1382,55 @@ export class SearchService {
 
         return this.httpClient.post<any>(`${this.basePath}/search/saveSearchQuery`,
             null,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param taskId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public takeTask(sessionId?: string, taskId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public takeTask(sessionId?: string, taskId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public takeTask(sessionId?: string, taskId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public takeTask(sessionId?: string, taskId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (taskId !== undefined && taskId !== null) {
+            queryParameters = queryParameters.set('taskId', <any>taskId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/tasks/takeTask`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,

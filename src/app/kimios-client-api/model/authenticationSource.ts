@@ -15,8 +15,8 @@ import { UserFactory } from './userFactory';
 
 export interface AuthenticationSource { 
     name?: string;
-    enableSSOCheck?: boolean;
-    groupFactory?: GroupFactory;
     userFactory?: UserFactory;
+    groupFactory?: GroupFactory;
+    enableSSOCheck?: boolean;
     enableAuthByEmail?: boolean;
 }

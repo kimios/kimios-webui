@@ -67,10 +67,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplConvertDocumentGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public converterServiceImplConvertDocumentGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public converterServiceImplConvertDocumentGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public converterServiceImplConvertDocumentGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public convertDocument(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public convertDocument(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public convertDocument(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public convertDocument(sessionId?: string, documentId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -131,10 +131,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplConvertDocumentUrlOnlyGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public converterServiceImplConvertDocumentUrlOnlyGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public converterServiceImplConvertDocumentUrlOnlyGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public converterServiceImplConvertDocumentUrlOnlyGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public convertDocumentUrlOnly(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public convertDocumentUrlOnly(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public convertDocumentUrlOnly(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public convertDocumentUrlOnly(sessionId?: string, documentId?: number, outputFormat?: string, converterImpl?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -192,10 +192,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplConvertDocumentVersionGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public converterServiceImplConvertDocumentVersionGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public converterServiceImplConvertDocumentVersionGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public converterServiceImplConvertDocumentVersionGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public convertDocumentVersion(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public convertDocumentVersion(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public convertDocumentVersion(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public convertDocumentVersion(sessionId?: string, versionId?: number, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -257,10 +257,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplConvertDocumentVersionsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public converterServiceImplConvertDocumentVersionsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public converterServiceImplConvertDocumentVersionsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public converterServiceImplConvertDocumentVersionsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public convertDocumentVersions(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public convertDocumentVersions(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public convertDocumentVersions(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public convertDocumentVersions(sessionId?: string, versionId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -324,10 +324,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplConvertDocumentsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public converterServiceImplConvertDocumentsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public converterServiceImplConvertDocumentsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public converterServiceImplConvertDocumentsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public convertDocuments(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public convertDocuments(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public convertDocuments(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public convertDocuments(sessionId?: string, documentId?: Array<number>, converterImpl?: string, outputFormat?: string, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -387,10 +387,10 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplDescriptorsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: Array<ConverterDescriptor>; }>;
-    public converterServiceImplDescriptorsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: Array<ConverterDescriptor>; }>>;
-    public converterServiceImplDescriptorsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: Array<ConverterDescriptor>; }>>;
-    public converterServiceImplDescriptorsGetOrgKimiosWebservicesConverterImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public descriptors(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: Array<ConverterDescriptor>; }>;
+    public descriptors(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: Array<ConverterDescriptor>; }>>;
+    public descriptors(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: Array<ConverterDescriptor>; }>>;
+    public descriptors(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -432,17 +432,17 @@ export class ConverterService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl(idpreview: string, respath: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl(idpreview: string, respath: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl(idpreview: string, respath: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl(idpreview: string, respath: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public previewPathSession(idpreview: string, respath: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public previewPathSession(idpreview: string, respath: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public previewPathSession(idpreview: string, respath: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public previewPathSession(idpreview: string, respath: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (idpreview === null || idpreview === undefined) {
-            throw new Error('Required parameter idpreview was null or undefined when calling converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl.');
+            throw new Error('Required parameter idpreview was null or undefined when calling previewPathSession.');
         }
 
         if (respath === null || respath === undefined) {
-            throw new Error('Required parameter respath was null or undefined when calling converterServiceImplPreviewPathSessionGetOrgKimiosWebservicesConverterImpl.');
+            throw new Error('Required parameter respath was null or undefined when calling previewPathSession.');
         }
 
         let headers = this.defaultHeaders;

@@ -64,10 +64,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createTokenDownloadTransaction(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public createTokenDownloadTransaction(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public createTokenDownloadTransaction(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public createTokenDownloadTransaction(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -108,15 +108,69 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param inline 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public downloadDocument(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocument(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocument(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocument(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (inline !== undefined && inline !== null) {
+            queryParameters = queryParameters.set('inline', <any>inline);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/octet-stream'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocument`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
      * @param token 
      * @param password 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocumentByToken(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -164,10 +218,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public downloadDocumentVersion(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocumentVersion(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocumentVersion(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocumentVersion(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -187,7 +241,8 @@ export class FiletransferService {
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            'application/octet-stream'
+            'application/octet-stream',
+            'application/json'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -198,7 +253,7 @@ export class FiletransferService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocument`,
+        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentVersion`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
@@ -219,10 +274,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public downloadDocument_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocument_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocument_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocument_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -275,70 +330,15 @@ export class FiletransferService {
      * 
      * @param sessionId 
      * @param transactionId 
-     * @param inline 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (sessionId !== undefined && sessionId !== null) {
-            queryParameters = queryParameters.set('sessionId', <any>sessionId);
-        }
-        if (transactionId !== undefined && transactionId !== null) {
-            queryParameters = queryParameters.set('transactionId', <any>transactionId);
-        }
-        if (inline !== undefined && inline !== null) {
-            queryParameters = queryParameters.set('inline', <any>inline);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/octet-stream',
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentVersion`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param sessionId 
-     * @param transactionId 
      * @param md5 
      * @param sha1 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public endUploadTransaction(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public endUploadTransaction(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public endUploadTransaction(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public endUploadTransaction(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -393,10 +393,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public sendChunk(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public sendChunk(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public sendChunk(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public sendChunk(sessionId?: string, transactionId?: number, data?: Array<string>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -449,10 +449,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public startDownloadTransaction(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public startDownloadTransaction(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public startDownloadTransaction(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public startDownloadTransaction(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -503,10 +503,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public startUploadTransaction(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public startUploadTransaction(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public startUploadTransaction(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public startUploadTransaction(sessionId?: string, documentId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -556,10 +556,10 @@ export class FiletransferService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public uploadDocument(sessionId?: string, transactionId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public uploadDocument(sessionId?: string, transactionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public uploadDocument(sessionId?: string, transactionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public uploadDocument(sessionId?: string, transactionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

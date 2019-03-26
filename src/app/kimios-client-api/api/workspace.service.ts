@@ -64,10 +64,10 @@ export class WorkspaceService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public workspaceServiceImplCreateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public workspaceServiceImplCreateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public workspaceServiceImplCreateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public workspaceServiceImplCreateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createWorkspace(sessionId?: string, name?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public createWorkspace(sessionId?: string, name?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public createWorkspace(sessionId?: string, name?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public createWorkspace(sessionId?: string, name?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -113,10 +113,10 @@ export class WorkspaceService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public workspaceServiceImplDeleteWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public workspaceServiceImplDeleteWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public workspaceServiceImplDeleteWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public workspaceServiceImplDeleteWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteWorkspace(sessionId?: string, workspaceId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteWorkspace(sessionId?: string, workspaceId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteWorkspace(sessionId?: string, workspaceId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteWorkspace(sessionId?: string, workspaceId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -162,10 +162,10 @@ export class WorkspaceService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public workspaceServiceImplGetWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'body', reportProgress?: boolean): Observable<Workspace>;
-    public workspaceServiceImplGetWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Workspace>>;
-    public workspaceServiceImplGetWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Workspace>>;
-    public workspaceServiceImplGetWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getWorkspace(sessionId?: string, workspaceId?: number, observe?: 'body', reportProgress?: boolean): Observable<Workspace>;
+    public getWorkspace(sessionId?: string, workspaceId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Workspace>>;
+    public getWorkspace(sessionId?: string, workspaceId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Workspace>>;
+    public getWorkspace(sessionId?: string, workspaceId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -210,10 +210,10 @@ export class WorkspaceService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public workspaceServiceImplGetWorkspacesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Workspace>>;
-    public workspaceServiceImplGetWorkspacesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Workspace>>>;
-    public workspaceServiceImplGetWorkspacesGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Workspace>>>;
-    public workspaceServiceImplGetWorkspacesGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getWorkspaces(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Workspace>>;
+    public getWorkspaces(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Workspace>>>;
+    public getWorkspaces(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Workspace>>>;
+    public getWorkspaces(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -256,10 +256,10 @@ export class WorkspaceService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public workspaceServiceImplUpdateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, name?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public workspaceServiceImplUpdateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, name?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public workspaceServiceImplUpdateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, name?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public workspaceServiceImplUpdateWorkspaceGetOrgKimiosWebservicesImpl(sessionId?: string, workspaceId?: number, name?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateWorkspace(sessionId?: string, workspaceId?: number, name?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateWorkspace(sessionId?: string, workspaceId?: number, name?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateWorkspace(sessionId?: string, workspaceId?: number, name?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateWorkspace(sessionId?: string, workspaceId?: number, name?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

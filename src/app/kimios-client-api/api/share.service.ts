@@ -65,10 +65,60 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocumentByToken(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocumentByToken(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (token !== undefined && token !== null) {
+            queryParameters = queryParameters.set('token', <any>token);
+        }
+        if (password !== undefined && password !== null) {
+            queryParameters = queryParameters.set('password', <any>password);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/octet-stream',
+            'application/x-www-form-urlencoded'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/downloadDocumentByToken`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param token 
+     * @param password 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public downloadDocumentByTokenAndPassword(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public downloadDocumentByTokenAndPassword(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public downloadDocumentByTokenAndPassword(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public downloadDocumentByTokenAndPassword(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -121,64 +171,14 @@ export class ShareService {
     /**
      * 
      * 
-     * @param token 
-     * @param password 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
-        if (token !== undefined && token !== null) {
-            queryParameters = queryParameters.set('token', <any>token);
-        }
-        if (password !== undefined && password !== null) {
-            queryParameters = queryParameters.set('password', <any>password);
-        }
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/octet-stream',
-            'application/x-www-form-urlencoded'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/downloadDocumentByToken`,
-            {
-                params: queryParameters,
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
      * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
-    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
-    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
-    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listEntitiesSharedByMe(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
+    public listEntitiesSharedByMe(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
+    public listEntitiesSharedByMe(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
+    public listEntitiesSharedByMe(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -218,10 +218,10 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
-    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
-    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
-    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listEntitiesSharedWithMe(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
+    public listEntitiesSharedWithMe(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
+    public listEntitiesSharedWithMe(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
+    public listEntitiesSharedWithMe(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -261,13 +261,13 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public loadDefaultTemplate(sessionId: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public loadDefaultTemplate(sessionId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public loadDefaultTemplate(sessionId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public loadDefaultTemplate(sessionId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (sessionId === null || sessionId === undefined) {
-            throw new Error('Required parameter sessionId was null or undefined when calling shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl.');
+            throw new Error('Required parameter sessionId was null or undefined when calling loadDefaultTemplate.');
         }
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -306,10 +306,10 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public removeShare(observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public removeShare(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public removeShare(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public removeShare(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 
@@ -345,17 +345,17 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'body', reportProgress?: boolean): Observable<Array<MailContact>>;
-    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MailContact>>>;
-    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MailContact>>>;
-    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public searchContact(sessionId: string, query: string, observe?: 'body', reportProgress?: boolean): Observable<Array<MailContact>>;
+    public searchContact(sessionId: string, query: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MailContact>>>;
+    public searchContact(sessionId: string, query: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MailContact>>>;
+    public searchContact(sessionId: string, query: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (sessionId === null || sessionId === undefined) {
-            throw new Error('Required parameter sessionId was null or undefined when calling shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl.');
+            throw new Error('Required parameter sessionId was null or undefined when calling searchContact.');
         }
 
         if (query === null || query === undefined) {
-            throw new Error('Required parameter query was null or undefined when calling shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl.');
+            throw new Error('Required parameter query was null or undefined when calling searchContact.');
         }
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -407,10 +407,10 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareByEmailFullContact(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareByEmailFullContact(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareByEmailFullContact(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareByEmailFullContact(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -499,10 +499,10 @@ export class ShareService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareDocument(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareDocument(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareDocument(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareDocument(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

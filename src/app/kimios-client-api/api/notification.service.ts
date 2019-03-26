@@ -70,10 +70,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public acceptRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public acceptRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public acceptRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public acceptRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -139,10 +139,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public cancelWorkflow(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public cancelWorkflow(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public cancelWorkflow(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public cancelWorkflow(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -189,10 +189,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public createRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public createRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public createRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -246,10 +246,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'body', reportProgress?: boolean): Observable<DocumentWorkflowStatusRequest>;
-    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentWorkflowStatusRequest>>;
-    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentWorkflowStatusRequest>>;
-    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getDocumentWorkflowStatusRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'body', reportProgress?: boolean): Observable<DocumentWorkflowStatusRequest>;
+    public getDocumentWorkflowStatusRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentWorkflowStatusRequest>>;
+    public getDocumentWorkflowStatusRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentWorkflowStatusRequest>>;
+    public getDocumentWorkflowStatusRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -311,10 +311,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<WorkflowStatus>;
-    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<WorkflowStatus>>;
-    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<WorkflowStatus>>;
-    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getLastWorkflowStatus(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<WorkflowStatus>;
+    public getLastWorkflowStatus(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<WorkflowStatus>>;
+    public getLastWorkflowStatus(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<WorkflowStatus>>;
+    public getLastWorkflowStatus(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -359,10 +359,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
-    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
-    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
-    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getPendingRequests(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
+    public getPendingRequests(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
+    public getPendingRequests(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
+    public getPendingRequests(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -404,10 +404,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
-    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
-    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
-    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getRequests(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
+    public getRequests(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
+    public getRequests(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
+    public getRequests(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -458,10 +458,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public rejectRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public rejectRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public rejectRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public rejectRequest(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -532,10 +532,10 @@ export class NotificationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateDocumentWorkflowStatusRequestComment(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateDocumentWorkflowStatusRequestComment(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateDocumentWorkflowStatusRequestComment(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateDocumentWorkflowStatusRequestComment(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

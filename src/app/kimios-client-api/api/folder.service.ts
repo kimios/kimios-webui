@@ -67,10 +67,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public createFolder(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public createFolder(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public createFolder(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public createFolder(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -124,10 +124,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public deleteFolder(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public deleteFolder(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public deleteFolder(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public deleteFolder(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -173,10 +173,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Folder>;
-    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Folder>>;
-    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Folder>>;
-    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getFolder(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Folder>;
+    public getFolder(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Folder>>;
+    public getFolder(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Folder>>;
+    public getFolder(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -222,10 +222,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<MetaValue>>;
-    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MetaValue>>>;
-    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MetaValue>>>;
-    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getFolderMetaValues(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<MetaValue>>;
+    public getFolderMetaValues(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MetaValue>>>;
+    public getFolderMetaValues(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MetaValue>>>;
+    public getFolderMetaValues(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -271,10 +271,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Folder>>;
-    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Folder>>>;
-    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Folder>>>;
-    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getFolders(sessionId?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Folder>>;
+    public getFolders(sessionId?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Folder>>>;
+    public getFolders(sessionId?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Folder>>>;
+    public getFolders(sessionId?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -320,10 +320,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: Array<MetaValue>; }>;
-    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: Array<MetaValue>; }>>;
-    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: Array<MetaValue>; }>>;
-    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getFoldersWithMetaValues(sessionId?: string, foldersId?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: Array<MetaValue>; }>;
+    public getFoldersWithMetaValues(sessionId?: string, foldersId?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: Array<MetaValue>; }>>;
+    public getFoldersWithMetaValues(sessionId?: string, foldersId?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: Array<MetaValue>; }>>;
+    public getFoldersWithMetaValues(sessionId?: string, foldersId?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -373,10 +373,10 @@ export class FolderService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateFolder(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public updateFolder(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public updateFolder(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public updateFolder(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

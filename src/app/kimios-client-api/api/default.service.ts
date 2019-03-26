@@ -64,10 +64,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplCanHandleAutomaticPathDepositGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<boolean>;
-    public extensionServiceImplCanHandleAutomaticPathDepositGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
-    public extensionServiceImplCanHandleAutomaticPathDepositGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
-    public extensionServiceImplCanHandleAutomaticPathDepositGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public canHandleAutomaticPathDeposit(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<boolean>;
+    public canHandleAutomaticPathDeposit(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
+    public canHandleAutomaticPathDeposit(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
+    public canHandleAutomaticPathDeposit(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -111,10 +111,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplGeneratePasswordForUserGetOrgKimiosWebservicesImpl(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public extensionServiceImplGeneratePasswordForUserGetOrgKimiosWebservicesImpl(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public extensionServiceImplGeneratePasswordForUserGetOrgKimiosWebservicesImpl(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public extensionServiceImplGeneratePasswordForUserGetOrgKimiosWebservicesImpl(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public generatePasswordForUser(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public generatePasswordForUser(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public generatePasswordForUser(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public generatePasswordForUser(sessionId?: string, userId?: string, userSource?: string, sendMail?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -169,10 +169,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplGetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<DMEntityAttribute>;
-    public extensionServiceImplGetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntityAttribute>>;
-    public extensionServiceImplGetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntityAttribute>>;
-    public extensionServiceImplGetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<DMEntityAttribute>;
+    public getEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntityAttribute>>;
+    public getEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntityAttribute>>;
+    public getEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -223,10 +223,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplGetEntityAttributeValueGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public extensionServiceImplGetEntityAttributeValueGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public extensionServiceImplGetEntityAttributeValueGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public extensionServiceImplGetEntityAttributeValueGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getEntityAttributeValue(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public getEntityAttributeValue(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public getEntityAttributeValue(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public getEntityAttributeValue(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -277,10 +277,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplGetEntityAttributesGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntityAttribute>>;
-    public extensionServiceImplGetEntityAttributesGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntityAttribute>>>;
-    public extensionServiceImplGetEntityAttributesGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntityAttribute>>>;
-    public extensionServiceImplGetEntityAttributesGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public getEntityAttributes(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntityAttribute>>;
+    public getEntityAttributes(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntityAttribute>>>;
+    public getEntityAttributes(sessionId?: string, dmEntityId?: number, attributeName?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntityAttribute>>>;
+    public getEntityAttributes(sessionId?: string, dmEntityId?: number, attributeName?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -330,10 +330,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplListExtensionsGetOrgKimiosWebservicesImpl(sessionId?: string, extensionType?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
-    public extensionServiceImplListExtensionsGetOrgKimiosWebservicesImpl(sessionId?: string, extensionType?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
-    public extensionServiceImplListExtensionsGetOrgKimiosWebservicesImpl(sessionId?: string, extensionType?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
-    public extensionServiceImplListExtensionsGetOrgKimiosWebservicesImpl(sessionId?: string, extensionType?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public listExtensions(sessionId?: string, extensionType?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<string>>;
+    public listExtensions(sessionId?: string, extensionType?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<string>>>;
+    public listExtensions(sessionId?: string, extensionType?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<string>>>;
+    public listExtensions(sessionId?: string, extensionType?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -379,10 +379,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplRestoreFromTrashGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<DMEntity>;
-    public extensionServiceImplRestoreFromTrashGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntity>>;
-    public extensionServiceImplRestoreFromTrashGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntity>>;
-    public extensionServiceImplRestoreFromTrashGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public restoreFromTrash(sessionId?: string, dmEntityId?: number, observe?: 'body', reportProgress?: boolean): Observable<DMEntity>;
+    public restoreFromTrash(sessionId?: string, dmEntityId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DMEntity>>;
+    public restoreFromTrash(sessionId?: string, dmEntityId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DMEntity>>;
+    public restoreFromTrash(sessionId?: string, dmEntityId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -433,10 +433,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplSaveVirtualFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public extensionServiceImplSaveVirtualFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public extensionServiceImplSaveVirtualFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public extensionServiceImplSaveVirtualFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public saveVirtualFolder(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public saveVirtualFolder(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public saveVirtualFolder(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public saveVirtualFolder(sessionId?: string, folderId?: number, folderName?: string, parentId?: number, isSecurityInherited?: boolean, documentTypeId?: number, metaItemsJsonString?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -505,10 +505,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplSetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public extensionServiceImplSetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public extensionServiceImplSetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public extensionServiceImplSetEntityAttributeGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public setEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public setEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public setEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public setEntityAttribute(sessionId?: string, dmEntityId?: number, attributeName?: string, attributeValue?: string, isIndexed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -567,10 +567,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplTrashEntityGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public extensionServiceImplTrashEntityGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public extensionServiceImplTrashEntityGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public extensionServiceImplTrashEntityGetOrgKimiosWebservicesImpl(sessionId?: string, dmEntityId?: number, force?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public trashEntity(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public trashEntity(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public trashEntity(sessionId?: string, dmEntityId?: number, force?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public trashEntity(sessionId?: string, dmEntityId?: number, force?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -621,10 +621,10 @@ export class DefaultService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public extensionServiceImplViewTrashGetOrgKimiosWebservicesImpl(sessionId?: string, start?: number, count?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntity>>;
-    public extensionServiceImplViewTrashGetOrgKimiosWebservicesImpl(sessionId?: string, start?: number, count?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntity>>>;
-    public extensionServiceImplViewTrashGetOrgKimiosWebservicesImpl(sessionId?: string, start?: number, count?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntity>>>;
-    public extensionServiceImplViewTrashGetOrgKimiosWebservicesImpl(sessionId?: string, start?: number, count?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public viewTrash(sessionId?: string, start?: number, count?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DMEntity>>;
+    public viewTrash(sessionId?: string, start?: number, count?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DMEntity>>>;
+    public viewTrash(sessionId?: string, start?: number, count?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DMEntity>>>;
+    public viewTrash(sessionId?: string, start?: number, count?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 

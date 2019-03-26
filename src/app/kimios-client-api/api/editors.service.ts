@@ -63,10 +63,10 @@ export class EditorsService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public editorServiceImplEndDocumentEditPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
-    public editorServiceImplEndDocumentEditPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
-    public editorServiceImplEndDocumentEditPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
-    public editorServiceImplEndDocumentEditPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public endDocumentEdit(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
+    public endDocumentEdit(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
+    public endDocumentEdit(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
+    public endDocumentEdit(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -110,10 +110,10 @@ export class EditorsService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public editorServiceImplStartDocumentEditGetOrgKimiosWebservicesEditorsImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
-    public editorServiceImplStartDocumentEditGetOrgKimiosWebservicesEditorsImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
-    public editorServiceImplStartDocumentEditGetOrgKimiosWebservicesEditorsImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
-    public editorServiceImplStartDocumentEditGetOrgKimiosWebservicesEditorsImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public startDocumentEdit(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
+    public startDocumentEdit(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
+    public startDocumentEdit(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
+    public startDocumentEdit(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -158,10 +158,10 @@ export class EditorsService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public editorServiceImplVersionDocumentPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
-    public editorServiceImplVersionDocumentPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
-    public editorServiceImplVersionDocumentPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
-    public editorServiceImplVersionDocumentPostOrgKimiosWebservicesEditorsImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public versionDocument(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<EditorData>;
+    public versionDocument(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<EditorData>>;
+    public versionDocument(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<EditorData>>;
+    public versionDocument(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
