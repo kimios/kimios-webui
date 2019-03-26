@@ -61,10 +61,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getServerName(observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getServerName(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getServerName(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getServerName(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplGetServerNameGetOrgKimiosWebservicesImpl(observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public informationServiceImplGetServerNameGetOrgKimiosWebservicesImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public informationServiceImplGetServerNameGetOrgKimiosWebservicesImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public informationServiceImplGetServerNameGetOrgKimiosWebservicesImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 
@@ -98,10 +98,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getServerOnlineTime(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Date>;
-    public getServerOnlineTime(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Date>>;
-    public getServerOnlineTime(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Date>>;
-    public getServerOnlineTime(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplGetServerOnlineTimeGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Date>;
+    public informationServiceImplGetServerOnlineTimeGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Date>>;
+    public informationServiceImplGetServerOnlineTimeGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Date>>;
+    public informationServiceImplGetServerOnlineTimeGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -141,10 +141,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getServerVersionNumber(observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getServerVersionNumber(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getServerVersionNumber(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getServerVersionNumber(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplGetServerVersionNumberGetOrgKimiosWebservicesImpl(observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public informationServiceImplGetServerVersionNumberGetOrgKimiosWebservicesImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public informationServiceImplGetServerVersionNumberGetOrgKimiosWebservicesImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public informationServiceImplGetServerVersionNumberGetOrgKimiosWebservicesImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 
@@ -177,10 +177,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getTelemetryUUID(observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getTelemetryUUID(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getTelemetryUUID(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getTelemetryUUID(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplGetTelemetryUUIDGetOrgKimiosWebservicesImpl(observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public informationServiceImplGetTelemetryUUIDGetOrgKimiosWebservicesImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public informationServiceImplGetTelemetryUUIDGetOrgKimiosWebservicesImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public informationServiceImplGetTelemetryUUIDGetOrgKimiosWebservicesImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 
@@ -213,10 +213,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public isRegistered(observe?: 'body', reportProgress?: boolean): Observable<boolean>;
-    public isRegistered(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
-    public isRegistered(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
-    public isRegistered(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplIsRegisteredGetOrgKimiosWebservicesImpl(observe?: 'body', reportProgress?: boolean): Observable<boolean>;
+    public informationServiceImplIsRegisteredGetOrgKimiosWebservicesImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
+    public informationServiceImplIsRegisteredGetOrgKimiosWebservicesImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
+    public informationServiceImplIsRegisteredGetOrgKimiosWebservicesImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 
@@ -249,10 +249,10 @@ export class InformationService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public register(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public register(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public register(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public register(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public informationServiceImplRegisterPostOrgKimiosWebservicesImpl(observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public informationServiceImplRegisterPostOrgKimiosWebservicesImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public informationServiceImplRegisterPostOrgKimiosWebservicesImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public informationServiceImplRegisterPostOrgKimiosWebservicesImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         let headers = this.defaultHeaders;
 

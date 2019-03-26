@@ -11,8 +11,11 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface EditorData { 
+    documentId?: number;
+    createdVersionId?: number;
+    userId?: string;
+    userSource?: string;
+    proxyName?: string;
+    cookiesDatas?: { [key: string]: string; };
 }

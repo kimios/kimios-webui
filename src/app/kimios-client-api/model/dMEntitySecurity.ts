@@ -11,8 +11,14 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
+export interface DMEntitySecurity { 
+    dmEntityUid?: number;
+    dmEntityType?: number;
     name?: string;
-    documentType?: DocumentType;
+    source?: string;
+    fullName?: string;
+    type?: number;
+    read?: boolean;
+    write?: boolean;
+    fullAccess?: boolean;
 }

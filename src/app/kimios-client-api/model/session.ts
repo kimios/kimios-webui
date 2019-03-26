@@ -9,10 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Group } from './group';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface Session { 
+    uid?: string;
+    userName?: string;
+    userSource?: string;
+    lastUse?: Date;
+    groups?: Array<Group>;
+    metaDatas?: string;
 }

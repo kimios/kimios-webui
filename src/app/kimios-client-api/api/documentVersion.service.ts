@@ -21,6 +21,7 @@ import { Observable }                                        from 'rxjs/Observab
 import { DocumentComment } from '../model/documentComment';
 import { DocumentVersion } from '../model/documentVersion';
 import { Meta } from '../model/meta';
+import { MetaValue } from '../model/metaValue';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -61,13 +62,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param comment 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public addDocumentComment(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public addDocumentComment(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public addDocumentComment(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public addDocumentComment(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplAddDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplAddDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplAddDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplAddDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (comment !== undefined && comment !== null) {
+            queryParameters = queryParameters.set('comment', <any>comment);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -86,6 +104,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/addDocumentComment`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -97,49 +116,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createDocumentVersion(observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public createDocumentVersion(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public createDocumentVersion(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public createDocumentVersion(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplCreateDocumentVersionFromLatestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public documentVersionServiceImplCreateDocumentVersionFromLatestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public documentVersionServiceImplCreateDocumentVersionFromLatestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public documentVersionServiceImplCreateDocumentVersionFromLatestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = this.defaultHeaders;
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
         }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<number>(`${this.basePath}/document-version/createDocumentVersion`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public createDocumentVersionFromLatest(observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public createDocumentVersionFromLatest(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public createDocumentVersionFromLatest(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public createDocumentVersionFromLatest(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -158,6 +153,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<number>(`${this.basePath}/document-version/createDocumentVersionFromLatest`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -169,13 +165,74 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDocumentComment(observe?: 'body', reportProgress?: boolean): Observable<DocumentComment>;
-    public getDocumentComment(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentComment>>;
-    public getDocumentComment(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentComment>>;
-    public getDocumentComment(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplCreateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public documentVersionServiceImplCreateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public documentVersionServiceImplCreateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public documentVersionServiceImplCreateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<number>(`${this.basePath}/document-version/createDocumentVersion`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param commentId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public documentVersionServiceImplGetDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'body', reportProgress?: boolean): Observable<DocumentComment>;
+    public documentVersionServiceImplGetDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentComment>>;
+    public documentVersionServiceImplGetDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentComment>>;
+    public documentVersionServiceImplGetDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (commentId !== undefined && commentId !== null) {
+            queryParameters = queryParameters.set('commentId', <any>commentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -194,6 +251,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<DocumentComment>(`${this.basePath}/document-version/getDocumentComment`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -205,13 +263,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDocumentComments(observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentComment>>;
-    public getDocumentComments(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentComment>>>;
-    public getDocumentComments(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentComment>>>;
-    public getDocumentComments(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetDocumentCommentsGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentComment>>;
+    public documentVersionServiceImplGetDocumentCommentsGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentComment>>>;
+    public documentVersionServiceImplGetDocumentCommentsGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentComment>>>;
+    public documentVersionServiceImplGetDocumentCommentsGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -230,6 +300,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<Array<DocumentComment>>(`${this.basePath}/document-version/getDocumentComments`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -241,13 +312,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDocumentVersion(observe?: 'body', reportProgress?: boolean): Observable<DocumentVersion>;
-    public getDocumentVersion(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentVersion>>;
-    public getDocumentVersion(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentVersion>>;
-    public getDocumentVersion(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<DocumentVersion>;
+    public documentVersionServiceImplGetDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentVersion>>;
+    public documentVersionServiceImplGetDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentVersion>>;
+    public documentVersionServiceImplGetDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -266,6 +349,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<DocumentVersion>(`${this.basePath}/document-version/getDocumentVersion`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -277,13 +361,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDocumentVersions(observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentVersion>>;
-    public getDocumentVersions(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentVersion>>>;
-    public getDocumentVersions(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentVersion>>>;
-    public getDocumentVersions(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetDocumentVersionsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentVersion>>;
+    public documentVersionServiceImplGetDocumentVersionsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentVersion>>>;
+    public documentVersionServiceImplGetDocumentVersionsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentVersion>>>;
+    public documentVersionServiceImplGetDocumentVersionsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -302,6 +398,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<Array<DocumentVersion>>(`${this.basePath}/document-version/getDocumentVersions`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -313,13 +410,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getLastDocumentVersion(observe?: 'body', reportProgress?: boolean): Observable<DocumentVersion>;
-    public getLastDocumentVersion(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentVersion>>;
-    public getLastDocumentVersion(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentVersion>>;
-    public getLastDocumentVersion(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetLastDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<DocumentVersion>;
+    public documentVersionServiceImplGetLastDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentVersion>>;
+    public documentVersionServiceImplGetLastDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentVersion>>;
+    public documentVersionServiceImplGetLastDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -338,6 +447,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<DocumentVersion>(`${this.basePath}/document-version/getLastDocumentVersion`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -349,49 +459,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param metaId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMeta(observe?: 'body', reportProgress?: boolean): Observable<Meta>;
-    public getMeta(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Meta>>;
-    public getMeta(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Meta>>;
-    public getMeta(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetaBooleanGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'body', reportProgress?: boolean): Observable<boolean>;
+    public documentVersionServiceImplGetMetaBooleanGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
+    public documentVersionServiceImplGetMetaBooleanGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
+    public documentVersionServiceImplGetMetaBooleanGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = this.defaultHeaders;
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/json'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
         }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<Meta>(`${this.basePath}/document-version/getMeta`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getMetaBoolean(observe?: 'body', reportProgress?: boolean): Observable<boolean>;
-    public getMetaBoolean(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<boolean>>;
-    public getMetaBoolean(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<boolean>>;
-    public getMetaBoolean(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (metaId !== undefined && metaId !== null) {
+            queryParameters = queryParameters.set('metaId', <any>metaId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -410,6 +501,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<boolean>(`${this.basePath}/document-version/getMetaBoolean`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -421,13 +513,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param metaId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMetaDate(observe?: 'body', reportProgress?: boolean): Observable<Date>;
-    public getMetaDate(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Date>>;
-    public getMetaDate(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Date>>;
-    public getMetaDate(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetaDateGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'body', reportProgress?: boolean): Observable<Date>;
+    public documentVersionServiceImplGetMetaDateGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Date>>;
+    public documentVersionServiceImplGetMetaDateGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Date>>;
+    public documentVersionServiceImplGetMetaDateGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (metaId !== undefined && metaId !== null) {
+            queryParameters = queryParameters.set('metaId', <any>metaId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -446,6 +555,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<Date>(`${this.basePath}/document-version/getMetaDate`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -457,13 +567,79 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param metaId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMetaNumber(observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public getMetaNumber(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public getMetaNumber(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public getMetaNumber(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetaGetOrgKimiosWebservicesImpl(sessionId?: string, metaId?: number, observe?: 'body', reportProgress?: boolean): Observable<Meta>;
+    public documentVersionServiceImplGetMetaGetOrgKimiosWebservicesImpl(sessionId?: string, metaId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Meta>>;
+    public documentVersionServiceImplGetMetaGetOrgKimiosWebservicesImpl(sessionId?: string, metaId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Meta>>;
+    public documentVersionServiceImplGetMetaGetOrgKimiosWebservicesImpl(sessionId?: string, metaId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (metaId !== undefined && metaId !== null) {
+            queryParameters = queryParameters.set('metaId', <any>metaId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Meta>(`${this.basePath}/document-version/getMeta`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param metaId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public documentVersionServiceImplGetMetaNumberGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public documentVersionServiceImplGetMetaNumberGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public documentVersionServiceImplGetMetaNumberGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public documentVersionServiceImplGetMetaNumberGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (metaId !== undefined && metaId !== null) {
+            queryParameters = queryParameters.set('metaId', <any>metaId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -482,6 +658,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<number>(`${this.basePath}/document-version/getMetaNumber`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -493,13 +670,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param metaId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMetaString(observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public getMetaString(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public getMetaString(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public getMetaString(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetaStringGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public documentVersionServiceImplGetMetaStringGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public documentVersionServiceImplGetMetaStringGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public documentVersionServiceImplGetMetaStringGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, metaId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (metaId !== undefined && metaId !== null) {
+            queryParameters = queryParameters.set('metaId', <any>metaId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -518,6 +712,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<string>(`${this.basePath}/document-version/getMetaString`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -529,13 +724,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMetaValues(observe?: 'body', reportProgress?: boolean): Observable<Array<any>>;
-    public getMetaValues(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<any>>>;
-    public getMetaValues(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<any>>>;
-    public getMetaValues(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<MetaValue>>;
+    public documentVersionServiceImplGetMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MetaValue>>>;
+    public documentVersionServiceImplGetMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MetaValue>>>;
+    public documentVersionServiceImplGetMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -552,8 +759,9 @@ export class DocumentVersionService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<any>>(`${this.basePath}/document-version/getMetaValues`,
+        return this.httpClient.get<Array<MetaValue>>(`${this.basePath}/document-version/getMetaValues`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -565,13 +773,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentTypeId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMetas(observe?: 'body', reportProgress?: boolean): Observable<Array<Meta>>;
-    public getMetas(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Meta>>>;
-    public getMetas(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Meta>>>;
-    public getMetas(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Meta>>;
+    public documentVersionServiceImplGetMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Meta>>>;
+    public documentVersionServiceImplGetMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Meta>>>;
+    public documentVersionServiceImplGetMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentTypeId !== undefined && documentTypeId !== null) {
+            queryParameters = queryParameters.set('documentTypeId', <any>documentTypeId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -590,6 +810,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<Array<Meta>>(`${this.basePath}/document-version/getMetas`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -601,13 +822,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentTypeId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getUnheritedMetas(observe?: 'body', reportProgress?: boolean): Observable<Array<Meta>>;
-    public getUnheritedMetas(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Meta>>>;
-    public getUnheritedMetas(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Meta>>>;
-    public getUnheritedMetas(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplGetUnheritedMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Meta>>;
+    public documentVersionServiceImplGetUnheritedMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Meta>>>;
+    public documentVersionServiceImplGetUnheritedMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Meta>>>;
+    public documentVersionServiceImplGetUnheritedMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentTypeId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentTypeId !== undefined && documentTypeId !== null) {
+            queryParameters = queryParameters.set('documentTypeId', <any>documentTypeId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -626,6 +859,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<Array<Meta>>(`${this.basePath}/document-version/getUnheritedMetas`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -637,13 +871,25 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param commentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public removeDocumentComment(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public removeDocumentComment(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public removeDocumentComment(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public removeDocumentComment(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplRemoveDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplRemoveDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplRemoveDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplRemoveDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, commentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (commentId !== undefined && commentId !== null) {
+            queryParameters = queryParameters.set('commentId', <any>commentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -662,6 +908,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/removeDocumentComment`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -673,13 +920,35 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param commentId 
+     * @param newComment 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateDocumentComment(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateDocumentComment(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateDocumentComment(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateDocumentComment(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplUpdateDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, commentId?: number, newComment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplUpdateDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, commentId?: number, newComment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplUpdateDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, commentId?: number, newComment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplUpdateDocumentCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, commentId?: number, newComment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (commentId !== undefined && commentId !== null) {
+            queryParameters = queryParameters.set('commentId', <any>commentId);
+        }
+        if (newComment !== undefined && newComment !== null) {
+            queryParameters = queryParameters.set('newComment', <any>newComment);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -698,6 +967,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/updateDocumentComment`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -709,13 +979,35 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param documentTypeId 
+     * @param xmlStream 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateDocumentVersion(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateDocumentVersion(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateDocumentVersion(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateDocumentVersion(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplUpdateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, documentTypeId?: number, xmlStream?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplUpdateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, documentTypeId?: number, xmlStream?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplUpdateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, documentTypeId?: number, xmlStream?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplUpdateDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, documentTypeId?: number, xmlStream?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (documentTypeId !== undefined && documentTypeId !== null) {
+            queryParameters = queryParameters.set('documentTypeId', <any>documentTypeId);
+        }
+        if (xmlStream !== undefined && xmlStream !== null) {
+            queryParameters = queryParameters.set('xmlStream', <any>xmlStream);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -734,6 +1026,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/updateDocumentVersion`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -745,13 +1038,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param customVersion 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateDocumentVersionId(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateDocumentVersionId(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateDocumentVersionId(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateDocumentVersionId(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplUpdateDocumentVersionIdGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, customVersion?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplUpdateDocumentVersionIdGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, customVersion?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplUpdateDocumentVersionIdGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, customVersion?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplUpdateDocumentVersionIdGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, customVersion?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (customVersion !== undefined && customVersion !== null) {
+            queryParameters = queryParameters.set('customVersion', <any>customVersion);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -770,6 +1080,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/updateDocumentVersionId`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -781,13 +1092,30 @@ export class DocumentVersionService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param xmlStream 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateMetas(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateMetas(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateMetas(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateMetas(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public documentVersionServiceImplUpdateMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, xmlStream?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public documentVersionServiceImplUpdateMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, xmlStream?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public documentVersionServiceImplUpdateMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, xmlStream?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public documentVersionServiceImplUpdateMetasGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, xmlStream?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (xmlStream !== undefined && xmlStream !== null) {
+            queryParameters = queryParameters.set('xmlStream', <any>xmlStream);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -806,6 +1134,7 @@ export class DocumentVersionService {
 
         return this.httpClient.get<any>(`${this.basePath}/document-version/updateMetas`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

@@ -9,10 +9,9 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Cell } from './cell';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface Row { 
+    cells?: Array<Cell>;
 }

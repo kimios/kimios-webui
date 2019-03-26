@@ -60,13 +60,35 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param name 
+     * @param parentId 
+     * @param isSecurityInherited 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createFolder(observe?: 'body', reportProgress?: boolean): Observable<number>;
-    public createFolder(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
-    public createFolder(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
-    public createFolder(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
+    public folderServiceImplCreateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, name?: string, parentId?: number, isSecurityInherited?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (name !== undefined && name !== null) {
+            queryParameters = queryParameters.set('name', <any>name);
+        }
+        if (parentId !== undefined && parentId !== null) {
+            queryParameters = queryParameters.set('parentId', <any>parentId);
+        }
+        if (isSecurityInherited !== undefined && isSecurityInherited !== null) {
+            queryParameters = queryParameters.set('isSecurityInherited', <any>isSecurityInherited);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -85,6 +107,7 @@ export class FolderService {
 
         return this.httpClient.get<number>(`${this.basePath}/folder/createFolder`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -96,13 +119,25 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteFolder(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public deleteFolder(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public deleteFolder(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public deleteFolder(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public folderServiceImplDeleteFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (folderId !== undefined && folderId !== null) {
+            queryParameters = queryParameters.set('folderId', <any>folderId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -121,6 +156,7 @@ export class FolderService {
 
         return this.httpClient.get<any>(`${this.basePath}/folder/deleteFolder`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -132,13 +168,25 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getFolder(observe?: 'body', reportProgress?: boolean): Observable<Folder>;
-    public getFolder(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Folder>>;
-    public getFolder(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Folder>>;
-    public getFolder(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Folder>;
+    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Folder>>;
+    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Folder>>;
+    public folderServiceImplGetFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (folderId !== undefined && folderId !== null) {
+            queryParameters = queryParameters.set('folderId', <any>folderId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -157,6 +205,7 @@ export class FolderService {
 
         return this.httpClient.get<Folder>(`${this.basePath}/folder/getFolder`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -168,13 +217,25 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getFolderMetaValues(observe?: 'body', reportProgress?: boolean): Observable<Array<MetaValue>>;
-    public getFolderMetaValues(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MetaValue>>>;
-    public getFolderMetaValues(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MetaValue>>>;
-    public getFolderMetaValues(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<MetaValue>>;
+    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MetaValue>>>;
+    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MetaValue>>>;
+    public folderServiceImplGetFolderMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (folderId !== undefined && folderId !== null) {
+            queryParameters = queryParameters.set('folderId', <any>folderId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -193,6 +254,7 @@ export class FolderService {
 
         return this.httpClient.get<Array<MetaValue>>(`${this.basePath}/folder/getFolderMetaValues`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -204,13 +266,25 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param parentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getFolders(observe?: 'body', reportProgress?: boolean): Observable<Array<Folder>>;
-    public getFolders(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Folder>>>;
-    public getFolders(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Folder>>>;
-    public getFolders(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Folder>>;
+    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Folder>>>;
+    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Folder>>>;
+    public folderServiceImplGetFoldersGetOrgKimiosWebservicesImpl(sessionId?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (parentId !== undefined && parentId !== null) {
+            queryParameters = queryParameters.set('parentId', <any>parentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -229,6 +303,7 @@ export class FolderService {
 
         return this.httpClient.get<Array<Folder>>(`${this.basePath}/folder/getFolders`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -240,13 +315,27 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param foldersId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getFoldersWithMetaValues(observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: any; }>;
-    public getFoldersWithMetaValues(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: any; }>>;
-    public getFoldersWithMetaValues(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: any; }>>;
-    public getFoldersWithMetaValues(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<{ [key: string]: Array<MetaValue>; }>;
+    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<{ [key: string]: Array<MetaValue>; }>>;
+    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<{ [key: string]: Array<MetaValue>; }>>;
+    public folderServiceImplGetFoldersWithMetaValuesGetOrgKimiosWebservicesImpl(sessionId?: string, foldersId?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (foldersId) {
+            foldersId.forEach((element) => {
+                queryParameters = queryParameters.append('foldersId', <any>element);
+            })
+        }
 
         let headers = this.defaultHeaders;
 
@@ -263,8 +352,9 @@ export class FolderService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<{ [key: string]: any; }>(`${this.basePath}/folder/getFoldersWithMetaValues`,
+        return this.httpClient.get<{ [key: string]: Array<MetaValue>; }>(`${this.basePath}/folder/getFoldersWithMetaValues`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -276,13 +366,35 @@ export class FolderService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param folderId 
+     * @param name 
+     * @param parentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateFolder(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateFolder(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateFolder(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateFolder(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public folderServiceImplUpdateFolderGetOrgKimiosWebservicesImpl(sessionId?: string, folderId?: number, name?: string, parentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (folderId !== undefined && folderId !== null) {
+            queryParameters = queryParameters.set('folderId', <any>folderId);
+        }
+        if (name !== undefined && name !== null) {
+            queryParameters = queryParameters.set('name', <any>name);
+        }
+        if (parentId !== undefined && parentId !== null) {
+            queryParameters = queryParameters.set('parentId', <any>parentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -301,6 +413,7 @@ export class FolderService {
 
         return this.httpClient.get<any>(`${this.basePath}/folder/updateFolder`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

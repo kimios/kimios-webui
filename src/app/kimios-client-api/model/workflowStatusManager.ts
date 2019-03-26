@@ -11,8 +11,9 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface WorkflowStatusManager { 
+    securityEntityName?: string;
+    securityEntitySource?: string;
+    securityEntityType?: number;
+    workflowStatusUid?: number;
 }

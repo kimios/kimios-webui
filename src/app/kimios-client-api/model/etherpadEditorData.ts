@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { EditorData } from './editorData';
+import { EtherpadUserData } from './etherpadUserData';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface EtherpadEditorData extends EditorData { 
+    etherPadUrl?: string;
+    padId?: string;
+    groupId?: string;
+    usersDatas?: { [key: string]: EtherpadUserData; };
 }

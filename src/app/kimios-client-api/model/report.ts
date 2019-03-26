@@ -9,10 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Body } from './body';
+import { Header } from './header';
 
 
-export interface DocumentType { 
-    uid?: number;
+export interface Report { 
     name?: string;
-    documentType?: DocumentType;
+    className?: string;
+    date?: Date;
+    header?: Header;
+    body?: Body;
 }

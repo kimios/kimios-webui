@@ -9,10 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { User } from './user';
 
 
 export interface Group { 
     gid?: string;
     name?: string;
-    source?: string;
+    authenticationSourceName?: string;
+    users?: Array<User>;
+    type?: number;
+    id?: string;
 }

@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Document } from './document';
 
 
-export interface DocumentType { 
+export interface Lock { 
     uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+    document?: Document;
+    user?: string;
+    userSource?: string;
+    date?: Date;
 }

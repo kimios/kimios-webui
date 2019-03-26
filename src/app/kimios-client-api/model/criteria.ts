@@ -31,6 +31,6 @@ export interface Criteria {
     dateFacetGapRange?: string;
     rawQuery?: boolean;
     dateFormat?: string;
-    faceted?: boolean;
     facetRange?: boolean;
+    faceted?: boolean;
 }

@@ -10,13 +10,10 @@
  * Do not edit the class manually.
  */
 import { DMEntityAttribute } from './dMEntityAttribute';
-import { DocumentVersion } from './documentVersion';
-import { Folder } from './folder';
-import { Lock } from './lock';
 import { Share } from './share';
 
 
-export interface Document { 
+export interface DMEntityImpl { 
     uid?: number;
     type?: number;
     path?: string;
@@ -29,14 +26,4 @@ export interface Document {
     addOnDatas?: string;
     trashed?: boolean;
     shareSet?: Array<Share>;
-    folderUid?: number;
-    folder?: Folder;
-    mimeType?: string;
-    extension?: string;
-    lock?: Lock;
-    relatedDocuments?: Array<Document>;
-    parentsRelatedDocuments?: Array<Document>;
-    versionList?: Array<DocumentVersion>;
-    checkedOut?: boolean;
-    checkoutLock?: Lock;
 }

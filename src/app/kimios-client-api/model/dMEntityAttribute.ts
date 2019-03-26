@@ -11,8 +11,8 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
+export interface DMEntityAttribute { 
+    indexed?: boolean;
     name?: string;
-    documentType?: DocumentType;
+    value?: string;
 }

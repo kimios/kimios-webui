@@ -59,13 +59,25 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createTokenDownloadTransaction(observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public createTokenDownloadTransaction(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public createTokenDownloadTransaction(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public createTokenDownloadTransaction(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public fileTransferServiceImplCreateTokenDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -84,6 +96,7 @@ export class FiletransferService {
 
         return this.httpClient.get<DataTransaction>(`${this.basePath}/filetransfer/createTokenDownload`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -95,49 +108,25 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param token 
+     * @param password 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public downloadDocument(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public downloadDocument(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public downloadDocument(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public downloadDocument(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = this.defaultHeaders;
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/octet-stream'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (token !== undefined && token !== null) {
+            queryParameters = queryParameters.set('token', <any>token);
         }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocument`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public downloadDocumentByToken(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public downloadDocumentByToken(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public downloadDocumentByToken(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public downloadDocumentByToken(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (password !== undefined && password !== null) {
+            queryParameters = queryParameters.set('password', <any>password);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -157,6 +146,7 @@ export class FiletransferService {
 
         return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentByToken`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -168,13 +158,145 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param inline 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public downloadDocumentVersion(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public downloadDocumentVersion(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public downloadDocumentVersion(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public downloadDocumentVersion(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (inline !== undefined && inline !== null) {
+            queryParameters = queryParameters.set('inline', <any>inline);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/octet-stream'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocument`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param inline 
+     * @param metaIds 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplDownloadDocumentGetOrgKimiosWebservicesImpl_1(sessionId?: string, transactionId?: number, inline?: boolean, metaIds?: Array<number>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (inline !== undefined && inline !== null) {
+            queryParameters = queryParameters.set('inline', <any>inline);
+        }
+        if (metaIds) {
+            metaIds.forEach((element) => {
+                queryParameters = queryParameters.append('metaIds', <any>element);
+            })
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/octet-stream'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentWithCustomFileName`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param inline 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplDownloadDocumentVersionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, inline?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (inline !== undefined && inline !== null) {
+            queryParameters = queryParameters.set('inline', <any>inline);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -194,6 +316,7 @@ export class FiletransferService {
 
         return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentVersion`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -205,49 +328,35 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param md5 
+     * @param sha1 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public downloadDocument_1(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public downloadDocument_1(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public downloadDocument_1(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public downloadDocument_1(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplEndUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, md5?: string, sha1?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = this.defaultHeaders;
 
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-            'application/octet-stream'
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
         }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.get<any>(`${this.basePath}/filetransfer/downloadDocumentWithCustomFileName`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public endUploadTransaction(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public endUploadTransaction(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public endUploadTransaction(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public endUploadTransaction(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (md5 !== undefined && md5 !== null) {
+            queryParameters = queryParameters.set('md5', <any>md5);
+        }
+        if (sha1 !== undefined && sha1 !== null) {
+            queryParameters = queryParameters.set('sha1', <any>sha1);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -266,6 +375,7 @@ export class FiletransferService {
 
         return this.httpClient.get<any>(`${this.basePath}/filetransfer/endUploadTransaction`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -277,13 +387,32 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param transactionId 
+     * @param data 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public sendChunk(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public sendChunk(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public sendChunk(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public sendChunk(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplSendChunkGetOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, data?: Array<string>, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
+        if (data) {
+            data.forEach((element) => {
+                queryParameters = queryParameters.append('data', <any>element);
+            })
+        }
 
         let headers = this.defaultHeaders;
 
@@ -302,6 +431,7 @@ export class FiletransferService {
 
         return this.httpClient.get<any>(`${this.basePath}/filetransfer/sendChunk`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -313,13 +443,30 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentVersionId 
+     * @param isCompressed 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public startDownloadTransaction(observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public startDownloadTransaction(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public startDownloadTransaction(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public startDownloadTransaction(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public fileTransferServiceImplStartDownloadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentVersionId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentVersionId !== undefined && documentVersionId !== null) {
+            queryParameters = queryParameters.set('documentVersionId', <any>documentVersionId);
+        }
+        if (isCompressed !== undefined && isCompressed !== null) {
+            queryParameters = queryParameters.set('isCompressed', <any>isCompressed);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -338,6 +485,7 @@ export class FiletransferService {
 
         return this.httpClient.get<DataTransaction>(`${this.basePath}/filetransfer/startDownloadTransaction`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -349,13 +497,30 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param isCompressed 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public startUploadTransaction(observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
-    public startUploadTransaction(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
-    public startUploadTransaction(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
-    public startUploadTransaction(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'body', reportProgress?: boolean): Observable<DataTransaction>;
+    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DataTransaction>>;
+    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DataTransaction>>;
+    public fileTransferServiceImplStartUploadTransactionGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, isCompressed?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (isCompressed !== undefined && isCompressed !== null) {
+            queryParameters = queryParameters.set('isCompressed', <any>isCompressed);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -374,6 +539,7 @@ export class FiletransferService {
 
         return this.httpClient.get<DataTransaction>(`${this.basePath}/filetransfer/startUploadTransaction`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -385,13 +551,25 @@ export class FiletransferService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param transactionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public uploadDocument(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public uploadDocument(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public uploadDocument(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public uploadDocument(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public fileTransferServiceImplUploadDocumentPostOrgKimiosWebservicesImpl(sessionId?: string, transactionId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (transactionId !== undefined && transactionId !== null) {
+            queryParameters = queryParameters.set('transactionId', <any>transactionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -412,6 +590,7 @@ export class FiletransferService {
         return this.httpClient.post<any>(`${this.basePath}/filetransfer/uploadDocument`,
             null,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

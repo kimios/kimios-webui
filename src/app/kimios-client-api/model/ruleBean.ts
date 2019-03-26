@@ -11,8 +11,14 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
+export interface RuleBean { 
+    id?: number;
+    javaClass?: string;
     name?: string;
-    documentType?: DocumentType;
+    path?: string;
+    ruleOwner?: string;
+    ruleOwnerSource?: string;
+    ruleCreationDate?: Date;
+    ruleUpdateDate?: Date;
+    recursive?: boolean;
 }

@@ -9,10 +9,14 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { UserWrapper } from './userWrapper';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface CommentWrapper { 
+    id?: number;
+    content?: string;
+    postDate?: number;
+    processInstanceId?: number;
+    tenantId?: number;
+    userWrapper?: UserWrapper;
 }

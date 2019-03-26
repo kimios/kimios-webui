@@ -9,10 +9,15 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Share } from './share';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface DMSecurityRule { 
+    ruleHash?: string;
+    ruleHashShare?: string;
+    securityEntityUid?: string;
+    securityEntitySource?: string;
+    securityEntityType?: number;
+    rights?: number;
+    share?: Share;
 }

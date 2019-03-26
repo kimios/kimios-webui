@@ -19,6 +19,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 import { Observable }                                        from 'rxjs/Observable';
 
 import { MailContact } from '../model/mailContact';
+import { Share } from '../model/share';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -59,13 +60,86 @@ export class ShareService {
     /**
      * 
      * 
+     * @param token 
+     * @param password 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public downloadDocumentByToken(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public downloadDocumentByToken(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public downloadDocumentByToken(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public downloadDocumentByToken(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareServiceImplDownloadDocumentByTokenAndPasswordPostOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/octet-stream',
+            'application/x-www-form-urlencoded'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/x-www-form-urlencoded'
+        ];
+
+        const canConsumeForm = this.canConsumeForm(consumes);
+
+        let formParams: any | { append(param: string, value: any): void; };
+        let useForm = false;
+        let convertFormParamsToString = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        }
+
+        if (token !== undefined) {
+            formParams = formParams.append('token', <any>token) || formParams;
+        }
+        if (password !== undefined) {
+            formParams = formParams.append('password', <any>password) || formParams;
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/downloadDocumentByTokenAndPassword`,
+            convertFormParamsToString ? formParams.toString() : formParams,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param token 
+     * @param password 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareServiceImplDownloadDocumentByTokenGetOrgKimiosWebservicesShareImpl(token?: string, password?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (token !== undefined && token !== null) {
+            queryParameters = queryParameters.set('token', <any>token);
+        }
+        if (password !== undefined && password !== null) {
+            queryParameters = queryParameters.set('password', <any>password);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -85,6 +159,7 @@ export class ShareService {
 
         return this.httpClient.get<any>(`${this.basePath}/downloadDocumentByToken`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -96,13 +171,109 @@ export class ShareService {
     /**
      * 
      * 
+     * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public loadDefaultTemplate(observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public loadDefaultTemplate(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public loadDefaultTemplate(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public loadDefaultTemplate(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
+    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
+    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
+    public shareServiceImplListEntitiesSharedByMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<Share>>(`${this.basePath}/by-me`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<Share>>;
+    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Share>>>;
+    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Share>>>;
+    public shareServiceImplListEntitiesSharedWithMeGetOrgKimiosWebservicesShareImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.get<Array<Share>>(`${this.basePath}/with-me`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId sessionId
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
+    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
+    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl(sessionId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (sessionId === null || sessionId === undefined) {
+            throw new Error('Required parameter sessionId was null or undefined when calling shareServiceImplLoadDefaultTemplateGetOrgKimiosWebservicesShareImpl.');
+        }
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -120,6 +291,44 @@ export class ShareService {
 
         return this.httpClient.get<string>(`${this.basePath}/load-default-template`,
             {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareServiceImplRemoveSharePostOrgKimiosWebservicesShareImpl(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'multipart/form-data'
+        ];
+
+        return this.httpClient.post<any>(`${this.basePath}/remove`,
+            null,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -131,13 +340,31 @@ export class ShareService {
     /**
      * List Contact
      * Provide list of previously used contacts
+     * @param sessionId sessionId
+     * @param query query
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchContact(observe?: 'body', reportProgress?: boolean): Observable<Array<MailContact>>;
-    public searchContact(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MailContact>>>;
-    public searchContact(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MailContact>>>;
-    public searchContact(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'body', reportProgress?: boolean): Observable<Array<MailContact>>;
+    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<MailContact>>>;
+    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<MailContact>>>;
+    public shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl(sessionId: string, query: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (sessionId === null || sessionId === undefined) {
+            throw new Error('Required parameter sessionId was null or undefined when calling shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl.');
+        }
+
+        if (query === null || query === undefined) {
+            throw new Error('Required parameter query was null or undefined when calling shareServiceImplSearchContactGetOrgKimiosWebservicesShareImpl.');
+        }
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (query !== undefined && query !== null) {
+            queryParameters = queryParameters.set('query', <any>query);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -155,6 +382,7 @@ export class ShareService {
 
         return this.httpClient.get<Array<MailContact>>(`${this.basePath}/search-contact`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -166,13 +394,64 @@ export class ShareService {
     /**
      * Share provided documents by email
      * Share documents by email. An exception will be thrown if the total size exceed the parameters
+     * @param sessionId sessionId
+     * @param documentIds documentIds
+     * @param body recipients
+     * @param subject subject
+     * @param content content
+     * @param senderAddress senderAddress
+     * @param senderName senderName
+     * @param defaultSender Default Sender
+     * @param password password
+     * @param expirationDate expirationDate
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public shareByEmailFullContact(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public shareByEmailFullContact(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public shareByEmailFullContact(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public shareByEmailFullContact(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareServiceImplShareByEmailFullContactPostOrgKimiosWebservicesShareImpl(sessionId?: string, documentIds?: Array<number>, body?: Array<MailContact>, subject?: string, content?: string, senderAddress?: string, senderName?: string, defaultSender?: boolean, password?: string, expirationDate?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentIds) {
+            documentIds.forEach((element) => {
+                queryParameters = queryParameters.append('documentIds', <any>element);
+            })
+        }
+        if (subject !== undefined && subject !== null) {
+            queryParameters = queryParameters.set('subject', <any>subject);
+        }
+        if (content !== undefined && content !== null) {
+            queryParameters = queryParameters.set('content', <any>content);
+        }
+        if (senderAddress !== undefined && senderAddress !== null) {
+            queryParameters = queryParameters.set('senderAddress', <any>senderAddress);
+        }
+        if (senderName !== undefined && senderName !== null) {
+            queryParameters = queryParameters.set('senderName', <any>senderName);
+        }
+        if (defaultSender !== undefined && defaultSender !== null) {
+            queryParameters = queryParameters.set('defaultSender', <any>defaultSender);
+        }
+        if (password !== undefined && password !== null) {
+            queryParameters = queryParameters.set('password', <any>password);
+        }
+        if (expirationDate !== undefined && expirationDate !== null) {
+            queryParameters = queryParameters.set('expirationDate', <any>expirationDate);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -188,9 +467,108 @@ export class ShareService {
         const consumes: string[] = [
             'application/json'
         ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
 
         return this.httpClient.post<any>(`${this.basePath}/share-by-mail`,
-            null,
+            body,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param sessionId 
+     * @param dmEntityId 
+     * @param targetUserId 
+     * @param targetUserSource 
+     * @param read 
+     * @param write 
+     * @param fullAccess 
+     * @param expirationDate 
+     * @param notify 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public shareServiceImplShareDocumentPostOrgKimiosWebservicesShareImpl(sessionId?: string, dmEntityId?: number, targetUserId?: string, targetUserSource?: string, read?: boolean, write?: boolean, fullAccess?: boolean, expirationDate?: string, notify?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/x-www-form-urlencoded'
+        ];
+
+        const canConsumeForm = this.canConsumeForm(consumes);
+
+        let formParams: any | { append(param: string, value: any): void; };
+        let useForm = false;
+        let convertFormParamsToString = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        }
+
+        if (sessionId !== undefined) {
+            formParams = formParams.append('sessionId', <any>sessionId) || formParams;
+        }
+        if (dmEntityId !== undefined) {
+            formParams = formParams.append('dmEntityId', <any>dmEntityId) || formParams;
+        }
+        if (targetUserId !== undefined) {
+            formParams = formParams.append('targetUserId', <any>targetUserId) || formParams;
+        }
+        if (targetUserSource !== undefined) {
+            formParams = formParams.append('targetUserSource', <any>targetUserSource) || formParams;
+        }
+        if (read !== undefined) {
+            formParams = formParams.append('read', <any>read) || formParams;
+        }
+        if (write !== undefined) {
+            formParams = formParams.append('write', <any>write) || formParams;
+        }
+        if (fullAccess !== undefined) {
+            formParams = formParams.append('fullAccess', <any>fullAccess) || formParams;
+        }
+        if (expirationDate !== undefined) {
+            formParams = formParams.append('expirationDate', <any>expirationDate) || formParams;
+        }
+        if (notify !== undefined) {
+            formParams = formParams.append('notify', <any>notify) || formParams;
+        }
+
+        return this.httpClient.post<any>(`${this.basePath}/share-document`,
+            convertFormParamsToString ? formParams.toString() : formParams,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

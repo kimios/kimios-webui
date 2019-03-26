@@ -11,8 +11,7 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface Cell { 
+    value?: any;
+    columnName?: string;
 }

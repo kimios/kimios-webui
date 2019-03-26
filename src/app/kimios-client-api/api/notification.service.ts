@@ -60,13 +60,50 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param workflowStatusId 
+     * @param userName 
+     * @param userSource 
+     * @param statusDate 
+     * @param comment 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public acceptRequest(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public acceptRequest(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public acceptRequest(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public acceptRequest(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public notificationServiceImplAcceptRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (workflowStatusId !== undefined && workflowStatusId !== null) {
+            queryParameters = queryParameters.set('workflowStatusId', <any>workflowStatusId);
+        }
+        if (userName !== undefined && userName !== null) {
+            queryParameters = queryParameters.set('userName', <any>userName);
+        }
+        if (userSource !== undefined && userSource !== null) {
+            queryParameters = queryParameters.set('userSource', <any>userSource);
+        }
+        if (statusDate !== undefined && statusDate !== null) {
+            queryParameters = queryParameters.set('statusDate', <any>statusDate.toISOString());
+        }
+        if (comment !== undefined && comment !== null) {
+            queryParameters = queryParameters.set('comment', <any>comment);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -85,6 +122,7 @@ export class NotificationService {
 
         return this.httpClient.get<any>(`${this.basePath}/notification/acceptRequest`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -96,13 +134,25 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public cancelWorkflow(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public cancelWorkflow(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public cancelWorkflow(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public cancelWorkflow(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public notificationServiceImplCancelWorkflowGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -121,6 +171,7 @@ export class NotificationService {
 
         return this.httpClient.get<any>(`${this.basePath}/notification/cancelWorkflow`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -132,13 +183,30 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param workflowStatusId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createRequest(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public createRequest(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public createRequest(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public createRequest(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public notificationServiceImplCreateRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (workflowStatusId !== undefined && workflowStatusId !== null) {
+            queryParameters = queryParameters.set('workflowStatusId', <any>workflowStatusId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -157,6 +225,7 @@ export class NotificationService {
 
         return this.httpClient.get<any>(`${this.basePath}/notification/createRequest`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -168,13 +237,45 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param workflowStatusId 
+     * @param userName 
+     * @param userSource 
+     * @param requestDate 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDocumentWorkflowStatusRequest(observe?: 'body', reportProgress?: boolean): Observable<DocumentWorkflowStatusRequest>;
-    public getDocumentWorkflowStatusRequest(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentWorkflowStatusRequest>>;
-    public getDocumentWorkflowStatusRequest(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentWorkflowStatusRequest>>;
-    public getDocumentWorkflowStatusRequest(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'body', reportProgress?: boolean): Observable<DocumentWorkflowStatusRequest>;
+    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<DocumentWorkflowStatusRequest>>;
+    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<DocumentWorkflowStatusRequest>>;
+    public notificationServiceImplGetDocumentWorkflowStatusRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (workflowStatusId !== undefined && workflowStatusId !== null) {
+            queryParameters = queryParameters.set('workflowStatusId', <any>workflowStatusId);
+        }
+        if (userName !== undefined && userName !== null) {
+            queryParameters = queryParameters.set('userName', <any>userName);
+        }
+        if (userSource !== undefined && userSource !== null) {
+            queryParameters = queryParameters.set('userSource', <any>userSource);
+        }
+        if (requestDate !== undefined && requestDate !== null) {
+            queryParameters = queryParameters.set('requestDate', <any>requestDate.toISOString());
+        }
 
         let headers = this.defaultHeaders;
 
@@ -193,6 +294,7 @@ export class NotificationService {
 
         return this.httpClient.get<DocumentWorkflowStatusRequest>(`${this.basePath}/notification/getDocumentWorkflowStatusRequest`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -204,13 +306,25 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getLastWorkflowStatus(observe?: 'body', reportProgress?: boolean): Observable<WorkflowStatus>;
-    public getLastWorkflowStatus(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<WorkflowStatus>>;
-    public getLastWorkflowStatus(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<WorkflowStatus>>;
-    public getLastWorkflowStatus(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<WorkflowStatus>;
+    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<WorkflowStatus>>;
+    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<WorkflowStatus>>;
+    public notificationServiceImplGetLastWorkflowStatusGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -229,6 +343,7 @@ export class NotificationService {
 
         return this.httpClient.get<WorkflowStatus>(`${this.basePath}/notification/getLastWorkflowStatus`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -240,13 +355,20 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getPendingRequests(observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
-    public getPendingRequests(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
-    public getPendingRequests(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
-    public getPendingRequests(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
+    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
+    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
+    public notificationServiceImplGetPendingRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -265,6 +387,7 @@ export class NotificationService {
 
         return this.httpClient.get<Array<DocumentWorkflowStatusRequest>>(`${this.basePath}/notification/getPendingRequests`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -276,13 +399,25 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getRequests(observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
-    public getRequests(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
-    public getRequests(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
-    public getRequests(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'body', reportProgress?: boolean): Observable<Array<DocumentWorkflowStatusRequest>>;
+    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<DocumentWorkflowStatusRequest>>>;
+    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<DocumentWorkflowStatusRequest>>>;
+    public notificationServiceImplGetRequestsGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -301,6 +436,7 @@ export class NotificationService {
 
         return this.httpClient.get<Array<DocumentWorkflowStatusRequest>>(`${this.basePath}/notification/getRequests`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -312,13 +448,50 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param workflowStatusId 
+     * @param userName 
+     * @param userSource 
+     * @param statusDate 
+     * @param comment 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public rejectRequest(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public rejectRequest(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public rejectRequest(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public rejectRequest(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public notificationServiceImplRejectRequestGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, statusDate?: Date, comment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (workflowStatusId !== undefined && workflowStatusId !== null) {
+            queryParameters = queryParameters.set('workflowStatusId', <any>workflowStatusId);
+        }
+        if (userName !== undefined && userName !== null) {
+            queryParameters = queryParameters.set('userName', <any>userName);
+        }
+        if (userSource !== undefined && userSource !== null) {
+            queryParameters = queryParameters.set('userSource', <any>userSource);
+        }
+        if (statusDate !== undefined && statusDate !== null) {
+            queryParameters = queryParameters.set('statusDate', <any>statusDate.toISOString());
+        }
+        if (comment !== undefined && comment !== null) {
+            queryParameters = queryParameters.set('comment', <any>comment);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -337,6 +510,7 @@ export class NotificationService {
 
         return this.httpClient.get<any>(`${this.basePath}/notification/rejectRequest`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -348,13 +522,50 @@ export class NotificationService {
     /**
      * 
      * 
+     * @param sessionId 
+     * @param documentId 
+     * @param workflowStatusId 
+     * @param userName 
+     * @param userSource 
+     * @param requestDate 
+     * @param newComment 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateDocumentWorkflowStatusRequestComment(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public updateDocumentWorkflowStatusRequestComment(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public updateDocumentWorkflowStatusRequestComment(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public updateDocumentWorkflowStatusRequestComment(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public notificationServiceImplUpdateDocumentWorkflowStatusRequestCommentGetOrgKimiosWebservicesImpl(sessionId?: string, documentId?: number, workflowStatusId?: number, userName?: string, userSource?: string, requestDate?: Date, newComment?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+        }
+        if (documentId !== undefined && documentId !== null) {
+            queryParameters = queryParameters.set('documentId', <any>documentId);
+        }
+        if (workflowStatusId !== undefined && workflowStatusId !== null) {
+            queryParameters = queryParameters.set('workflowStatusId', <any>workflowStatusId);
+        }
+        if (userName !== undefined && userName !== null) {
+            queryParameters = queryParameters.set('userName', <any>userName);
+        }
+        if (userSource !== undefined && userSource !== null) {
+            queryParameters = queryParameters.set('userSource', <any>userSource);
+        }
+        if (requestDate !== undefined && requestDate !== null) {
+            queryParameters = queryParameters.set('requestDate', <any>requestDate.toISOString());
+        }
+        if (newComment !== undefined && newComment !== null) {
+            queryParameters = queryParameters.set('newComment', <any>newComment);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -373,6 +584,7 @@ export class NotificationService {
 
         return this.httpClient.get<any>(`${this.basePath}/notification/updateDocumentWorkflowStatusRequestComment`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

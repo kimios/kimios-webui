@@ -11,8 +11,12 @@
  */
 
 
-export interface DocumentType { 
+export interface Log { 
     uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+    date?: Date;
+    user?: string;
+    userSource?: string;
+    dmEntityUid?: number;
+    dmEntityType?: number;
+    operation?: number;
 }

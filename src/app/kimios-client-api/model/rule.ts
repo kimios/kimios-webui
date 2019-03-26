@@ -9,10 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { RuleImplP } from './ruleImplP';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface Rule { 
+    javaClassName?: string;
+    beans?: Array<RuleImplP>;
+    toto?: any;
 }

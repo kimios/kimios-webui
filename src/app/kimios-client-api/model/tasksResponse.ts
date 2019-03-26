@@ -9,10 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Number } from './number';
+import { TaskWrapper } from './taskWrapper';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface TasksResponse { 
+    tasks?: Array<TaskWrapper>;
+    totalProperty?: Number;
 }

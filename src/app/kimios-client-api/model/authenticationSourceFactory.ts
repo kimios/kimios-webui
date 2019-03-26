@@ -9,10 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { AuthenticationSource } from './authenticationSource';
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface AuthenticationSourceFactory { 
+    authenticationSources?: Array<AuthenticationSource>;
+    availableAuthenticationSourceXml?: string;
+    availableAuthenticationSource?: Array<string>;
 }

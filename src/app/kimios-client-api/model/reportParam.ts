@@ -11,8 +11,10 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
+export interface ReportParam { 
     name?: string;
-    documentType?: DocumentType;
+    type?: string;
+    value?: string;
+    listType?: string;
+    availableValues?: Array<string>;
 }

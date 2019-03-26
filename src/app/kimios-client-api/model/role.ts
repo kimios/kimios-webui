@@ -11,8 +11,8 @@
  */
 
 
-export interface DocumentType { 
-    uid?: number;
-    name?: string;
-    documentType?: DocumentType;
+export interface Role { 
+    role?: number;
+    userName?: string;
+    userSource?: string;
 }
