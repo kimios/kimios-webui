@@ -5,7 +5,7 @@ import {Observable, of, throwError} from 'rxjs';
 import {EntityService} from 'app/services/entity.service';
 import {catchError} from 'rxjs/operators';
 
-const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
+const DEFAULT_PATH = 'boumboumboum/mika';
 
 @Component({
     selector: 'app-file-manager',
@@ -20,10 +20,11 @@ export class FileManagerComponent implements OnInit {
         private entityService: EntityService,
     ) {
 
-        this.columnsDescription.forEach( (elem) => {
+        this.columnsDescription.forEach((elem) => {
             this.displayedColumns.push(elem.matHeaderCellDef);
         });
     }
+
     private filesPath: string = DEFAULT_PATH;
 
     displayedColumns: string[] = [];
@@ -57,20 +58,18 @@ export class FileManagerComponent implements OnInit {
             .subscribe(
                 (workspace) => {
                     this.workspaceUsed = workspace;
-                    this.entityService.retrieveFolder(pathTab[1], workspace)
-                        .pipe(
-                            catchError((err) => throwError(err))
-                        )
-                        .subscribe(
-                            (folder) => this.folderUsed = folder,
-                            (error) => console.log('error'),
-                            () => console.log('folder not find: ' + pathTab[1])
-                        );
                 }
             );
 
-            // this.entityService.
-
+        this.entityService.retrieveEntity('/' + DEFAULT_PATH)
+            .pipe(
+                catchError((err) => throwError(err))
+            )
+            .subscribe(
+                (folder) => this._folderUsed = folder,
+                (error) => console.log('error', error),
+                () => console.log('folder not find: ' + pathTab[1])
+            );
     }
 
     sortData(sort: Sort): number {

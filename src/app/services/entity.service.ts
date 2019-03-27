@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
-import {DMEntity, Document, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {DMEntity, Document, DocumentService, Folder, FolderService, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
 import {Observable, of, throwError} from 'rxjs';
 import {SessionService} from './session.service';
-import {camelCaseToDashCase} from '@angular/platform-browser/src/dom/util';
 import {catchError} from 'rxjs/operators';
 
 @Injectable({
@@ -14,16 +13,25 @@ export class EntityService {
         private sessionService: SessionService,
         private documentService: DocumentService,
         private workspaceService: WorkspaceService,
-        private folderService: FolderService
+        private folderService: FolderService,
+        private searchService: SearchService
     ) { }
 
     retrieveEntitiesAtPath(path: string): Observable<DMEntity[]> {
         let array: Observable<DMEntity[]>;
-
         let pathArray = path.split('/');
-
-
         return array;
+    }
+
+
+    retrieveEntity(path: string): Observable<DMEntity> {
+
+        let entity: Observable<DMEntity>;
+        entity = this.searchService.getDMentityFromPath(this.sessionService.sessionToken, path);
+        console.log('entity ', entity.path);
+        return entity;
+
+
     }
 
     retrieveUserWorkspaces(): Observable<Workspace[]> {
@@ -36,7 +44,7 @@ export class EntityService {
                 catchError((err) => of())
             )
             .map(
-                (array) => of(
+                (array: Array<any>) => of(
                     array.filter(
                         (elem) => elem.name === folderName
                     ).shift()
