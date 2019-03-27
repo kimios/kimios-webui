@@ -28,7 +28,7 @@ export class EntityService {
 
         let entity: Observable<DMEntity>;
         entity = this.searchService.getDMentityFromPath(this.sessionService.sessionToken, path);
-        console.log('entity ', entity.path);
+        console.log('entity ', entity);
         return entity;
 
 
