@@ -1,4 +1,15 @@
 
+<div>
+    <ul>
+        <li>
+            workspace used: {{workspaceUsed ? workspaceUsed.name : 'not find'}}
+        </li>
+        <li>
+            folder used: {{folderUsed ? folderUsed.name : 'not find'}}
+        </li>
+    </ul>
+</div>
+<br />
 <div class="example-container mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
         <ng-container

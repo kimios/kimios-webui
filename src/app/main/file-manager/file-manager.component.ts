@@ -1,7 +1,9 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatButtonToggleGroup, MatPaginator, MatSort, MatTableDataSource, Sort} from '@angular/material';
-import {Document, DocumentService, FolderService, WorkspaceService} from 'app/kimios-client-api';
-import {SessionService} from '../../services/session.service';
+import {Component, OnInit} from '@angular/core';
+import {Sort} from '@angular/material';
+import {Document, Folder, Workspace} from 'app/kimios-client-api';
+import {Observable, of, throwError} from 'rxjs';
+import {EntityService} from 'app/services/entity.service';
+import {catchError} from 'rxjs/operators';
 
 const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
 
@@ -11,10 +13,11 @@ const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
     styleUrls: ['./file-manager.component.scss']
 })
 export class FileManagerComponent implements OnInit {
+    private _folderUsed: Folder;
+    private workspaceUsed: Workspace;
 
     constructor(
-        private sessionService: SessionService,
-
+        private entityService: EntityService,
     ) {
 
         this.columnsDescription.forEach( (elem) => {
@@ -24,23 +27,56 @@ export class FileManagerComponent implements OnInit {
     private filesPath: string = DEFAULT_PATH;
 
     displayedColumns: string[] = [];
-    dataSource: DocumentInterface[] = ELEMENT_DATA;
+    dataSource: Document[];
 
     tables = [0];
 
     columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
+
+    set folderUsed(value: Folder) {
+        this._folderUsed = value;
+    }
+
+    get folderUsed(): Folder {
+        return this._folderUsed;
+    }
 
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
         return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
     }
 
     ngOnInit(): void {
+        const pathTab = this.filesPath.split('/');
 
-        // this.entityService
+        this.entityService.retrieveUserWorkspaces()
+            .map(
+                (array) => array.filter(
+                    (elem) => elem.name === pathTab[0]
+                ).shift()
+            )
+            .subscribe(
+                (workspace) => {
+                    this.workspaceUsed = workspace;
+                    this.entityService.retrieveFolder(pathTab[1], workspace)
+                        .pipe(
+                            catchError((err) => throwError(err))
+                        )
+                        .subscribe(
+                            (folder) => this.folderUsed = folder,
+                            (error) => console.log('error'),
+                            () => console.log('folder not find: ' + pathTab[1])
+                        );
+                }
+            );
+
+            // this.entityService.
 
     }
 
     sortData(sort: Sort): number {
+        if (this.dataSource === null) {
+            return;
+        }
         const data = this.dataSource.slice();
         if (!sort.active || sort.direction === '') {
             this.dataSource = data;
