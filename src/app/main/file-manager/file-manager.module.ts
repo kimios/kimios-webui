@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FileManagerComponent} from './file-manager.component';
-import {MatTableModule} from '@angular/material';
+import {MatSortModule, MatTableModule} from '@angular/material';
 
 @NgModule({
     declarations: [
@@ -9,7 +9,8 @@ import {MatTableModule} from '@angular/material';
     ],
     imports: [
         CommonModule,
-        MatTableModule
+        MatTableModule,
+        MatSortModule
     ]
 })
 export class FileManagerModule { }
