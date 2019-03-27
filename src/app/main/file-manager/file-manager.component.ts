@@ -14,7 +14,7 @@ const DEFAULT_PATH = 'boumboumboum/mika';
 })
 export class FileManagerComponent implements OnInit {
     private _folderUsed: Folder;
-    private workspaceUsed: Workspace;
+    public workspaceUsed: Workspace;
 
     constructor(
         private entityService: EntityService,
