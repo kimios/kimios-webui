@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Sort} from '@angular/material';
 import {Document, Folder, Workspace} from 'app/kimios-client-api';
-import {Observable, of, throwError} from 'rxjs';
+import {of} from 'rxjs';
 import {EntityService} from 'app/services/entity.service';
-import {catchError} from 'rxjs/operators';
+import 'rxjs/add/operator/mergeMap';
 
 const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
 
@@ -15,6 +15,13 @@ const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
 export class FileManagerComponent implements OnInit {
     private _folderUsed: Folder;
     private workspaceUsed: Workspace;
+    private documents: Document[];
+    private filesPath: string = DEFAULT_PATH;
+
+    displayedColumns: string[] = [];
+    dataSource: Document[];
+    tables = [0];
+    columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
 
     constructor(
         private entityService: EntityService,
@@ -24,14 +31,6 @@ export class FileManagerComponent implements OnInit {
             this.displayedColumns.push(elem.matHeaderCellDef);
         });
     }
-    private filesPath: string = DEFAULT_PATH;
-
-    displayedColumns: string[] = [];
-    dataSource: Document[];
-
-    tables = [0];
-
-    columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
 
     set folderUsed(value: Folder) {
         this._folderUsed = value;
@@ -49,28 +48,33 @@ export class FileManagerComponent implements OnInit {
         const pathTab = this.filesPath.split('/');
 
         this.entityService.retrieveUserWorkspaces()
-            .map(
-                (array) => array.filter(
+            .mergeMap(
+                (array) => of(array.filter(
                     (elem) => elem.name === pathTab[0]
-                ).shift()
+                ).shift())
             )
-            .subscribe(
+            .mergeMap(
                 (workspace) => {
                     this.workspaceUsed = workspace;
-                    this.entityService.retrieveFolder(pathTab[1], workspace)
-                        .pipe(
-                            catchError((err) => throwError(err))
-                        )
-                        .subscribe(
-                            (folder) => this.folderUsed = folder,
-                            (error) => console.log('error'),
-                            () => console.log('folder not find: ' + pathTab[1])
-                        );
+                    return this.entityService.retrieveFolders(workspace);
                 }
-            );
-
-            // this.entityService.
-
+            )
+            .mergeMap(
+                (folders) => {
+                    const f = folders.filter(
+                        (elem) => elem.name === pathTab[1]
+                    ).shift();
+                    this.folderUsed = f;
+                    return of(f);
+                }
+            )
+            .mergeMap(
+                (folder) => this.entityService.retrieveFolderFiles(folder)
+            )
+            .mergeMap(
+                (docs) => this.dataSource = docs
+            )
+            .subscribe();
     }
 
     sortData(sort: Sort): number {
