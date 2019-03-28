@@ -1,7 +1,9 @@
-import {Injectable, OnDestroy} from '@angular/core';
+import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
-import {Observable} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
+import {Router} from '@angular/router';
+import {catchError} from 'rxjs/operators';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -15,12 +17,11 @@ export class SessionService implements OnDestroy {
 
     constructor(
         private securityService: SecurityService,
-        private cookieService: CookieService
+        private cookieService: CookieService,
+        private router: Router,
+        public _zone: NgZone
     ) {
-        this.intervalId = window.setInterval(
-            () => this.setSessionAlive(),
-            5000
-        );
+
     }
 
     ngOnDestroy(): void {
@@ -56,7 +57,51 @@ export class SessionService implements OnDestroy {
         return this.securityService.getUser(this.sessionToken);
     }
 
-    logout(): Observable<string> {
-        return this.securityService.endSession(this.sessionToken);
+    logout(): void {
+        this.securityService.endSession(this.sessionToken).subscribe();
+        this.router.navigate(['/login']);
+        clearInterval(this.intervalId);
+    }
+
+    callStartSession(login: string, source: string, pwd: string): Observable<any> {
+        return this.securityService
+            .startSession(login, source, pwd);
+    }
+
+    login(login: string, authenticationSource: string, password: string): void {
+        let token = null;
+        // const router = this.router;
+
+        this.callStartSession(login, authenticationSource, password)
+            .pipe(
+                catchError(err => {
+                    if (err.status === 200
+                        && err.statusText === 'OK') {
+                        token = err.error.text;
+
+                        return of();
+                    }
+                    throwError(err);
+                })
+            )
+            .subscribe(
+                res => {
+                },
+                error => {
+                },
+                () => {
+                    if (token != null) {
+                        this._zone.run(() => {
+                            this.sessionToken = token;
+                            this.sessionAlive = true;
+                            this.router.navigate(['']);
+                            this.intervalId = window.setInterval(
+                                () => this.setSessionAlive(),
+                                5000
+                            );
+                        });
+                    }
+                }
+            );
     }
 }

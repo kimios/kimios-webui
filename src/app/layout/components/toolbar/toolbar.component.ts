@@ -176,11 +176,6 @@ export class ToolbarComponent implements OnInit, OnDestroy
     }
 
     logout(): void {
-        this.sessionService.logout()
-            .subscribe(
-                next => this.router.navigate(['']),
-                error => console.log('error while logout: ' + error),
-                () => this.router.navigate(['']),
-             );
+        this.sessionService.logout();
     }
 }
