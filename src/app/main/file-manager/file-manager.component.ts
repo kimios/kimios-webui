@@ -15,12 +15,10 @@ const DEFAULT_PATH = 'WORKSPACE_DEFAULT/FOLDER_DEFAULT';
 export class FileManagerComponent implements OnInit {
     private _folderUsed: Folder;
     private workspaceUsed: Workspace;
-    private documents: Document[];
     private filesPath: string = DEFAULT_PATH;
 
     displayedColumns: string[] = [];
     dataSource: Document[];
-    tables = [0];
     columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
 
     constructor(
@@ -92,39 +90,6 @@ export class FileManagerComponent implements OnInit {
         });
     }
 }
-
-export interface DocumentInterface {
-    name: string;
-    documentTypeName: string;
-    mimeType: string;
-    updateDate: Date;
-    creationDate: Date;
-    owner: string;
-    lastVersionId: string;
-}
-
-const ELEMENT_DATA: DocumentInterface[] = [
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Helium', documentTypeName: 'doc type 2', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Helium', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Beryllium', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Boron', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Fluorine', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Neon', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 5', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 09', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'}
-
-];
 
 export interface ColumnDescription {
     matColumnDef: string;
