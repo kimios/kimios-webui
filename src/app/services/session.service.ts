@@ -1,7 +1,7 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {SecurityService, User} from '../kimios-client-api';
-import { CookieService } from 'ngx-cookie-service';
-import {Observable, of} from 'rxjs';
+import {Injectable, OnDestroy} from '@angular/core';
+import {SecurityService, User} from 'app/kimios-client-api';
+import {CookieService} from 'ngx-cookie-service';
+import {Observable} from 'rxjs';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -54,5 +54,9 @@ export class SessionService implements OnDestroy {
 
     retrieveUserData(): Observable<User> {
         return this.securityService.getUser(this.sessionToken);
+    }
+
+    logout(): Observable<string> {
+        return this.securityService.endSession(this.sessionToken);
     }
 }
