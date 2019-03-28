@@ -1,17 +1,14 @@
-import {Component, Input, NgZone, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {FuseConfigService} from '@fuse/services/config.service';
 import {fuseAnimations} from '@fuse/animations';
 
-import {Router} from '@angular/router';
-
 import {UserService} from 'app/user.service';
 import {SecurityService} from 'app/kimios-client-api/api/api';
 import {AuthenticationSource} from 'app/kimios-client-api';
-import {Observable, of, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
-import {catchError} from 'rxjs/operators';
 
 @Component({
     selector     : 'login',
@@ -40,8 +37,6 @@ export class LoginComponent implements OnInit
         private _fuseConfigService: FuseConfigService,
         private _formBuilder: FormBuilder,
         private userService: UserService,
-        public router: Router,
-        public _zone: NgZone,
         private securityService: SecurityService,
         private sessionService: SessionService
     )
@@ -97,37 +92,9 @@ export class LoginComponent implements OnInit
     }
 
     onSubmit(): void {
-        let token = null;
-        // const router = this.router;
-
-        this.callStartSession(
-                this.loginForm.get('login').value,
-                this.loginForm.get('authenticationSource').value,
-                this.loginForm.get('password').value
-            )
-            .pipe(
-                catchError(err => {
-                    if (err.status === 200
-                        && err.statusText === 'OK') {
-                        token = err.error.text;
-
-                        return of();
-                    }
-                    throwError(err);
-                })
-            )
-            .subscribe(
-                res => {},
-                error => {},
-                () => {
-                    if (token != null) {
-                        this._zone.run(() => {
-                            this.sessionService.sessionToken = token;
-                            this.sessionService.sessionAlive = true;
-                            this.router.navigate(['']);
-                        });
-                    }
-                }
-            );
+        this.sessionService.login(this.loginForm.get('login').value,
+            this.loginForm.get('authenticationSource').value,
+            this.loginForm.get('password').value
+        );
     }
 }

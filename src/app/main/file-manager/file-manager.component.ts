@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Sort} from '@angular/material';
 import {Document, Folder, Workspace} from 'app/kimios-client-api';
-import {Observable, of, throwError} from 'rxjs';
+import {of} from 'rxjs';
 import {EntityService} from 'app/services/entity.service';
-import {catchError} from 'rxjs/operators';
+import 'rxjs/add/operator/mergeMap';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -14,7 +14,12 @@ const DEFAULT_PATH = 'boumboumboum/mika';
 })
 export class FileManagerComponent implements OnInit {
     private _folderUsed: Folder;
-    public workspaceUsed: Workspace;
+    private workspaceUsed: Workspace;
+    private filesPath: string = DEFAULT_PATH;
+
+    displayedColumns: string[] = [];
+    dataSource: Document[];
+    columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
 
     constructor(
         private entityService: EntityService,
@@ -24,15 +29,6 @@ export class FileManagerComponent implements OnInit {
             this.displayedColumns.push(elem.matHeaderCellDef);
         });
     }
-
-    private filesPath: string = DEFAULT_PATH;
-
-    displayedColumns: string[] = [];
-    dataSource: Document[];
-
-    tables = [0];
-
-    columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
 
     set folderUsed(value: Folder) {
         this._folderUsed = value;
@@ -50,26 +46,33 @@ export class FileManagerComponent implements OnInit {
         const pathTab = this.filesPath.split('/');
 
         this.entityService.retrieveUserWorkspaces()
-            .map(
-                (array) => array.filter(
+            .mergeMap(
+                (array) => of(array.filter(
                     (elem) => elem.name === pathTab[0]
-                ).shift()
+                ).shift())
             )
-            .subscribe(
+            .mergeMap(
                 (workspace) => {
                     this.workspaceUsed = workspace;
+                    return this.entityService.retrieveFolders(workspace);
                 }
-            );
-
-        this.entityService.retrieveEntity('/' + DEFAULT_PATH)
-            .pipe(
-                catchError((err) => throwError(err))
             )
-            .subscribe(
-                (folder) => this._folderUsed = folder,
-                (error) => console.log('error', error),
-                () => console.log('folder not find: ' + pathTab[1])
-            );
+            .mergeMap(
+                (folders) => {
+                    const f = folders.filter(
+                        (elem) => elem.name === pathTab[1]
+                    ).shift();
+                    this.folderUsed = f;
+                    return of(f);
+                }
+            )
+            .mergeMap(
+                (folder) => this.entityService.retrieveFolderFiles(folder)
+            )
+            .mergeMap(
+                (docs) => this.dataSource = docs
+            )
+            .subscribe();
     }
 
     sortData(sort: Sort): number {
@@ -87,39 +90,6 @@ export class FileManagerComponent implements OnInit {
         });
     }
 }
-
-export interface DocumentInterface {
-    name: string;
-    documentTypeName: string;
-    mimeType: string;
-    updateDate: Date;
-    creationDate: Date;
-    owner: string;
-    lastVersionId: string;
-}
-
-const ELEMENT_DATA: DocumentInterface[] = [
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Helium', documentTypeName: 'doc type 2', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Helium', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Beryllium', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Boron', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Carbon', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Fluorine', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Neon', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 3', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 5', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 09', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'},
-    {name: 'Hydrogen', documentTypeName: 'doc type 1', mimeType: 'mime type', updateDate: new Date(), creationDate: new Date(), owner: 'You', lastVersionId: '0.0.1'}
-
-];
 
 export interface ColumnDescription {
     matColumnDef: string;

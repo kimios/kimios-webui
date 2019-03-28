@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import { Subject} from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
@@ -7,9 +7,10 @@ import * as _ from 'lodash';
 import { FuseConfigService } from '@fuse/services/config.service';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
 
-import { navigation } from 'app/navigation/navigation';
-import {User} from '../../../kimios-client-api';
-import {SessionService} from '../../../services/session.service';
+import {navigation} from 'app/navigation/navigation';
+import {User} from 'app/kimios-client-api';
+import {SessionService} from 'app/services/session.service';
+import {Router} from '@angular/router';
 
 @Component({
     selector     : 'toolbar',
@@ -44,7 +45,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
         private _fuseConfigService: FuseConfigService,
         private _fuseSidebarService: FuseSidebarService,
         private _translateService: TranslateService,
-        private sessionService: SessionService
+        private sessionService: SessionService,
+        private router: Router
     )
     {
         // Set the defaults
@@ -171,5 +173,9 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
         // Use the selected language for translations
         this._translateService.use(lang.id);
+    }
+
+    logout(): void {
+        this.sessionService.logout();
     }
 }

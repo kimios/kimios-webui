@@ -38,22 +38,13 @@ export class EntityService {
         return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
     }
 
-    retrieveFolder(folderName: string, parent: DMEntity): Observable<any> {
-        return this.folderService.getFolders(this.sessionService.sessionToken, parent.uid)
-            .pipe(
-                catchError((err) => of())
-            )
-            .map(
-                (array: Array<any>) => of(
-                    array.filter(
-                        (elem) => elem.name === folderName
-                    ).shift()
-                )
-            );
+    retrieveFolders(parent: DMEntity): Observable<Folder[]> {
+        return this.folderService.getFolders(this.sessionService.sessionToken, parent.uid);
     }
 
     retrieveFolderFiles(parent: DMEntity): Observable<Document[]> {
         return this.documentService.getDocuments(this.sessionService.sessionToken, parent.uid);
 
     }
+
 }
