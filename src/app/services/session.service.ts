@@ -78,7 +78,6 @@ export class SessionService implements OnDestroy {
                     if (err.status === 200
                         && err.statusText === 'OK') {
                         token = err.error.text;
-
                         return of();
                     }
                     throwError(err);

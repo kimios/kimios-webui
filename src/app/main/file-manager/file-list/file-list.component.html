@@ -1,0 +1,26 @@
+<mat-table #table [dataSource]="dataSource" [@animateStagger]="{value:'50'}" matSort
+           matSort matSortActive="updateDate" matSortDirection="desc" matSortDisableClear>
+
+
+    <ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}">
+        <mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header="{{col.matColumnDef}}"
+        > {{col.displayName}} </mat-header-cell>
+        <mat-cell *matCellDef="let element" > {{ col.cell ? col.cell(element) : element[col.matColumnDef]}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns;"
+             (click)="onSelect(row)"
+             [ngClass]="{'selected' : row == selected}"
+             matRipple [@animate]="{value:'*',params:{y:'100%'}}"
+    >
+    </mat-row>
+
+
+</mat-table>

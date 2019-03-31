@@ -6,13 +6,17 @@ import {SampleComponent} from './main/sample/sample.component';
 import {LoggedInGuard} from './logged-in.guard';
 import {FileManagerComponent} from './main/file-manager/file-manager.component';
 import {FileDetailComponent} from './main/components/file-detail/file-detail.component';
+import {EntityService} from './services/entity.service';
 
 export const routes: Routes = [
     {
         path: '',
         component: FileManagerComponent,
         pathMatch: 'full' ,
-        canActivate: [ LoggedInGuard ]
+        canActivate: [ LoggedInGuard ],
+        resolve  : {
+            files: EntityService
+        }
     },
     {
         path: 'files/:id',
