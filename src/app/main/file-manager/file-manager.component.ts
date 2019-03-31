@@ -8,10 +8,6 @@ import 'rxjs/add/operator/mergeMap';
 const DEFAULT_PATH = 'boumboumboum/mika';
 
 
-
-
-
-
 @Component({
     selector: 'app-file-manager',
     templateUrl: './file-manager.component.html',
