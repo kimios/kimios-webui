@@ -192,15 +192,6 @@ export interface ColumnDescription {
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
-    /*{
-        id: 'icon',
-        matColumnDef: 'icon',
-        position: 0,
-        matHeaderCellDef: 'icon',
-        sticky: false,
-        displayName: '',
-        cell: null
-    },*/
     {
         id: 'name',
         matColumnDef: 'name',

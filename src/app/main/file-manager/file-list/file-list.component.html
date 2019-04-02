@@ -1,14 +1,6 @@
 <mat-table #table [dataSource]="dataSource" [@animateStagger]="{value:'50'}" matSort
            matSort matSortActive="updateDate" matSortDirection="desc" matSortDisableClear>
 
-
-    <ng-container matColumnDef="icon">
-        <mat-header-cell *matHeaderCellDef fxFlex="64px"></mat-header-cell>
-        <mat-cell *matCellDef="let element">
-            <mat-icon class="type-icon" [ngClass]="element.extension"></mat-icon>
-        </mat-cell>
-    </ng-container>
-
     <ng-container
             *ngFor="let col of columnsDescription"
             matColumnDef="{{col.matColumnDef}}"
@@ -19,7 +11,7 @@
         > {{col.displayName}} </mat-header-cell>
         <mat-cell *matCellDef="let element">
             <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
-            <mat-icon *ngIf="col.id == 'icon'" class="type-icon" [ngClass]="element.extension"></mat-icon>
+            <mat-icon *ngIf="col.id == 'icon'" class="type-icon" [ngClass]="element.extension" fxFlex="64px"></mat-icon>
         </mat-cell>
     </ng-container>
 
