@@ -9,15 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { DMEntityImpl } from './dMEntityImpl';
-import { DMSecurityRule } from './dMSecurityRule';
-import { DataTransfer } from './dataTransfer';
-import { MailContact } from './mailContact';
+import { DMEntity } from './dMEntity';
 
 
 export interface Share { 
     id?: number;
-    entity?: DMEntityImpl;
     creationDate?: Date;
     updateDate?: Date;
     creatorId?: string;
@@ -35,9 +31,7 @@ export interface Share {
     downloadCount?: number;
     expirationDate?: Date;
     shareStatus?: Share.ShareStatusEnum;
-    dataTransfer?: DataTransfer;
-    mailContact?: MailContact;
-    securityRuleSet?: Array<DMSecurityRule>;
+    entity?: DMEntity;
 }
 export namespace Share {
     export type TypeEnum = 'SYSTEM' | 'EXTERNAL';

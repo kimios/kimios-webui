@@ -12,6 +12,8 @@ import {Document} from '../../../kimios-client-api';
 import * as moment from 'moment';
 import {SearchEntityService} from '../../../services/searchentity.service';
 
+
+
 @Component({
     selector     : 'file-list',
     templateUrl  : './file-list.component.html',
@@ -190,19 +192,28 @@ export interface ColumnDescription {
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
+    /*{
+        id: 'icon',
+        matColumnDef: 'icon',
+        position: 0,
+        matHeaderCellDef: 'icon',
+        sticky: false,
+        displayName: '',
+        cell: null
+    },*/
     {
         id: 'name',
         matColumnDef: 'name',
-        position: 0,
+        position: 1,
         matHeaderCellDef: 'name',
-        sticky: true,
+        sticky: false,
         displayName: 'Name',
         cell: null
     },
     {
         id: 'documentTypeName',
         matColumnDef: 'documentTypeName',
-        position: 1,
+        position: 2,
         matHeaderCellDef: 'documentTypeName',
         sticky: false,
         displayName: 'Type',
@@ -225,6 +236,15 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'Size',
         cell: (row: any) => `${ FileManagerFileListComponent.humanFileSize(row.length, 1024) }`
+    },
+    {
+        id: 'extension',
+        matColumnDef: 'extension',
+        position: 5,
+        matHeaderCellDef: 'extension',
+        sticky: false,
+        displayName: 'File Type',
+        cell: null
     }
     /*{
         id: 'creationDate',

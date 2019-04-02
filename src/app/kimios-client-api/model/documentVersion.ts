@@ -9,8 +9,6 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Document } from './document';
-import { DocumentType } from './documentType';
 
 
 export interface DocumentVersion { 
@@ -20,12 +18,11 @@ export interface DocumentVersion {
     creationDate?: Date;
     modificationDate?: Date;
     documentUid?: number;
-    document?: Document;
-    storagePath?: string;
     length?: number;
-    documentType?: DocumentType;
-    hashMD5?: string;
-    hashSHA1?: string;
+    documentTypeUid?: number;
+    documentTypeName?: string;
+    hashMd5?: string;
+    hashSha?: string;
     customVersion?: string;
     customVersionPending?: string;
     lastUpdateAuthor?: string;

@@ -14,5 +14,5 @@
 export interface DocumentType { 
     uid?: number;
     name?: string;
-    documentType?: DocumentType;
+    documentTypeUid?: number;
 }

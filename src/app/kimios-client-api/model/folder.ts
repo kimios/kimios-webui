@@ -9,25 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { DMEntityAttribute } from './dMEntityAttribute';
-import { DMEntityImpl } from './dMEntityImpl';
-import { Share } from './share';
+import { DMEntity } from './dMEntity';
+import { MetaValue } from './metaValue';
 
 
-export interface Folder { 
-    uid?: number;
-    type?: number;
-    path?: string;
-    name?: string;
-    owner?: string;
-    ownerSource?: string;
-    creationDate?: Date;
-    updateDate?: Date;
-    attributes?: { [key: string]: DMEntityAttribute; };
-    addOnDatas?: string;
-    trashed?: boolean;
-    shareSet?: Array<Share>;
-    parent?: DMEntityImpl;
+export interface Folder extends DMEntity { 
     parentUid?: number;
     parentType?: number;
 }

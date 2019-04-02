@@ -9,14 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Group } from './group';
 
 
 export interface Session { 
-    uid?: string;
+    sessionUid?: string;
     userName?: string;
     userSource?: string;
     lastUse?: Date;
-    groups?: Array<Group>;
     metaDatas?: string;
 }

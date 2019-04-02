@@ -9,7 +9,6 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Group } from './group';
 
 
 export interface User { 
@@ -18,15 +17,9 @@ export interface User {
     firstName?: string;
     lastName?: string;
     phoneNumber?: string;
-    avatar?: Array<string>;
+    source?: string;
     lastLogin?: Date;
     mail?: string;
-    password?: string;
-    authenticationSourceName?: string;
-    groups?: Array<Group>;
-    attributes?: { [key: string]: string; };
-    enabled?: boolean;
     emails?: Array<string>;
-    type?: number;
-    id?: string;
+    enabled?: boolean;
 }

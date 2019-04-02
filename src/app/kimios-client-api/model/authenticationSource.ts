@@ -9,14 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { GroupFactory } from './groupFactory';
-import { UserFactory } from './userFactory';
 
 
 export interface AuthenticationSource { 
     name?: string;
-    userFactory?: UserFactory;
-    groupFactory?: GroupFactory;
-    enableSSOCheck?: boolean;
-    enableAuthByEmail?: boolean;
+    className?: string;
+    enableSso?: boolean;
+    enableMailCheck?: boolean;
 }

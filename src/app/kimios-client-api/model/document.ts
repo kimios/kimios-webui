@@ -9,34 +9,33 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { DMEntityAttribute } from './dMEntityAttribute';
-import { DocumentVersion } from './documentVersion';
-import { Folder } from './folder';
-import { Lock } from './lock';
-import { Share } from './share';
+import { DMEntity } from './dMEntity';
+import { MetaValue } from './metaValue';
 
 
-export interface Document { 
-    uid?: number;
-    type?: number;
-    path?: string;
-    name?: string;
-    owner?: string;
-    ownerSource?: string;
-    creationDate?: Date;
-    updateDate?: Date;
-    attributes?: { [key: string]: DMEntityAttribute; };
-    addOnDatas?: string;
-    trashed?: boolean;
-    shareSet?: Array<Share>;
+export interface Document extends DMEntity { 
+    lastVersionId?: number;
+    versionCreationDate?: Date;
+    versionUpdateDate?: Date;
     folderUid?: number;
-    folder?: Folder;
     mimeType?: string;
     extension?: string;
-    lock?: Lock;
-    relatedDocuments?: Array<Document>;
-    parentsRelatedDocuments?: Array<Document>;
-    versionList?: Array<DocumentVersion>;
     checkedOut?: boolean;
-    checkoutLock?: Lock;
+    checkoutUser?: string;
+    checkoutUserSource?: string;
+    checkoutDate?: Date;
+    length?: number;
+    customVersion?: string;
+    customVersionPending?: string;
+    lastUpdateAuthor?: string;
+    lastUpdateAuthorSource?: string;
+    workflowStatusUid?: number;
+    workflowStatusName?: string;
+    validatorUserName?: string;
+    validatorUserSource?: string;
+    workflowName?: string;
+    documentTypeName?: string;
+    documentTypeUid?: number;
+    indexScore?: number;
+    outOfWorkflow?: boolean;
 }

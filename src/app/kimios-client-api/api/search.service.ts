@@ -235,11 +235,13 @@ export class SearchService {
     public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
     public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
     public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
-    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number,
-                                   sortField?: string, sortDir?: string,
-                                   virtualPath?: string, requestId?: number,
-                                   mustSave?: boolean, criterias?: Criteria[], observe: any = 'body',
-                                   reportProgress: boolean = false ): Observable<any> {
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+
+
+
 
 
 

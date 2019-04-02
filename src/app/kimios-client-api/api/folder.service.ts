@@ -58,12 +58,12 @@ export class FolderService {
 
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param name
-     * @param parentId
-     * @param isSecurityInherited
+     * 
+     * 
+     * @param sessionId 
+     * @param name 
+     * @param parentId 
+     * @param isSecurityInherited 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -117,10 +117,10 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param folderId
+     * 
+     * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -166,10 +166,10 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param folderId
+     * 
+     * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -215,10 +215,10 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param folderId
+     * 
+     * 
+     * @param sessionId 
+     * @param folderId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -264,10 +264,10 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param parentId
+     * 
+     * 
+     * @param sessionId 
+     * @param parentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -298,7 +298,8 @@ export class FolderService {
         }
 
         // to determine the Content-Type header
-        const consumes: string[] = [];
+        const consumes: string[] = [
+        ];
 
         return this.httpClient.get<Array<Folder>>(`${this.basePath}/folder/getFolders`,
             {
@@ -312,10 +313,10 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param foldersId
+     * 
+     * 
+     * @param sessionId 
+     * @param foldersId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -363,12 +364,12 @@ export class FolderService {
     }
 
     /**
-     *
-     *
-     * @param sessionId
-     * @param folderId
-     * @param name
-     * @param parentId
+     * 
+     * 
+     * @param sessionId 
+     * @param folderId 
+     * @param name 
+     * @param parentId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */

@@ -2,6 +2,13 @@
            matSort matSortActive="updateDate" matSortDirection="desc" matSortDisableClear>
 
 
+    <ng-container matColumnDef="icon">
+        <mat-header-cell *matHeaderCellDef fxFlex="64px"></mat-header-cell>
+        <mat-cell *matCellDef="let element">
+            <mat-icon class="type-icon" [ngClass]="element.extension"></mat-icon>
+        </mat-cell>
+    </ng-container>
+
     <ng-container
             *ngFor="let col of columnsDescription"
             matColumnDef="{{col.matColumnDef}}"
@@ -10,7 +17,10 @@
                 *matHeaderCellDef
                 mat-sort-header="{{col.matColumnDef}}"
         > {{col.displayName}} </mat-header-cell>
-        <mat-cell *matCellDef="let element" > {{ col.cell ? col.cell(element) : element[col.matColumnDef]}} </mat-cell>
+        <mat-cell *matCellDef="let element">
+            <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+            <mat-icon *ngIf="col.id == 'icon'" class="type-icon" [ngClass]="element.extension"></mat-icon>
+        </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>

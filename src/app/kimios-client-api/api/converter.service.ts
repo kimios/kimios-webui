@@ -21,7 +21,7 @@ import { Observable }                                        from 'rxjs/Observab
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
-import {ConverterDescriptor} from '..';
+import { ConverterDescriptor } from '../model/converterDescriptor';
 
 
 @Injectable()
@@ -57,13 +57,13 @@ export class ConverterService {
 
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param documentId 
-     * @param converterImpl 
-     * @param outputFormat 
-     * @param inline 
+     *
+     *
+     * @param sessionId
+     * @param documentId
+     * @param converterImpl
+     * @param outputFormat
+     * @param inline
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -122,12 +122,12 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param documentId 
-     * @param outputFormat 
-     * @param converterImpl 
+     *
+     *
+     * @param sessionId
+     * @param documentId
+     * @param outputFormat
+     * @param converterImpl
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -182,13 +182,13 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param versionId 
-     * @param converterImpl 
-     * @param outputFormat 
-     * @param inline 
+     *
+     *
+     * @param sessionId
+     * @param versionId
+     * @param converterImpl
+     * @param outputFormat
+     * @param inline
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -247,13 +247,13 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param versionId 
-     * @param converterImpl 
-     * @param outputFormat 
-     * @param inline 
+     *
+     *
+     * @param sessionId
+     * @param versionId
+     * @param converterImpl
+     * @param outputFormat
+     * @param inline
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -314,13 +314,13 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param documentId 
-     * @param converterImpl 
-     * @param outputFormat 
-     * @param inline 
+     *
+     *
+     * @param sessionId
+     * @param documentId
+     * @param converterImpl
+     * @param outputFormat
+     * @param inline
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -381,9 +381,9 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -425,10 +425,10 @@ export class ConverterService {
     }
 
     /**
-     * 
-     * 
-     * @param idpreview 
-     * @param respath 
+     *
+     *
+     * @param idpreview
+     * @param respath
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */

@@ -34,23 +34,4 @@ export * from './studio.service';
 import { StudioService } from './studio.service';
 export * from './workspace.service';
 import { WorkspaceService } from './workspace.service';
-export const APIS = [
-    AdministrationService,
-    ConverterService,
-    DefaultService,
-    DocumentService,
-    DocumentVersionService,
-    EditorsService,
-    FiletransferService,
-    FolderService,
-    InformationService,
-    LogService,
-    NotificationService,
-    ReportingService,
-    RuleService,
-    SearchService,
-    SecurityService,
-    ShareService,
-    StudioService,
-    WorkspaceService
-];
+export const APIS = [AdministrationService, ConverterService, DefaultService, DocumentService, DocumentVersionService, EditorsService, FiletransferService, FolderService, InformationService, LogService, NotificationService, ReportingService, RuleService, SearchService, SecurityService, ShareService, StudioService, WorkspaceService];
