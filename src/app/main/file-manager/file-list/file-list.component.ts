@@ -35,6 +35,23 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
 
 
 
+    static humanFileSize(bytes, si): string {
+        var thresh = si ? 1000 : 1024;
+        if (Math.abs(bytes) < thresh) {
+            return bytes + ' B';
+        }
+        var units = si
+            ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+            : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        var u = -1;
+        do {
+            bytes /= thresh;
+            ++u;
+        } while (Math.abs(bytes) >= thresh && u < units.length - 1);
+        return bytes.toFixed(1) + ' ' + units[u];
+    }
+
+
     /**
      * Constructor
      *
@@ -192,23 +209,23 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         cell: null
     },
     {
-        id: 'mimeType',
-        matColumnDef: 'mimeType',
-        position: 2,
-        matHeaderCellDef: 'mimeType',
-        sticky: false,
-        displayName: 'Type',
-        cell: null
-    },
-    {
-        id: 'updateDate',
-        matColumnDef: 'updateDate',
+        id: 'versionUpdateDate',
+        matColumnDef: 'versionUpdateDate',
         position: 3,
-        matHeaderCellDef: 'updateDate',
+        matHeaderCellDef: 'versionUpdateDate',
         sticky: false,
         displayName: 'Last Update',
-        cell: (row: Document) => `${ moment(row.updateDate).format('DD/MM/YYYY HH:mm:ss')}`
+        cell: (row: Document) => `${ moment(row.updateDate).fromNow() }`
     },
+    {
+        id: 'length',
+        matColumnDef: 'length',
+        position: 4,
+        matHeaderCellDef: 'length',
+        sticky: false,
+        displayName: 'Size',
+        cell: (row: any) => `${ FileManagerFileListComponent.humanFileSize(row.length, 1024) }`
+    }
     /*{
         id: 'creationDate',
         matColumnDef: 'creationDate',

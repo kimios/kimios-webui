@@ -107,10 +107,11 @@ export class SearchEntityService implements Resolve<any> {
                 // TODO: enhance sorfielf mapping:
 
                 const searchFieldMapping = {
-                  updateDate: 'DocumentVersionUpdateDate',
-                  documentTypeName: 'DocumentTypeName',
-                  name: 'DocumentName',
-                  mimeType: 'DocumentMimeType'
+                    versionUpdateDate: 'DocumentVersionUpdateDate',
+                    lastUpdateAuthor: 'DocumentVersionLastUpdateAuthor',
+                    documentTypeName: 'DocumentTypeName',
+                    name: 'DocumentName',
+                    length: 'DocumentVersionLength'
                 };
 
 
