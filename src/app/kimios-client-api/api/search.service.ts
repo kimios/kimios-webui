@@ -29,6 +29,7 @@ import { TasksResponse } from '../model/tasksResponse';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
+import {Criteria} from '..';
 
 
 @Injectable()
@@ -64,11 +65,11 @@ export class SearchService {
 
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
-     * @param comment 
+     *
+     *
+     * @param sessionId
+     * @param taskId
+     * @param comment
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -118,9 +119,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -164,11 +165,11 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param xmlStream 
-     * @param dmEntityId 
+     *
+     *
+     * @param sessionId
+     * @param xmlStream
+     * @param dmEntityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -218,29 +219,27 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
-     * @param virtualPath 
-     * @param requestId 
-     * @param mustSave 
+     *
+     *
+     * @param sessionId
+     * @param start
+     * @param pageSize
+     * @param sortField
+     * @param sortDir
+     * @param virtualPath
+     * @param requestId
+     * @param mustSave
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
-    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
-    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
-    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-
-
-
-
-
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'body', reportProgress?: boolean): Observable<SearchResponse>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SearchResponse>>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number, sortField?: string, sortDir?: string, virtualPath?: string, requestId?: number, mustSave?: boolean, criterias?: Criteria[], observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SearchResponse>>;
+    public advancedSearchDocuments(sessionId?: string, start?: number, pageSize?: number,
+                                   sortField?: string, sortDir?: string,
+                                   virtualPath?: string, requestId?: number,
+                                   mustSave?: boolean, criterias?: Criteria[], observe: any = 'body',
+                                   reportProgress: boolean = false ): Observable<any> {
 
 
 
@@ -287,7 +286,7 @@ export class SearchService {
         ];
 
         return this.httpClient.post<SearchResponse>(`${this.basePath}/search/advancedSearchDocument`,
-            null,
+            criterias,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
@@ -299,15 +298,15 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
-     * @param virtualPath 
-     * @param requestId 
+     *
+     *
+     * @param sessionId
+     * @param start
+     * @param pageSize
+     * @param sortField
+     * @param sortDir
+     * @param virtualPath
+     * @param requestId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -375,10 +374,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param searchQueryId 
+     *
+     *
+     * @param sessionId
+     * @param searchQueryId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -424,15 +423,15 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param searchQueryId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
-     * @param virtualPath 
+     *
+     *
+     * @param sessionId
+     * @param searchQueryId
+     * @param start
+     * @param pageSize
+     * @param sortField
+     * @param sortDir
+     * @param virtualPath
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -498,11 +497,11 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param start 
-     * @param limit 
+     *
+     *
+     * @param sessionId
+     * @param start
+     * @param limit
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -552,10 +551,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
+     *
+     *
+     * @param sessionId
+     * @param taskId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -601,10 +600,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param path 
+     *
+     *
+     * @param sessionId
+     * @param path
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -650,10 +649,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param entityId 
+     *
+     *
+     * @param sessionId
+     * @param entityId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -699,11 +698,11 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param start 
-     * @param limit 
+     *
+     *
+     * @param sessionId
+     * @param start
+     * @param limit
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -753,9 +752,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -797,12 +796,12 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param processInstanceId 
-     * @param start 
-     * @param limit 
+     *
+     *
+     * @param sessionId
+     * @param processInstanceId
+     * @param start
+     * @param limit
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -856,10 +855,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
+     *
+     *
+     * @param sessionId
+     * @param taskId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -905,9 +904,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -949,9 +948,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -993,9 +992,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1037,9 +1036,9 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
+     *
+     *
+     * @param sessionId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1081,10 +1080,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param searchQueryId 
+     *
+     *
+     * @param sessionId
+     * @param searchQueryId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1130,15 +1129,15 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param query 
-     * @param dmEntityId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
+     *
+     *
+     * @param sessionId
+     * @param query
+     * @param dmEntityId
+     * @param start
+     * @param pageSize
+     * @param sortField
+     * @param sortDir
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1204,15 +1203,15 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param query 
-     * @param dmEntityId 
-     * @param start 
-     * @param pageSize 
-     * @param sortField 
-     * @param sortDir 
+     *
+     *
+     * @param sessionId
+     * @param query
+     * @param dmEntityId
+     * @param start
+     * @param pageSize
+     * @param sortField
+     * @param sortDir
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1278,10 +1277,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
+     *
+     *
+     * @param sessionId
+     * @param taskId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1327,13 +1326,13 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param id 
-     * @param name 
-     * @param sortField 
-     * @param sortDir 
+     *
+     *
+     * @param sessionId
+     * @param id
+     * @param name
+     * @param sortField
+     * @param sortDir
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -1393,10 +1392,10 @@ export class SearchService {
     }
 
     /**
-     * 
-     * 
-     * @param sessionId 
-     * @param taskId 
+     *
+     *
+     * @param sessionId
+     * @param taskId
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */

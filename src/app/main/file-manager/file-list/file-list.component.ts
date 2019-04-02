@@ -10,6 +10,7 @@ import { EntityService } from 'app/services/entity.service';
 import {MatSort} from '@angular/material';
 import {Document} from '../../../kimios-client-api';
 import * as moment from 'moment';
+import {SearchEntityService} from '../../../services/searchentity.service';
 
 @Component({
     selector     : 'file-list',
@@ -41,7 +42,7 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
      * @param {FuseSidebarService} _fuseSidebarService
      */
     constructor(
-        private _fileManagerService: EntityService,
+        private _fileManagerService: SearchEntityService,
         private _fuseSidebarService: FuseSidebarService
 
     )
@@ -82,7 +83,7 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
         // reset the paginator after sorting
         this.sort.sortChange
             .pipe(
-                tap(() => this.dataSource.loadDocuments(this.sort.active, this.sort.direction))
+                tap(() => this.dataSource.loadDocuments(this.sort.active, this.sort.direction, 0, 25 , "*"))
             )
             .subscribe();
     }
@@ -132,7 +133,7 @@ export class FilesDataSource extends DataSource<any>
      * @param {FileManagerService} _fileManagerService
      */
     constructor(
-        private _fileManagerService: EntityService
+        private _fileManagerService: SearchEntityService
     )
     {
         super();
@@ -155,8 +156,8 @@ export class FilesDataSource extends DataSource<any>
     {
     }
 
-    loadDocuments(sortField: string, sortDir): void {
-        this._fileManagerService.getFiles(sortField, sortDir);
+    loadDocuments(sortField: string, sortDir, page: number, pageSize: number, query: string): void {
+        this._fileManagerService.getFiles(sortField, sortDir, page, pageSize, query);
     }
 }
 

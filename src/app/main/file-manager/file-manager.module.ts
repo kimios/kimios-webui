@@ -14,6 +14,7 @@ import { EntityService } from 'app/services/entity.service';
 import { FileManagerDetailsSidebarComponent } from 'app/main/file-manager/sidebars/details/details.component';
 import { FileManagerFileListComponent } from 'app/main/file-manager/file-list/file-list.component';
 import { FileManagerMainSidebarComponent } from 'app/main/file-manager/sidebars/main/main.component';
+import {SearchEntityService} from '../../services/searchentity.service';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { FileManagerMainSidebarComponent } from 'app/main/file-manager/sidebars/
         FuseSidebarModule
     ],
     providers   : [
-        EntityService
+        EntityService,
+        SearchEntityService
     ]
 })
 export class FileManagerModule { }

@@ -7,6 +7,7 @@ import {LoggedInGuard} from './logged-in.guard';
 import {FileManagerComponent} from './main/file-manager/file-manager.component';
 import {FileDetailComponent} from './main/components/file-detail/file-detail.component';
 import {EntityService} from './services/entity.service';
+import {SearchEntityService} from './services/searchentity.service';
 
 export const routes: Routes = [
     {
@@ -15,7 +16,7 @@ export const routes: Routes = [
         pathMatch: 'full' ,
         canActivate: [ LoggedInGuard ],
         resolve  : {
-            files: EntityService
+            files: SearchEntityService
         }
     },
     {
