@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Sort} from '@angular/material';
-import {Document, Folder, Workspace} from 'app/kimios-client-api';
-import {of} from 'rxjs';
-import {EntityService} from 'app/services/entity.service';
-import 'rxjs/add/operator/mergeMap';
+import {Folder, Workspace} from 'app/kimios-client-api';
+import {Observable, of} from 'rxjs';
+import {FileUploadService} from '../../services/file-upload.service';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -19,9 +17,11 @@ export class FileManagerComponent implements OnInit {
     private filesPath: string = DEFAULT_PATH;
 
     displayedColumns: string[] = [];
+    fileToUpload: File = null;
+    lastUploadedDocId: Observable<number> = null;
 
     constructor(
-
+        private fileUploadService: FileUploadService
     ) {
 
     }
@@ -41,6 +41,27 @@ export class FileManagerComponent implements OnInit {
     ngOnInit(): void {
         const pathTab = this.filesPath.split('/');
 
+    }
+
+    onSubmitFileUpload(): void {
+        const formData = new FormData();
+        formData.append('file', this.fileToUpload);
+    }
+
+    handleFileInput(files: FileList): void {
+        this.fileToUpload = files.item(0);
+
+        this.fileUploadService.uploadFile(
+            this.fileToUpload,
+            this.filesPath + '/' + this.fileToUpload.name,
+            true,
+            '[]',
+            true,
+            -1,
+            '[]'
+        ).subscribe(
+            (res) => this.lastUploadedDocId = of(res)
+        );
     }
 }
 

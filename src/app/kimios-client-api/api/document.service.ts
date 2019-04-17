@@ -731,14 +731,40 @@ export class DocumentService {
             throw new Error('Required parameter document was null or undefined when calling createDocumentFromFullPathWithPropertiesNoHash.');
         }
 
-
-
-
-
-
-
-
-
+        const formData = new FormData();
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (document !== undefined && document !== null) {
+            queryParameters = queryParameters.set('document', <any>document);
+            formData.append('document', document);
+        }
+        if (sessionId !== undefined && sessionId !== null) {
+            queryParameters = queryParameters.set('sessionId', <any>sessionId);
+            formData.append('sessionId', sessionId);
+        }
+        if (path !== undefined && path !== null) {
+            queryParameters = queryParameters.set('path', <any>path);
+            formData.append('path', path);
+        }
+        if (isSecurityInherited !== undefined && isSecurityInherited !== null) {
+            queryParameters = queryParameters.set('isSecurityInherited', <any>isSecurityInherited);
+            formData.append('isSecurityInherited', isSecurityInherited.toString());
+        }
+        if (isRecursive !== undefined && isRecursive !== null) {
+            queryParameters = queryParameters.set('isRecursive', <any>isRecursive);
+            formData.append('isRecursive', isRecursive.toString());
+        }
+        if (documentTypeId !== undefined && documentTypeId !== null) {
+            queryParameters = queryParameters.set('documentTypeId', <any>documentTypeId);
+            formData.append('documentTypeId', documentTypeId.toString());
+        }
+        if (securityItems !== undefined && securityItems !== null) {
+            queryParameters = queryParameters.set('securityItems', <any>securityItems);
+            formData.append('securityItems', securityItems);
+        }
+        if (metaItems !== undefined && metaItems !== null) {
+            queryParameters = queryParameters.set('metaItems', <any>metaItems);
+            formData.append('metaItems', metaItems);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -753,16 +779,17 @@ export class DocumentService {
 
         // to determine the Content-Type header
         const consumes: string[] = [
-            'multipart/form-data'
+//            'multipart/form-data'
         ];
         const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected != undefined) {
+        if (httpContentTypeSelected !== undefined) {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
         return this.httpClient.post<number>(`${this.basePath}/document/createDocumentFromFullPathWithPropertiesNoHash`,
-            sha1,
+            formData,
             {
+                // params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

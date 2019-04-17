@@ -41,14 +41,16 @@
 
             <!-- ADD FILE BUTTON -->
             <div class="file-uploader">
-                <input hidden type="file" #fileInput/>
-                <button mat-fab
-                        color="warn"
-                        class="add-file-button"
-                        (click)="fileInput.click()"
-                        aria-label="Add file">
-                    <mat-icon>add</mat-icon>
-                </button>
+                <form (ngSubmit)="onSubmitFileUpload()">
+                    <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
+                    <button mat-fab
+                            color="warn"
+                            class="add-file-button"
+                            (click)="fileInput.click($event.target.files)"
+                            aria-label="Add file">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </form>
             </div>
             <!-- / ADD FILE BUTTON -->
 
