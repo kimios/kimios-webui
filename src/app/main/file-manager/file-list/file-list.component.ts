@@ -1,17 +1,14 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import { DataSource } from '@angular/cdk/collections';
-import { Observable, Subject } from 'rxjs';
-import {takeUntil, tap} from 'rxjs/operators';
+import {DataSource} from '@angular/cdk/collections';
+import {Observable, Subject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
-import { fuseAnimations } from '@fuse/animations';
-import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
-
-import { EntityService } from 'app/services/entity.service';
+import {fuseAnimations} from '@fuse/animations';
+import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
 import {MatSort} from '@angular/material';
 import {Document} from '../../../kimios-client-api';
 import * as moment from 'moment';
 import {SearchEntityService} from '../../../services/searchentity.service';
-
 
 
 @Component({
@@ -84,18 +81,6 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
     ngOnInit(): void
     {
         this.dataSource = new FilesDataSource(this._fileManagerService);
-
-        this._fileManagerService.onFilesChanged
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(files => {
-                this.files = files;
-            });
-
-        this._fileManagerService.onFileSelected
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(selected => {
-                this.selected = selected;
-            });
     }
 
     ngAfterViewInit(): void {
