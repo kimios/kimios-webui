@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Folder, Workspace} from 'app/kimios-client-api';
 import {Observable, of} from 'rxjs';
 import {FileUploadService} from '../../services/file-upload.service';
+import {isNumeric} from 'rxjs/internal-compatibility';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -19,6 +20,8 @@ export class FileManagerComponent implements OnInit {
     displayedColumns: string[] = [];
     fileToUpload: File = null;
     lastUploadedDocId: Observable<number> = null;
+    uploadResponse = { status: '', message: '' };
+    error: string;
 
     constructor(
         private fileUploadService: FileUploadService
@@ -60,7 +63,24 @@ export class FileManagerComponent implements OnInit {
             -1,
             '[]'
         ).subscribe(
-            (res) => this.lastUploadedDocId = of(res)
+            (res) => {
+                if (res instanceof Object
+                    && res.hasOwnProperty('status')
+                    && res.hasOwnProperty('message')) {
+                    this.uploadResponse = {
+                        status: res['status'],
+                        message: '' + res['message']
+                    };
+                    console.log('uploadResponse: ');
+                    console.log(this.uploadResponse);
+                } else if (isNumeric(res)) {
+                    console.log('HttpResponse: ' + res);
+                } else {
+                    console.log(res);
+                }
+            },
+            (err) => this.error = err
+
         );
     }
 }
