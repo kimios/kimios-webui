@@ -14,6 +14,13 @@ export class SearchEntityService implements Resolve<any> {
     onFilesChanged: BehaviorSubject<any>;
     onFileSelected: BehaviorSubject<any>;
 
+    // keep last query parameters to be able to reload
+    private sortField: string;
+    private sortDirection: string;
+//    private page: number;
+    private pageSize: number;
+    private query: string;
+
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
 
         if (typeof a === 'string' && typeof b === 'string') {
@@ -96,6 +103,11 @@ export class SearchEntityService implements Resolve<any> {
      * @returns {Promise<any>}
      */
     getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string): Promise<any> {
+        this.sortField = sortField;
+        this.sortDirection = sortDirection;
+        this.pageSize = pageSize;
+        this.query = query;
+
         return new Promise((resolve, reject) => {
             console.log('inside Promise getFiles entity Service...');
             if (!this.sessionService.sessionAlive) {
@@ -131,6 +143,10 @@ export class SearchEntityService implements Resolve<any> {
                     }, reject);
             }
         });
+    }
+
+    reloadFiles(): Promise<any> {
+        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
     }
 
 }

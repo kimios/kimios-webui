@@ -1,3 +1,3 @@
 export const APP_CONFIG = {
-    'KIMIOS_API_BASE_PATH' : 'https://demo.kimios.com/services/rest'
+    'KIMIOS_API_BASE_PATH' : 'http://firefly.local:8181/services/rest'
 };

@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Folder, Workspace} from 'app/kimios-client-api';
 import {Observable, of} from 'rxjs';
-import {FileUploadService} from '../../services/file-upload.service';
+import {FileUploadService} from 'app/services/file-upload.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
+import {SearchEntityService} from 'app/services/searchentity.service';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -24,7 +25,8 @@ export class FileManagerComponent implements OnInit {
     error: string;
 
     constructor(
-        private fileUploadService: FileUploadService
+        private fileUploadService: FileUploadService,
+        private searchEntityService: SearchEntityService
     ) {
 
     }
@@ -79,7 +81,8 @@ export class FileManagerComponent implements OnInit {
                     console.log(res);
                 }
             },
-            (err) => this.error = err
+            (err) => this.error = err,
+            () => this.searchEntityService.reloadFiles()
 
         );
     }
