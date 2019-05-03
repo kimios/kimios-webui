@@ -1,0 +1,23 @@
+<!--
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div *ngFor="let file of data.filesList">
+        <mat-checkbox>{{file.name}}</mat-checkbox>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button (click)="onNoClick()">No Thanks</button>
+        <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+    </div>
+</form>
+-->
+<form [formGroup]="form">
+    <div formArrayName="filesList" *ngFor="let file of form.controls.filesList.controls; let i = index">
+
+        <mat-checkbox [formControlName]="i" name="{{i}}">{{this.data.filesList[i]?.name}}</mat-checkbox>
+
+    </div>
+
+    <div mat-dialog-actions>
+        <button mat-button (click)="onNoClick()">No, Thanks</button>
+        <button mat-button (click)="submit()">Ok</button>
+    </div>
+</form>

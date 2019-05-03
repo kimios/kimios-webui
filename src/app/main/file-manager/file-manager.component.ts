@@ -1,9 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Folder, Workspace} from 'app/kimios-client-api';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {SearchEntityService} from 'app/services/searchentity.service';
+import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
+import {MatDialog} from '@angular/material';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -26,7 +28,8 @@ export class FileManagerComponent implements OnInit {
 
     constructor(
         private fileUploadService: FileUploadService,
-        private searchEntityService: SearchEntityService
+        private searchEntityService: SearchEntityService,
+        public filesUploadDialog: MatDialog
     ) {
 
     }
@@ -86,6 +89,34 @@ export class FileManagerComponent implements OnInit {
 
         );
     }
+
+    handleDrop(event: Event): void {
+        event.preventDefault();
+
+        if (event['dataTransfer'] != null
+            && event['dataTransfer']['files'] != null) {
+            Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
+            this.openFilesUploadDialog(event['dataTransfer']['files']);
+        }
+    }
+
+    handleDragOver(event: Event): void {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    openFilesUploadDialog(list: FileList): void {
+        const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
+            // width: '250px',
+            data: {filesList: Array.from(list)}
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log('The dialog was closed');
+            console.dir(dialogRef.componentInstance.data.filesList);
+        });
+    }
+
 }
 
 
