@@ -35,7 +35,7 @@ export class FilesUploadDialogComponent {
     submit(): void {
 //        let fileToUpload = new Array<File>();
         const fileToUpload = this.data.filesList
-            .filter((elem, i) => this.form.controls.filesList.controls[i].value === 1);
+            .filter((elem, i) => this.form.controls.filesList['controls'][i].value === 1);
         this.data.filesList = fileToUpload;
         this.dialogRef.close();
     }
