@@ -23,7 +23,7 @@ export class FileUploadService {
     }
 
     uploadFile(
-        document: InputStream,
+        document: File,
 //        sessionId?: string,
         docPath?: string,
         isSecurityInherited?: boolean,
