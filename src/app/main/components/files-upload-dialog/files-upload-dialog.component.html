@@ -10,7 +10,7 @@
 </form>
 -->
 <form [formGroup]="form">
-    <div formArrayName="filesList" *ngFor="let file of form.controls.filesList.controls; let i = index">
+    <div formArrayName="filesList" *ngFor="let file of form.controls.filesList['controls']; let i = index">
 
         <mat-checkbox [formControlName]="i" name="{{i}}">{{this.data.filesList[i]?.name}}</mat-checkbox>
 
