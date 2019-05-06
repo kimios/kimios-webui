@@ -33,7 +33,7 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Domain name:</mat-label>
                     <mat-select placeholder="Domain name" formControlName="authenticationSource">
-                        <mat-option *ngFor="let source of authenticationSources" [value]="source.name">
+                        <mat-option *ngFor="let source of authenticationSources$ | async" [value]="source.name">
                             {{source.name}}
                         </mat-option>
                     </mat-select>

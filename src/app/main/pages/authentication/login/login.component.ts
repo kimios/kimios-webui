@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {FuseConfigService} from '@fuse/services/config.service';
@@ -7,8 +7,9 @@ import {fuseAnimations} from '@fuse/animations';
 import {UserService} from 'app/user.service';
 import {SecurityService} from 'app/kimios-client-api/api/api';
 import {AuthenticationSource} from 'app/kimios-client-api';
-import {Observable} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
+import {catchError} from 'rxjs/operators';
 
 @Component({
     selector     : 'login',
@@ -17,9 +18,9 @@ import {SessionService} from 'app/services/session.service';
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
-export class LoginComponent implements OnInit
-{
-    authenticationSources: Array<AuthenticationSource>;
+export class LoginComponent implements OnInit, OnDestroy {
+    authenticationSources$: Observable<{} | AuthenticationSource[]>;
+    private intervalId: number;
 
     loginForm = new FormGroup({
         login: new FormControl(''),
@@ -75,11 +76,30 @@ export class LoginComponent implements OnInit
             authenticationSource: ['', Validators.required]
         });
 
-        this.securityService.getAuthenticationSources().subscribe(
-            (sources) => {
-                this.authenticationSources = sources;
-            }
+        this.intervalId = window.setInterval(
+            () => {
+                this.loadAuthenticationSources();
+            },
+            1000
         );
+    }
+
+    loadAuthenticationSources(): void {
+        this.securityService.getAuthenticationSources()
+            .pipe(
+                catchError(error => {
+                    console.log('server is not responding: ' + error);
+                    return of();
+                    throwError(error);
+                })
+            )
+            .subscribe(
+                (sources) => {
+                    this.authenticationSources$ = of(sources);
+                },
+                (error) => console.log('server is not responding: ' + error),
+                () => console.log('load try completed')
+            );
     }
 
     callStartSession(login: string, source: string, pwd: string): Observable<any> {
@@ -97,4 +117,9 @@ export class LoginComponent implements OnInit
             this.loginForm.get('password').value
         );
     }
+
+    ngOnDestroy(): void {
+        clearInterval(this.intervalId);
+    }
+
 }
