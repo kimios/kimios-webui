@@ -21,15 +21,22 @@ export class SessionService implements OnDestroy {
         private router: Router,
         public _zone: NgZone
     ) {
-
+        // if sessionToken is read from cookie, we temporarily consider session alive
+        if (this.sessionToken) {
+            this.sessionAlive = true;
+        }
+        this.startSessionCheck();
     }
 
     ngOnDestroy(): void {
-        clearInterval(this.intervalId);
+        this.stopSessionCheck();
     }
 
     get sessionToken(): string {
-        return this._sessionToken ? this._sessionToken : this.cookieService.get(KIMIOS_COOKIE);
+        if (this._sessionToken === undefined || this._sessionToken === null) {
+            this.sessionToken = this.readSessionTokenFromCookie();
+        }
+        return this._sessionToken;
     }
 
     set sessionToken(value: string) {
@@ -38,11 +45,21 @@ export class SessionService implements OnDestroy {
     }
 
     setSessionAlive(): void {
-        this.securityService.isSessionAlive(this.sessionToken)
-            .subscribe(
-                res => this._sessionAlive = res,
-                error => this._sessionAlive = error.error.text
-            );
+        if (! this.sessionToken) {
+            this.sessionAlive = false;
+        } else {
+            this.securityService.isSessionAlive(this.sessionToken)
+                .subscribe(
+                    res => {
+                        this._sessionAlive = res;
+                        if (this._sessionAlive === false) {
+                            this.stopSessionCheck();
+                            this.cookieService.delete(KIMIOS_COOKIE);
+                        }
+                    },
+                    error => this._sessionAlive = error.error.text
+                );
+        }
     }
 
     get sessionAlive(): boolean {
@@ -53,14 +70,20 @@ export class SessionService implements OnDestroy {
         this._sessionAlive = alive;
     }
 
+    readSessionTokenFromCookie(): string {
+        return this.cookieService.check(KIMIOS_COOKIE) ? this.cookieService.get(KIMIOS_COOKIE) : '';
+    }
+
     retrieveUserData(): Observable<User> {
         return this.securityService.getUser(this.sessionToken);
     }
 
     logout(): void {
-        this.securityService.endSession(this.sessionToken).subscribe();
+        this.securityService.endSession(this.sessionToken).subscribe(
+            () => { this.cookieService.delete(KIMIOS_COOKIE); }
+        );
         this.router.navigate(['/login']);
-        clearInterval(this.intervalId);
+        this.stopSessionCheck();
     }
 
     callStartSession(login: string, source: string, pwd: string): Observable<any> {
@@ -94,13 +117,28 @@ export class SessionService implements OnDestroy {
                             this.sessionToken = token;
                             this.sessionAlive = true;
                             this.router.navigate(['']);
-                            this.intervalId = window.setInterval(
-                                () => this.setSessionAlive(),
-                                5000
-                            );
+                            if (! this.isSessionCheckStarted()) {
+                                this.startSessionCheck();
+                            }
                         });
                     }
                 }
             );
+    }
+
+    startSessionCheck(): void {
+        this.intervalId = window.setInterval(
+            () => this.setSessionAlive(),
+            5000
+        );
+    }
+
+    stopSessionCheck(): void {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+    }
+
+    isSessionCheckStarted(): boolean {
+        return (this.intervalId != null);
     }
 }
