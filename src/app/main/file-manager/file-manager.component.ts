@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {Folder, Workspace} from 'app/kimios-client-api';
-import {Observable} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {MatDialog} from '@angular/material';
+import {catchError} from 'rxjs/operators';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -69,25 +70,29 @@ export class FileManagerComponent implements OnInit {
             '[]'
         ).subscribe(
             (res) => {
-                if (res instanceof Object
-                    && res.hasOwnProperty('status')
-                    && res.hasOwnProperty('message')) {
-                    this.uploadResponse = {
-                        status: res['status'],
-                        message: '' + res['message']
-                    };
-                    console.log('uploadResponse: ');
-                    console.log(this.uploadResponse);
-                } else if (isNumeric(res)) {
-                    console.log('HttpResponse: ' + res);
-                } else {
-                    console.log(res);
-                }
+                this.handleUploadProgress(res);
             },
             (err) => this.error = err,
             () => this.searchEntityService.reloadFiles()
 
         );
+    }
+
+    handleUploadProgress(res: { name: string, status: string, message: number } | number | string | {}): void {
+        if (res instanceof Object
+            && res.hasOwnProperty('status')
+            && res.hasOwnProperty('message')) {
+            this.uploadResponse = {
+                status: res['status'],
+                message: '' + res['message']
+            };
+            console.log('uploadResponse: ');
+            console.log(this.uploadResponse);
+        } else if (isNumeric(res)) {
+            console.log('HttpResponse: ' + res);
+        } else {
+            console.log(res);
+        }
     }
 
     handleDrop(event: Event): void {
@@ -114,6 +119,28 @@ export class FileManagerComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
             console.log('The dialog was closed');
             console.dir(dialogRef.componentInstance.data.filesList);
+
+            this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
+                    v,
+                    this.filesPath + '/' + v.name,
+                    true,
+                    '[]',
+                    true,
+                    -1,
+                    '[]'
+            ]))
+                .pipe(
+                    catchError(error => {
+                        console.log('server error: ');
+                        console.dir(error);
+                        return of({ name: 'filename', status: 'error', message: error.error.message });
+                    })
+                )
+                .subscribe(
+                    (res) => this.handleUploadProgress(res),
+                    (err) => this.error = err,
+                    () => this.searchEntityService.reloadFiles()
+                );
         });
     }
 
