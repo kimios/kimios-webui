@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject} from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil} from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 
@@ -11,6 +11,7 @@ import {navigation} from 'app/navigation/navigation';
 import {User} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Router} from '@angular/router';
+import {SearchEntityService} from 'app/services/searchentity.service';
 
 @Component({
     selector     : 'toolbar',
@@ -33,6 +34,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
     // Private
     private _unsubscribeAll: Subject<any>;
+    private searchTerms = new Subject<string>();
 
     /**
      * Constructor
@@ -46,6 +48,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
         private _fuseSidebarService: FuseSidebarService,
         private _translateService: TranslateService,
         private sessionService: SessionService,
+        private searchEntityService: SearchEntityService,
         private router: Router
     )
     {
@@ -124,6 +127,19 @@ export class ToolbarComponent implements OnInit, OnDestroy
                 (user) => this.user = user,
                 (error) => this.user = null
             );
+
+        this.searchTerms.pipe(
+            debounceTime(300),
+            distinctUntilChanged(),
+            switchMap(
+                value => this.searchEntityService.searchInContent(value)
+            ),
+            catchError(error => {
+                // TODO: real error handling
+                console.log(`Error in component ... ${error}`);
+                return ([]);
+            })
+        ).subscribe();
     }
 
     /**
@@ -159,6 +175,9 @@ export class ToolbarComponent implements OnInit, OnDestroy
     {
         // Do your search here...
         console.log(value);
+        if (value.length >= 3) {
+            this.searchTerms.next(value);
+        }
     }
 
     /**

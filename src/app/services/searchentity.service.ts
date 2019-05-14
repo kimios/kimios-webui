@@ -101,7 +101,7 @@ export class SearchEntityService implements Resolve<any> {
      *
      * @returns {Promise<any>}
      */
-    getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string): Promise<any> {
+    getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string, criterias = []): Promise<any> {
         this.sortField = sortField;
         this.sortDirection = sortDirection;
         this.pageSize = pageSize;
@@ -125,15 +125,6 @@ export class SearchEntityService implements Resolve<any> {
                     length: 'DocumentVersionLength'
                 };
 
-
-                let criterias: Criteria[] = [
-                /*    {
-                        fieldName: 'DocumentName',
-                        query: 'pdf',
-                        filterQuery: true
-                    }*/
-                ];
-
                 this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
                     page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias, null, false)
                     .subscribe((response: any) => {
@@ -148,5 +139,14 @@ export class SearchEntityService implements Resolve<any> {
 
     reloadFiles(): Promise<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
+    }
+
+    searchInContent(content: string): Promise<any> {
+        const criterias = [{
+            fieldName: 'DocumentBody',
+            query: content,
+//            filterQuery: true
+        }];
+        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 }
