@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Criteria, DMEntity, Document, DocumentService, Folder, FolderService, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
-import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {SessionService} from './session.service';
-import {catchError} from 'rxjs/operators';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 
 @Injectable({
@@ -127,11 +126,13 @@ export class SearchEntityService implements Resolve<any> {
                 };
 
 
-                let criterias: Criteria[] = [{
-                    fieldName: 'DocumentExtension',
-                    query: 'pdf',
-                    filterQuery: true
-                }];
+                let criterias: Criteria[] = [
+                /*    {
+                        fieldName: 'DocumentName',
+                        query: 'pdf',
+                        filterQuery: true
+                    }*/
+                ];
 
                 this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
                     page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias, null, false)
@@ -148,5 +149,4 @@ export class SearchEntityService implements Resolve<any> {
     reloadFiles(): Promise<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
     }
-
 }
