@@ -1,0 +1,36 @@
+<form class="full-width"  fxLayout="column">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+
+      <mat-form-field class="full-width" >
+        <input type="text" matInput aria-label="Search" [matAutocomplete]="auto" [formControl]="searchInputCtrl">
+      </mat-form-field>
+
+    </mat-expansion-panel-header>
+
+    <div fxLayout="row space-between">
+      <mat-autocomplete #auto="matAutocomplete" fxFlex="40">
+        <mat-option *ngFor="let name of filenames$ | async" [value]="name">
+          <span>{{name}}</span> |
+        </mat-option>
+      </mat-autocomplete>
+      <!-- TODO propose terms to search by content (needs Kimios server improvements to have it in Solr index)
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let term of terms$ | async" [value]="term">
+      <span>{{term}}</span> |
+    </mat-option>
+  </mat-autocomplete>
+  -->
+      <mat-form-field fxFlex="40">
+        <input type="text" matInput aria-label="Tags" [matAutocomplete]="auto" [formControl]="searchTagCtrl">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+            <span>{{tag}}</span> |
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+</mat-expansion-panel>
+
+</form>

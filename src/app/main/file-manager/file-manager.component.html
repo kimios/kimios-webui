@@ -12,43 +12,14 @@
     <!-- CENTER -->
     <div class="center" fxFlex>
 
-        <!-- HEADER -->
-        <div class="header green p-24" fxLayout="column" fxLayoutAlign="space-between start">
-
-            <!-- TOOLBAR -->
-            <div class="toolbar w-100-p" fxFlex fxLayout="row" fxLayoutAlign="space-between start">
-
-                <!--<div class="left-side" fxLayout="row">
-                    <button mat-icon-button class="sidebar-toggle"
-                            (click)="toggleSidebar('file-manager-main-sidebar')">
-                        <mat-icon>menu</mat-icon>
-                    </button>
-                </div>-->
-
-                <div class="right-side" fxLayout="row">
-                    <button mat-icon-button aria-label="Search" matTooltip="Search">
-                        <mat-icon>search</mat-icon>
-                    </button>
-                </div>
-            </div>
-            <!-- / TOOLBAR -->
-
-            <!-- BREADCRUMB
-            <div class="breadcrumb text-truncate h1 pl-72" fxLayout="row" fxLayoutAlign="start center">
-                <div *ngFor="let path of pathArr; last  as isLast" fxLayout="row" fxLayoutAlign="start center">
-                    <span>{{path}}</span>
-                    <mat-icon *ngIf="!isLast" class="separator">chevron_right</mat-icon>
-                </div>
-            </div>-->
-            <!-- / BREADCRUMB -->
-
+        <div fxLayout="row" fxLayoutAlign="space-between center">
             <!-- ADD FILE BUTTON -->
-            <div class="file-uploader">
+            <div class="file-uploader" div fxLayout="row" style="padding:20px">
                 <form (ngSubmit)="onSubmitFileUpload()">
                     <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
                     <button mat-fab
                             color="warn"
-                            class="add-file-button"
+
                             (click)="fileInput.click($event.target.files)"
                             aria-label="Add file">
                         <mat-icon>add</mat-icon>
@@ -57,9 +28,9 @@
             </div>
             <!-- / ADD FILE BUTTON -->
 
-        </div>
-        <!-- / HEADER -->
+            <file-search fxFlex style="padding:20px" ></file-search>
 
+        </div>
         <!-- CONTENT -->
         <div class="content" fusePerfectScrollbar>
             <file-list></file-list>

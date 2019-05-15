@@ -1,10 +1,20 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FileManagerComponent} from './file-manager.component';
-import {MatButtonModule, MatCheckboxModule, MatDialogModule, MatIconModule, MatRippleModule, MatSlideToggleModule, MatSortModule, MatTableModule} from '@angular/material';
+import {
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDialogModule, MatExpansionModule, MatFormFieldModule,
+    MatIconModule, MatInputModule,
+    MatRippleModule,
+    MatSlideToggleModule,
+    MatSortModule,
+    MatTableModule
+} from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
-import {FuseSidebarModule} from '@fuse/components';
+import {FuseSearchBarModule, FuseSidebarModule} from '@fuse/components';
 
 
 import {EntityService} from 'app/services/entity.service';
@@ -13,6 +23,7 @@ import {FileManagerFileListComponent} from 'app/main/file-manager/file-list/file
 import {FileManagerMainSidebarComponent} from 'app/main/file-manager/sidebars/main/main.component';
 import {SearchEntityService} from '../../services/searchentity.service';
 import {FilesUploadDialogComponent} from '../components/files-upload-dialog/files-upload-dialog.component';
+import {FileSearchComponent} from '../components/file-search/file-search.component';
 
 
 @NgModule({
@@ -21,9 +32,10 @@ import {FilesUploadDialogComponent} from '../components/files-upload-dialog/file
         FileManagerFileListComponent,
         FileManagerMainSidebarComponent,
         FileManagerDetailsSidebarComponent,
-        FilesUploadDialogComponent
+        FilesUploadDialogComponent,
+        FileSearchComponent
     ],
-    imports     : [
+    imports: [
 
         MatButtonModule,
         MatIconModule,
@@ -34,9 +46,14 @@ import {FilesUploadDialogComponent} from '../components/files-upload-dialog/file
         MatSortModule,
         MatCheckboxModule,
         MatDialogModule,
+        MatAutocompleteModule,
 
         FuseSharedModule,
-        FuseSidebarModule
+        FuseSidebarModule,
+        MatInputModule,
+        MatFormFieldModule,
+        FuseSearchBarModule,
+        MatExpansionModule
     ],
     providers   : [
         EntityService,
