@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
+import {TagService} from '../../../services/tag.service';
 
 @Component({
   selector: 'file-search',
@@ -12,17 +13,15 @@ export class FileSearchComponent implements OnInit {
   searchInputCtrl = new FormControl();
   filenames$: Observable<string>;
   terms$: Observable<string>;
-  filteredTags$: Observable<string>;
+  filteredTags$: Observable<string[]>;
   searchTagCtrl = new FormControl();
 
-  constructor() {
-    this.filenames$ = this.searchInputCtrl.valueChanges
-        .pipe(
-
-        );
+  constructor(private tagService: TagService) {
+    this.filteredTags$ = this.tagService.tags$;
   }
 
   ngOnInit(): void {
+    this.filteredTags$.subscribe();
   }
 
   search(term: string): void {
