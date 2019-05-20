@@ -21,4 +21,5 @@ export interface SearchResponse {
     documentIds?: Array<number>;
     virtualPath?: string;
     facetsData?: { [key: string]: any; };
+    allfacetsData?: Map<string, { [key: string]: any; }>;
 }

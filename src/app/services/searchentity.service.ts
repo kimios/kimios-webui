@@ -1,8 +1,10 @@
 import {Injectable} from '@angular/core';
-import {Criteria, DMEntity, Document, DocumentService, Folder, FolderService, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Criteria, DMEntity, Document, DocumentService, Folder, FolderService, SearchResponse, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
+import {concatMap, map} from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +14,7 @@ export class SearchEntityService implements Resolve<any> {
 
     onFilesChanged: BehaviorSubject<any>;
     onFileSelected: BehaviorSubject<any>;
+    onTagsDataChanged: BehaviorSubject<Array<{ uid: number; name: string; count: number }>>;
 
     // keep last query parameters to be able to reload
     private sortField: string;
@@ -41,10 +44,12 @@ export class SearchEntityService implements Resolve<any> {
         private documentService: DocumentService,
         private workspaceService: WorkspaceService,
         private folderService: FolderService,
-        private searchService: SearchService
+        private searchService: SearchService,
+        private tagService: TagService
     ) {
         this.onFilesChanged = new BehaviorSubject({});
         this.onFileSelected = new BehaviorSubject({});
+        this.onTagsDataChanged = new BehaviorSubject([]);
     }
 
     retrieveEntitiesAtPath(path: string): Observable<DMEntity[]> {
@@ -125,12 +130,27 @@ export class SearchEntityService implements Resolve<any> {
                     length: 'DocumentVersionLength'
                 };
 
-                this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
-                    page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias, null, false)
+                this.tagService.loadTagsRaw()
+                    .pipe(
+                        map(
+                            (tagList) => tagList.map((field) => ({
+                                fieldName: TAG_META_DATA_PREFIX + field.uid,
+                                faceted: true
+                            }))
+                        )
+                    )
+                    .pipe(
+                        concatMap(
+                            (res) =>
+                                this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
+                                page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias.concat(res), null, false)
+                        )
+                    )
                     .subscribe((response: any) => {
                         console.log('loaded results', response);
                         this.onFilesChanged.next(response.rows);
                         this.onFileSelected.next(response.rows[0]);
+                        this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
                         resolve(response.rows);
                     }, reject);
             }
@@ -141,12 +161,92 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
     }
 
-    searchInContent(content: string): Promise<any> {
-        const criterias = [{
+    searchInContent(content: string, criterias = []): Promise<any> {
+        criterias.push({
             fieldName: 'DocumentBody',
             query: content,
 //            filterQuery: true
-        }];
+        });
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
+    }
+
+    searchInContentWithFacets(content: string, facetFields: string[]): Promise<any> {
+        const criterias = facetFields.map(
+            (field) => ({
+                facetField: field
+            })
+        );
+        return this.searchInContent(content, criterias);
+    }
+
+    // extractFacets()
+
+    searchDocumentsByName(searchTerm: string): Observable<SearchResponse> {
+        const criterias = [{
+            fieldName: 'DocumentName',
+            query: searchTerm,
+//            filterQuery: true
+        }];
+
+        return this.searchService.advancedSearchDocuments(
+            this.sessionService.sessionToken,
+            0,
+            25,
+            "DocumentName",
+            '',
+            null,
+            -1,
+            false,
+            criterias,
+            null,
+            false
+        );
+    }
+
+    searchDocumentsByContent(searchTerm: string): Observable<SearchResponse> {
+        const criterias = [{
+            fieldName: 'DocumentBody',
+            query: searchTerm,
+//            filterQuery: true
+        }];
+
+        return this.searchService.advancedSearchDocuments(
+            this.sessionService.sessionToken,
+            0,
+            25,
+            'DocumentName',
+            '',
+            null,
+            -1,
+            false,
+            criterias,
+            null,
+            false
+        );
+    }
+
+    private extractTags(facetsData: Map<string, { [p: string]: any }>): Array<{ uid: number; name: string; count: number }> {
+        const array = new Array<{ uid: number; name: string; count: number }>();
+        const allTags = this.tagService.allTagsMap;
+        for (const key of Object.keys(facetsData)) {
+            const tagId = key.replace(new RegExp('^' + TagService.TAG_META_DATA_NAME_PREFIX), '');
+            const facetValues = facetsData[key];
+            for (const index of Object.keys(facetValues)) {
+                const facetValue = facetValues[index];
+                if (facetValue[0] !== ''
+                    && facetValue[1] !== 0) {
+                    const tag = {
+                        uid: +tagId,
+                        count: facetValue[1],
+                        name: ''
+                    };
+                    if (tag.count > 0 && allTags.has(+tagId)) {
+                        tag.name = allTags.get(+tagId).name;
+                        array.push(tag);
+                    }
+                }
+            }
+        }
+        return array;
     }
 }
