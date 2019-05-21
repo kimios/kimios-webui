@@ -1,19 +1,26 @@
-<form class="full-width"  fxLayout="column">
+<form class="full-width"  fxLayout="column" #form [formGroup]="searchParams" (ngSubmit)="onSubmit()">
   <mat-expansion-panel>
     <mat-expansion-panel-header>
 
-      <mat-form-field class="full-width" >
-        <input type="text" matInput aria-label="Search" [matAutocomplete]="auto" [formControl]="searchInputCtrl">
+      <mat-form-field class="full-width">
+        <input #inputContent type="text" name="inputContent" matInput aria-label="Search"
+               formControlName="content" placeholder="Content">
       </mat-form-field>
 
     </mat-expansion-panel-header>
 
     <div fxLayout="row space-between">
-      <mat-autocomplete #auto="matAutocomplete" fxFlex="40">
-        <mat-option *ngFor="let name of filenames$ | async" [value]="name">
-          <span>{{name}}</span> |
-        </mat-option>
-      </mat-autocomplete>
+
+      <mat-form-field fxFlex="40">
+        <input #inputFilename type="text" name="inputFilename" matInput aria-label="Tags" formControlName="filename"
+               [matAutocomplete]="autoFilename" placeholder="Filename">
+        <mat-autocomplete #autoFilename="matAutocomplete" fxFlex="40">
+          <mat-option *ngFor="let name of filenames$ | async" placeholder="File name" [value]="name"
+                      (click)="onSubmit()" >
+            <span>{{name}}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
       <!-- TODO propose terms to search by content (needs Kimios server improvements to have it in Solr index)
   <mat-autocomplete #auto="matAutocomplete">
     <mat-option *ngFor="let term of terms$ | async" [value]="term">
@@ -22,9 +29,11 @@
   </mat-autocomplete>
   -->
       <mat-form-field fxFlex="40">
-        <input type="text" matInput aria-label="Tags" [matAutocomplete]="auto" [formControl]="searchTagCtrl">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag.name">
+        <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" formControlName="tag"
+               [matAutocomplete]="autoTag" placeholder="Tags">
+        <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">
+          <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag"
+                      (click)="onSubmit()">
             <span>{{tag.name}} ({{tag.count}})</span>
           </mat-option>
         </mat-autocomplete>
