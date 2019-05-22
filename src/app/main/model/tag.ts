@@ -25,8 +25,4 @@ export class Tag {
     get uid(): number {
         return this._uid;
     }
-
-    public static makeFacetFieldName(tag: Tag): string {
-        return '';
-    }
 }

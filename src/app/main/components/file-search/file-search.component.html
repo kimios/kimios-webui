@@ -11,7 +11,8 @@
 
     <div fxLayout="row space-between">
 
-      <mat-form-field fxFlex="40">
+        <div  fxFlex="40">
+      <mat-form-field>
         <input #inputFilename type="text" name="inputFilename" matInput aria-label="Tags" formControlName="filename"
                [matAutocomplete]="autoFilename" placeholder="Filename">
         <mat-autocomplete #autoFilename="matAutocomplete" fxFlex="40">
@@ -21,13 +22,17 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
+        </div>
+
       <!-- TODO propose terms to search by content (needs Kimios server improvements to have it in Solr index)
+
   <mat-autocomplete #auto="matAutocomplete">
     <mat-option *ngFor="let term of terms$ | async" [value]="term">
       <span>{{term}}</span> |
     </mat-option>
   </mat-autocomplete>
   -->
+        <div  fxFlex="40">
       <mat-form-field fxFlex="40">
         <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" formControlName="tag"
                [matAutocomplete]="autoTag" placeholder="Tags">
@@ -38,6 +43,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
+        </div>
     </div>
 
 </mat-expansion-panel>

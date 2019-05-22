@@ -5,6 +5,7 @@ import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
 import {concatMap, map} from 'rxjs/operators';
+import {Tag} from '../main/model/tag';
 
 @Injectable({
     providedIn: 'root'
@@ -167,6 +168,33 @@ export class SearchEntityService implements Resolve<any> {
             query: content,
 //            filterQuery: true
         });
+        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
+    }
+
+    searchWithFilters(content: string, filename: string, tag: Tag): Promise<any> {
+        const criterias = new Array<Criteria>();
+        if (content) {
+            criterias.push({
+                fieldName: 'DocumentBody',
+                query: content,
+//            filterQuery: true
+            });
+        }
+        if (filename) {
+            criterias.push({
+                fieldName: 'DocumentName',
+                query: filename,
+//            filterQuery: true
+            });
+        }
+        if (tag) {
+            criterias.push({
+                fieldName: TagService.TAG_META_DATA_NAME_PREFIX + tag.uid.toString(),
+                query: tag.uid.toString(),
+                metaId: tag.uid,
+                // filterQuery: true
+            });
+        }
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 

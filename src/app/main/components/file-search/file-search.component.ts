@@ -66,16 +66,14 @@ export class FileSearchComponent implements OnInit {
         return this.tags.filter(tag => tag.name.toLowerCase().includes(filterValue));
     }
 
-    search(term: string): void {
-
-    }
-
-    private sendSearch(event: Event): void {
-
-    }
-
     onSubmit(): void {
         console.log(this.searchParams);
+
+        this.searchEntityService.searchWithFilters(
+            this.searchParams.get('content').value,
+            this.searchParams.get('filename').value,
+            this.searchParams.get('tag').value
+        );
     }
 
     displayTag(tag?: { uid: number; name: string; count: number }): string | undefined {
