@@ -4,7 +4,7 @@ import {FileManagerComponent} from './file-manager.component';
 import {
     MatAutocompleteModule,
     MatButtonModule,
-    MatCheckboxModule,
+    MatCheckboxModule, MatChipsModule,
     MatDialogModule, MatExpansionModule, MatFormFieldModule,
     MatIconModule, MatInputModule,
     MatRippleModule,
@@ -47,6 +47,7 @@ import {FileSearchComponent} from '../components/file-search/file-search.compone
         MatCheckboxModule,
         MatDialogModule,
         MatAutocompleteModule,
+        MatChipsModule,
 
         FuseSharedModule,
         FuseSidebarModule,

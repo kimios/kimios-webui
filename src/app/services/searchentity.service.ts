@@ -15,7 +15,7 @@ export class SearchEntityService implements Resolve<any> {
 
     onFilesChanged: BehaviorSubject<any>;
     onFileSelected: BehaviorSubject<any>;
-    onTagsDataChanged: BehaviorSubject<Array<{ uid: number; name: string; count: number }>>;
+    onTagsDataChanged: BehaviorSubject<Array<Tag>>;
 
     // keep last query parameters to be able to reload
     private sortField: string;
@@ -171,7 +171,7 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 
-    searchWithFilters(content: string, filename: string, tag: Tag): Promise<any> {
+    searchWithFilters(content: string, filename: string, tagList: Tag[]): Promise<any> {
         const criterias = new Array<Criteria>();
         if (content) {
             criterias.push({
@@ -187,13 +187,13 @@ export class SearchEntityService implements Resolve<any> {
 //            filterQuery: true
             });
         }
-        if (tag) {
-            criterias.push({
+        if (tagList.length > 0) {
+            tagList.forEach(tag => criterias.push({
                 fieldName: TagService.TAG_META_DATA_NAME_PREFIX + tag.uid.toString(),
                 query: tag.uid.toString(),
                 metaId: tag.uid,
                 // filterQuery: true
-            });
+            }));
         }
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
@@ -253,8 +253,8 @@ export class SearchEntityService implements Resolve<any> {
         );
     }
 
-    private extractTags(facetsData: Map<string, { [p: string]: any }>): Array<{ uid: number; name: string; count: number }> {
-        const array = new Array<{ uid: number; name: string; count: number }>();
+    private extractTags(facetsData: Map<string, { [p: string]: any }>): Array<Tag> {
+        const array = new Array<Tag>();
         const allTags = this.tagService.allTagsMap;
         for (const key of Object.keys(facetsData)) {
             const tagId = key.replace(new RegExp('^' + TagService.TAG_META_DATA_NAME_PREFIX), '');
@@ -262,16 +262,11 @@ export class SearchEntityService implements Resolve<any> {
             for (const index of Object.keys(facetValues)) {
                 const facetValue = facetValues[index];
                 if (facetValue[0] !== ''
-                    && facetValue[1] !== 0) {
-                    const tag = {
-                        uid: +tagId,
-                        count: facetValue[1],
-                        name: ''
-                    };
-                    if (tag.count > 0 && allTags.has(+tagId)) {
-                        tag.name = allTags.get(+tagId).name;
-                        array.push(tag);
-                    }
+                    && facetValue[1] > 0
+                    && allTags.has(+tagId)) {
+                    const tag = new Tag(allTags.get(+tagId).name, +tagId);
+                    tag.count = facetValue[1];
+                    array.push(tag);
                 }
             }
         }

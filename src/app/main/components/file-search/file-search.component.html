@@ -22,7 +22,7 @@
 
     <div fxLayout="row space-between">
 
-        <div  fxFlex="40">
+        <div  fxFlex="30">
       <mat-form-field>
         <input #inputFilename type="text" name="inputFilename" matInput aria-label="Tags" formControlName="filename"
                [matAutocomplete]="autoFilename" placeholder="Filename">
@@ -46,21 +46,30 @@
     </mat-option>
   </mat-autocomplete>
   -->
-        <div  fxFlex="40">
-      <mat-form-field fxFlex="40">
-        <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" formControlName="tag"
-               [matAutocomplete]="autoTag" placeholder="Tags">
-          <button mat-button *ngIf="inputTag.value" matSuffix mat-icon-button aria-label="Clear" (click)="this.searchParams.value.get('tag').setValue('uid', -1)">
+        <div  fxFlex="30">
+          <mat-form-field>
+            <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" [formControl]="tagFilter"
+                   [matAutocomplete]="autoTag" placeholder="Tags">
+            <button mat-button *ngIf="tagFilter.value" matSuffix mat-icon-button aria-label="Clear" (click)="tagFilter.setValue('')">
               <mat-icon>close</mat-icon>
-          </button>
-        <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">
-          <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag"
-                      (click)="onSubmit()">
-            <span>{{tag.name}} ({{tag.count}})</span>
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+            </button>
+            <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">
+              <mat-option *ngFor="let tag of filteredTags$ | async"
+                          (click)="selectTag(tag);">
+                <span>{{tag.name}} ({{tag.count}})</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
         </div>
+      <div fxFlex="40">
+        <mat-chip-list #selectedTags>
+          <mat-chip *ngFor="let tag of selectedTags$ | async"
+                    [removable]="removable" (removed)="removeTag(tag)">
+            {{tag.name}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-list>
+      </div>
     </div>
 
 </mat-expansion-panel>

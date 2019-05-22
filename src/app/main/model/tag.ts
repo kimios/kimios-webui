@@ -1,6 +1,6 @@
 export class Tag {
 
-    private readonly _name: string;
+    private _name: string;
     private _count: number;
     private readonly _uid: number;
 
@@ -12,6 +12,10 @@ export class Tag {
 
     get name(): string {
         return this._name;
+    }
+
+    set name(value: string) {
+        this._name = value;
     }
 
     get count(): number {
