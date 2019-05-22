@@ -1,16 +1,25 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder} from '@angular/forms';
+import {FormBuilder, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {TagService} from '../../../services/tag.service';
 import {SearchEntityService} from '../../../services/searchentity.service';
 import {map, startWith} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 
-export interface Tag {
-    name: string;
-    count: number;
-    uid: number;
-}
+export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+    const content = control.get('content');
+    const filename = control.get('filename');
+    const tag = control.get('tag');
+
+    return (
+        content
+        && filename
+        && tag
+        && content.value === ''
+        && filename.value === ''
+        && tag.value.uid === -1
+    ) ? { 'searchParamsValid': false } : null;
+};
 
 @Component({
   selector: 'file-search',
@@ -22,6 +31,8 @@ export class FileSearchComponent implements OnInit {
         content: '',
         tag: new Tag('', -1),
         filename: ''
+    }, {
+        validators: searchParamsValidator
     });
 
     filenames$: Observable<string>;
@@ -67,13 +78,18 @@ export class FileSearchComponent implements OnInit {
     }
 
     onSubmit(): void {
-        console.log(this.searchParams);
+        console.log(this.searchParams.errors);
 
-        this.searchEntityService.searchWithFilters(
-            this.searchParams.get('content').value,
-            this.searchParams.get('filename').value,
-            this.searchParams.get('tag').value
-        );
+        this.searchParams.updateValueAndValidity();
+
+        if (this.searchParams.errors === null
+            || this.searchParams.errors['searchParamsValid'] === null) {
+            this.searchEntityService.searchWithFilters(
+                this.searchParams.get('content').value,
+                this.searchParams.get('filename').value,
+                this.searchParams.get('tag').value
+            );
+        }
     }
 
     displayTag(tag?: { uid: number; name: string; count: number }): string | undefined {

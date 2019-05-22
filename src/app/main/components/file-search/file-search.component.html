@@ -1,7 +1,9 @@
-<form class="full-width"  fxLayout="column" #form [formGroup]="searchParams" (ngSubmit)="onSubmit()">
+<form class="full-width"  fxLayout="column" #form [formGroup]="searchParams" (ngSubmit)="onSubmit()" (keyup)="$event.key === 'Enter' ? onSubmit():1" >
   <mat-expansion-panel>
     <mat-expansion-panel-header>
+        <div fxLayout="row" fxLayoutAlign="space-between center" style="width: 100%;">
 
+            <div fxFlex="25">
       <mat-form-field class="full-width">
         <input #inputContent type="text" name="inputContent" matInput aria-label="Search"
                formControlName="content" placeholder="Content">
@@ -9,7 +11,13 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
+            </div>
 
+            <div fxFlex>
+                <mat-icon class="s-24 secondary-text" (click)="onSubmit()">search</mat-icon>
+            </div>
+
+        </div>
     </mat-expansion-panel-header>
 
     <div fxLayout="row space-between">
@@ -42,6 +50,9 @@
       <mat-form-field fxFlex="40">
         <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" formControlName="tag"
                [matAutocomplete]="autoTag" placeholder="Tags">
+          <button mat-button *ngIf="inputTag.value" matSuffix mat-icon-button aria-label="Clear" (click)="this.searchParams.value.get('tag').setValue('uid', -1)">
+              <mat-icon>close</mat-icon>
+          </button>
         <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">
           <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag"
                       (click)="onSubmit()">
