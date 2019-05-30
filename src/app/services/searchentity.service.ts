@@ -189,9 +189,9 @@ export class SearchEntityService implements Resolve<any> {
         }
         if (tagList.length > 0) {
             tagList.forEach(tag => criterias.push({
-                fieldName: TagService.TAG_META_DATA_NAME_PREFIX + tag.uid.toString(),
-                query: tag.uid.toString(),
-                metaId: tag.uid,
+                fieldName: TagService.TAG_META_DATA_NAME_PREFIX + tag['_uid'].toString(),
+                query: tag['_uid'].toString(),
+                metaId: tag['_uid'],
                 // filterQuery: true
             }));
         }

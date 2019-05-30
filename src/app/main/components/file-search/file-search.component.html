@@ -46,29 +46,55 @@
     </mat-option>
   </mat-autocomplete>
   -->
-        <div  fxFlex="30">
-          <mat-form-field>
-            <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" [formControl]="tagFilter"
-                   [matAutocomplete]="autoTag" placeholder="Tags">
-            <button mat-button *ngIf="tagFilter.value" matSuffix mat-icon-button aria-label="Clear" (click)="tagFilter.setValue('')">
-              <mat-icon>close</mat-icon>
-            </button>
-            <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">
-              <mat-option *ngFor="let tag of filteredTags$ | async"
-                          (click)="selectTag(tag);">
-                <span>{{tag.name}} ({{tag.count}})</span>
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-        </div>
-      <div fxFlex="40">
-        <mat-chip-list #selectedTags>
-          <mat-chip *ngFor="let tag of selectedTags$ | async"
-                    [removable]="removable" (removed)="removeTag(tag)">
-            {{tag.name}}
-            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
+        <div  fxFlex="60">
+<!--          <mat-form-field>-->
+<!--            <input #inputTag type="text" name="inputTag" matInput aria-label="Tags" [formControl]="tagFilter"-->
+<!--                   [matAutocomplete]="autoTag" placeholder="Tags">-->
+<!--            <button mat-button *ngIf="tagFilter.value" matSuffix mat-icon-button aria-label="Clear" (click)="tagFilter.setValue('')">-->
+<!--              <mat-icon>close</mat-icon>-->
+<!--            </button>-->
+<!--            <mat-autocomplete #autoTag="matAutocomplete" [displayWith]="displayTag">-->
+<!--              <mat-option *ngFor="let tag of filteredTags$ | async"-->
+<!--                          (click)="selectTag(tag);">-->
+<!--                {{tag.name}} ({{tag.count}})-->
+<!--              </mat-option>-->
+<!--            </mat-autocomplete>-->
+<!--          </mat-form-field>-->
+<!--        </div>-->
+<!--      <div fxFlex="40">-->
+<!--        <mat-chip-list #selectedTags>-->
+<!--          <mat-chip *ngFor="let tag of selectedTags$ | async"-->
+<!--                    [removable]="removable" (removed)="removeTag(tag)" value="tag.name">-->
+<!--            {{tag.getName()}}-->
+<!--            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>-->
+<!--          </mat-chip>-->
+<!--        </mat-chip-list>-->
+
+        <mat-form-field class="example-chip-list">
+          <mat-chip-list #chipList>
+            <mat-chip
+                    *ngFor="let tag of selectedTags"
+                    [selectable]="selectable"
+                    [removable]="removable"
+                    (removed)="deselectTag(tag)">
+              {{tag.name}}
+              <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+                    placeholder="Selected tags"
+                    #tagInput
+                    [formControl]="tagCtrl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="addOnBlur">
+          </mat-chip-list>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayTag">
+            <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+              {{tag.name}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
       </div>
     </div>
 

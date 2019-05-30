@@ -1,10 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {Observable, of, pipe} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {TagService} from '../../../services/tag.service';
 import {SearchEntityService} from '../../../services/searchentity.service';
-import {map, startWith, tap} from 'rxjs/operators';
+import {map, startWith} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 
 export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
     const content = control.get('content');
@@ -28,13 +30,7 @@ export const searchParamsValidator: ValidatorFn = (control: FormGroup): Validati
   styleUrls: ['./file-search.component.scss']
 })
 export class FileSearchComponent implements OnInit {
-    searchParams = this.fb.group({
-        content: '',
-        tagList: this.fb.array([]),
-        filename: ''
-    }, {
-        validators: searchParamsValidator
-    });
+    searchParams: FormGroup;
 
     tagFilter = new FormControl('');
 
@@ -43,13 +39,22 @@ export class FileSearchComponent implements OnInit {
     tags$: Observable<Tag[]>;
     tags: Tag[];
     filteredTags$: Observable<Tag[]>;
-    filteredTags: Map<number, { uid: number; name: string; count: number }>;
+    filteredTags: Tag[];
     filteredTagsWithCount$: Observable<Array<{name: string, count: number}>>;
-    selectedTags$: Observable<Tag[]>;
+    selectedTag$: Subject<Tag>;
+    deselectedTag$: Subject<Tag>;
+    selectedTags: Tag[];
 
     visible = true;
     selectable = true;
     removable = true;
+    addOnBlur = true;
+
+    separatorKeysCodes: number[] = [ENTER, COMMA];
+    tagCtrl = new FormControl();
+
+    @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
+    @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
     constructor(
         private tagService: TagService,
@@ -62,29 +67,66 @@ export class FileSearchComponent implements OnInit {
                     val.name = val.name.toLocaleUpperCase().replace(new RegExp('^' + TagService.TAG_NAME_PREFIX), '');
                 });
                 this.tags$ = of(res);
-                this.filteredTags$ = this.tags$;
+                // this.filteredTags$ = this.tags$;
                 this.tags = res;
                 console.log('received tags');
                 console.dir(res);
             }
         );
+        this.selectedTags = new Array<Tag>();
+        this.selectedTag$ = new Subject<Tag>();
+        this.deselectedTag$ = new Subject<Tag>();
+        this.searchParams = this.fb.group({
+            content: '',
+            tagList: this.fb.array([''
+                // this.fb.control('')
+            ]),
+            filename: ''
+        }, {
+            validators: searchParamsValidator
+        });
     }
 
     ngOnInit(): void {
-        this.filteredTags$ = this.tagFilter.valueChanges
-            .pipe(
-                startWith<string>(''),
-                tap(value => console.log('value : ' + value)),
-                map(value => value ? this._filterTags(value) : this.tags.slice())
-            );
-        this.selectedTags$ = this.searchParams.get('tagList').valueChanges
-            .pipe(
-                map(value => value)
-            );
+        // this.filteredTags$ = this.tagCtrl.valueChanges
+        //     .pipe(
+        //         startWith<string>(''),
+        //         tap(value => console.log('value : ' + value)),
+        //         map(value => value ? this._filterTags(value) : this.tags.slice())
+        //     );
+        // this.searchParams.get('tagList').valueChanges
+        //     .pipe(
+        //         tap(value => { console.log('value : '); console.log(value); }),
+        //         map(value => value)
+        //     ).subscribe(
+        //         res => this.selectedTags$ = of(res)
+        // );
+
+        this.filteredTags$ = this.tagCtrl.valueChanges.pipe(
+            startWith(null),
+            map((tag: (string|Tag) | null) =>
+                tag ?
+                    this._filterTags(tag instanceof Tag ? tag.name : tag) :
+                    this.tags.slice()));
 
         // this.selectedTags$.subscribe(value => this.filteredTags$ = this.filteredTags$.pipe(
         //     map(list => list.filter(t => value.includes(t))))
         // );
+
+        this.selectedTag$.subscribe(
+            (res) => {
+                this.selectedTags.push(res);
+                (this.searchParams.get('tagList') as FormArray).push(this.createFormArrayTag(res));
+            }
+        );
+        this.deselectedTag$.subscribe(
+            (res) => {
+                const index = this.selectedTags.indexOf(res);
+                if (index >= 0) {
+                    this.selectedTags.splice(index, 1);
+                }
+            }
+        );
     }
 
     private _filterTags(value: string): Tag[] {
@@ -103,7 +145,7 @@ export class FileSearchComponent implements OnInit {
             this.searchEntityService.searchWithFilters(
                 this.searchParams.get('content').value,
                 this.searchParams.get('filename').value,
-                this.searchParams.get('tagList').value
+                (this.searchParams.get('tagList') as FormArray).getRawValue().filter(e => e !== '')
             );
         }
     }
@@ -113,15 +155,19 @@ export class FileSearchComponent implements OnInit {
     }
 
     selectTag(tag: Tag): void {
-        const tagsFormArray = this.searchParams.get('tagList') as FormArray;
-        tagsFormArray.push(this.createFormArrayTag(tag));
+        (this.searchParams.get('tagList') as FormArray).push(this.createFormArrayTag(tag));
+        // tagsFormArray.push(this.createFormArrayTag(tag));
+        // this.searchParams.get('tagList').setValue(tagsFormArray.getRawValue());
+        // this.searchParams.updateValueAndValidity();
     }
 
-    removeTag(tag: Tag): void {
+    deselectTag(tag: Tag): void {
+        this.deselectedTag$.next(tag);
+
         const tagsFormArray = this.searchParams.get('tagList') as FormArray;
         let index = -1;
         tagsFormArray.getRawValue().forEach((e, i) => {
-            if (e.uid === tag.uid) {
+            if (e['_uid'] === tag.uid) {
                 index = i;
             }
         });
@@ -133,4 +179,33 @@ export class FileSearchComponent implements OnInit {
     createFormArrayTag(tag: Tag): FormGroup {
         return this.fb.group(tag);
     }
+
+    addTag(event: MatChipInputEvent): void {
+        if (!this.matAutocomplete.isOpen) {
+            const input = event.input;
+            const value = event.value;
+
+            // Add our fruit
+            if ((value || '').trim()) {
+                this.selectedTags.push(this.tags.filter(t => t.uid === +value.trim())[0]);
+            }
+
+            // Reset the input value
+            if (input) {
+                input.value = '';
+            }
+
+            this.tagCtrl.setValue(null);
+        }
+    }
+
+    selected(event: MatAutocompleteSelectedEvent): void {
+        const tag: any = event.option.value;
+        if (this.selectedTags.filter(t => t.uid === tag.uid).length === 0) {
+            this.selectedTag$.next(tag);
+        }
+        this.tagInput.nativeElement.value = '';
+        this.tagCtrl.setValue(null);
+    }
+
 }
