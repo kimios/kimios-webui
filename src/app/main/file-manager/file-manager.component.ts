@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {Folder, Workspace} from 'app/kimios-client-api';
-import {Observable, of, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
-import {SearchEntityService} from 'app/services/searchentity.service';
+import {PAGE_SIZE_DEFAULT, SearchEntityService} from 'app/services/searchentity.service';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
-import {MatDialog} from '@angular/material';
+import {MatDialog, PageEvent} from '@angular/material';
 import {catchError} from 'rxjs/operators';
+import {isNumber} from 'util';
 
 const DEFAULT_PATH = 'boumboumboum/mika';
 
@@ -26,13 +27,19 @@ export class FileManagerComponent implements OnInit {
     lastUploadedDocId: Observable<number> = null;
     uploadResponse = { status: '', message: '' };
     error: string;
+    totalFilesFound$: BehaviorSubject<number>;
+
+    pageSize: number;
+    pageIndex: number;
+    pageSizeOptions = [5, 10, 20];
 
     constructor(
         private fileUploadService: FileUploadService,
         private searchEntityService: SearchEntityService,
         public filesUploadDialog: MatDialog
     ) {
-
+        this.totalFilesFound$ = new BehaviorSubject<number>(undefined);
+        this.pageSize = PAGE_SIZE_DEFAULT;
     }
 
     set folderUsed(value: Folder) {
@@ -49,7 +56,12 @@ export class FileManagerComponent implements OnInit {
 
     ngOnInit(): void {
         const pathTab = this.filesPath.split('/');
-
+        this.searchEntityService.onTotalFilesChanged.subscribe(
+            res => this.totalFilesFound$.next(isNumber(res) ? res : undefined)
+        );
+        this.searchEntityService.onSortChanged.subscribe(
+            res => this.pageIndex = 0
+        );
     }
 
     onSubmitFileUpload(): void {
@@ -144,6 +156,11 @@ export class FileManagerComponent implements OnInit {
         });
     }
 
+    paginatorHandler($event: PageEvent): void {
+        this.searchEntityService.changePage($event.pageIndex, $event.pageSize);
+        this.pageIndex = $event.pageIndex;
+        this.pageSize = $event.pageSize;
+    }
 }
 
 

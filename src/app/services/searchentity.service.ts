@@ -7,6 +7,8 @@ import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
 import {concatMap, map} from 'rxjs/operators';
 import {Tag} from '../main/model/tag';
 
+export const PAGE_SIZE_DEFAULT = 20;
+
 @Injectable({
     providedIn: 'root'
 })
@@ -16,6 +18,8 @@ export class SearchEntityService implements Resolve<any> {
     onFilesChanged: BehaviorSubject<any>;
     onFileSelected: BehaviorSubject<any>;
     onTagsDataChanged: BehaviorSubject<Array<Tag>>;
+    onTotalFilesChanged: BehaviorSubject<any>;
+    onSortChanged: BehaviorSubject<any>;
 
     // keep last query parameters to be able to reload
     private sortField: string;
@@ -23,6 +27,7 @@ export class SearchEntityService implements Resolve<any> {
 //    private page: number;
     private pageSize: number;
     private query: string;
+    private criterias: Criteria[];
 
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
 
@@ -51,6 +56,9 @@ export class SearchEntityService implements Resolve<any> {
         this.onFilesChanged = new BehaviorSubject({});
         this.onFileSelected = new BehaviorSubject({});
         this.onTagsDataChanged = new BehaviorSubject([]);
+        this.onTotalFilesChanged = new BehaviorSubject({});
+        this.onSortChanged = new BehaviorSubject({});
+        this.pageSize = PAGE_SIZE_DEFAULT;
     }
 
     retrieveEntitiesAtPath(path: string): Observable<DMEntity[]> {
@@ -110,8 +118,9 @@ export class SearchEntityService implements Resolve<any> {
     getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string, criterias = []): Promise<any> {
         this.sortField = sortField;
         this.sortDirection = sortDirection;
-        this.pageSize = pageSize;
+        this.pageSize = pageSize ? pageSize : this.pageSize;
         this.query = query;
+        this.criterias = criterias;
 
         return new Promise((resolve, reject) => {
             console.log('inside Promise getFiles entity Service...');
@@ -152,6 +161,7 @@ export class SearchEntityService implements Resolve<any> {
                         this.onFilesChanged.next(response.rows);
                         this.onFileSelected.next(response.rows[0]);
                         this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
+                        this.onTotalFilesChanged.next(response.results);
                         resolve(response.rows);
                     }, reject);
             }
@@ -271,5 +281,14 @@ export class SearchEntityService implements Resolve<any> {
             }
         }
         return array;
+    }
+
+    public changePage(page, pageSize): Promise<any> {
+        return this.getFiles(this.sortField, this.sortDirection, page, pageSize, this.query, this.criterias);
+    }
+
+    public changeSort(sortField, sortDirection, page): Promise<any> {
+        this.onSortChanged.next(sortField + ' ' + sortDirection);
+        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this.criterias);
     }
 }

@@ -87,7 +87,7 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
         // reset the paginator after sorting
         this.sort.sortChange
             .pipe(
-                tap(() => this.dataSource.loadDocuments(this.sort.active, this.sort.direction, 0, 25 , '*'))
+                tap(() => this.dataSource.loadDocuments(this.sort.active, this.sort.direction, 0))
             )
             .subscribe();
     }
@@ -160,8 +160,8 @@ export class FilesDataSource extends DataSource<any>
     {
     }
 
-    loadDocuments(sortField: string, sortDir, page: number, pageSize: number, query: string): void {
-        this._fileManagerService.getFiles(sortField, sortDir, page, pageSize, query);
+    loadDocuments(sortField: string, sortDir, page: number): void {
+        this._fileManagerService.changeSort(sortField, sortDir, page);
     }
 }
 
