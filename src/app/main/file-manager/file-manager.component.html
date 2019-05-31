@@ -32,6 +32,10 @@
 
         </div>
         <!-- CONTENT -->
+        <div>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+            <mat-divider></mat-divider>
+        </div>
         <div class="content" fusePerfectScrollbar>
             <file-list></file-list>
         </div>
