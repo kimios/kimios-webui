@@ -3,8 +3,8 @@
     <mat-expansion-panel-header>
         <div fxLayout="row" fxLayoutAlign="space-between center" style="width: 100%;">
 
-            <div fxFlex="25">
-      <mat-form-field class="full-width">
+            <div fxFlex="30">
+      <mat-form-field class="full-width" style="width: 90%;">
         <input #inputContent type="text" name="inputContent" matInput aria-label="Search"
                formControlName="content" placeholder="Content">
         <button mat-button *ngIf="searchParams.get('content').value" matSuffix mat-icon-button aria-label="Clear" (click)="searchParams.get('content').setValue('')">
@@ -23,7 +23,7 @@
     <div fxLayout="row space-between">
 
         <div  fxFlex="30">
-      <mat-form-field>
+      <mat-form-field style="width: 90%;">
         <input #inputFilename type="text" name="inputFilename" matInput aria-label="Tags" formControlName="filename"
                [matAutocomplete]="autoFilename" placeholder="Filename">
         <button mat-button *ngIf="searchParams.get('filename').value" matSuffix mat-icon-button aria-label="Clear" (click)="searchParams.get('filename').setValue('')">
@@ -70,7 +70,7 @@
 <!--          </mat-chip>-->
 <!--        </mat-chip-list>-->
 
-        <mat-form-field class="example-chip-list">
+        <mat-form-field style="width: 100%;">
           <mat-chip-list #chipList>
             <mat-chip
                     *ngFor="let tag of selectedTags"
