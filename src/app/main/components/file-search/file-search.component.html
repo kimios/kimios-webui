@@ -4,7 +4,7 @@
         <div fxLayout="row" fxLayoutAlign="space-between center" style="width: 100%;">
 
             <div fxFlex="30">
-      <mat-form-field class="full-width" style="width: 90%;">
+      <mat-form-field class="full-width" style="width: 90%;" (click)="$event.stopPropagation();">
         <input #inputContent type="text" name="inputContent" matInput aria-label="Search"
                formControlName="content" placeholder="Content">
         <button mat-button *ngIf="searchParams.get('content').value" matSuffix mat-icon-button aria-label="Clear" (click)="searchParams.get('content').setValue('')">
@@ -14,7 +14,7 @@
             </div>
 
             <div fxFlex>
-                <mat-icon class="s-24 secondary-text" (click)="onSubmit()">search</mat-icon>
+                <mat-icon class="s-24 secondary-text" (click)="onSubmit(); $event.stopPropagation();">search</mat-icon>
             </div>
 
         </div>
