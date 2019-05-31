@@ -21,9 +21,10 @@ import {EntityService} from 'app/services/entity.service';
 import {FileManagerDetailsSidebarComponent} from 'app/main/file-manager/sidebars/details/details.component';
 import {FileManagerFileListComponent} from 'app/main/file-manager/file-list/file-list.component';
 import {FileManagerMainSidebarComponent} from 'app/main/file-manager/sidebars/main/main.component';
-import {SearchEntityService} from '../../services/searchentity.service';
-import {FilesUploadDialogComponent} from '../components/files-upload-dialog/files-upload-dialog.component';
-import {FileSearchComponent} from '../components/file-search/file-search.component';
+import {SearchEntityService} from 'app/services/searchentity.service';
+import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
+import {FileSearchComponent} from 'app/main/components/file-search/file-search.component';
+import {FileUploadListComponent} from 'app/main/components/file-upload-list/file-upload-list.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import {FileSearchComponent} from '../components/file-search/file-search.compone
         FileManagerMainSidebarComponent,
         FileManagerDetailsSidebarComponent,
         FilesUploadDialogComponent,
-        FileSearchComponent
+        FileSearchComponent,
+        FileUploadListComponent
     ],
     imports: [
 
@@ -64,6 +66,9 @@ import {FileSearchComponent} from '../components/file-search/file-search.compone
     ],
     entryComponents: [
         FilesUploadDialogComponent
+    ],
+    exports: [
+        FileUploadListComponent
     ]
 })
 export class FileManagerModule { }
