@@ -14,14 +14,16 @@ export class FileUploadService {
     public lastUploadedDocumentId: Observable<number>;
 
     onFilesUploading: BehaviorSubject<any>;
-    uploadingFile: BehaviorSubject<any>;
-    filesProgress: Map<string, Observable<{ name: string, status: string, message: number }>>;
+    uploadingFile: BehaviorSubject<File>;
+    filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
 
     constructor(
         private documentService: DocumentService,
         private sessionService: SessionService
     ) {
         this.onFilesUploading = new BehaviorSubject([]);
+        this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
+        this.uploadingFile = new BehaviorSubject<File>(undefined);
     }
 
     uploadFile(
@@ -34,6 +36,8 @@ export class FileUploadService {
         documentTypeId?: number,
         metaItems?: string
     ): Observable<{ name: string, status: string, message: number } | number | string > {
+        this.uploadingFile.next(document);
+
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
             , this.sessionService.sessionToken
@@ -48,22 +52,34 @@ export class FileUploadService {
             , 'events'
             , true
         ).pipe(map((event) => {
-
+            let res;
             switch (event.type) {
 
                 case HttpEventType.UploadProgress:
                     const progress = Math.round(100 * event.loaded / event.total);
-                    return { name: document.name, status: 'progress', message: progress };
+                    res = { name: document.name, status: 'progress', message: progress };
+                    break;
 
                 case HttpEventType.Response:
-                    return event.body;
+                    res = event.body;
+                    break;
+
                 default:
-                    return `Unhandled event: ${event.type}`;
+                    res = `Unhandled event: ${event.type}`;
             }
+            this.filesProgress.get(document.name).next(res);
+            return res;
         }));
     }
 
     uploadFiles(array: Array<Array<any>>): Observable<{ name: string, status: string, message: number } | number | string > {
+        array.forEach(
+            elem => this.filesProgress.set(
+                elem[0]['name'],
+                new BehaviorSubject({ name: elem[0]['name'], status: 'not started', message: -1 })
+            )
+        );
+
         return from(array).pipe(
             concatMap(
                 fileArray => this.uploadFile(
