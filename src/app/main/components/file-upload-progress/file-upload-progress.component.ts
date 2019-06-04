@@ -1,8 +1,7 @@
-import {Component, Input, OnChanges, OnInit, SimpleChange} from '@angular/core';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {Component, Input, OnInit} from '@angular/core';
+import {Observable, of, Subject} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
-import {concatMap, map} from 'rxjs/operators';
-import {el} from '@angular/platform-browser/testing/src/browser_util';
+import {map, mergeMap, tap} from 'rxjs/operators';
 
 export const KIMIOS_CURRENT_UPLOADING_FILE = 'KIMIOS_CURRENT_UPLOADING_FILE';
 
@@ -12,9 +11,17 @@ export const KIMIOS_CURRENT_UPLOADING_FILE = 'KIMIOS_CURRENT_UPLOADING_FILE';
   styleUrls: ['./file-upload-progress.component.scss']
 })
 export class FileUploadProgressComponent implements OnInit {
-  @Input() uploadingFileName: string;
-  file: Subject<string>;
-  progress: Observable<{ name: string, status: string, message: number } | number | string >;
+    @Input() uploadingFileName: string;
+    file: Subject<string>;
+    progress: Observable<{ name: string, status: string, message: number } | number | string >;
+    color = 'primary';
+    mode = 'determinate';
+    value = 0;
+    bufferValue = 1;
+    showProgressBar = false;
+    showComponent = false;
+    messageDisplayed = '';
+    uploadStatus: 'ongoing' | 'done';
 
   constructor(private fileUploadService: FileUploadService) {
     this.file = new Subject<string>();
@@ -28,6 +35,7 @@ export class FileUploadProgressComponent implements OnInit {
           .pipe(
               map(res => {
                 if (res) {
+                    this.uploadingFileName = res.name;
                   return res.name;
                 } else {
                   return ;
@@ -43,7 +51,14 @@ export class FileUploadProgressComponent implements OnInit {
       this.file.next(this.uploadingFileName);
     }
     this.file.pipe(
-        concatMap(
+        // tap(
+        //     res => {
+        //         this.hide = true;
+        //         this.initProgressBar();
+        //         this.hide = false;
+        //     }
+        // ),
+        mergeMap(
             res => res ? this.fileUploadService.filesProgress.get(res) : of()
         )
     ).subscribe(
@@ -51,8 +66,27 @@ export class FileUploadProgressComponent implements OnInit {
           this.progress = of(res);
           console.log('in FileUploadProgressComponent');
           console.log(res);
+          this.value = res.message ? res.message : this.value;
+          if (this.value === -1) {
+              this.initProgressBar();
+              this.showProgressBar = true;
+              this.showComponent = true;
+          } else {
+              if (this.value === 100) {
+                  this.uploadStatus = 'done';
+                  this.messageDisplayed = 'uploaded: ' + this.uploadingFileName;
+                  this.showProgressBar = false;
+              }
+          }
         }
     );
 
   }
+
+    initProgressBar(): void {
+        console.log('initProgressBar()');
+        this.messageDisplayed = 'uploading: ' + this.uploadingFileName;
+        this.uploadStatus = 'ongoing';
+        this.value = 0;
+    }
 }

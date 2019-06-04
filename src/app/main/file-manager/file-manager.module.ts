@@ -10,7 +10,8 @@ import {
     MatRippleModule,
     MatSlideToggleModule,
     MatSortModule,
-    MatTableModule
+    MatTableModule,
+    MatProgressBarModule, MatProgressSpinnerModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -54,13 +55,15 @@ import {FileUploadProgressComponent} from '../components/file-upload-progress/fi
         MatChipsModule,
         MatPaginatorModule,
         MatDividerModule,
+        MatProgressBarModule,
 
         FuseSharedModule,
         FuseSidebarModule,
         MatInputModule,
         MatFormFieldModule,
         FuseSearchBarModule,
-        MatExpansionModule
+        MatExpansionModule,
+        MatProgressSpinnerModule
     ],
     providers   : [
         EntityService,
