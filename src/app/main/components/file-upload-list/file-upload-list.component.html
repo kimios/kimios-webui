@@ -1,0 +1,16 @@
+<div *ngFor="let file of progress.keys()">
+
+    <!--
+    {{file}}: <file-upload-progress uploadingFileName="{{file}}"></file-upload-progress>
+    -->
+
+    <div *ngIf="progress.get(file) | async as fileProgress">
+        {{file}}
+        <mat-progress-bar
+                *ngIf="fileProgress.message < 100; else elseBlock"
+                [value]="fileProgress.message"
+                [bufferValue]="1">
+        </mat-progress-bar>
+        <ng-template #elseBlock><mat-icon>done</mat-icon></ng-template>
+    </div>
+</div>

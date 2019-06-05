@@ -6,6 +6,7 @@ import {FuseSharedModule} from '@fuse/shared.module';
 
 import {FooterComponent} from 'app/layout/components/footer/footer.component';
 import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
+import {FileUploadListComponent} from 'app/main/components/file-upload-list/file-upload-list.component';
 
 @NgModule({
     declarations: [
@@ -23,6 +24,9 @@ import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
     ],
     exports     : [
         FooterComponent
+    ],
+    entryComponents: [
+        FileUploadListComponent
     ]
 })
 export class FooterModule

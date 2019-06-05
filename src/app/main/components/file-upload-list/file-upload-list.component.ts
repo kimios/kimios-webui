@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FileUploadService} from 'app/services/file-upload.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'file-upload-list',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FileUploadListComponent implements OnInit {
 
-  constructor() { }
+  filesUploading: string[];
+  progress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
 
-  ngOnInit() {
+  constructor(private fileUploadService: FileUploadService) {
+    this.filesUploading = Array.from(fileUploadService.filesProgress.keys());
+    console.log('FileUploadListComponent() with this.filesUploading:');
+    console.log(this.filesUploading);
+    this.progress = this.fileUploadService.filesProgress;
+  }
+
+  ngOnInit(): void {
   }
 
 }
