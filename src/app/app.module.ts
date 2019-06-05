@@ -32,11 +32,13 @@ import {SessionService} from 'app/services/session.service';
 import {CookieService} from 'ngx-cookie-service';
 import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
+import { FileDetailDialogComponent } from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 
 @NgModule({
     declarations: [
         AppComponent,
-        FileDetailComponent
+        FileDetailComponent,
+        FileDetailDialogComponent
     ],
     imports     : [
         BrowserModule,

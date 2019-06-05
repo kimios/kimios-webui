@@ -1,3 +1,8 @@
-<p>
-  file-detail works!
-</p>
+<!-- File details -->
+<!-- file properties : name, type, size, author, creation date -->
+<div *ngIf="documentData$ | async as data">
+    {{data.uid}} | {{data.name}} | {{data.mimeType}} | {{data.owner}} ({{data.ownerSource}}) | {{data.creationDate | date}}
+</div>
+<!-- tags -->
+<!-- file versions -->
+

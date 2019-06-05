@@ -26,7 +26,8 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {FileSearchComponent} from 'app/main/components/file-search/file-search.component';
 import {FileUploadListComponent} from 'app/main/components/file-upload-list/file-upload-list.component';
-import {FileUploadProgressComponent} from '../components/file-upload-progress/file-upload-progress.component';
+import {FileUploadProgressComponent} from 'app/main/components/file-upload-progress/file-upload-progress.component';
+import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 
 
 @NgModule({
@@ -70,7 +71,8 @@ import {FileUploadProgressComponent} from '../components/file-upload-progress/fi
         SearchEntityService
     ],
     entryComponents: [
-        FilesUploadDialogComponent
+        FilesUploadDialogComponent,
+        FileDetailDialogComponent
     ],
     exports: [
         FileUploadListComponent,

@@ -5,11 +5,11 @@ import {tap} from 'rxjs/operators';
 
 import {fuseAnimations} from '@fuse/animations';
 import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
-import {MatSort} from '@angular/material';
-import {Document} from '../../../kimios-client-api';
+import {MatDialog, MatSort} from '@angular/material';
+import {Document} from 'app/kimios-client-api';
 import * as moment from 'moment';
-import {SearchEntityService} from '../../../services/searchentity.service';
-
+import {SearchEntityService} from 'app/services/searchentity.service';
+import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 
 @Component({
     selector     : 'file-list',
@@ -59,8 +59,8 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
      */
     constructor(
         private _fileManagerService: SearchEntityService,
-        private _fuseSidebarService: FuseSidebarService
-
+        private _fuseSidebarService: FuseSidebarService,
+        public dialog: MatDialog
     )
     {
 
@@ -114,9 +114,14 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
     onSelect(selected): void
     {
         this._fileManagerService.onFileSelected.next(selected);
+        this.openDocumentDetailDialog(selected.uid);
     }
 
-
+    openDocumentDetailDialog(uid: number): void {
+        const dialogRef = this.dialog.open(FileDetailDialogComponent, {
+            data: { 'uid': uid }
+        });
+    }
 
     /**
      * Toggle the sidebar
