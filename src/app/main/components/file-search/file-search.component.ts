@@ -69,6 +69,7 @@ export class FileSearchComponent implements OnInit {
                 this.tags$ = of(res);
                 // this.filteredTags$ = this.tags$;
                 this.tags = res;
+                this.tagCtrl.updateValueAndValidity();
                 console.log('received tags');
                 console.dir(res);
             }
@@ -150,8 +151,8 @@ export class FileSearchComponent implements OnInit {
         }
     }
 
-    displayTag(tag?: { uid: number; name: string; count: number }): string | undefined {
-        return tag ? tag.name : undefined;
+    displayTag(tag?: Tag): string | undefined {
+        return tag ? (tag.name + ' (' + tag.count + ')') : undefined;
     }
 
     selectTag(tag: Tag): void {

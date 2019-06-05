@@ -89,9 +89,9 @@
                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                     [matChipInputAddOnBlur]="addOnBlur">
           </mat-chip-list>
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayTag">
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
             <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
-              {{tag.name}}
+              {{tag.name}} ({{tag.count}})
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
