@@ -1,8 +1,38 @@
 <!-- File details -->
-<!-- file properties : name, type, size, author, creation date -->
 <div *ngIf="documentData$ | async as data">
-    {{data.uid}} | {{data.name}} | {{data.mimeType}} | {{data.owner}} ({{data.ownerSource}}) | {{data.creationDate | date}}
+    <!-- file properties : name, type, size, author, creation date -->
+    <div>
+        {{data.uid}} | {{data.name}} | {{data.mimeType}} | {{data.owner}} ({{data.ownerSource}}) | {{data.creationDate | date}}
+    </div>
+    <!-- tags -->
+    <div>
+        <mat-form-field style="width: 100%;">
+            <mat-chip-list #chipList>
+                <mat-chip
+                        *ngFor="let tag of documentTags$ | async"
+                        [selectable]="selectable"
+                        [removable]="removable"
+                        (removed)="remove(tag)">
+                    {{tag.name}}
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </mat-chip>
+                <input
+                        placeholder="Tags"
+                        #tagInput
+                        [formControl]="tagCtrl"
+                        [matAutocomplete]="auto"
+                        [matChipInputFor]="chipList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputAddOnBlur]="addOnBlur">
+            </mat-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+                    {{tag.name}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
 </div>
-<!-- tags -->
+
 <!-- file versions -->
 

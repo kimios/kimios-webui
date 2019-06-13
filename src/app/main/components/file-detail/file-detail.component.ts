@@ -1,7 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
+import {TagService} from 'app/services/tag.service';
+import {concatMap, map, startWith, tap} from 'rxjs/operators';
+import {Tag} from 'app/main/model/tag';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {FormControl} from '@angular/forms';
+import {MatAutocompleteSelectedEvent} from '@angular/material';
 
 @Component({
   selector: 'file-detail',
@@ -10,22 +16,160 @@ import {SessionService} from 'app/services/session.service';
 })
 export class FileDetailComponent implements OnInit {
 
-  @Input()
-  documentId: number;
-  documentData$: Observable<KimiosDocument>;
-  documentVersions$: Observable<Array<DocumentVersion>>;
+    @Input()
+    documentId: number;
+    documentData$: Observable<KimiosDocument>;
+    documentVersions$: Observable<Array<DocumentVersion>>;
+    allTags$: Observable<Tag[]>;
+    allTags: Tag[];
+    documentTags$: BehaviorSubject<Tag[]>;
+    filteredTags$: Observable<Tag[]>;
+    selectedTag$: Subject<Tag>;
+    removedTag$: Subject<Tag>;
+    selectedTag: Tag;
+    removedTag: Tag;
 
-  constructor(
-      private documentService: DocumentService,
-      private documentVersionService: DocumentVersionService,
-      private sessionService: SessionService,
-  ) {
+    visible = true;
+    selectable = true;
+    removable = true;
+    addOnBlur = true;
+    separatorKeysCodes: number[] = [ENTER, COMMA];
+    tagCtrl = new FormControl();
 
-  }
+    @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
-  ngOnInit(): void {
-    this.documentData$ = this.documentService.getDocument(this.sessionService.sessionToken, this.documentId);
-    this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId);
-  }
+    constructor(
+        private documentService: DocumentService,
+        private documentVersionService: DocumentVersionService,
+        private sessionService: SessionService,
+        private tagService: TagService
+    ) {
+        this.allTags$ = this.tagService.loadTags()
+            .pipe(
+                map(res => res.map(v => new Tag(v.name, v.uid)))
+            );
+        this.documentTags$ = new BehaviorSubject<Tag[]>(new Array<Tag>());
+        this.selectedTag$ = new Subject<Tag>();
+        this.removedTag$ = new Subject<Tag>();
+    }
 
+    ngOnInit(): void {
+        this.documentData$ = this.allTags$
+            .pipe(
+                tap(res => this.allTags = res),
+                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                tap(
+                    res2 => this.documentTags$.next(
+                        res2['addonDatas'] ? 
+                            this.extractTagsFromAddonDatas(res2.addonDatas) :
+                            new Array<Tag>()
+                    )
+                )
+            );
+        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId);
+
+        this.filteredTags$ = this.tagCtrl.valueChanges.pipe(
+            startWith(null),
+            map((tag: (string|Tag) | null) =>
+                tag ?
+                    this._filterTags(tag instanceof Tag ? tag.name : tag) :
+                    this.allTags
+                        .filter(t => !this.isTagSetOnDocument(t))
+                        .slice()
+            )
+        );
+
+        this.selectedTag$
+            .pipe(
+                tap(next => this.selectedTag = next),
+                concatMap(next => this.documentService.updateDocumentTag(
+                    this.sessionService.sessionToken,
+                    this.documentId,
+                    next.uid,
+                    true
+                    )
+                )
+            )
+            .subscribe(
+                next => this.documentTags$.next(this.documentTags$.getValue().concat(this.selectedTag))
+            );
+
+        this.removedTag$
+            .pipe(
+                tap(next => this.removedTag = next),
+                concatMap(next => this.documentService.updateDocumentTag(
+                    this.sessionService.sessionToken,
+                    this.documentId,
+                    next.uid,
+                    false
+                    )
+                )
+            )
+            .subscribe(
+                next => {
+                    const tags = this.documentTags$.getValue();
+                    let tagIndex;
+                    tags.forEach((value, index) => {
+                        if (value.uid === this.removedTag.uid) {
+                            tagIndex = index;
+                        }
+                    });
+                    if (tagIndex !== null && tagIndex !== undefined) {
+                        tags.splice(tagIndex, 1);
+                        this.documentTags$.next(tags);
+                    }
+                }
+            );
+
+    }
+
+    private isTagSetOnDocument(tag: Tag): boolean {
+        return this.documentTags$.getValue().filter(
+            value => value.uid === tag.uid
+        ).length > 0;
+    }
+
+    private _filterTags(value: string): Tag[] {
+        const filterValue = value.toLowerCase();
+
+        return this.allTags.filter(tag => !this.isTagSetOnDocument(tag) && tag.name.toLowerCase().includes(filterValue));
+    }
+
+    private extractTagsFromAddonDatas(addonDataJsonString: string): Tag[] {
+        const addonData = JSON.parse(addonDataJsonString);
+        const tags = new Array<Tag>();
+        const allTagsMap = new Map<number, Tag>();
+        this.allTags.forEach(tag => allTagsMap.set(tag.uid, tag));
+        if (addonData['entityMetaValues'] && Array.isArray(addonData['entityMetaValues'])) {
+            Array.from(addonData['entityMetaValues']).forEach(
+                metaValue => {
+                    if (metaValue['meta']
+                        && metaValue['meta']['uid']
+                        && allTagsMap.get(metaValue['meta']['uid'])
+                        && metaValue['meta']['name']
+                        && metaValue['value']
+                        && metaValue['value'] == metaValue['meta']['uid']) {
+                        tags.push(new Tag(
+                            metaValue['meta']['name']
+                                .toLocaleUpperCase()
+                                .replace(new RegExp('^' + TagService.TAG_NAME_PREFIX), ''),
+                            metaValue['meta']['uid']
+                        ));
+                    }
+                }
+            );
+        }
+        return tags;
+    }
+
+    selected(event: MatAutocompleteSelectedEvent): void {
+        const tag: any = event.option.value;
+        this.selectedTag$.next(tag);
+        this.tagInput.nativeElement.value = '';
+        this.tagCtrl.setValue(null);
+    }
+
+    remove(tag: Tag): void {
+        this.removedTag$.next(tag);
+    }
 }
