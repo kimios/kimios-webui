@@ -230,7 +230,7 @@ export class SearchEntityService implements Resolve<any> {
             this.sessionService.sessionToken,
             0,
             25,
-            "DocumentName",
+            'DocumentName',
             '',
             null,
             -1,
