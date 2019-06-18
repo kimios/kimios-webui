@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
@@ -7,7 +7,8 @@ import {concatMap, map, startWith, tap} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
-import {MatAutocompleteSelectedEvent} from '@angular/material';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'file-detail',
@@ -28,6 +29,7 @@ export class FileDetailComponent implements OnInit {
     removedTag$: Subject<Tag>;
     selectedTag: Tag;
     removedTag: Tag;
+    createdTagName: string;
 
     visible = true;
     selectable = true;
@@ -37,16 +39,19 @@ export class FileDetailComponent implements OnInit {
     tagCtrl = new FormControl();
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
+    @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
     constructor(
         private documentService: DocumentService,
         private documentVersionService: DocumentVersionService,
         private sessionService: SessionService,
-        private tagService: TagService
+        private tagService: TagService,
+        private documentDetailService: DocumentDetailService
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
-                map(res => res.map(v => new Tag(v.name, v.uid)))
+                map(res => res.map(v => new Tag(v.name, v.uid))),
+                tap(res => this.allTags = res)
             );
         this.documentTags$ = new BehaviorSubject<Tag[]>(new Array<Tag>());
         this.selectedTag$ = new Subject<Tag>();
@@ -56,28 +61,18 @@ export class FileDetailComponent implements OnInit {
     ngOnInit(): void {
         this.documentData$ = this.allTags$
             .pipe(
-                tap(res => this.allTags = res),
-                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
-                tap(
-                    res2 => this.documentTags$.next(
-                        res2['addonDatas'] ? 
-                            this.extractTagsFromAddonDatas(res2.addonDatas) :
-                            new Array<Tag>()
-                    )
-                )
+                // tap(res => this.allTags = res),
+                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId))
             );
+
+        this.documentDetailService.retrieveDocumentTags(this.documentId)
+            .subscribe(
+                next => this.documentTags$.next(next)
+            );
+
         this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId);
 
-        this.filteredTags$ = this.tagCtrl.valueChanges.pipe(
-            startWith(null),
-            map((tag: (string|Tag) | null) =>
-                tag ?
-                    this._filterTags(tag instanceof Tag ? tag.name : tag) :
-                    this.allTags
-                        .filter(t => !this.isTagSetOnDocument(t))
-                        .slice()
-            )
-        );
+        this.filteredTags$ = this.initFilteredTags();
 
         this.selectedTag$
             .pipe(
@@ -121,6 +116,19 @@ export class FileDetailComponent implements OnInit {
                 }
             );
 
+    }
+
+    private initFilteredTags(): Observable<Tag[]> {
+        return this.tagCtrl.valueChanges.pipe(
+            startWith(null),
+            map((tag: (string|Tag) | null) =>
+                tag ?
+                    this._filterTags(tag instanceof Tag ? tag.name : tag) :
+                    this.allTags
+                        .filter(t => !this.isTagSetOnDocument(t))
+                        .slice()
+            )
+        );
     }
 
     private isTagSetOnDocument(tag: Tag): boolean {
@@ -171,5 +179,41 @@ export class FileDetailComponent implements OnInit {
 
     remove(tag: Tag): void {
         this.removedTag$.next(tag);
+    }
+
+    createAndAddTag($event: MatChipInputEvent): void {
+        if (!this.matAutocomplete.isOpen) {
+            const input = $event.input;
+            const value = $event.value;
+
+            // Add our tag
+            if ((value || '').trim()) {
+// ask to tagService to create the tag (the meta on the right document type)
+                this.createdTagName = value;
+                this.tagService.createTag(value)
+                    .pipe(
+                        // concatMap(next => this.tagService.loadTags()),
+                        // map(res => res.map(v => new Tag(v.name, v.uid)))
+                        concatMap(next => this.allTags$)
+                    )
+                    .subscribe(
+                        next => {
+                            const newTag = next.filter(tag => tag.name === this.createdTagName)[0];
+                            if (newTag) {
+                                this.selectedTag$.next(newTag);
+                                this.filteredTags$ = this.initFilteredTags();
+
+                            }
+                        });
+
+            }
+
+            // Reset the input value
+            if (input) {
+                input.value = '';
+            }
+
+            this.tagCtrl.setValue(null);
+        }
     }
 }

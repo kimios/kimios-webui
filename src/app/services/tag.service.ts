@@ -78,4 +78,12 @@ export class TagService implements OnInit {
                 })
             );
     }
+
+    createTag(value: string): Observable<any> {
+        return this.studioService.createTag(
+            this.sessionService.sessionToken,
+            TagService.TAG_NAME_PREFIX + value,
+            this.documentType.uid
+        );
+    }
 }
