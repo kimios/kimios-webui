@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
@@ -9,13 +9,14 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {SearchEntityService} from 'app/services/searchentity.service';
 
 @Component({
   selector: 'file-detail',
   templateUrl: './file-detail.component.html',
   styleUrls: ['./file-detail.component.scss']
 })
-export class FileDetailComponent implements OnInit {
+export class FileDetailComponent implements OnInit, OnDestroy {
 
     @Input()
     documentId: number;
@@ -46,7 +47,8 @@ export class FileDetailComponent implements OnInit {
         private documentVersionService: DocumentVersionService,
         private sessionService: SessionService,
         private tagService: TagService,
-        private documentDetailService: DocumentDetailService
+        private documentDetailService: DocumentDetailService,
+        private searchEntityService: SearchEntityService
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
@@ -116,6 +118,13 @@ export class FileDetailComponent implements OnInit {
                 }
             );
 
+        this.documentTags$.subscribe(res => this.searchEntityService.reloadTags());
+    }
+
+    ngOnDestroy(): void {
+        this.documentTags$.unsubscribe();
+        this.selectedTag$.unsubscribe();
+        this.removedTag$.unsubscribe();
     }
 
     private initFilteredTags(): Observable<Tag[]> {

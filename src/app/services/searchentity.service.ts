@@ -26,6 +26,7 @@ export class SearchEntityService implements Resolve<any> {
     private sortDirection: string;
 //    private page: number;
     private pageSize: number;
+    private page: number;
     private query: string;
     private criterias: Criteria[];
 
@@ -115,10 +116,11 @@ export class SearchEntityService implements Resolve<any> {
      *
      * @returns {Promise<any>}
      */
-    getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string, criterias = []): Promise<any> {
+    getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string, criterias = [], onlyTags = false): Promise<any> {
         this.sortField = sortField;
         this.sortDirection = sortDirection;
         this.pageSize = pageSize ? pageSize : this.pageSize;
+        this.page = page;
         this.query = query;
         this.criterias = criterias;
 
@@ -158,18 +160,28 @@ export class SearchEntityService implements Resolve<any> {
                     )
                     .subscribe((response: any) => {
                         console.log('loaded results', response);
-                        this.onFilesChanged.next(response.rows);
-                        this.onFileSelected.next(response.rows[0]);
-                        this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
-                        this.onTotalFilesChanged.next(response.results);
+                        this.handleFilesLoad(response, onlyTags);
                         resolve(response.rows);
                     }, reject);
             }
         });
     }
 
+    handleFilesLoad(response: any, onlyTags: boolean): void {
+        if (! onlyTags) {
+            this.onFilesChanged.next(response.rows);
+            this.onFileSelected.next(response.rows[0]);
+            this.onTotalFilesChanged.next(response.results);
+        }
+        this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
+    }
+
     reloadFiles(): Promise<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
+    }
+
+    reloadTags(): Promise<any> {
+        return this.getFiles(this.sortField, this.sortDirection, this.page, this.pageSize, this.query, this.criterias, true);
     }
 
     searchInContent(content: string, criterias = []): Promise<any> {
