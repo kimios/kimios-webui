@@ -765,6 +765,14 @@ export class DocumentService {
             queryParameters = queryParameters.set('metaItems', <any>metaItems);
             formData.append('metaItems', metaItems);
         }
+        if (metaItems !== undefined && metaItems !== null) {
+            queryParameters = queryParameters.set('md5', <any>metaItems);
+            formData.append('md5', md5);
+        }
+        if (metaItems !== undefined && metaItems !== null) {
+            queryParameters = queryParameters.set('sha1', <any>metaItems);
+            formData.append('sha1', sha1);
+        }
 
         let headers = this.defaultHeaders;
 

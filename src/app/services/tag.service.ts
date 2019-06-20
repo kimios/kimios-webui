@@ -4,7 +4,7 @@ import {Observable, of, Subject} from 'rxjs';
 import {SessionService} from './session.service';
 import {concatMap, first, map, tap} from 'rxjs/operators';
 
-export const DOC_TYPE_TAGGABLE = 'Taggable';
+export const DOC_TYPE_TAGGABLE = 'Taggable2';
 export const TAG_META_DATA_PREFIX = 'MetaDataString_';
 
 @Injectable({

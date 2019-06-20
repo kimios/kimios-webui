@@ -5,6 +5,7 @@ import {BehaviorSubject, from, Observable, of, throwError} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
 import {catchError, concatMap, map} from 'rxjs/operators';
+import {TagService} from './tag.service';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +20,8 @@ export class FileUploadService {
 
     constructor(
         private documentService: DocumentService,
-        private sessionService: SessionService
+        private sessionService: SessionService,
+        private tagService: TagService
     ) {
         this.onFilesUploading = new BehaviorSubject([]);
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
@@ -45,7 +47,9 @@ export class FileUploadService {
             , isSecurityInherited
             , securityItems
             , isRecursive
-            , documentTypeId
+            , (documentTypeId === null || documentTypeId === undefined || documentTypeId === -1) ?
+                this.tagService.documentType.uid :
+                documentTypeId
             , metaItems
             , ''
             , ''
