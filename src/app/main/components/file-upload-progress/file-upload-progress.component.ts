@@ -43,7 +43,7 @@ export class FileUploadProgressComponent implements OnInit {
               })
           )
           .subscribe(
-          (res) => this.file.next(res),
+          (res) => res !== null && res !== undefined ? this.file.next(res) : console.log('undefined'),
               (error) => console.log(error),
               () => console.log('no file')
       );
@@ -59,7 +59,7 @@ export class FileUploadProgressComponent implements OnInit {
         //     }
         // ),
         mergeMap(
-            res => res ? this.fileUploadService.filesProgress.get(res) : of()
+            res => res !== null && res !== undefined ? this.fileUploadService.filesProgress.get(res) : of()
         )
     ).subscribe(
         res => {

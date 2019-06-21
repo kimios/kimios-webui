@@ -29,6 +29,7 @@ import {FileUploadListComponent} from 'app/main/components/file-upload-list/file
 import {FileUploadProgressComponent} from 'app/main/components/file-upload-progress/file-upload-progress.component';
 import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
+import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolbar.component';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.c
         FileUploadListComponent,
         FileUploadProgressComponent,
         FileDetailComponent,
-        FileDetailDialogComponent
+        FileDetailDialogComponent,
+        FileToolbarComponent
     ],
     imports: [
 

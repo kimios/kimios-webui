@@ -1,0 +1,37 @@
+<div fxLayout="row" fxLayoutAlign="start center">
+    <div *ngIf="versionUploading; else elseBlock" style="margin: 10px 10px 10px 0px;" >
+        <mat-progress-spinner
+                class="example-margin"
+                [color]="color"
+                [mode]="mode"
+                [value]="value"
+                diameter="56">
+        </mat-progress-spinner>
+    </div>
+    <ng-template #elseBlock>
+        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, documentId)" />
+        <button mat-fab
+                color="warn"
+                (click)="fileInput.click()"
+                aria-label="Import new version"
+                label="Import new version"
+                style="margin: 10px 10px 10px 0px; ">
+            <mat-icon>cloud_upload</mat-icon>
+        </button>
+    </ng-template>
+
+    <button mat-fab
+            aria-label="Download file"
+            label="Download file"
+            style="margin: 10px 10px 10px 0px; ">
+      <mat-icon>cloud_download</mat-icon>
+    </button>
+    <button mat-fab
+            color="warn"
+            aria-label="Delete"
+            label="Delete"
+            style="margin: 10px 10px 10px 0px; ">
+      <mat-icon>delete</mat-icon>
+    </button>
+
+</div>

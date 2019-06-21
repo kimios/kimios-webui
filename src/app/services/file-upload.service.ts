@@ -65,7 +65,7 @@ export class FileUploadService {
                     break;
 
                 case HttpEventType.Response:
-                    res = event.body;
+                    res = event.body ? event.body : event.status;
                     break;
 
                 default:
@@ -98,6 +98,35 @@ export class FileUploadService {
                 )
             )
         );
+    }
+
+    uploadNewVersion(document: File, documentId: number): Observable<{ name: string, status: string, message: number } | number | string > {
+
+        return this.documentService.uploadNewDocumentVersion(
+            this.sessionService.sessionToken,
+            documentId,
+            document,
+            'events',
+            true
+        ).pipe(map((event) => {
+            let res;
+            switch (event.type) {
+
+                case HttpEventType.UploadProgress:
+                    const progress = Math.round(100 * event.loaded / event.total);
+                    res = { name: document.name, status: 'progress', message: progress };
+                    break;
+
+                case HttpEventType.Response:
+                    res = event.body ? event.body : event.status;
+                    break;
+
+                default:
+                    res = `Unhandled event: ${event.type}`;
+            }
+
+            return res;
+        }));
     }
 
 }
