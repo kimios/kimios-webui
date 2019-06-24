@@ -20,6 +20,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     @Input()
     documentId: number;
+    document: KimiosDocument;
     documentData$: Observable<KimiosDocument>;
     documentVersions$: Observable<Array<DocumentVersion>>;
     allTags$: Observable<Tag[]>;
@@ -64,7 +65,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.documentData$ = this.allTags$
             .pipe(
                 // tap(res => this.allTags = res),
-                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId))
+                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                tap(res => this.document = res)
             );
 
         this.documentDetailService.retrieveDocumentTags(this.documentId)
@@ -227,5 +229,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
             this.tagCtrl.setValue(null);
         }
+    }
+
+    handleVersionDownload(versionId: number): void {
+        this.documentDetailService.downloadDocumentVersion(versionId);
     }
 }

@@ -1,5 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FileUploadService} from 'app/services/file-upload.service';
+import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'file-toolbar',
@@ -9,14 +11,15 @@ import {FileUploadService} from 'app/services/file-upload.service';
 export class FileToolbarComponent implements OnInit {
 
   @Input()
-  documentId: number;
+  document: KimiosDocument;
   color = 'primary';
   mode = 'determinate';
   value = 0;
   versionUploading = false;
 
   constructor(
-      private fileUploadService: FileUploadService
+      private fileUploadService: FileUploadService,
+      private documentDetailService: DocumentDetailService
   ) {
 
   }
@@ -44,5 +47,9 @@ export class FileToolbarComponent implements OnInit {
     } else {
       this.value = res.message;
     }
+  }
+
+  handleFileDownload(versionId: number): void {
+    this.documentDetailService.downloadDocumentVersion(versionId);
   }
 }

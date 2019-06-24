@@ -9,7 +9,7 @@
         </mat-progress-spinner>
     </div>
     <ng-template #elseBlock>
-        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, documentId)" />
+        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, document.uid)" />
         <button mat-fab
                 color="warn"
                 (click)="fileInput.click()"
@@ -23,7 +23,8 @@
     <button mat-fab
             aria-label="Download file"
             label="Download file"
-            style="margin: 10px 10px 10px 0px; ">
+            style="margin: 10px 10px 10px 0px; "
+            (click)="handleFileDownload(document.lastVersionId)">
       <mat-icon>cloud_download</mat-icon>
     </button>
     <button mat-fab

@@ -1,6 +1,6 @@
 <!-- File details -->
 <div *ngIf="documentData$ | async as data">
-    <file-toolbar [documentId]="documentId"></file-toolbar>
+    <file-toolbar [document]="document"></file-toolbar>
     <!-- file properties : name, type, size, author, creation date -->
     <div>
         {{data.uid}} | {{data.name}} | {{data.mimeType}} | {{data.owner}} ({{data.ownerSource}}) | {{data.creationDate | date}}
@@ -44,7 +44,10 @@
                 </mat-expansion-panel-header>
                 <mat-list>
                     <mat-list-item *ngFor="let version of versions">
-                        <mat-icon mat-list-icon>cloud_download</mat-icon>
+                        <mat-icon mat-list-icon
+                                  (click)="handleVersionDownload(version.uid)">
+                            cloud_download
+                        </mat-icon>
                         <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
                     </mat-list-item>
                 </mat-list>
