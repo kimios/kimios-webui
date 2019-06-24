@@ -34,7 +34,26 @@
             </mat-autocomplete>
         </mat-form-field>
     </div>
+
+    <!-- file versions -->
+    <div *ngIf="documentVersions$ | async as versions">
+        <div *ngIf="versions.length > 1; else versionsElseBlock">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
+                </mat-expansion-panel-header>
+                <mat-list>
+                    <mat-list-item *ngFor="let version of versions">
+                        <mat-icon mat-list-icon>cloud_download</mat-icon>
+                        <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
+                    </mat-list-item>
+                </mat-list>
+            </mat-expansion-panel>
+        </div>
+        <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
+
+    </div>
 </div>
 
-<!-- file versions -->
+
 

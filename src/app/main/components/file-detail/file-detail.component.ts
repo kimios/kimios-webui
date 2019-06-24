@@ -72,7 +72,10 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 next => this.documentTags$.next(next)
             );
 
-        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId);
+        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
+            .map(
+                res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
+            );
 
         this.filteredTags$ = this.initFilteredTags();
 
