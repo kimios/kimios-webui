@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
