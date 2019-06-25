@@ -10,6 +10,7 @@ import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
+import {DocumentRefreshService} from 'app/services/document-refresh.service';
 
 @Component({
   selector: 'file-detail',
@@ -49,7 +50,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private sessionService: SessionService,
         private tagService: TagService,
         private documentDetailService: DocumentDetailService,
-        private searchEntityService: SearchEntityService
+        private searchEntityService: SearchEntityService,
+        private documentRefreshService: DocumentRefreshService
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
@@ -124,12 +126,17 @@ export class FileDetailComponent implements OnInit, OnDestroy {
             );
 
         this.documentTags$.subscribe(res => this.searchEntityService.reloadTags());
+
+        this.documentRefreshService.needRefresh.subscribe(
+            res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
+        );
     }
 
     ngOnDestroy(): void {
         this.documentTags$.unsubscribe();
         this.selectedTag$.unsubscribe();
         this.removedTag$.unsubscribe();
+        this.documentRefreshService.needRefresh.unsubscribe();
     }
 
     private initFilteredTags(): Observable<Tag[]> {
@@ -233,5 +240,26 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     handleVersionDownload(versionId: number): void {
         this.documentDetailService.downloadDocumentVersion(versionId);
+    }
+
+    private reloadDocument(): void {
+        this.documentData$ = this.allTags$
+            .pipe(
+                // tap(res => this.allTags = res),
+                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                tap(res => this.document = res)
+            );
+
+        this.documentDetailService.retrieveDocumentTags(this.documentId)
+            .subscribe(
+                next => this.documentTags$.next(next)
+            );
+
+        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
+            .map(
+                res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
+            );
+
+        this.filteredTags$ = this.initFilteredTags();
     }
 }

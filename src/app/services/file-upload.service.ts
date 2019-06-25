@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 
 import {DocumentService} from '../kimios-client-api';
-import {BehaviorSubject, from, Observable, of, throwError} from 'rxjs';
+import {BehaviorSubject, from, Observable} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
-import {catchError, concatMap, map} from 'rxjs/operators';
+import {concatMap, map, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
+import {DocumentRefreshService} from './document-refresh.service';
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +22,8 @@ export class FileUploadService {
     constructor(
         private documentService: DocumentService,
         private sessionService: SessionService,
-        private tagService: TagService
+        private tagService: TagService,
+        private documentRefreshService: DocumentRefreshService
     ) {
         this.onFilesUploading = new BehaviorSubject([]);
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
@@ -108,25 +110,32 @@ export class FileUploadService {
             document,
             'events',
             true
-        ).pipe(map((event) => {
-            let res;
-            switch (event.type) {
+        ).pipe(
+            map((event) => {
+                let res;
+                switch (event.type) {
 
-                case HttpEventType.UploadProgress:
-                    const progress = Math.round(100 * event.loaded / event.total);
-                    res = { name: document.name, status: 'progress', message: progress };
-                    break;
+                    case HttpEventType.UploadProgress:
+                        const progress = Math.round(100 * event.loaded / event.total);
+                        res = { name: document.name, status: 'progress', message: progress };
+                        break;
 
-                case HttpEventType.Response:
-                    res = event.body ? event.body : event.status;
-                    break;
+                    case HttpEventType.Response:
+                        res = event.body ? event.body : event.status;
+                        break;
 
-                default:
-                    res = `Unhandled event: ${event.type}`;
-            }
+                    default:
+                        res = `Unhandled event: ${event.type}`;
+                }
 
-            return res;
-        }));
+                return res;
+            }),
+            tap({
+                next: (val) => {},
+                error: (error) => {},
+                complete: () => this.documentRefreshService.needRefresh.next(documentId)
+            })
+        );
     }
 
 }
