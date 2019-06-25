@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
-import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService} from 'app/kimios-client-api';
+import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
@@ -33,6 +33,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     selectedTag: Tag;
     removedTag: Tag;
     createdTagName: string;
+    canWrite$: Observable<boolean>;
+
 
     visible = true;
     selectable = true;
@@ -51,7 +53,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private tagService: TagService,
         private documentDetailService: DocumentDetailService,
         private searchEntityService: SearchEntityService,
-        private documentRefreshService: DocumentRefreshService
+        private documentRefreshService: DocumentRefreshService,
+        private securityService: SecurityService
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
@@ -61,9 +64,12 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.documentTags$ = new BehaviorSubject<Tag[]>(new Array<Tag>());
         this.selectedTag$ = new Subject<Tag>();
         this.removedTag$ = new Subject<Tag>();
+        this.canWrite$ = new Observable<boolean>();
     }
 
     ngOnInit(): void {
+        this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
+
         this.documentData$ = this.allTags$
             .pipe(
                 // tap(res => this.allTags = res),

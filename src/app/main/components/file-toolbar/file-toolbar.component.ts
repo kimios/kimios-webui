@@ -14,23 +14,20 @@ export class FileToolbarComponent implements OnInit {
 
   @Input()
   document: KimiosDocument;
+  @Input()
+  canWrite$: Observable<boolean>;
   color = 'primary';
   mode = 'determinate';
   value = 0;
   versionUploading = false;
-  canWrite$: Observable<boolean>;
 
   constructor(
       private fileUploadService: FileUploadService,
-      private documentDetailService: DocumentDetailService,
-      private sessionService: SessionService,
-      private securityService: SecurityService
+      private documentDetailService: DocumentDetailService
   ) {
-    this.canWrite$ = new Observable<boolean>();
   }
 
   ngOnInit(): void {
-    this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.document.uid);
   }
 
   handleFileInput(target: EventTarget, documentId: number): void {
