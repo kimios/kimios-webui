@@ -9,13 +9,15 @@
         </mat-progress-spinner>
     </div>
     <ng-template #elseBlock>
-        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, document.uid)" />
+        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, document.uid)"
+               [disabled]="!(canWrite$ | async)" />
         <button mat-fab
                 color="warn"
                 (click)="fileInput.click()"
                 aria-label="Import new version"
                 label="Import new version"
-                style="margin: 10px 10px 10px 0px; ">
+                style="margin: 10px 10px 10px 0px; "
+                [disabled]="!(canWrite$ | async)" >
             <mat-icon>cloud_upload</mat-icon>
         </button>
     </ng-template>
@@ -31,7 +33,8 @@
             color="warn"
             aria-label="Delete"
             label="Delete"
-            style="margin: 10px 10px 10px 0px; ">
+            style="margin: 10px 10px 10px 0px; "
+            [disabled]="!(canWrite$ | async)" >
       <mat-icon>delete</mat-icon>
     </button>
 

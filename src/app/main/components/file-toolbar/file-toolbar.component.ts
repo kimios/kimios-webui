@@ -1,7 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FileUploadService} from 'app/services/file-upload.service';
-import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {Document as KimiosDocument, SecurityService} from 'app/kimios-client-api';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {Observable} from 'rxjs';
+import {SessionService} from 'app/services/session.service';
 
 @Component({
   selector: 'file-toolbar',
@@ -16,15 +18,19 @@ export class FileToolbarComponent implements OnInit {
   mode = 'determinate';
   value = 0;
   versionUploading = false;
+  canWrite$: Observable<boolean>;
 
   constructor(
       private fileUploadService: FileUploadService,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private sessionService: SessionService,
+      private securityService: SecurityService
   ) {
-
+    this.canWrite$ = new Observable<boolean>();
   }
 
   ngOnInit(): void {
+    this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.document.uid);
   }
 
   handleFileInput(target: EventTarget, documentId: number): void {
