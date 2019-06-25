@@ -7,7 +7,7 @@
     </div>
     <!-- tags -->
     <div>
-        <mat-form-field style="width: 100%;">
+        <mat-form-field style="width: 100%;" *ngIf="canWrite$ | async; else elseBlockTags">
             <mat-chip-list #chipList>
                 <mat-chip
                         *ngFor="let tag of documentTags$ | async"
@@ -33,6 +33,17 @@
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>
+        <ng-template #elseBlockTags>
+            <mat-chip-list #chipList>
+                <mat-chip
+                        *ngFor="let tag of documentTags$ | async"
+                        [selectable]="false"
+                        [removable]="false"
+                        (removed)="remove(tag)">
+                    {{tag.name}}
+                </mat-chip>
+            </mat-chip-list>
+        </ng-template>
     </div>
 
     <!-- file versions -->
