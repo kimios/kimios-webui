@@ -11,7 +11,7 @@ import {
     MatSlideToggleModule,
     MatSortModule,
     MatTableModule,
-    MatProgressBarModule, MatProgressSpinnerModule, MatListModule
+    MatProgressBarModule, MatProgressSpinnerModule, MatListModule, MatTabsModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -63,6 +63,7 @@ import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolba
         MatDividerModule,
         MatProgressBarModule,
         MatListModule,
+        MatTabsModule,
 
         FuseSharedModule,
         FuseSidebarModule,
