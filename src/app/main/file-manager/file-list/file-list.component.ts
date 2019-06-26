@@ -10,6 +10,7 @@ import {Document} from 'app/kimios-client-api';
 import * as moment from 'moment';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
+import {ColumnDescription} from 'app/main/model/column-description';
 
 @Component({
     selector     : 'file-list',
@@ -168,17 +169,6 @@ export class FilesDataSource extends DataSource<any>
     loadDocuments(sortField: string, sortDir, page: number): void {
         this._fileManagerService.changeSort(sortField, sortDir, page);
     }
-}
-
-
-export interface ColumnDescription {
-    matColumnDef: string;
-    id: string;
-    position: number;
-    matHeaderCellDef: string;
-    displayName: string;
-    sticky: boolean;
-    cell: any;
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
