@@ -1,0 +1,36 @@
+<form class="example-container" [formGroup]="dmEntitySecuritiesForm">
+  <mat-table #table [dataSource]="dataSource"
+             matSort >
+    <!--matSortActive="" matSortDirection="desc" matSortDisableClear-->
+
+    <ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}" >
+      <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="{{col.matColumnDef}}"
+              class="{{col.class ? col.class : ''}}"
+      > {{col.displayName}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" class="{{col.class ? col.class : ''}}">
+          <mat-icon *ngIf="col.element === 'icon'">{{ element.type === 1 ? 'person' : 'group'}}</mat-icon>
+          <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+          <mat-checkbox
+                  *ngIf="col.element === 'checkbox'"
+                  name="{{element.name + '@' + element.source + '_' + col.matColumnDef}}"
+                  [checked]="element[col.matColumnDef]"
+                  [value]="element[col.matColumnDef]">
+          </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns;">
+    </mat-row>
+
+  </mat-table>
+
+</form>

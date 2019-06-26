@@ -4,14 +4,23 @@ import {FileManagerComponent} from './file-manager.component';
 import {
     MatAutocompleteModule,
     MatButtonModule,
-    MatCheckboxModule, MatChipsModule,
-    MatDialogModule, MatDividerModule, MatExpansionModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatPaginatorModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatDividerModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatRippleModule,
     MatSlideToggleModule,
     MatSortModule,
     MatTableModule,
-    MatProgressBarModule, MatProgressSpinnerModule, MatListModule, MatTabsModule
+    MatTabsModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -30,6 +39,7 @@ import {FileUploadProgressComponent} from 'app/main/components/file-upload-progr
 import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
 import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolbar.component';
+import {FileSecurityComponent} from 'app/main/components/file-security/file-security.component';
 
 
 @NgModule({
@@ -44,7 +54,8 @@ import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolba
         FileUploadProgressComponent,
         FileDetailComponent,
         FileDetailDialogComponent,
-        FileToolbarComponent
+        FileToolbarComponent,
+        FileSecurityComponent
     ],
     imports: [
 

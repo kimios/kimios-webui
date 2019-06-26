@@ -2,7 +2,7 @@
 <div *ngIf="documentData$ | async as data">
 
     <mat-tab-group dynamicHeight>
-        <mat-tab label="Document data">
+        <mat-tab label="Data">
 
     <file-toolbar [document]="document" [canWrite$]="canWrite$" ></file-toolbar>
     <!-- file properties : name, type, size, author, creation date -->
@@ -55,7 +55,7 @@
     <!-- file versions -->
 <!--    <div *ngIf="documentVersions$ | async as versions">-->
 
-        <mat-tab *ngIf="documentVersions$ | async as versions" [disabled]="versions.length <= 1" label="Document versions">
+        <mat-tab *ngIf="documentVersions$ | async as versions" [disabled]="versions.length <= 1" label="Versions">
 
         <!--<div *ngIf="versions.length > 1; else versionsElseBlock">
             <mat-expansion-panel>
@@ -75,6 +75,10 @@
         </div>
         <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
 -->
+        </mat-tab>
+
+        <mat-tab label="Security">
+            <file-security [documentId]="documentId"></file-security>
         </mat-tab>
     </mat-tab-group>
 <!--    </div>-->
