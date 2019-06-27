@@ -34,7 +34,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     removedTag: Tag;
     createdTagName: string;
     canWrite$: Observable<boolean>;
-
+    hasFullAccess$: Observable<boolean>;
 
     visible = true;
     selectable = true;
@@ -69,6 +69,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
+        this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 
         this.documentData$ = this.allTags$
             .pipe(

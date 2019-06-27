@@ -37,5 +37,13 @@
             [disabled]="!(canWrite$ | async)" >
       <mat-icon>delete</mat-icon>
     </button>
+    <button mat-fab
+            color="warn"
+            aria-label="Delete"
+            label="Delete"
+            style="margin: 10px 10px 10px 0px; "
+            [disabled]="!(hasFullAccess$ | async)" >
+        <mat-icon>share</mat-icon>
+    </button>
 
 </div>

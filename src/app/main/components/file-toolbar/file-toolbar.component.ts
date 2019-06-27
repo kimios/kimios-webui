@@ -16,6 +16,8 @@ export class FileToolbarComponent implements OnInit {
   document: KimiosDocument;
   @Input()
   canWrite$: Observable<boolean>;
+  @Input()
+  hasFullAccess$: Observable<boolean>;
   color = 'primary';
   mode = 'determinate';
   value = 0;
