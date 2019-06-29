@@ -1,9 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FileUploadService} from 'app/services/file-upload.service';
-import {Document as KimiosDocument, SecurityService} from 'app/kimios-client-api';
+import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {Observable} from 'rxjs';
-import {SessionService} from 'app/services/session.service';
+import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
+import {MatDialog} from '@angular/material';
 
 @Component({
   selector: 'file-toolbar',
@@ -25,7 +26,8 @@ export class FileToolbarComponent implements OnInit {
 
   constructor(
       private fileUploadService: FileUploadService,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      public dialog: MatDialog
   ) {
   }
 
@@ -56,5 +58,14 @@ export class FileToolbarComponent implements OnInit {
 
   handleFileDownload(versionId: number): void {
     this.documentDetailService.downloadDocumentVersion(versionId);
+  }
+
+  openShareDialog(): void {
+    const dialogRef = this.dialog.open(ShareDialogComponent, {
+      data: {
+        'uid': this.document.uid,
+        'name': this.document.name
+      }
+    });
   }
 }

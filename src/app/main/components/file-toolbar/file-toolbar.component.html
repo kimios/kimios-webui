@@ -42,7 +42,8 @@
             aria-label="Delete"
             label="Delete"
             style="margin: 10px 10px 10px 0px; "
-            [disabled]="!(hasFullAccess$ | async)" >
+            [disabled]="!(hasFullAccess$ | async)"
+            (click)="openShareDialog()" >
         <mat-icon>share</mat-icon>
     </button>
 

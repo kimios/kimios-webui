@@ -6,6 +6,7 @@ import {
     MatButtonModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDatepickerModule,
     MatDialogModule,
     MatDividerModule,
     MatExpansionModule,
@@ -15,8 +16,9 @@ import {
     MatListModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatProgressSpinnerModule,
+    MatProgressSpinnerModule, MatRadioModule,
     MatRippleModule,
+    MatSelectModule,
     MatSlideToggleModule,
     MatSortModule,
     MatTableModule,
@@ -40,6 +42,8 @@ import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
 import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolbar.component';
 import {FileSecurityComponent} from 'app/main/components/file-security/file-security.component';
+import {ShareFormComponent} from 'app/main/components/share-form/share-form.component';
+import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 
 
 @NgModule({
@@ -55,7 +59,9 @@ import {FileSecurityComponent} from 'app/main/components/file-security/file-secu
         FileDetailComponent,
         FileDetailDialogComponent,
         FileToolbarComponent,
-        FileSecurityComponent
+        FileSecurityComponent,
+        ShareFormComponent,
+        ShareDialogComponent
     ],
     imports: [
 
@@ -75,6 +81,9 @@ import {FileSecurityComponent} from 'app/main/components/file-security/file-secu
         MatProgressBarModule,
         MatListModule,
         MatTabsModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        MatRadioModule,
 
         FuseSharedModule,
         FuseSidebarModule,
@@ -90,11 +99,13 @@ import {FileSecurityComponent} from 'app/main/components/file-security/file-secu
     ],
     entryComponents: [
         FilesUploadDialogComponent,
-        FileDetailDialogComponent
+        FileDetailDialogComponent,
+        ShareDialogComponent
     ],
     exports: [
         FileUploadListComponent,
-        FileUploadProgressComponent
+        FileUploadProgressComponent,
+        ShareFormComponent
     ]
 })
 export class FileManagerModule { }
