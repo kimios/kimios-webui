@@ -65,6 +65,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.selectedTag$ = new Subject<Tag>();
         this.removedTag$ = new Subject<Tag>();
         this.canWrite$ = new Observable<boolean>();
+        this.hasFullAccess$ = new Observable<boolean>();
     }
 
     ngOnInit(): void {
@@ -143,7 +144,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.documentTags$.unsubscribe();
         this.selectedTag$.unsubscribe();
         this.removedTag$.unsubscribe();
-        this.documentRefreshService.needRefresh.unsubscribe();
+        // this.documentRefreshService.needRefresh.unsubscribe();
     }
 
     private initFilteredTags(): Observable<Tag[]> {
