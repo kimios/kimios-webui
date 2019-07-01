@@ -3,8 +3,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {SecurityService, ShareService, User} from 'app/kimios-client-api';
 import {from, Observable, Subject} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
-import {concatMap, map, mergeMap, startWith} from 'rxjs/operators';
-import {isArray} from 'util';
+import {map, mergeMap, startWith} from 'rxjs/operators';
 
 
 @Component({
@@ -93,23 +92,18 @@ export class ShareFormComponent implements OnInit {
     if (this.shareFormGroup.invalid) {
 
     } else {
-      this.sessionService.retrieveUserData()
-          .pipe(
-              concatMap(res =>
-                  this.shareService.shareDocument(
-                      this.sessionService.sessionToken,
-                      this.documentId,
-                      res.uid,
-                      res.source,
-                      true,
-                      this.shareFormGroup.get('shareLevel').value === 'write'
-                          || this.shareFormGroup.get('shareLevel').value === 'fullAccess',
-                      this.shareFormGroup.get('shareLevel').value === 'fullAccess',
-                      this.formatDate(this.shareFormGroup.get('dateUntil').value, this.shareFormGroup.get('timeUntil').value),
-                      this.shareFormGroup.get('notify').value
-                  )
-              )
-          ).subscribe();
+        this.shareService.shareDocument(
+            this.sessionService.sessionToken,
+            this.documentId,
+            this.shareFormGroup.get('user').value['uid'],
+            this.shareFormGroup.get('user').value['source'],
+            true,
+            this.shareFormGroup.get('shareLevel').value === 'write'
+            || this.shareFormGroup.get('shareLevel').value === 'fullAccess',
+            this.shareFormGroup.get('shareLevel').value === 'fullAccess',
+            this.formatDate(this.shareFormGroup.get('dateUntil').value, this.shareFormGroup.get('timeUntil').value),
+            this.shareFormGroup.get('notify').value
+        ).subscribe();
 
     }
   }
@@ -150,7 +144,7 @@ export class ShareFormComponent implements OnInit {
       if (dateUntil['_i']
           && dateUntil['_i']['date']
           && dateUntil['_i']['month']
-          && dateUntil[' _i']['year']) {
+          && dateUntil['_i']['year']) {
         dateStr += this.format2digits('' + dateUntil['_i']['date']);
         dateStr += '-';
         dateStr += this.format2digits('' + (dateUntil['_i']['month'] + 1));
