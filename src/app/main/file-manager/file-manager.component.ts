@@ -9,7 +9,7 @@ import {MatDialog, PageEvent} from '@angular/material';
 import {catchError} from 'rxjs/operators';
 import {isNumber} from 'util';
 
-const DEFAULT_PATH = 'boumboumboum/mika';
+const DEFAULT_PATH = 'ng_workspace/root_folder';
 
 
 @Component({
