@@ -58,7 +58,7 @@ export class DocumentDetailService {
                   + '&transactionId='
                   + res.uid
                   + '&inline=false';
-              link.click();
+              window.open(link.href);
           }
       );
   }
