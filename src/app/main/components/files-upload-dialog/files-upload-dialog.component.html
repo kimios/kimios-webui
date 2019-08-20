@@ -12,10 +12,16 @@
 <form [formGroup]="form">
     <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
         <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
-            <div fxFlex="45" formArrayName="filesList" *ngFor="let file of form.controls.filesList['controls']; let i = index">
-
-                <mat-checkbox [formControlName]="i" name="{{i}}">{{this.data.filesList[i]?.name}}</mat-checkbox>
-
+            <div fxFlex="45" formArrayName="filesList" >
+                <div fxLayout="column" fxLayoutAlign="space-around start">
+                    <mat-checkbox
+                            *ngFor="let file of form.controls.filesList['controls']; let i = index"
+                            [formControlName]="i"
+                            name="{{i}}"
+                    >
+                        {{this.data.filesList[i]?.name}}
+                    </mat-checkbox>
+                </div>
             </div>
             <div fxFlex="45">
 

@@ -1,12 +1,15 @@
 import {Injectable} from '@angular/core';
 
-import {DocumentService} from '../kimios-client-api';
+import {DocumentService} from 'app/kimios-client-api';
 import {BehaviorSubject, from, Observable} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
-import {concatMap, map, tap} from 'rxjs/operators';
+import {concatMap, map, mergeAll, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
+import {isNumeric} from 'rxjs/internal-compatibility';
+import {Tag} from 'app/main/model/tag';
+import {DocumentDetailService} from './document-detail.service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,15 +21,18 @@ export class FileUploadService {
     onFilesUploading: BehaviorSubject<any>;
     uploadingFile: BehaviorSubject<File>;
     filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
+    filesUploaded: Map<string, BehaviorSubject<Tag[]>>;
 
     constructor(
         private documentService: DocumentService,
         private sessionService: SessionService,
         private tagService: TagService,
-        private documentRefreshService: DocumentRefreshService
+        private documentRefreshService: DocumentRefreshService,
+        private documentDetailService: DocumentDetailService
     ) {
         this.onFilesUploading = new BehaviorSubject([]);
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
+        this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
         this.uploadingFile = new BehaviorSubject<File>(undefined);
     }
 
@@ -38,9 +44,11 @@ export class FileUploadService {
         securityItems?: string,
         isRecursive?: boolean,
         documentTypeId?: number,
-        metaItems?: string
+        metaItems?: string,
+        tags?: number[]
     ): Observable<{ name: string, status: string, message: number } | number | string > {
         this.uploadingFile.next(document);
+        this.filesUploaded.set(document.name, new BehaviorSubject([]));
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
@@ -57,25 +65,56 @@ export class FileUploadService {
             , ''
             , 'events'
             , true
-        ).pipe(map((event) => {
-            let res;
-            switch (event.type) {
+        ).pipe(
+            map((event) => {
+                let res;
+                switch (event.type) {
 
-                case HttpEventType.UploadProgress:
-                    const progress = Math.round(100 * event.loaded / event.total);
-                    res = { name: document.name, status: 'progress', message: progress };
-                    break;
+                    case HttpEventType.UploadProgress:
+                        const progress = Math.round(100 * event.loaded / event.total);
+                        res = { name: document.name, status: 'progress', message: progress };
+                        break;
 
-                case HttpEventType.Response:
-                    res = event.body ? event.body : event.status;
-                    break;
+                    case HttpEventType.Response:
+                        res = event.body ? event.body : event.status;
+                        break;
 
-                default:
-                    res = `Unhandled event: ${event.type}`;
-            }
-            this.filesProgress.get(document.name).next(res);
-            return res;
-        }));
+                    default:
+                        res = `Unhandled event: ${event.type}`;
+                }
+                this.filesProgress.get(document.name).next(res);
+                return res;
+            })
+        ).pipe(
+            tap(
+                res => {
+                    if (tags
+                        && tags.length > 0
+                        && isNumeric(res)) {
+                        const docId = res;
+                        from(tags)
+                            .pipe(
+                                map(
+                                    tagId => this.documentService.updateDocumentTag(
+                                        this.sessionService.sessionToken,
+                                        Number(docId),
+                                        tagId
+                                    )
+                                ),
+                                mergeAll(),
+                                concatMap(
+                                    res2 => this.documentDetailService.retrieveDocumentTags(
+                                        Number(docId)
+                                    )
+                                ),
+                                tap(
+                                    res3 => this.filesUploaded.get(document.name).next(res3)
+                                )
+                        );
+                    }
+                }
+            )
+        );
     }
 
     uploadFiles(array: Array<Array<any>>): Observable<{ name: string, status: string, message: number } | number | string > {

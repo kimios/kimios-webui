@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
@@ -7,6 +7,7 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
 import {MatChipInputEvent} from '@angular/material';
 import {CdkDragEnd} from '@angular/cdk/drag-drop';
+import {DOCUMENT} from '@angular/common';
 
 @Component({
   selector: 'file-tags',
@@ -26,7 +27,10 @@ export class FileTagsComponent implements OnInit {
 
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
-  constructor(private tagService: TagService) {
+  constructor(
+      private tagService: TagService,
+      @Inject(DOCUMENT) document
+  ) {
     this.allTags$ = this.tagService.loadTags()
         .pipe(
             map(res => res.map(v => new Tag(v.name, v.uid))),
@@ -95,7 +99,7 @@ export class FileTagsComponent implements OnInit {
 
 
   dragEnd($event: CdkDragEnd<any>): void {
-    console.log($event);
+    $event.source._dragRef.reset();
   }
 
   createTag(): void {
