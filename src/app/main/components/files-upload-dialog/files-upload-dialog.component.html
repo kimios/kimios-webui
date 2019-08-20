@@ -10,14 +10,24 @@
 </form>
 -->
 <form [formGroup]="form">
-    <div formArrayName="filesList" *ngFor="let file of form.controls.filesList['controls']; let i = index">
+    <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
+        <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
+            <div fxFlex="45" formArrayName="filesList" *ngFor="let file of form.controls.filesList['controls']; let i = index">
 
-        <mat-checkbox [formControlName]="i" name="{{i}}">{{this.data.filesList[i]?.name}}</mat-checkbox>
+                <mat-checkbox [formControlName]="i" name="{{i}}">{{this.data.filesList[i]?.name}}</mat-checkbox>
 
-    </div>
+            </div>
+            <div fxFlex="45">
 
-    <div mat-dialog-actions>
-        <button mat-button (click)="onNoClick()">No, Thanks</button>
-        <button mat-button (click)="submit()">Ok</button>
+                Tag these files
+                <file-tags></file-tags>
+
+            </div>
+        </div>
+
+        <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
+            <button mat-button (click)="onNoClick()">No, Thanks</button>
+            <button mat-button (click)="submit()">Ok</button>
+        </div>
     </div>
 </form>

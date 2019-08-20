@@ -44,6 +44,8 @@ import {FileToolbarComponent} from 'app/main/components/file-toolbar/file-toolba
 import {FileSecurityComponent} from 'app/main/components/file-security/file-security.component';
 import {ShareFormComponent} from 'app/main/components/share-form/share-form.component';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
+import {FileTagsComponent} from 'app/main/components/file-tags/file-tags.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -61,7 +63,8 @@ import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialo
         FileToolbarComponent,
         FileSecurityComponent,
         ShareFormComponent,
-        ShareDialogComponent
+        ShareDialogComponent,
+        FileTagsComponent
     ],
     imports: [
 
@@ -91,7 +94,9 @@ import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialo
         MatFormFieldModule,
         FuseSearchBarModule,
         MatExpansionModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+
+        DragDropModule
     ],
     providers   : [
         EntityService,

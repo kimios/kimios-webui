@@ -5,7 +5,7 @@
 export const environment = {
     production: false,
     hmr       : false,
-    apiPath: 'http://localhost:8181'
+    apiPath: 'http://firefly.local:8181'
 };
 
 /*
