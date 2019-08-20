@@ -14,7 +14,7 @@
     </mat-form-field>
 
     <div fxFlex="47">
-      <a *ngIf="(filteredTags$ | async).length != 1 && tagInput.value.length > 2"
+      <a *ngIf="(filteredTags$ | async) && (filteredTags$ | async).length != 1 && tagInput.value.length > 2"
               (click)="createTag()" style="text-decoration: underline; cursor: pointer">Make new tag</a>
     </div>
 
