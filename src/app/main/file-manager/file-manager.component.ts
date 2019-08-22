@@ -125,7 +125,10 @@ export class FileManagerComponent implements OnInit {
     openFilesUploadDialog(list: FileList): void {
         const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
             // width: '250px',
-            data: {filesList: Array.from(list)}
+            data: {
+                filesList: Array.from(list),
+                filesTags: new Map<string, number[]>()
+            }
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -133,13 +136,16 @@ export class FileManagerComponent implements OnInit {
             console.dir(dialogRef.componentInstance.data.filesList);
 
             this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
-                    v,
-                    this.filesPath + '/' + v.name,
-                    true,
-                    '[]',
-                    true,
-                    -1,
-                    '[]'
+                v,
+                this.filesPath + '/' + v.name,
+                true,
+                '[]',
+                true,
+                -1,
+                '[]',
+                dialogRef.componentInstance.data.filesTags.get(v.name) ?
+                    dialogRef.componentInstance.data.filesTags.get(v.name) :
+                    []
             ]))
                 .pipe(
                     catchError(error => {

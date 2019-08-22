@@ -20,14 +20,19 @@
 
   </div>
 
-    <mat-chip-list #chipList>
+    <mat-chip-list
+            #chipList
+            cdkDropList
+            [cdkDropListConnectedTo]="cdkDropListConnectedTo_var"
+    >
 
       <mat-chip
               *ngFor="let tag of filteredTags$ | async"
               [selectable]="selectable"
               cdkDrag
               (cdkDragEnded)="dragEnd($event)"
-              attr.data-tag-uid="{{tag.uid}}"
+              (cdkDragStarted)="dragStart($event)"
+              [cdkDragData]="tag"
       >
         {{tag.name}}
       </mat-chip>

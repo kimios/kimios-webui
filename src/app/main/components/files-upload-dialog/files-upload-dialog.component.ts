@@ -1,9 +1,11 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 
 export interface DialogData {
     filesList: File[];
+    filesTags: Map<string, number[]>;
 }
 
 @Component({
@@ -13,6 +15,7 @@ export interface DialogData {
 })
 export class FilesUploadDialogComponent {
     form: FormGroup;
+    private _fileIds: string[];
 
     constructor(
         public dialogRef: MatDialogRef<FilesUploadDialogComponent>,
@@ -43,5 +46,17 @@ export class FilesUploadDialogComponent {
     onNoClick(): void {
         this.data.filesList = [];
         this.dialogRef.close();
+    }
+
+    addTag($event: CdkDragDrop<any>): void {
+        console.log($event);
+    }
+
+    dragOver($event: CdkDragEnter<any>): void {
+        console.log('dragover');
+    }
+
+    get fileIds(): string[] {
+        return this.data.filesList.map(file => file.name);
     }
 }

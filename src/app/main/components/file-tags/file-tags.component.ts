@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
@@ -6,7 +6,7 @@ import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
 import {MatChipInputEvent} from '@angular/material';
-import {CdkDragEnd} from '@angular/cdk/drag-drop';
+import {CdkDragEnd, CdkDragStart} from '@angular/cdk/drag-drop';
 import {DOCUMENT} from '@angular/common';
 
 @Component({
@@ -24,6 +24,9 @@ export class FileTagsComponent implements OnInit {
   addOnBlur = true;
   tagCtrl = new FormControl();
   separatorKeysCodes: number[] = [ENTER, COMMA];
+
+  @Input()
+  cdkDropListConnectedTo_var;
 
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
@@ -123,4 +126,7 @@ export class FileTagsComponent implements OnInit {
     }
   }
 
+    dragStart($event: CdkDragStart<any>): void {
+        console.log('start drag');
+    }
 }

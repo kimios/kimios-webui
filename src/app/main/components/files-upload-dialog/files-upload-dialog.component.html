@@ -13,20 +13,35 @@
     <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
         <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
             <div fxFlex="45" formArrayName="filesList" >
-                <div fxLayout="column" fxLayoutAlign="space-around start">
-                    <mat-checkbox
-                            *ngFor="let file of form.controls.filesList['controls']; let i = index"
-                            [formControlName]="i"
-                            name="{{i}}"
+                <div
+                        cdkDropList
+                        #filesListDiv
+                        fxLayout="column"
+                        fxLayoutAlign="space-around start"
+                >
+
+                    <div
+                         cdkDropList
+                         [id]="data.filesList[i]?.name"
+                         [cdkDropListConnectedTo]="fileIds"
+                         (cdkDropListDropped)="addTag($event)"
+                         (cdkDropListEntered)="dragOver($event)"
+                         *ngFor="let file of form.controls.filesList['controls']; let i = index"
                     >
-                        {{this.data.filesList[i]?.name}}
-                    </mat-checkbox>
+                        <mat-checkbox
+                                [formControlName]="i"
+                                name="{{i}}"
+                        >
+                            {{this.data.filesList[i]?.name}}
+                        </mat-checkbox>
+                    </div>
+
                 </div>
             </div>
             <div fxFlex="45">
 
                 Tag these files
-                <file-tags></file-tags>
+                <file-tags [cdkDropListConnectedTo_var]="fileIds"></file-tags>
 
             </div>
         </div>
