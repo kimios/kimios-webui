@@ -8,6 +8,7 @@ import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialo
 import {MatDialog, PageEvent} from '@angular/material';
 import {catchError} from 'rxjs/operators';
 import {isNumber} from 'util';
+import {Tag} from 'app/main/model/tag';
 
 const DEFAULT_PATH = 'ng_workspace/root_folder';
 
@@ -127,11 +128,14 @@ export class FileManagerComponent implements OnInit {
             // width: '250px',
             data: {
                 filesList: Array.from(list),
-                filesTags: new Map<string, number[]>()
+                filesTags: new Map<string, Map<number, Tag>>()
             }
         });
 
         dialogRef.afterClosed().subscribe(result => {
+            if (! result) {
+                return;
+            }
             console.log('The dialog was closed');
             console.dir(dialogRef.componentInstance.data.filesList);
 
@@ -144,7 +148,7 @@ export class FileManagerComponent implements OnInit {
                 -1,
                 '[]',
                 dialogRef.componentInstance.data.filesTags.get(v.name) ?
-                    dialogRef.componentInstance.data.filesTags.get(v.name) :
+                    dialogRef.componentInstance.data.filesTags.get(v.name).keys() :
                     []
             ]))
                 .pipe(

@@ -8,7 +8,13 @@
             <span>Kimios by Teclib'</span>
         </a>
 
-        <div fxFlex="60" (click)="openBottomSheetUploadList()" [hidden]="!showFileUploadProgress">
+        <div
+                fxFlex="60"
+                (click)="openBottomSheetUploadList()"
+                [hidden]="!showFileUploadProgress"
+                fxLayout="column"
+                fxLayoutAlign="space-between start"
+        >
             <file-upload-progress></file-upload-progress>
         </div>
 

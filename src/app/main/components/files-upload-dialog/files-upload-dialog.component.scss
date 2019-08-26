@@ -2,3 +2,17 @@ form {
   width: 700px;
   min-height: 150px;
 }
+
+.fileToUpload {
+  min-height: 50px;
+}
+
+.fileToUpload.dragover {
+  border:1px groove lawngreen;
+  border-radius: 12px;
+}
+
+.w100p {
+  width: 100%;
+}
+

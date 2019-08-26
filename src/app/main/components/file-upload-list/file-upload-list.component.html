@@ -4,23 +4,24 @@
     {{file}}: <file-upload-progress uploadingFileName="{{file}}"></file-upload-progress>
     -->
 
-    <div *ngIf="progress.get(file) | async as fileProgress">
-        {{file}}
-        <mat-progress-bar
-                *ngIf="fileProgress.message < 100; else elseBlock"
-                [value]="fileProgress.message"
-                [bufferValue]="1">
-        </mat-progress-bar>
-        <ng-template #elseBlock>
-            <mat-icon>done</mat-icon>
-            <mat-chip-list #chipList>
-                <mat-chip
-                        *ngFor="let tag of filesUploaded.get(file) | async"
-                        [removable]="true"
-                >
-                    {{tag.name}}
-                </mat-chip>
-            </mat-chip-list>
-        </ng-template>
+    <div *ngIf="progress.get(file) | async as fileProgress" fxLayout="row" fxLayoutAlign="start start">
+        <div>{{file}}</div>
+        <div>
+            <mat-progress-bar
+                    *ngIf="fileProgress.message < 100; else elseBlock"
+                    [value]="fileProgress.message"
+                    [bufferValue]="1">
+            </mat-progress-bar>
+            <ng-template #elseBlock>
+                <mat-icon>done</mat-icon>
+            </ng-template>
+        </div>
+        <mat-chip-list #chipList>
+            <mat-chip
+                    *ngFor="let tag of filesUploaded.get(file) | async"
+            >
+                {{tag.name}}
+            </mat-chip>
+        </mat-chip-list>
     </div>
 </div>

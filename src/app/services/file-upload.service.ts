@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy, OnInit} from '@angular/core';
 
 import {DocumentService} from 'app/kimios-client-api';
-import {BehaviorSubject, from, Observable} from 'rxjs';
+import {BehaviorSubject, from, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
 import {concatMap, map, mergeAll, tap} from 'rxjs/operators';
@@ -11,9 +11,17 @@ import {isNumeric} from 'rxjs/internal-compatibility';
 import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
 
+
+interface TagJob {
+    docId: number;
+    docName: string;
+    tagIds: number[];
+}
+
 @Injectable({
     providedIn: 'root'
 })
+
 export class FileUploadService {
 
     public lastUploadedDocumentId: Observable<number>;
@@ -22,6 +30,7 @@ export class FileUploadService {
     uploadingFile: BehaviorSubject<File>;
     filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
     filesUploaded: Map<string, BehaviorSubject<Tag[]>>;
+    tagJobs: BehaviorSubject<TagJob>;
 
     constructor(
         private documentService: DocumentService,
@@ -34,6 +43,8 @@ export class FileUploadService {
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
         this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
         this.uploadingFile = new BehaviorSubject<File>(undefined);
+        this.tagJobs = new BehaviorSubject<TagJob>(undefined);
+        this.lastUploadedDocumentId = undefined;
     }
 
     uploadFile(
@@ -77,6 +88,7 @@ export class FileUploadService {
 
                     case HttpEventType.Response:
                         res = event.body ? event.body : event.status;
+                        this.lastUploadedDocumentId = res;
                         break;
 
                     default:
@@ -84,35 +96,32 @@ export class FileUploadService {
                 }
                 this.filesProgress.get(document.name).next(res);
                 return res;
-            })
-        ).pipe(
+            }),
             tap(
-                res => {
-                    if (tags
-                        && tags.length > 0
-                        && isNumeric(res)) {
-                        const docId = res;
-                        from(tags)
-                            .pipe(
-                                map(
-                                    tagId => this.documentService.updateDocumentTag(
-                                        this.sessionService.sessionToken,
-                                        Number(docId),
-                                        tagId
-                                    )
-                                ),
-                                mergeAll(),
-                                concatMap(
-                                    res2 => this.documentDetailService.retrieveDocumentTags(
-                                        Number(docId)
-                                    )
-                                ),
-                                tap(
-                                    res3 => this.filesUploaded.get(document.name).next(res3)
-                                )
-                        );
+                    next => {
+                        if (isNumeric(next)) {
+                            this.tagFile(Number(next), tags).subscribe(
+                                (tagsReturned) => this.filesUploaded.get(document.name).next(tagsReturned)
+                            );
+                        }
                     }
-                }
+            )
+        );
+    }
+
+    tagFile(docId: number, tags: number[]): Observable<Tag[]> {
+        return from(tags).pipe(
+            concatMap(
+                next => this.documentService.updateDocumentTag(
+                    this.sessionService.sessionToken,
+                    docId,
+                    next,
+                    true
+                )
+            )
+        ).pipe(
+            concatMap(
+                () => this.documentDetailService.retrieveDocumentTags(docId)
             )
         );
     }
@@ -135,7 +144,8 @@ export class FileUploadService {
                     fileArray[3],
                     fileArray[4],
                     fileArray[5],
-                    fileArray[6]
+                    fileArray[6],
+                    fileArray[7]
                 )
             )
         );

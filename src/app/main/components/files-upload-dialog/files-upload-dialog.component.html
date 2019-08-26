@@ -26,7 +26,11 @@
                          [cdkDropListConnectedTo]="fileIds"
                          (cdkDropListDropped)="addTag($event)"
                          (cdkDropListEntered)="dragOver($event)"
-                         *ngFor="let file of form.controls.filesList['controls']; let i = index"
+                         (cdkDropListExited)="dragExit($event)"
+                         *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index"
+                         class="fileToUpload w100p"
+                         fxLayout="row"
+                         fxLayoutAlign="start start"
                     >
                         <mat-checkbox
                                 [formControlName]="i"
@@ -34,6 +38,18 @@
                         >
                             {{this.data.filesList[i]?.name}}
                         </mat-checkbox>
+                        <mat-chip-list>
+                            <mat-chip
+                                    *ngFor="let tag of this.filesTags$.get(this.data.filesList[i]?.name) | async"
+                                    [removable]="true"
+                                    (removed)="removeTag($event)"
+                                    attr.data-filename="{{this.data.filesList[i]?.name}}"
+                                    attr.data-tagid="{{tag.uid}}"
+                            >
+                                {{tag.name}}
+                                <mat-icon matChipRemove >cancel</mat-icon>
+                            </mat-chip>
+                        </mat-chip-list>
                     </div>
 
                 </div>
