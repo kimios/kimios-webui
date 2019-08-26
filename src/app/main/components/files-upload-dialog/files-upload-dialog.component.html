@@ -18,39 +18,47 @@
                         #filesListDiv
                         fxLayout="column"
                         fxLayoutAlign="space-around start"
+                        fxLayoutGap="10px"
                 >
 
-                    <div
-                         cdkDropList
-                         [id]="data.filesList[i]?.name"
-                         [cdkDropListConnectedTo]="fileIds"
-                         (cdkDropListDropped)="addTag($event)"
-                         (cdkDropListEntered)="dragOver($event)"
-                         (cdkDropListExited)="dragExit($event)"
-                         *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index"
-                         class="fileToUpload w100p"
-                         fxLayout="row"
-                         fxLayoutAlign="start start"
-                    >
-                        <mat-checkbox
-                                [formControlName]="i"
-                                name="{{i}}"
+                    <ng-container *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index">
+                        <!-- not working, bug -->
+                        <!--<mat-divider *ngIf="i > 0"></mat-divider>-->
+                        <hr *ngIf="i > 0" style="width: 100%"/>
+
+                        <div
+                                cdkDropList
+                                [id]="data.filesList[i]?.name"
+                                [cdkDropListConnectedTo]="fileIds"
+                                (cdkDropListDropped)="addTag($event)"
+                                (cdkDropListEntered)="dragOver($event)"
+                                (cdkDropListExited)="dragExit($event)"
+
+                                class="fileToUpload w100p"
+                                fxLayout="row"
+                                fxLayoutAlign="start start"
                         >
-                            {{this.data.filesList[i]?.name}}
-                        </mat-checkbox>
-                        <mat-chip-list>
-                            <mat-chip
-                                    *ngFor="let tag of this.filesTags$.get(this.data.filesList[i]?.name) | async"
-                                    [removable]="true"
-                                    (removed)="removeTag($event)"
-                                    attr.data-filename="{{this.data.filesList[i]?.name}}"
-                                    attr.data-tagid="{{tag.uid}}"
+                            <mat-checkbox
+                                    [formControlName]="i"
+                                    name="{{i}}"
                             >
-                                {{tag.name}}
-                                <mat-icon matChipRemove >cancel</mat-icon>
-                            </mat-chip>
-                        </mat-chip-list>
-                    </div>
+                                {{this.data.filesList[i]?.name}}
+                            </mat-checkbox>
+                            <mat-chip-list>
+                                <mat-chip
+                                        *ngFor="let tag of this.filesTags$.get(this.data.filesList[i]?.name) | async"
+                                        [removable]="true"
+                                        (removed)="removeTag($event)"
+                                        attr.data-filename="{{this.data.filesList[i]?.name}}"
+                                        attr.data-tagid="{{tag.uid}}"
+                                >
+                                    {{tag.name}}
+                                    <mat-icon matChipRemove >cancel</mat-icon>
+                                </mat-chip>
+                            </mat-chip-list>
+                        </div>
+
+                    </ng-container>
 
                 </div>
             </div>
