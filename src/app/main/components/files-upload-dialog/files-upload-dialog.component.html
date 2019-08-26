@@ -21,10 +21,11 @@
                         fxLayoutGap="10px"
                 >
 
-                    <ng-container *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index">
+                    <div *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index"
+                         class="fileToUpload w100p" >
                         <!-- not working, bug -->
                         <!--<mat-divider *ngIf="i > 0"></mat-divider>-->
-                        <hr *ngIf="i > 0" style="width: 100%"/>
+                        <hr *ngIf="i > 0" class="hrSeparator" />
 
                         <div
                                 cdkDropList
@@ -34,9 +35,11 @@
                                 (cdkDropListEntered)="dragOver($event)"
                                 (cdkDropListExited)="dragExit($event)"
 
-                                class="fileToUpload w100p"
                                 fxLayout="row"
                                 fxLayoutAlign="start start"
+                                fxLayoutGap="7px"
+
+                                class="padding5"
                         >
                             <mat-checkbox
                                     [formControlName]="i"
@@ -58,7 +61,7 @@
                             </mat-chip-list>
                         </div>
 
-                    </ng-container>
+                    </div>
 
                 </div>
             </div>

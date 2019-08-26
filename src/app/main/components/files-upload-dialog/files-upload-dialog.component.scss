@@ -7,12 +7,22 @@ form {
   min-height: 30px;
 }
 
-.fileToUpload.dragover {
+.fileToUpload > .dragover {
   border:1px groove lawngreen;
   border-radius: 12px;
 }
 
 .w100p {
   width: 100%;
+}
+
+.padding5 {
+  padding: 5px;
+}
+
+.hrSeparator {
+  width: 100%;
+  margin-top: 0px;
+  margin-bottom: 10px
 }
 
