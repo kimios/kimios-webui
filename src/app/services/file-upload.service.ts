@@ -1,10 +1,10 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {DocumentService} from 'app/kimios-client-api';
-import {BehaviorSubject, from, Observable, of} from 'rxjs';
+import {BehaviorSubject, forkJoin, from, Observable} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
-import {concatMap, map, mergeAll, tap} from 'rxjs/operators';
+import {concatMap, map, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
@@ -110,13 +110,15 @@ export class FileUploadService {
     }
 
     tagFile(docId: number, tags: number[]): Observable<Tag[]> {
-        return from(tags).pipe(
-            concatMap(
-                next => this.documentService.updateDocumentTag(
-                    this.sessionService.sessionToken,
-                    docId,
-                    next,
-                    true
+        return forkJoin(
+            from(tags).pipe(
+                concatMap(
+                    next => this.documentService.updateDocumentTag(
+                        this.sessionService.sessionToken,
+                        docId,
+                        next,
+                        true
+                    )
                 )
             )
         ).pipe(
