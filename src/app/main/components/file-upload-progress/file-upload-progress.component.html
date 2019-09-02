@@ -1,7 +1,7 @@
 <div *ngIf="showComponent" >
-  <div class="cut-text" title="{{messageDisplayed}}">
+  <div class="cut-text" title="{{messageDisplayed | async}}">
+      {{messageDisplayed | async}}
       <span *ngIf="uploadStatus == 'done'"><mat-icon>done</mat-icon></span>
-            {{messageDisplayed}}
   </div>
 <!--    <div *ngIf="showProgressBar">-->
         <mat-progress-bar

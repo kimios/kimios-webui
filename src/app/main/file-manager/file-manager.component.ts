@@ -27,7 +27,6 @@ export class FileManagerComponent implements OnInit {
     fileToUpload: File = null;
     lastUploadedDocId: Observable<number> = null;
     uploadResponse = { status: '', message: '' };
-    error: string;
     totalFilesFound$: BehaviorSubject<number>;
 
     pageSize: number;
@@ -74,6 +73,7 @@ export class FileManagerComponent implements OnInit {
         this.fileToUpload = files.item(0);
 
         this.fileUploadService.uploadFile(
+            null,
             this.fileToUpload,
             this.filesPath + '/' + this.fileToUpload.name,
             true,
@@ -85,7 +85,7 @@ export class FileManagerComponent implements OnInit {
             (res) => {
                 this.handleUploadProgress(res);
             },
-            (err) => this.error = err,
+            null,
             () => this.searchEntityService.reloadFiles()
 
         );
@@ -148,19 +148,19 @@ export class FileManagerComponent implements OnInit {
                 -1,
                 '[]',
                 dialogRef.componentInstance.data.filesTags.get(v.name) ?
-                    dialogRef.componentInstance.data.filesTags.get(v.name).keys() :
+                    Array.from(dialogRef.componentInstance.data.filesTags.get(v.name).keys()) :
                     []
             ]))
                 .pipe(
                     catchError(error => {
                         console.log('server error: ');
                         console.dir(error);
-                        return of({ name: 'filename', status: 'error', message: error.error.message });
+                        return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
                     })
                 )
                 .subscribe(
-                    (res) => this.handleUploadProgress(res),
-                    (err) => this.error = err,
+                    null,
+                    null,
                     () => this.searchEntityService.reloadFiles()
                 );
         });

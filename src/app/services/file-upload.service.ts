@@ -1,15 +1,16 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 
 import {DocumentService} from 'app/kimios-client-api';
-import {BehaviorSubject, forkJoin, from, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, forkJoin, from, Observable, of, Subject} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
-import {concatMap, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, map, mergeAll, switchMap, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
+import {updateContextWithBindings} from '@angular/core/src/render3/styling/class_and_style_bindings';
 
 
 interface TagJob {
@@ -17,6 +18,8 @@ interface TagJob {
     docName: string;
     tagIds: number[];
 }
+
+const defaultUploadError = 'Error, this document has not been uploaded';
 
 @Injectable({
     providedIn: 'root'
@@ -26,11 +29,15 @@ export class FileUploadService {
 
     public lastUploadedDocumentId: Observable<number>;
 
-    onFilesUploading: BehaviorSubject<any>;
-    uploadingFile: BehaviorSubject<File>;
-    filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
+    uploadingFile: BehaviorSubject<string>;
+    filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>;
     filesUploaded: Map<string, BehaviorSubject<Tag[]>>;
-    tagJobs: BehaviorSubject<TagJob>;
+    uploadQueue$: BehaviorSubject<Array<string>>;
+    uploadQueue: Map<string, Array<any>>;
+    uploadingFiles$: BehaviorSubject<Array<any>>;
+    uploadFinished$: BehaviorSubject<string>;
+    private uploadingFiles: any[];
+    allUploads: Map<string, Array<any>>;
 
     constructor(
         private documentService: DocumentService,
@@ -39,15 +46,67 @@ export class FileUploadService {
         private documentRefreshService: DocumentRefreshService,
         private documentDetailService: DocumentDetailService
     ) {
-        this.onFilesUploading = new BehaviorSubject([]);
-        this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>();
+        this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>();
         this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
-        this.uploadingFile = new BehaviorSubject<File>(undefined);
-        this.tagJobs = new BehaviorSubject<TagJob>(undefined);
+        this.uploadingFile = new BehaviorSubject<string>(undefined);
         this.lastUploadedDocumentId = undefined;
+
+        this.uploadQueue = new Map<string, Array<any>>();
+        this.uploadQueue$ = new BehaviorSubject(null);
+        this.uploadingFiles$ = new BehaviorSubject<Array<any>>([]);
+        this.uploadingFiles = new Array<any>();
+        this.allUploads = new Map<string, Array<any>>();
+        this.uploadFinished$ = new BehaviorSubject<string>(undefined);
+
+        this.init();
+    }
+
+    init(): void {
+        this.uploadingFile.subscribe(
+            next => {
+                this.uploadingFiles.push(next);
+                this.uploadingFiles$.next(this.uploadingFiles.slice());
+            }
+        );
+
+        this.uploadFinished$.subscribe(
+            next => {
+                from(next).pipe(
+                    map(
+                        uploadId => {
+                            const index = this.uploadingFiles.indexOf(uploadId);
+                            if (index > -1) {
+                                this.uploadingFiles.splice(index, 1);
+                            }
+                            return uploadId;
+                        }
+                    ),
+                    concatMap(
+                        uploadId => {
+                            return combineLatest(
+                                of(uploadId),
+                                (this.filesProgress.get(uploadId) !== undefined &&
+                                    this.filesProgress.get(uploadId).getValue().status === 'done') ?
+                                    this.tagFile(Number(uploadId), this.allUploads.get(uploadId)[7]) :
+                                    of([])
+                            );
+                        }
+                    ),
+                    concatMap(
+                        ([uploadId, tags]) => {
+                            if (tags.length > 0) {
+                                this.filesUploaded.get(uploadId).next(tags);
+                            }
+                            return uploadId;
+                        }
+                    )
+                );
+            }
+        );
     }
 
     uploadFile(
+        uploadId: string,
         document: File,
 //        sessionId?: string,
         docPath?: string,
@@ -58,8 +117,13 @@ export class FileUploadService {
         metaItems?: string,
         tags?: number[]
     ): Observable<{ name: string, status: string, message: number } | number | string > {
-        this.uploadingFile.next(document);
-        this.filesUploaded.set(document.name, new BehaviorSubject([]));
+
+        if (uploadId === null
+            || uploadId === undefined) {
+            uploadId = this.generateUploadId();
+        }
+        this.uploadingFile.next(uploadId);
+        this.filesUploaded.set(uploadId, new BehaviorSubject([]));
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
@@ -77,34 +141,92 @@ export class FileUploadService {
             , 'events'
             , true
         ).pipe(
-            map((event) => {
-                let res;
-                switch (event.type) {
+            switchMap(
+                response =>
+                    of(response)
+                        .map(event => {
+                            let res;
+                            let reportProgress = true;
+                            if (event['ok'] != null
+                                && event['ok'] !== undefined
+                                && event['ok'] === false) {
+                                console.log('error catched: ');
+                                console.log(event);
+                                res = { name: document.name, status: 'status', message: event['statusText'] ? event['statusText'] : '<no message>' };
+                                reportProgress = false;
+                            } else {
 
-                    case HttpEventType.UploadProgress:
-                        const progress = Math.round(100 * event.loaded / event.total);
-                        res = { name: document.name, status: 'progress', message: progress };
-                        break;
+                                switch (event.type) {
 
-                    case HttpEventType.Response:
-                        res = event.body ? event.body : event.status;
-                        this.lastUploadedDocumentId = res;
-                        break;
+                                    case HttpEventType.UploadProgress:
+                                        const progress = Math.round(100 * event.loaded / event.total);
+                                        res = {name: document.name, status: 'progress', message: progress};
+                                        break;
 
-                    default:
-                        res = `Unhandled event: ${event.type}`;
+                                    case HttpEventType.Response:
+                                        res = {
+                                            name: document.name,
+                                            status: event.body ? 'done' : 'status',
+                                            message: event.body ? event.body : event.status
+                                        };
+                                        this.lastUploadedDocumentId = res;
+                                        break;
+
+                                    default:
+                                        res = {
+                                            name: document.name,
+                                            status: 'event',
+                                            message: 'Unhandled event: ' + event.type
+                                        };
+                                        reportProgress = false;
+                                }
+                            }
+                            if (reportProgress) {
+                                this.filesProgress.get(uploadId).next(res);
+                            }
+                            return res;
+                        })
+                        .catch(error => of(error))
+            ),
+            catchError(error => {
+                const res = {
+                    name: document.name,
+                    status: 'error',
+                    message:
+                        error['error'] ?
+                            error['error']['message'] ?
+                            error['error']['message'] :
+                                defaultUploadError :
+                            defaultUploadError
+
+                };
+                this.filesProgress.get(uploadId).next(res);
+                console.log('second catchError: ');
+                console.log(res);
+                return of(res);
+            }),
+            map(response => {
+                let res = response;
+                if (response instanceof Error) {
+                    res = { name: document.name, status: 'error', message: response.message };
                 }
-                this.filesProgress.get(document.name).next(res);
+                if (['done', 'error'].includes(res.status)) {
+                    this.uploadFinished$.next(uploadId);
+                }
+                console.log('in the map (' + document.name + ')');
                 return res;
             }),
             tap(
-                    next => {
-                        if (isNumeric(next)) {
-                            this.tagFile(Number(next), tags).subscribe(
-                                (tagsReturned) => this.filesUploaded.get(document.name).next(tagsReturned)
+                (res) => {
+                    if (res['status'] === 'done'
+                        && tags
+                        && tags.length > 0) {
+                        this.tagFile(res['message'], tags)
+                            .subscribe(
+                                next => this.filesUploaded.get(uploadId).next(next)
                             );
-                        }
                     }
+                }
             )
         );
     }
@@ -130,25 +252,44 @@ export class FileUploadService {
 
     uploadFiles(array: Array<Array<any>>): Observable<{ name: string, status: string, message: number } | number | string > {
         array.forEach(
-            elem => this.filesProgress.set(
-                elem[0]['name'],
-                new BehaviorSubject({ name: elem[0]['name'], status: 'not started', message: -1 })
-            )
+            elem => {
+                const uploadId = this.generateUploadId();
+                this.filesProgress.set(
+                    uploadId,
+                    new BehaviorSubject({ name: elem[0]['name'], status: 'not started', message: '-1' })
+                );
+                this.uploadQueue.set(uploadId, elem);
+                this.allUploads.set(uploadId, elem);
+            }
         );
+        this.uploadQueue$.next(Array.from(this.uploadQueue.keys()));
 
-        return from(array).pipe(
+        const queue = Array.from(this.uploadQueue.keys()).slice();
+
+        return from(queue).pipe(
             concatMap(
-                fileArray => this.uploadFile(
-                    fileArray[0],
+                uploadId => {
+                    this.uploadQueue.delete(uploadId);
+                    this.uploadQueue$.next(Array.from(this.uploadQueue.keys()));
+                    return of(uploadId);
+                }
+            ),
+            concatMap(
+                uploadId => {
+                    const fileArray = this.allUploads.get(uploadId);
+                    return this.uploadFile(
+                        uploadId,
+                        fileArray[0],
 //        sessionId?: string,
-                    fileArray[1],
-                    fileArray[2],
-                    fileArray[3],
-                    fileArray[4],
-                    fileArray[5],
-                    fileArray[6],
-                    fileArray[7]
-                )
+                        fileArray[1],
+                        fileArray[2],
+                        fileArray[3],
+                        fileArray[4],
+                        fileArray[5],
+                        fileArray[6],
+                        fileArray[7]
+                    );
+                }
             )
         );
     }
@@ -162,23 +303,36 @@ export class FileUploadService {
             'events',
             true
         ).pipe(
+            switchMap(
+                response =>
+                    of(response)
+                        .map(next => next)
+                        .catch(error => of(error))
+            ),
             map((event) => {
                 let res;
-                switch (event.type) {
+                if (event.ok
+                    && event.ok === false) {
+                    console.log('error catched: ');
+                    console.log(event);
+                    res = { name: document.name, status: 'error', message: event.message };
+                } else {
 
-                    case HttpEventType.UploadProgress:
-                        const progress = Math.round(100 * event.loaded / event.total);
-                        res = { name: document.name, status: 'progress', message: progress };
-                        break;
+                    switch (event.type) {
 
-                    case HttpEventType.Response:
-                        res = event.body ? event.body : event.status;
-                        break;
+                        case HttpEventType.UploadProgress:
+                            const progress = Math.round(100 * event.loaded / event.total);
+                            res = {name: document.name, status: 'progress', message: progress};
+                            break;
 
-                    default:
-                        res = `Unhandled event: ${event.type}`;
+                        case HttpEventType.Response:
+                            res = event.body ? event.body : event.status;
+                            break;
+
+                        default:
+                            res = `Unhandled event: ${event.type}`;
+                    }
                 }
-
                 return res;
             }),
             tap({
@@ -187,6 +341,10 @@ export class FileUploadService {
                 complete: () => this.documentRefreshService.needRefresh.next(documentId)
             })
         );
+    }
+
+    private generateUploadId(): string {
+        return 'upload-' + Math.random().toString(36).substr(2, 16);
     }
 
 }

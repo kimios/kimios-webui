@@ -10,14 +10,12 @@ import {Tag} from 'app/main/model/tag';
 })
 export class FileUploadListComponent implements OnInit {
 
-  filesUploading: string[];
-  progress: Map<string, BehaviorSubject<{ name: string, status: string, message: number }>>;
+  progress: Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>;
   filesUploaded: Map<string, Observable<Tag[]>>;
 
   constructor(private fileUploadService: FileUploadService) {
-    this.filesUploading = Array.from(fileUploadService.filesProgress.keys());
+
     console.log('FileUploadListComponent() with this.filesUploading:');
-    console.log(this.filesUploading);
     this.progress = this.fileUploadService.filesProgress;
     this.filesUploaded = this.fileUploadService.filesUploaded;
   }

@@ -1,24 +1,28 @@
-<div *ngFor="let file of progress.keys()">
+<div *ngFor="let uploadId of progress.keys()">
 
-    <!--
-    {{file}}: <file-upload-progress uploadingFileName="{{file}}"></file-upload-progress>
-    -->
-
-    <div *ngIf="progress.get(file) | async as fileProgress" fxLayout="row" fxLayoutAlign="start start">
-        <div>{{file}}</div>
+    <div *ngIf="progress.get(uploadId) | async as fileProgress" fxLayout="row" fxLayoutAlign="start start">
+        <div>{{fileProgress.name}}</div>
         <div>
-            <mat-progress-bar
-                    *ngIf="fileProgress.message < 100; else elseBlock"
-                    [value]="fileProgress.message"
-                    [bufferValue]="1">
-            </mat-progress-bar>
-            <ng-template #elseBlock>
-                <mat-icon>done</mat-icon>
+            <ng-container *ngIf="fileProgress.status === 'error'; else elseBlock2">
+                <mat-icon>error</mat-icon>
+                <span>{{fileProgress.message}}</span>
+            </ng-container>
+            <ng-template #elseBlock2>
+                <mat-progress-bar
+                        *ngIf="fileProgress.status === 'progress' && fileProgress.message < 100; else elseBlock"
+                        [value]="fileProgress.message"
+                        [bufferValue]="1">
+                </mat-progress-bar>
+                <ng-template #elseBlock>
+                    <ng-container *ngIf="fileProgress.status === 'done'">
+                        <mat-icon>done</mat-icon>
+                    </ng-container>
+                </ng-template>
             </ng-template>
         </div>
         <mat-chip-list #chipList>
             <mat-chip
-                    *ngFor="let tag of filesUploaded.get(file) | async"
+                    *ngFor="let tag of filesUploaded.get(uploadId) | async"
             >
                 {{tag.name}}
             </mat-chip>
