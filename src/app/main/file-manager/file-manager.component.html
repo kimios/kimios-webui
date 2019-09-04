@@ -6,51 +6,9 @@
     </fuse-sidebar>-->
     <!-- / SIDEBAR -->
 
-    <!-- CENTER -->
-    <div class="center"
-         fxFlex
-         (drop)="handleDrop($event)"
-         (dragover)="handleDragOver($event)"
-    >
-
-        <div fxLayout="row" fxLayoutAlign="space-between center">
-            <!-- ADD FILE BUTTON -->
-            <div class="file-uploader" div fxLayout="row" style="padding:20px">
-                <form (ngSubmit)="onSubmitFileUpload()">
-                    <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
-                    <button mat-fab
-                            color="warn"
-
-                            (click)="fileInput.click($event.target.files)"
-                            aria-label="Add file">
-                        <mat-icon>add</mat-icon>
-                    </button>
-                </form>
-            </div>
-            <!-- / ADD FILE BUTTON -->
-
-            <file-search-bar fxFlex style="padding:20px" ></file-search-bar>
-
-        </div>
-        <!-- CONTENT -->
-        <div>
-            <mat-paginator
-                    [length]="totalFilesFound$ | async"
-                    [pageSize]="pageSize"
-                    [pageSizeOptions]="pageSizeOptions"
-                    (page)="paginatorHandler($event)"
-                    [pageIndex]="pageIndex"
-                    showFirstLastButtons>
-            </mat-paginator>
-            <mat-divider></mat-divider>
-        </div>
-        <div class="content" fusePerfectScrollbar>
-            <file-list></file-list>
-        </div>
-        <!-- / CONTENT -->
-
+    <div class="center">
+        <file-search-panel></file-search-panel>
     </div>
-    <!-- / CENTER -->
 
     <!-- SIDEBAR
     <fuse-sidebar class="sidebar details-sidebar" name="file-manager-details-sidebar" position="right"

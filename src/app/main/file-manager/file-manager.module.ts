@@ -46,6 +46,7 @@ import {ShareFormComponent} from 'app/main/components/share-form/share-form.comp
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 import {FileTagsComponent} from 'app/main/components/file-tags/file-tags.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import { FileSearchPanelComponent } from 'app/main/components/file-search-panel/file-search-panel.component';
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
         FileSecurityComponent,
         ShareFormComponent,
         ShareDialogComponent,
-        FileTagsComponent
+        FileTagsComponent,
+        FileSearchPanelComponent
     ],
     imports: [
 
