@@ -11,6 +11,7 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'file-detail',
@@ -47,6 +48,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
     constructor(
+        private route: ActivatedRoute,
         private documentService: DocumentService,
         private documentVersionService: DocumentVersionService,
         private sessionService: SessionService,
@@ -69,6 +71,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.documentId = +this.route.snapshot.paramMap.get('documentId');
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
         this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 

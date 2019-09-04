@@ -4,7 +4,7 @@ import {FileUploadService} from 'app/services/file-upload.service';
 import {PAGE_SIZE_DEFAULT, SearchEntityService} from 'app/services/searchentity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {BehaviorSubject, of} from 'rxjs';
-import {FilesUploadDialogComponent} from '../files-upload-dialog/files-upload-dialog.component';
+import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {catchError} from 'rxjs/operators';
 import {DEFAULT_PATH} from 'app/main/file-manager/file-manager.component';
