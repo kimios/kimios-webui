@@ -82,30 +82,11 @@ export class FileManagerComponent implements OnInit {
             -1,
             '[]'
         ).subscribe(
-            (res) => {
-                this.handleUploadProgress(res);
-            },
+            null,
             null,
             () => this.searchEntityService.reloadFiles()
 
         );
-    }
-
-    handleUploadProgress(res: { name: string, status: string, message: number } | number | string | {}): void {
-        if (res instanceof Object
-            && res.hasOwnProperty('status')
-            && res.hasOwnProperty('message')) {
-            this.uploadResponse = {
-                status: res['status'],
-                message: '' + res['message']
-            };
-            console.log('uploadResponse: ');
-            console.log(this.uploadResponse);
-        } else if (isNumeric(res)) {
-            console.log('HttpResponse: ' + res);
-        } else {
-            console.log(res);
-        }
     }
 
     handleDrop(event: Event): void {
