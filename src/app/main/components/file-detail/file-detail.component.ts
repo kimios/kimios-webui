@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
@@ -44,6 +44,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     addOnBlur = true;
     separatorKeysCodes: number[] = [ENTER, COMMA];
     tagCtrl = new FormControl();
+    loading$: Observable<boolean>;
+    spinnerColor = 'primary';
+    spinnerMode = 'indeterminate';
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -70,6 +73,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.removedTag$ = new Subject<Tag>();
         this.canWrite$ = new Observable<boolean>();
         this.hasFullAccess$ = new Observable<boolean>();
+        this.loading$ = of(true);
     }
 
     ngOnInit(): void {
@@ -79,9 +83,14 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
         this.documentData$ = this.allTags$
             .pipe(
+                concatMap(res => {
+                    this.loading$ = of(true);
+                    return res;
+                }),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
-                tap(res => this.document = res)
+                tap(res => this.document = res),
+                tap(res => this.loading$ = of(false))
             );
 
         this.documentDetailService.retrieveDocumentTags(this.documentId)

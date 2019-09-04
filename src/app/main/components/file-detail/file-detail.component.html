@@ -1,5 +1,15 @@
-<mat-icon (click)="goBack()" style="cursor: pointer;">arrow_back</mat-icon>
+<div fxLayout="column" fxLayoutAlign="start start">
+    <div fxLayout="row" fxLayoutAlign="start center" class="goBackDiv" (click)="goBack()">
+        <mat-icon id="goBackIcon" >arrow_back</mat-icon>
+        <span>Go back to search results</span>
+    </div>
 
+    <div class="content">
+<mat-progress-spinner
+        *ngIf="loading$ | async"
+        [color]="spinnerColor"
+        [mode]="spinnerMode"
+></mat-progress-spinner>
 <!-- File details -->
 <div *ngIf="documentData$ | async as data">
 
@@ -85,6 +95,9 @@
     </mat-tab-group>
 <!--    </div>-->
 
+</div>
+
+</div>
 
 </div>
 
