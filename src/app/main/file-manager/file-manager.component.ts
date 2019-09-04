@@ -19,14 +19,9 @@ const DEFAULT_PATH = 'ng_workspace/root_folder';
     styleUrls: ['./file-manager.component.scss']
 })
 export class FileManagerComponent implements OnInit {
-    private _folderUsed: Folder;
-    private workspaceUsed: Workspace;
     private filesPath: string = DEFAULT_PATH;
 
-    displayedColumns: string[] = [];
     fileToUpload: File = null;
-    lastUploadedDocId: Observable<number> = null;
-    uploadResponse = { status: '', message: '' };
     totalFilesFound$: BehaviorSubject<number>;
 
     pageSize: number;
@@ -42,20 +37,11 @@ export class FileManagerComponent implements OnInit {
         this.pageSize = PAGE_SIZE_DEFAULT;
     }
 
-    set folderUsed(value: Folder) {
-        this._folderUsed = value;
-    }
-
-    get folderUsed(): Folder {
-        return this._folderUsed;
-    }
-
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
         return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
     }
 
     ngOnInit(): void {
-        const pathTab = this.filesPath.split('/');
         this.searchEntityService.onTotalFilesChanged.subscribe(
             res => this.totalFilesFound$.next(isNumber(res) ? res : undefined)
         );
