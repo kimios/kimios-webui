@@ -25,11 +25,11 @@ export const searchParamsValidator: ValidatorFn = (control: FormGroup): Validati
 };
 
 @Component({
-  selector: 'file-search',
-  templateUrl: './file-search.component.html',
-  styleUrls: ['./file-search.component.scss']
+  selector: 'file-search-bar',
+  templateUrl: './file-search-bar.component.html',
+  styleUrls: ['./file-search-bar.component.scss']
 })
-export class FileSearchComponent implements OnInit {
+export class FileSearchBarComponent implements OnInit {
     searchParams: FormGroup;
 
     tagFilter = new FormControl('');
