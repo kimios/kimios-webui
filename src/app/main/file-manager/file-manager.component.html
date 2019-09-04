@@ -1,7 +1,4 @@
-<div id="file-manager" class="page-layout simple right-sidebar inner-scroll"
-     (drop)="handleDrop($event)"
-     (dragover)="handleDragOver($event)"
->
+<div id="file-manager" class="page-layout simple right-sidebar inner-scroll">
 
     <!-- SIDEBAR
     <fuse-sidebar class="sidebar main-sidebar" name="file-manager-main-sidebar" position="left">
@@ -10,7 +7,11 @@
     <!-- / SIDEBAR -->
 
     <!-- CENTER -->
-    <div class="center" fxFlex>
+    <div class="center"
+         fxFlex
+         (drop)="handleDrop($event)"
+         (dragover)="handleDragOver($event)"
+    >
 
         <div fxLayout="row" fxLayoutAlign="space-between center">
             <!-- ADD FILE BUTTON -->
