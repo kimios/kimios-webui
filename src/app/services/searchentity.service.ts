@@ -8,12 +8,18 @@ import {concatMap, map} from 'rxjs/operators';
 import {Tag} from '../main/model/tag';
 
 export const PAGE_SIZE_DEFAULT = 20;
+const DEFAULT_SORT_FIELD = 'DocumentName';
+const DEFAULT_SORT_DIRECTION = 'asc';
+const DEFAULT_PAGE = 0;
 
 @Injectable({
     providedIn: 'root'
 })
 export class SearchEntityService implements Resolve<any> {
 
+    get criterias(): Criteria[] {
+        return this._criterias;
+    }
 
     onFilesChanged: BehaviorSubject<any>;
     onFileSelected: BehaviorSubject<any>;
@@ -28,7 +34,7 @@ export class SearchEntityService implements Resolve<any> {
     private pageSize: number;
     private page: number;
     private query: string;
-    private criterias: Criteria[];
+    private _criterias: Criteria[];
 
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
 
@@ -101,7 +107,14 @@ export class SearchEntityService implements Resolve<any> {
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> | Promise<any> | any {
         return new Promise((resolve, reject) => {
             Promise.all([
-                this.getFiles('DocumentName', 'asc', 0, 20, null)
+                this.getFiles(
+                    this.sortField ? this.sortField : DEFAULT_SORT_FIELD,
+                    this.sortDirection ? this.sortDirection : DEFAULT_SORT_DIRECTION,
+                    this.page ? this.page : DEFAULT_PAGE,
+                    this.pageSize ? this.pageSize : PAGE_SIZE_DEFAULT,
+                    this.query,
+                    this._criterias
+                )
             ]).then(
                 ([files]) => {
                     resolve();
@@ -122,7 +135,7 @@ export class SearchEntityService implements Resolve<any> {
         this.pageSize = pageSize ? pageSize : this.pageSize;
         this.page = page;
         this.query = query;
-        this.criterias = criterias;
+        this._criterias = criterias;
 
         return new Promise((resolve, reject) => {
             console.log('inside Promise getFiles entity Service...');
@@ -181,7 +194,7 @@ export class SearchEntityService implements Resolve<any> {
     }
 
     reloadTags(): Promise<any> {
-        return this.getFiles(this.sortField, this.sortDirection, this.page, this.pageSize, this.query, this.criterias, true);
+        return this.getFiles(this.sortField, this.sortDirection, this.page, this.pageSize, this.query, this._criterias, true);
     }
 
     searchInContent(content: string, criterias = []): Promise<any> {
@@ -296,11 +309,11 @@ export class SearchEntityService implements Resolve<any> {
     }
 
     public changePage(page, pageSize): Promise<any> {
-        return this.getFiles(this.sortField, this.sortDirection, page, pageSize, this.query, this.criterias);
+        return this.getFiles(this.sortField, this.sortDirection, page, pageSize, this.query, this._criterias);
     }
 
     public changeSort(sortField, sortDirection, page): Promise<any> {
         this.onSortChanged.next(sortField + ' ' + sortDirection);
-        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this.criterias);
+        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this._criterias);
     }
 }

@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
-import {Observable, of, Subject} from 'rxjs';
+import {Observable, of, ReplaySubject, Subject} from 'rxjs';
 import {TagService} from '../../../services/tag.service';
 import {SearchEntityService} from '../../../services/searchentity.service';
 import {map, startWith} from 'rxjs/operators';
@@ -41,7 +41,7 @@ export class FileSearchBarComponent implements OnInit {
     filteredTags$: Observable<Tag[]>;
     filteredTags: Tag[];
     filteredTagsWithCount$: Observable<Array<{name: string, count: number}>>;
-    selectedTag$: Subject<Tag>;
+    selectedTag$: ReplaySubject<Tag>;
     deselectedTag$: Subject<Tag>;
     selectedTags: Tag[];
 
@@ -61,21 +61,8 @@ export class FileSearchBarComponent implements OnInit {
         private searchEntityService: SearchEntityService,
         private fb: FormBuilder
     ) {
-        this.searchEntityService.onTagsDataChanged.subscribe(
-            (res) => {
-                res.forEach(val => {
-                    val.name = val.name.toLocaleUpperCase().replace(new RegExp('^' + TagService.TAG_NAME_PREFIX), '');
-                });
-                this.tags$ = of(res);
-                // this.filteredTags$ = this.tags$;
-                this.tags = res;
-                this.tagCtrl.updateValueAndValidity();
-                console.log('received tags');
-                console.dir(res);
-            }
-        );
         this.selectedTags = new Array<Tag>();
-        this.selectedTag$ = new Subject<Tag>();
+        this.selectedTag$ = new ReplaySubject<Tag>();
         this.deselectedTag$ = new Subject<Tag>();
         this.searchParams = this.fb.group({
             content: '',
@@ -102,6 +89,22 @@ export class FileSearchBarComponent implements OnInit {
         //     ).subscribe(
         //         res => this.selectedTags$ = of(res)
         // );
+
+        this.searchEntityService.onTagsDataChanged.subscribe(
+            (res) => {
+                res.forEach(val => {
+                    val.name = val.name.toLocaleUpperCase().replace(new RegExp('^' + TagService.TAG_NAME_PREFIX), '');
+                });
+                this.tags$ = of(res);
+                // this.filteredTags$ = this.tags$;
+                this.tags = res;
+                this.tagCtrl.updateValueAndValidity();
+                console.log('received tags');
+                console.dir(res);
+            }
+        );
+
+        this.initFormFromHistory();
 
         this.filteredTags$ = this.tagCtrl.valueChanges.pipe(
             startWith(null),
@@ -209,4 +212,28 @@ export class FileSearchBarComponent implements OnInit {
         this.tagCtrl.setValue(null);
     }
 
+    private initFormFromHistory(): void {
+        this.searchEntityService.criterias.forEach(criteria => {
+            switch (criteria.fieldName) {
+                case 'DocumentBody':
+                    this.searchParams.get('content').setValue(criteria.query);
+                    break;
+
+                case 'DocumentName':
+                    this.searchParams.get('filename').setValue(criteria.query);
+                    break;
+
+                default:
+                    const re = new RegExp(TagService.TAG_META_DATA_NAME_PREFIX + '(.+)$');
+                    if (re.test(criteria.fieldName)) {
+                        const tagId = re.exec(criteria.fieldName)[1];
+                        const tag = this.tags.filter(tagWithCount => tagWithCount.uid === Number(tagId)).shift();
+                        if (tag) {
+                            this.selectedTag$.next(tag);
+//                            (this.searchParams.get('tagList') as FormArray).push(this.createFormArrayTag(tag));
+                        }
+                    }
+            }
+        });
+    }
 }
