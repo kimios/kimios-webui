@@ -12,6 +12,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'file-detail',
@@ -56,7 +57,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private documentDetailService: DocumentDetailService,
         private searchEntityService: SearchEntityService,
         private documentRefreshService: DocumentRefreshService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private location: Location
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
@@ -272,5 +274,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
             );
 
         this.filteredTags$ = this.initFilteredTags();
+    }
+
+    goBack(): void {
+        this.location.back();
     }
 }

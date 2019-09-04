@@ -2,7 +2,6 @@ import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulatio
 import {DataSource} from '@angular/cdk/collections';
 import {Observable, Subject} from 'rxjs';
 import {tap} from 'rxjs/operators';
-
 import {fuseAnimations} from '@fuse/animations';
 import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
 import {MatDialog, MatSort} from '@angular/material';
@@ -11,6 +10,7 @@ import * as moment from 'moment';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 import {ColumnDescription} from 'app/main/model/column-description';
+import {Router} from '@angular/router';
 
 @Component({
     selector     : 'file-list',
@@ -61,7 +61,8 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
     constructor(
         private _fileManagerService: SearchEntityService,
         private _fuseSidebarService: FuseSidebarService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        private router: Router
     )
     {
 
@@ -115,7 +116,12 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
     onSelect(selected): void
     {
         this._fileManagerService.onFileSelected.next(selected);
-        this.openDocumentDetailDialog(selected.uid);
+        // this.openDocumentDetailDialog(selected.uid);
+        this.navigateToSelectedFile(selected.uid);
+    }
+
+    private navigateToSelectedFile(id: number): void {
+        this.router.navigate(['/document', id]);
     }
 
     openDocumentDetailDialog(uid: number): void {
