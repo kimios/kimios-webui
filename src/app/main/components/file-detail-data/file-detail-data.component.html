@@ -1,0 +1,28 @@
+<table id="table">
+
+  <tr>
+    <td>Doc#</td>
+    <td>{{document.uid}}</td>
+  </tr>
+  <tr>
+    <td>Document name</td>
+    <td>{{document.name + '.' + (document.extension ? document.extension : '')}}</td>
+  </tr>
+  <tr>
+    <td>Type</td>
+    <td>{{document.mimeType}}</td>
+  </tr>
+  <tr>
+    <td>Owner</td>
+    <td>{{document.owner + '@' + document.ownerSource}}</td>
+  </tr>
+  <tr>
+    <td>Creation date</td>
+    <td>{{document.creationDate | date}}</td>
+  </tr>
+  <tr>
+    <td>Last modification date</td>
+    <td>{{document.versionUpdateDate | date}}</td>
+  </tr>
+
+</table>

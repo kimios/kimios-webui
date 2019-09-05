@@ -13,14 +13,16 @@
 <!-- File details -->
 <div *ngIf="documentData$ | async as data">
 
+    <span id="docTitle">{{data.name + (data.extension ? '.' + data.extension : '')}}</span>
+
+    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+
     <mat-tab-group dynamicHeight>
         <mat-tab label="Data">
 
-    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     <!-- file properties : name, type, size, author, creation date -->
-    <div>
-        {{data.uid}} | {{data.name}} | {{data.mimeType}} | {{data.owner}} ({{data.ownerSource}}) | {{data.creationDate | date}}
-    </div>
+            <file-detail-data [document]="documentData$ | async"></file-detail-data>
+
     <!-- tags -->
     <div>
         <mat-form-field style="width: 100%;" *ngIf="canWrite$ | async; else elseBlockTags">

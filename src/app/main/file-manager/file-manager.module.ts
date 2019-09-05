@@ -49,6 +49,7 @@ import {FileTagsComponent} from 'app/main/components/file-tags/file-tags.compone
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {FileSearchPanelComponent} from 'app/main/components/file-search-panel/file-search-panel.component';
 import {FileManagerRoutingModule} from 'app/main/file-manager/file-manager-routing/file-manager-routing.module';
+import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file-detail-data.component';
 
 
 @NgModule({
@@ -68,7 +69,8 @@ import {FileManagerRoutingModule} from 'app/main/file-manager/file-manager-routi
         ShareFormComponent,
         ShareDialogComponent,
         FileTagsComponent,
-        FileSearchPanelComponent
+        FileSearchPanelComponent,
+        FileDetailDataComponent
     ],
     imports: [
         FileManagerRoutingModule,
