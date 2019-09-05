@@ -1,3 +1,16 @@
 table {
-  border-spacing: 30px 10px;
+  border-collapse: collapse;
+}
+
+td {
+  padding: 5px;
+  border: 1px solid #e1d8df;
+}
+
+.talign-right {
+  text-align: right;
+}
+
+.data-title {
+  background-color: #e9ecec;
 }
