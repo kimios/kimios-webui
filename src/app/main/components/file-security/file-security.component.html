@@ -1,6 +1,9 @@
 <form class="example-container" [formGroup]="dmEntitySecuritiesForm">
-  <mat-table #table [dataSource]="dataSource"
-             matSort >
+
+    <div fxLayout="column" fxLayoutAlign="space-between center">
+
+    <mat-table #table [dataSource]="dataSource"
+             matSort class="w100pc">
     <!--matSortActive="" matSortDirection="desc" matSortDisableClear-->
 
     <ng-container
@@ -13,7 +16,8 @@
               class="{{col.class ? col.class : ''}}"
       > {{col.displayName}} </mat-header-cell>
       <mat-cell *matCellDef="let element" class="{{col.class ? col.class : ''}}">
-          <mat-icon *ngIf="col.element === 'icon'">{{ element.type === 1 ? 'person' : 'group'}}</mat-icon>
+          <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(element.index, $event)"> {{ col.cell }} </mat-icon>
+          <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
           <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
           <mat-checkbox
                   *ngIf="col.element === 'checkbox'"
@@ -32,5 +36,12 @@
     </mat-row>
 
   </mat-table>
+
+        <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
+            <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
+            <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
+        </div>
+
+    </div>
 
 </form>

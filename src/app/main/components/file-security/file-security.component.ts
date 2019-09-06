@@ -1,12 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {DMEntitySecurity, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {Observable, of} from 'rxjs';
-import {DataSource} from '@angular/cdk/table';
-import {CollectionViewer} from '@angular/cdk/collections';
+import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
-import {map, tap} from 'rxjs/operators';
+import {MatTableDataSource} from '@angular/material';
 
 @Component({
   selector: 'file-security',
@@ -21,7 +19,7 @@ export class FileSecurityComponent implements OnInit {
   dmEntitySecuritiesForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
 
-  dataSource: DmEntitySecurityDataSource;
+  dataSource: MatTableDataSource<DMEntitySecurity>;
   columnsDescription: ColumnDescriptionWithElement[] = DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns = [];
 
@@ -40,69 +38,72 @@ export class FileSecurityComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new DmEntitySecurityDataSource(
-        this.securityService,
-        this.sessionService,
-        this.documentId
+    this.dataSource = new MatTableDataSource<DMEntitySecurity>([]);
+
+    this.loadData().subscribe(
+        res => {
+          if (res && res.length > 0) {
+            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormArray(res));
+          }
+          this.dataSource.data = res;
+        }
     );
-
-    this.dataSource.dmEntitySecurities
-        .pipe(
-            map(
-                res => {
-                  if (res && res.length > 0) {
-                    const fa = this.fb.array([]);
-                    res.forEach( security =>
-                        fa.push(
-                            this.fb.group({
-                              'read': this.fb.control(security.read),
-                              'write': this.fb.control(security.write),
-                              'fullAccess': this.fb.control(security.fullAccess)
-                            }))
-                    );
-                    this.dmEntitySecuritiesForm.setControl('formArray', fa);
-                    this.formArray$ = of(fa.controls);
-                  }
-                }
-            )
-        );
   }
 
-}
-
-class DmEntitySecurityDataSource extends DataSource<any> {
-
-  private _dmEntitySecurities: Observable<Array<DMEntitySecurity>>;
-
-  constructor(
-      private securityService: SecurityService,
-      private sessionService: SessionService,
-      private documentId: number
-  ) {
-    super();
-    this._dmEntitySecurities = new Observable<Array<DMEntitySecurity>>();
-  }
-
-  get dmEntitySecurities(): Observable<Array<DMEntitySecurity>> {
-    return this._dmEntitySecurities;
-  }
-
-  connect(collectionViewer: CollectionViewer): Observable<DMEntitySecurity[]> {
+  private loadData(): Observable<Array<DMEntitySecurity>> {
     return this.securityService.getDMEntitySecurities(
         this.sessionService.sessionToken,
         this.documentId
-    )
-        .pipe(
-            tap(res => this._dmEntitySecurities = of(res))
-        );
+    );
   }
 
-  disconnect(collectionViewer: CollectionViewer): void {
+  deleteRow(rowIndex: number, event): void {
+    (this.dmEntitySecuritiesForm.get('formArray') as FormArray).removeAt(rowIndex);
+    event.target.closest('mat-row').remove();
   }
 
+  cancel(): void {
+    this.loadData().subscribe(
+        res => {
+          if (res && res.length > 0) {
+            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormArray(res));
+          }
+          this.dataSource.data = res;
+        }
+    );
+  }
+
+  private createFormArray(dmSecurityRules: Array<DMEntitySecurity>): FormArray {
+    const fa = this.fb.array([]);
+    dmSecurityRules.forEach( security =>
+        fa.push(
+            this.fb.group({
+              'read': this.fb.control(security.read),
+              'write': this.fb.control(security.write),
+              'fullAccess': this.fb.control(security.fullAccess)
+            }))
+    );
+    return fa;
+  }
+
+  submit(): void {
+
+  }
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
+  {
+    // to delete this row
+    id: 'actionRemove',
+    matColumnDef: 'actionRemove',
+    position: 1,
+    matHeaderCellDef: 'actionRemove',
+    sticky: false,
+    displayName: '',
+    cell: 'remove',
+    element: 'iconName',
+    class: 'mat-column-width50',
+  },
   {
     // group or person
     id: 'type',
@@ -111,9 +112,9 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     matHeaderCellDef: 'type',
     sticky: false,
     displayName: '',
-    cell: null,
-    element: 'icon',
-    class: 'mat-column-width100'
+    cell: (row: DMEntitySecurity): string => row.type === 1 ? 'person' : 'group',
+    element: 'iconFunction',
+    class: 'mat-column-width100',
   },
   {
     id: 'name',
