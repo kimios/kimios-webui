@@ -46,6 +46,7 @@ export * from './symbolicLink';
 export * from './taskInfo';
 export * from './taskWrapper';
 export * from './tasksResponse';
+export * from './updateSecurityCommand';
 export * from './user';
 export * from './userWrapper';
 export * from './workflow';
