@@ -1,28 +1,30 @@
 <table id="table">
 
+  <ng-container *ngIf="document$ | async as doc">
   <tr>
     <td class="talign-right data-title">Doc Id:</td>
-    <td>{{document.uid}}</td>
+    <td>{{doc.uid}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Document name:</td>
-    <td>{{document.name + '.' + (document.extension ? document.extension : '')}}</td>
+    <td>{{doc.name + '.' + (doc.extension ? doc.extension : '')}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Type:</td>
-    <td>{{document.mimeType}}</td>
+    <td>{{doc.mimeType}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Owner:</td>
-    <td>{{document.owner + '@' + document.ownerSource}}</td>
+    <td>{{doc.owner + '@' + doc.ownerSource}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Creation date:</td>
-    <td>{{document.creationDate | date}}</td>
+    <td>{{doc.creationDate | date}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Last modification date:</td>
-    <td>{{document.versionUpdateDate | date}}</td>
+    <td>{{doc.versionUpdateDate | date}}</td>
   </tr>
+  </ng-container>
 
 </table>

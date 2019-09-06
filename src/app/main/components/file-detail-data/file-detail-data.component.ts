@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'file-detail-data',
@@ -9,7 +10,7 @@ import {Document as KimiosDocument} from 'app/kimios-client-api';
 export class FileDetailDataComponent implements OnInit {
 
   @Input()
-  document: KimiosDocument;
+  document$: Observable<KimiosDocument>;
 
   constructor() {}
 
