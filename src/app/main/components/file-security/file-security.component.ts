@@ -1,10 +1,11 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup} from '@angular/forms';
-import {DMEntitySecurity, SecurityService} from 'app/kimios-client-api';
+import {DMEntitySecurity, SecurityService, UpdateSecurityCommand} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatTableDataSource} from '@angular/material';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'file-security',
@@ -29,7 +30,7 @@ export class FileSecurityComponent implements OnInit {
       private sessionService: SessionService
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
-      formArray: this.fb.array([])
+      formGroupSecurities: this.fb.group({})
     });
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
@@ -43,7 +44,7 @@ export class FileSecurityComponent implements OnInit {
     this.loadData().subscribe(
         res => {
           if (res && res.length > 0) {
-            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormArray(res));
+            this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(res));
           }
           this.dataSource.data = res;
         }
@@ -66,28 +67,57 @@ export class FileSecurityComponent implements OnInit {
     this.loadData().subscribe(
         res => {
           if (res && res.length > 0) {
-            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormArray(res));
+            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormGroup(res));
           }
           this.dataSource.data = res;
         }
     );
   }
 
-  private createFormArray(dmSecurityRules: Array<DMEntitySecurity>): FormArray {
-    const fa = this.fb.array([]);
-    dmSecurityRules.forEach( security =>
-        fa.push(
-            this.fb.group({
-              'read': this.fb.control(security.read),
-              'write': this.fb.control(security.write),
-              'fullAccess': this.fb.control(security.fullAccess)
-            }))
-    );
-    return fa;
-  }
+    private createFormGroup(dmSecurityRules: Array<DMEntitySecurity>): FormGroup {
+        const fg = this.fb.group([]);
+        dmSecurityRules.forEach( (security, index) =>
+            fg.addControl(
+                index.toString(),
+                this.fb.group({
+                    'name': this.fb.control(security.name),
+                    'source': this.fb.control(security.source),
+                    'type': this.fb.control(security.type),
+                    'read': this.fb.control(security.read),
+                    'write': this.fb.control(security.write),
+                    'fullAccess': this.fb.control(security.fullAccess)
+                })
+            )
+        );
+        return fg;
+    }
 
   submit(): void {
-
+      const updateSecurityCommand = <UpdateSecurityCommand> {
+          sessionId: this.sessionService.sessionToken,
+          dmEntityId: this.documentId,
+          appendMode: true,
+          securities: Object.keys((this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).controls).map(control =>
+              <DMEntitySecurity> {
+                  dmEntityUid: this.documentId,
+                  // document type is 3
+                  dmEntityType: 3,
+                  name: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('name').value,
+                  source: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('source').value,
+                  fullName: '',
+                  type: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('type').value,
+                  read: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('read').value,
+                  write: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('write').value,
+                  fullAccess: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('fullAccess').value
+              }
+          ),
+          recursive: false
+      };
+      this.securityService.updateDMEntitySecurities(updateSecurityCommand)
+          .pipe(
+              tap(res => this.loadData())
+          )
+          .subscribe();
   }
 }
 

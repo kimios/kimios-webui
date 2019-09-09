@@ -1,4 +1,4 @@
-<form class="example-container" [formGroup]="dmEntitySecuritiesForm">
+<form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
 
     <div fxLayout="column" fxLayoutAlign="space-between center">
 
@@ -15,15 +15,16 @@
               mat-sort-header="{{col.matColumnDef}}"
               class="{{col.class ? col.class : ''}}"
       > {{col.displayName}} </mat-header-cell>
-      <mat-cell *matCellDef="let element" class="{{col.class ? col.class : ''}}">
+      <mat-cell *matCellDef="let element; let i = index;" class="{{col.class ? col.class : ''}}" [formGroupName]="i" >
           <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(element.index, $event)"> {{ col.cell }} </mat-icon>
           <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
           <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
           <mat-checkbox
                   *ngIf="col.element === 'checkbox'"
-                  name="{{element.name + '@' + element.source + '_' + col.matColumnDef}}"
+                  name="{{col.matColumnDef}}"
                   [checked]="element[col.matColumnDef]"
-                  [value]="element[col.matColumnDef]">
+                  [value]="element[col.matColumnDef]"
+                  formControlName="{{col.matColumnDef}}">
           </mat-checkbox>
       </mat-cell>
     </ng-container>

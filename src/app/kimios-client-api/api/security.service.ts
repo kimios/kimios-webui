@@ -23,6 +23,7 @@ import { DMEntitySecurity } from '../model/dMEntitySecurity';
 import { Group } from '../model/group';
 import { SecurityEntity } from '../model/securityEntity';
 import { TaskInfo } from '../model/taskInfo';
+import { UpdateSecurityCommand } from '../model/updateSecurityCommand';
 import { User } from '../model/user';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -1010,13 +1011,15 @@ export class SecurityService {
     /**
      * 
      * 
+     * @param updateSecurityCommand 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateDMEntitySecurities(observe?: 'body', reportProgress?: boolean): Observable<TaskInfo>;
-    public updateDMEntitySecurities(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TaskInfo>>;
-    public updateDMEntitySecurities(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TaskInfo>>;
-    public updateDMEntitySecurities(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public updateDMEntitySecurities(updateSecurityCommand?: UpdateSecurityCommand, observe?: 'body', reportProgress?: boolean): Observable<TaskInfo>;
+    public updateDMEntitySecurities(updateSecurityCommand?: UpdateSecurityCommand, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<TaskInfo>>;
+    public updateDMEntitySecurities(updateSecurityCommand?: UpdateSecurityCommand, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<TaskInfo>>;
+    public updateDMEntitySecurities(updateSecurityCommand?: UpdateSecurityCommand, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
 
         let headers = this.defaultHeaders;
 
@@ -1033,9 +1036,13 @@ export class SecurityService {
         const consumes: string[] = [
             'application/json'
         ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers = headers.set('Content-Type', httpContentTypeSelected);
+        }
 
         return this.httpClient.post<TaskInfo>(`${this.basePath}/security/update-security`,
-            null,
+            updateSecurityCommand,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
