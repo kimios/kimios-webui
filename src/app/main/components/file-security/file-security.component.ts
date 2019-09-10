@@ -4,8 +4,9 @@ import {DMEntitySecurity, SecurityService, UpdateSecurityCommand} from 'app/kimi
 import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
-import {MatTableDataSource} from '@angular/material';
+import {MatDialog, MatTableDataSource} from '@angular/material';
 import {tap} from 'rxjs/operators';
+import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 
 @Component({
   selector: 'file-security',
@@ -27,7 +28,8 @@ export class FileSecurityComponent implements OnInit {
   constructor(
       private fb: FormBuilder,
       private securityService: SecurityService,
-      private sessionService: SessionService
+      private sessionService: SessionService,
+      public dialog: MatDialog
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -119,6 +121,28 @@ export class FileSecurityComponent implements OnInit {
           )
           .subscribe();
   }
+
+    add(): void {
+        // open dialog to select users and groups
+        // 2 panels :
+        //   - left: selected elements (identified with icon user or group)
+        //   - right: search panel
+        //     - 2 tabs : 1) users 2) groups
+        //     - autocomplete
+        //     - double click => select element
+        //     - when selected icon 'delete' allows to unselect user or group
+        //     - filter by datasource: datasource1, 2, …, n, 'All datasources'
+        //     - sort by name, firstname, id, etc
+        //     - drag and drop from right to left
+        //     - on submit: check if selected user belongs to selected groups and propose to not create security for user if so
+        //
+
+        this.openAddDialog();
+    }
+
+    private openAddDialog(): void {
+        const dialogRef = this.dialog.open(UsersAndGroupsSelectionDialogComponent, {});
+    }
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
@@ -133,6 +157,8 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     cell: 'remove',
     element: 'iconName',
     class: 'mat-column-width50',
+      noSortHeader: true,
+      cellHeaderIcon: 'add_circle'
   },
   {
     // group or person

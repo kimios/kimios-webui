@@ -50,6 +50,9 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {FileSearchPanelComponent} from 'app/main/components/file-search-panel/file-search-panel.component';
 import {FileManagerRoutingModule} from 'app/main/file-manager/file-manager-routing/file-manager-routing.module';
 import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file-detail-data.component';
+import {UsersGroupsSearchPanelComponent} from 'app/main/components/users-groups-search-panel/users-groups-search-panel.component';
+import {UsersAndGroupsSelectionPanelComponent} from '../components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {UsersAndGroupsSelectionDialogComponent} from '../components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 
 
 @NgModule({
@@ -70,7 +73,10 @@ import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file
         ShareDialogComponent,
         FileTagsComponent,
         FileSearchPanelComponent,
-        FileDetailDataComponent
+        FileDetailDataComponent,
+        UsersGroupsSearchPanelComponent,
+        UsersAndGroupsSelectionPanelComponent,
+        UsersAndGroupsSelectionDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -111,7 +117,8 @@ import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file
     entryComponents: [
         FilesUploadDialogComponent,
         FileDetailDialogComponent,
-        ShareDialogComponent
+        ShareDialogComponent,
+        UsersAndGroupsSelectionDialogComponent
     ],
     exports: [
         FileUploadListComponent,

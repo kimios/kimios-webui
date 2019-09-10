@@ -6,4 +6,5 @@ export interface ColumnDescription {
     displayName: string;
     sticky: boolean;
     cell: any;
+    noSortHeader?: boolean;
 }

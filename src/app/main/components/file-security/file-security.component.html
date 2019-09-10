@@ -12,9 +12,9 @@
             sticky="{{col.sticky}}" >
       <mat-header-cell
               *matHeaderCellDef
-              mat-sort-header="{{col.matColumnDef}}"
+              mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
               class="{{col.class ? col.class : ''}}"
-      > {{col.displayName}} </mat-header-cell>
+      ><mat-icon *ngIf="col.cellHeaderIcon" (click)="add()">{{col.cellHeaderIcon}}</mat-icon>{{col.displayName}}</mat-header-cell>
       <mat-cell *matCellDef="let element; let i = index;" class="{{col.class ? col.class : ''}}" [formGroupName]="i" >
           <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(element.index, $event)"> {{ col.cell }} </mat-icon>
           <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>

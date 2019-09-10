@@ -1,0 +1,39 @@
+<div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
+  <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
+    <div fxFlex="45">
+      <div
+              cdkDropList
+              [id]="'selectedUsersAndGroups'"
+              [cdkDropListConnectedTo]="[userListId, groupListId]"
+              (cdkDropListDropped)="drop($event)"
+              class="dropArea"
+      >
+        <div *ngFor="let item of selectedUsersAndGroups$ | async">
+          <ng-container *ngIf="item.type === 'user'">
+            {{item.element.name}}, {{item.element.firstName}} ({{item.element.source}})
+          </ng-container>
+          <ng-container *ngIf="item.type === 'group'">
+            {{item.element.name}} ({{item.element.source}})
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <div fxFlex="45">
+
+      <users-groups-search-panel
+              [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
+              [userListId]="userListId"
+              [groupListId]="groupListId"
+      >
+      </users-groups-search-panel>
+
+    </div>
+  </div>
+
+  <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">No, Thanks</button>
+    <button mat-button (click)="submit()">Ok</button>
+  </div>
+</div>
+
+
