@@ -67,8 +67,10 @@ export class FileSecurityComponent implements OnInit {
     event.target.closest('mat-row').remove();
   }
 
-  cancel(): void {
-      this.showSpinner = true;
+    cancel($event: MouseEvent): void {
+      $event.stopPropagation();
+      $event.preventDefault();
+    this.showSpinner = true;
     this.loadData().subscribe(
         res => {
           if (res && res.length > 0) {
