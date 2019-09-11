@@ -24,6 +24,7 @@ export class FileSecurityComponent implements OnInit {
   dataSource: MatTableDataSource<DMEntitySecurity>;
   columnsDescription: ColumnDescriptionWithElement[] = DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns = [];
+  showSpinner = true;
 
   constructor(
       private fb: FormBuilder,
@@ -49,6 +50,7 @@ export class FileSecurityComponent implements OnInit {
             this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(res));
           }
           this.dataSource.data = res;
+          this.showSpinner = false;
         }
     );
   }
@@ -66,12 +68,14 @@ export class FileSecurityComponent implements OnInit {
   }
 
   cancel(): void {
+      this.showSpinner = true;
     this.loadData().subscribe(
         res => {
           if (res && res.length > 0) {
             this.dmEntitySecuritiesForm.setControl('formArray', this.createFormGroup(res));
           }
           this.dataSource.data = res;
+          this.showSpinner = false;
         }
     );
   }

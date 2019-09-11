@@ -1,3 +1,15 @@
+<div class="wrapper">
+    <div class="overlay" *ngIf="showSpinner">
+        <div class="spinner-wrapper">
+            <mat-spinner
+                    color="primary"
+            ></mat-spinner>
+        </div>
+    </div>
+
+    <div class="loaded-content" [class.blurred]="showSpinner">
+
+
 <form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
 
     <div fxLayout="column" fxLayoutAlign="space-between center">
@@ -46,3 +58,8 @@
     </div>
 
 </form>
+
+
+    </div>
+</div>
+
