@@ -51,8 +51,8 @@ import {FileSearchPanelComponent} from 'app/main/components/file-search-panel/fi
 import {FileManagerRoutingModule} from 'app/main/file-manager/file-manager-routing/file-manager-routing.module';
 import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file-detail-data.component';
 import {UsersGroupsSearchPanelComponent} from 'app/main/components/users-groups-search-panel/users-groups-search-panel.component';
-import {UsersAndGroupsSelectionPanelComponent} from '../components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
-import {UsersAndGroupsSelectionDialogComponent} from '../components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
+import {UsersAndGroupsSelectionPanelComponent} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 
 
 @NgModule({
