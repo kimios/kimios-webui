@@ -5,7 +5,7 @@ import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatDialog, MatTableDataSource} from '@angular/material';
-import {tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 
@@ -120,6 +120,8 @@ export class FileSecurityComponent implements OnInit {
     submit($event: MouseEvent): void {
         $event.stopPropagation();
         $event.preventDefault();
+
+        this.showSpinner = true;
       const updateSecurityCommand = <UpdateSecurityCommand> {
           sessionId: this.sessionService.sessionToken,
           dmEntityId: this.documentId,
@@ -141,9 +143,13 @@ export class FileSecurityComponent implements OnInit {
       };
       this.securityService.updateDMEntitySecurities(updateSecurityCommand)
           .pipe(
-              tap(res => this.loadData())
+              map(res => this.loadData())
           )
-          .subscribe();
+          .subscribe(
+              null,
+              null,
+              () => this.showSpinner = false
+          );
   }
 
     add(): void {
