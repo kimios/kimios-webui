@@ -173,7 +173,7 @@ export class FilesDataSource extends DataSource<any>
     }
 
     loadDocuments(sortField: string, sortDir, page: number): void {
-        this._fileManagerService.changeSort(sortField, sortDir, page);
+        this._fileManagerService.changeSort(sortField, sortDir, page).subscribe();
     }
 }
 

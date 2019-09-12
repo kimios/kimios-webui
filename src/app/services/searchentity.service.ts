@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {Criteria, DMEntity, Document, DocumentService, Folder, FolderService, SearchResponse, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {Criteria, DMEntity, DocumentService, FolderService, SearchResponse, SearchService, WorkspaceService} from 'app/kimios-client-api';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
-import {concatMap, map} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
 import {Tag} from '../main/model/tag';
 
 export const PAGE_SIZE_DEFAULT = 20;
@@ -68,35 +68,6 @@ export class SearchEntityService implements Resolve<any> {
         this.pageSize = PAGE_SIZE_DEFAULT;
     }
 
-    retrieveEntitiesAtPath(path: string): Observable<DMEntity[]> {
-        let array: Observable<DMEntity[]>;
-        let pathArray = path.split('/');
-        return array;
-    }
-
-
-    retrieveEntity(path: string): Observable<DMEntity> {
-        let entity: Observable<DMEntity>;
-        entity = this.searchService.getDMentityFromPath(this.sessionService.sessionToken, path);
-        console.log('entity ', entity);
-        return entity;
-
-
-    }
-
-    retrieveUserWorkspaces(): Observable<Workspace[]> {
-        return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
-    }
-
-    retrieveFolders(parent: DMEntity): Observable<Folder[]> {
-        return this.folderService.getFolders(this.sessionService.sessionToken, parent.uid);
-    }
-
-    retrieveFolderFiles(parent: DMEntity): Observable<Document[]> {
-        return this.documentService.getDocuments(this.sessionService.sessionToken, parent.uid);
-
-    }
-
     /**
      * Resolver
      *
@@ -104,24 +75,15 @@ export class SearchEntityService implements Resolve<any> {
      * @param {RouterStateSnapshot} state
      * @returns {Observable<any> | Promise<any> | any}
      */
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> | Promise<any> | any {
-        return new Promise((resolve, reject) => {
-            Promise.all([
-                this.getFiles(
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<DMEntity[]> {
+        return this.getFiles(
                     this.sortField ? this.sortField : DEFAULT_SORT_FIELD,
                     this.sortDirection ? this.sortDirection : DEFAULT_SORT_DIRECTION,
                     this.page ? this.page : DEFAULT_PAGE,
                     this.pageSize ? this.pageSize : PAGE_SIZE_DEFAULT,
                     this.query,
                     this._criterias
-                )
-            ]).then(
-                ([files]) => {
-                    resolve();
-                },
-                reject
-            );
-        });
+                );
     }
 
     /**
@@ -137,7 +99,7 @@ export class SearchEntityService implements Resolve<any> {
         query: string,
         criterias = [],
         onlyTags = false
-    ): Promise<any> {
+    ): Observable<DMEntity[]> {
 
         // TODO: enhance search requests history
         this.sortField = sortField;
@@ -147,57 +109,63 @@ export class SearchEntityService implements Resolve<any> {
         this.query = query;
         this._criterias = criterias;
 
-        return new Promise((resolve, reject) => {
-            console.log('inside Promise getFiles entity Service...');
-            if (!this.sessionService.sessionAlive) {
+        console.log('inside getFiles entity Service...');
+        /*if (!this.sessionService.sessionAlive) {
                 console.log('session not alive');
                 resolve([]);
-            } else {
+            }*/
 
 
-                // TODO: enhance sorfielf mapping:
+        // TODO: enhance sorfielf mapping:
 
-                const searchFieldMapping = {
-                    versionUpdateDate: 'DocumentVersionUpdateDate',
-                    lastUpdateAuthor: 'DocumentVersionLastUpdateAuthor',
-                    documentTypeName: 'DocumentTypeName',
-                    name: 'DocumentName',
-                    length: 'DocumentVersionLength'
-                };
+        const searchFieldMapping = {
+            versionUpdateDate: 'DocumentVersionUpdateDate',
+            lastUpdateAuthor: 'DocumentVersionLastUpdateAuthor',
+            documentTypeName: 'DocumentTypeName',
+            name: 'DocumentName',
+            length: 'DocumentVersionLength'
+        };
 
-                this.getSearchResponse(
-                    searchFieldMapping[sortField],
-                    sortDirection,
-                    page,
-                    pageSize,
-                    query,
-                    criterias
-                ).subscribe((response: any) => {
+        return this.getSearchResponse(
+            searchFieldMapping[sortField],
+            sortDirection,
+            page,
+            pageSize,
+            query,
+            criterias
+        ).pipe(
+            switchMap(
+                res => of(res).catch(error => of(error))
+            ),
+            catchError(error => {
+                console.log('we catched the error !');
+                console.log('getFiles( '
+                    + sortField
+                    + ' : string, '
+                    + sortDirection
+                    + ' : string, '
+                    + page
+                    + ' : number, '
+                    + pageSize
+                    + ' : number, '
+                    + query
+                    + ' : string, '
+                    + criterias
+                    + ' = [], '
+                    + onlyTags
+                    + ' = false)'
+                );
+                console.log(error);
+                return of([]);
+            }),
+            map(
+                response => {
                     console.log('loaded results', response);
                     this.handleFilesLoad(response, onlyTags);
-                    resolve(response.rows);
-                }, reject);
-            }
-        }).catch(function(error): void {
-            console.log('we catched the error !');
-            console.log('getFiles( '
-                + sortField
-                + ' : string, '
-                + sortDirection
-                + ' : string, '
-                + page
-                + ' : number, '
-                + pageSize
-                + ' : number, '
-                + query
-                + ' : string, '
-                + criterias
-                + ' = [], '
-                + onlyTags
-                + ' = false)'
-            );
-            console.log(error);
-        });
+                    return response.rows;
+                }
+            )
+        );
     }
 
     getSearchResponse(
@@ -234,15 +202,15 @@ export class SearchEntityService implements Resolve<any> {
         this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
     }
 
-    reloadFiles(): Promise<any> {
+    reloadFiles(): Observable<DMEntity[]> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
     }
 
-    reloadTags(): Promise<any> {
+    reloadTags(): Observable<DMEntity[]> {
         return this.getFiles(this.sortField, this.sortDirection, this.page, this.pageSize, this.query, this._criterias, true);
     }
 
-    searchInContent(content: string, criterias = []): Promise<any> {
+    searchInContent(content: string, criterias = []): Observable<DMEntity[]> {
         criterias.push({
             fieldName: 'DocumentBody',
             query: content,
@@ -251,7 +219,7 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 
-    searchWithFilters(content: string, filename: string, tagList: Tag[]): Promise<any> {
+    searchWithFilters(content: string, filename: string, tagList: Tag[]): Observable<DMEntity[]> {
         const criterias = new Array<Criteria>();
         if (content) {
             criterias.push({
@@ -278,7 +246,7 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 
-    searchInContentWithFacets(content: string, facetFields: string[]): Promise<any> {
+    searchInContentWithFacets(content: string, facetFields: string[]): Observable<DMEntity[]> {
         const criterias = facetFields.map(
             (field) => ({
                 facetField: field
@@ -353,11 +321,11 @@ export class SearchEntityService implements Resolve<any> {
         return array;
     }
 
-    public changePage(page, pageSize): Promise<any> {
+    public changePage(page, pageSize): Observable<DMEntity[]> {
         return this.getFiles(this.sortField, this.sortDirection, page, pageSize, this.query, this._criterias);
     }
 
-    public changeSort(sortField, sortDirection, page): Promise<any> {
+    public changeSort(sortField, sortDirection, page): Observable<DMEntity[]> {
         this.onSortChanged.next(sortField + ' ' + sortDirection);
         return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this._criterias);
     }

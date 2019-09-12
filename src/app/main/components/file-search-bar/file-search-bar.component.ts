@@ -150,7 +150,7 @@ export class FileSearchBarComponent implements OnInit {
                 this.searchParams.get('content').value,
                 this.searchParams.get('filename').value,
                 (this.searchParams.get('tagList') as FormArray).getRawValue().filter(e => e !== '')
-            );
+            ).subscribe();
         }
     }
 

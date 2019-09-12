@@ -67,7 +67,7 @@ export class FileSearchPanelComponent implements OnInit {
     ).subscribe(
         null,
         null,
-        () => this.searchEntityService.reloadFiles()
+        () => this.searchEntityService.reloadFiles().subscribe()
 
     );
   }
@@ -125,14 +125,19 @@ export class FileSearchPanelComponent implements OnInit {
           .subscribe(
               null,
               null,
-              () => this.searchEntityService.reloadFiles()
+              () => this.searchEntityService.reloadFiles().subscribe()
           );
     });
   }
 
   paginatorHandler($event: PageEvent): void {
-    this.searchEntityService.changePage($event.pageIndex, $event.pageSize);
-    this.pageIndex = $event.pageIndex;
-    this.pageSize = $event.pageSize;
+    this.searchEntityService.changePage($event.pageIndex, $event.pageSize).subscribe(
+        null,
+        null,
+        () => {
+          this.pageIndex = $event.pageIndex;
+          this.pageSize = $event.pageSize;
+        }
+    );
   }
 }

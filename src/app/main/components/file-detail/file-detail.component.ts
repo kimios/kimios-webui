@@ -147,7 +147,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 }
             );
 
-        this.documentTags$.subscribe(res => this.searchEntityService.reloadTags());
+        this.documentTags$.pipe(
+            tap(res => this.searchEntityService.reloadTags())
+        ).subscribe();
 
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
