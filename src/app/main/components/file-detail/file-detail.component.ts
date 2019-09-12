@@ -285,7 +285,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.filteredTags$ = this.initFilteredTags();
     }
 
-    goBack(): void {
+    goBack($event: MouseEvent): void {
+        $event.stopPropagation();
+        $event.preventDefault();
         this.location.back();
     }
 }
