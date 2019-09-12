@@ -129,7 +129,15 @@ export class SearchEntityService implements Resolve<any> {
      *
      * @returns {Promise<any>}
      */
-    getFiles(sortField: string, sortDirection: string, page: number, pageSize: number, query: string, criterias = [], onlyTags = false): Promise<any> {
+    getFiles(
+        sortField = DEFAULT_SORT_FIELD,
+        sortDirection = DEFAULT_SORT_DIRECTION,
+        page = DEFAULT_PAGE,
+        pageSize = PAGE_SIZE_DEFAULT,
+        query: string, criterias = [],
+        onlyTags = false
+    ): Promise<any> {
+
         this.sortField = sortField;
         this.sortDirection = sortDirection;
         this.pageSize = pageSize ? pageSize : this.pageSize;
@@ -177,6 +185,25 @@ export class SearchEntityService implements Resolve<any> {
                         resolve(response.rows);
                     }, reject);
             }
+        }).catch(function(error): void {
+            console.log('we catched the error !');
+            console.log('getFiles( '
+                + sortField
+                + ' : string, '
+                + sortDirection
+                + ' : string, '
+                + page
+                + ' : number, '
+                + pageSize
+                + ' : number, '
+                + query
+                + ' : string, '
+                + criterias
+                + ' = [], '
+                + onlyTags
+                + ' = false)'
+            );
+            console.log(error);
         });
     }
 
