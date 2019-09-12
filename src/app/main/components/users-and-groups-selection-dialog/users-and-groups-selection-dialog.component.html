@@ -3,7 +3,7 @@
     <users-and-groups-selection-panel [selectedUsersAndGroups]="selectedUsersAndGroups"></users-and-groups-selection-panel>
 
     <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
-        <button mat-button (click)="onNoClick()">No, Thanks</button>
-        <button mat-button (click)="submit()">Ok</button>
+        <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
+        <button mat-button (click)="onNoClick()"><mat-icon>cancel</mat-icon></button>
     </div>
 </div>
