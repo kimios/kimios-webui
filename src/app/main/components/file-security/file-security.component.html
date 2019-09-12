@@ -27,16 +27,17 @@
               mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
               class="{{col.class ? col.class : ''}}"
       ><mat-icon *ngIf="col.cellHeaderIcon" (click)="add()">{{col.cellHeaderIcon}}</mat-icon>{{col.displayName}}</mat-header-cell>
-      <mat-cell *matCellDef="let element; let i = index;" class="{{col.class ? col.class : ''}}" [formGroupName]="i" >
-          <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(element.index, $event)"> {{ col.cell }} </mat-icon>
+      <mat-cell
+              *matCellDef="let element; let i = index;"
+              class="{{col.class ? col.class : ''}}"
+              [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())"
+      >
+          <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(i, $event)"> {{ col.cell }} </mat-icon>
           <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
           <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
           <mat-checkbox
                   *ngIf="col.element === 'checkbox'"
-                  name="{{col.matColumnDef}}"
-                  [checked]="element[col.matColumnDef]"
-                  [value]="element[col.matColumnDef]"
-                  formControlName="{{col.matColumnDef}}">
+                  [formControlName]="col.matColumnDef">
           </mat-checkbox>
       </mat-cell>
     </ng-container>
@@ -51,7 +52,7 @@
   </mat-table>
 
         <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
-            <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
+            <button mat-button (click)="submit($event)"><mat-icon>check</mat-icon></button>
             <button mat-button (click)="cancel($event)"><mat-icon>cancel</mat-icon></button>
         </div>
 

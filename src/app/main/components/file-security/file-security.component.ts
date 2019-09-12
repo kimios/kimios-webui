@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {DMEntitySecurity, SecurityService, UpdateSecurityCommand} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
@@ -7,6 +7,17 @@ import {ColumnDescriptionWithElement} from 'app/main/model/column-description-wi
 import {MatDialog, MatTableDataSource} from '@angular/material';
 import {tap} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
+import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+
+export interface DialogData {
+    selectedUsersAndGroups: Array<UserOrGroup>;
+}
+
+const DMENTITYTYPE_DOCUMENT = 3;
+const enum SECURITY_ENTITY_TYPE {
+    USER = 1,
+    GROUP = 2
+}
 
 @Component({
   selector: 'file-security',
@@ -63,8 +74,10 @@ export class FileSecurityComponent implements OnInit {
   }
 
   deleteRow(rowIndex: number, event): void {
-    (this.dmEntitySecuritiesForm.get('formArray') as FormArray).removeAt(rowIndex);
-    event.target.closest('mat-row').remove();
+      this.dataSource.data.splice(rowIndex, 1);
+      const newData = this.dataSource.data.slice();
+      this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(newData));
+      this.dataSource.data = newData;
   }
 
     cancel($event: MouseEvent): void {
@@ -74,7 +87,7 @@ export class FileSecurityComponent implements OnInit {
     this.loadData().subscribe(
         res => {
           if (res && res.length > 0) {
-            this.dmEntitySecuritiesForm.setControl('formArray', this.createFormGroup(res));
+            this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(res));
           }
           this.dataSource.data = res;
           this.showSpinner = false;
@@ -87,20 +100,26 @@ export class FileSecurityComponent implements OnInit {
         dmSecurityRules.forEach( (security, index) =>
             fg.addControl(
                 index.toString(),
-                this.fb.group({
-                    'name': this.fb.control(security.name),
-                    'source': this.fb.control(security.source),
-                    'type': this.fb.control(security.type),
-                    'read': this.fb.control(security.read),
-                    'write': this.fb.control(security.write),
-                    'fullAccess': this.fb.control(security.fullAccess)
-                })
+                this.createSecurityFormGroup(security)
             )
         );
         return fg;
     }
 
-  submit(): void {
+    private createSecurityFormGroup(security: DMEntitySecurity): FormGroup {
+        return this.fb.group({
+            'name': security.name,
+            'source': security.source,
+            'type': security.type,
+            'read': security.read,
+            'write': security.write,
+            'fullAccess': security.fullAccess
+        });
+    }
+
+    submit($event: MouseEvent): void {
+        $event.stopPropagation();
+        $event.preventDefault();
       const updateSecurityCommand = <UpdateSecurityCommand> {
           sessionId: this.sessionService.sessionToken,
           dmEntityId: this.documentId,
@@ -108,8 +127,7 @@ export class FileSecurityComponent implements OnInit {
           securities: Object.keys((this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).controls).map(control =>
               <DMEntitySecurity> {
                   dmEntityUid: this.documentId,
-                  // document type is 3
-                  dmEntityType: 3,
+                  dmEntityType: DMENTITYTYPE_DOCUMENT,
                   name: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('name').value,
                   source: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('source').value,
                   fullName: '',
@@ -147,7 +165,38 @@ export class FileSecurityComponent implements OnInit {
     }
 
     private openAddDialog(): void {
-        const dialogRef = this.dialog.open(UsersAndGroupsSelectionDialogComponent, {});
+        const dialogRef = this.dialog.open(UsersAndGroupsSelectionDialogComponent, {
+            data: { selectedUsersAndGroups: new Array<UserOrGroup>() }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result !== true) {
+                return;
+            }
+
+            const newSecurities = dialogRef.componentInstance.data.selectedUsersAndGroups.map(userOrGroup =>
+                <DMEntitySecurity> {
+                    dmEntityUid: this.documentId,
+                    dmEntityType: DMENTITYTYPE_DOCUMENT,
+                    name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
+                    source: userOrGroup.element.source,
+                    fullName: userOrGroup.element.name,
+                    type: userOrGroup.type === 'user' ? SECURITY_ENTITY_TYPE.USER : SECURITY_ENTITY_TYPE.GROUP,
+                    read: false,
+                    write: false,
+                    fullAccess: false
+                });
+
+            this.loadData().subscribe(
+                res => {
+                    this.showSpinner = true;
+                    this.dataSource.data = this.dataSource.data.slice().concat(newSecurities);
+                    this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(this.dataSource.data));
+                    this.showSpinner = false;
+                }
+            );
+
+        });
     }
 }
 
@@ -192,7 +241,7 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
   {
     id: 'read',
     matColumnDef: 'read',
-    position: 2,
+    position: 4,
     matHeaderCellDef: 'read',
     sticky: false,
     displayName: 'read',
@@ -203,7 +252,7 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
   {
     id: 'write',
     matColumnDef: 'write',
-    position: 2,
+    position: 5,
     matHeaderCellDef: 'write',
     sticky: false,
     displayName: 'write',
@@ -214,7 +263,7 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
   {
     id: 'fullAccess',
     matColumnDef: 'fullAccess',
-    position: 2,
+    position: 6,
     matHeaderCellDef: 'fullAccess',
     sticky: false,
     displayName: 'full',

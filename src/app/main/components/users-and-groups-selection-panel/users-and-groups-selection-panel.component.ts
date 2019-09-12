@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {Group, User} from '../../../kimios-client-api';
-import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
+import {Component, Input, OnInit} from '@angular/core';
+import {Group, User} from 'app/kimios-client-api';
+import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {BehaviorSubject} from 'rxjs';
 
 export interface UserOrGroup {
@@ -15,13 +15,13 @@ export interface UserOrGroup {
 })
 export class UsersAndGroupsSelectionPanelComponent implements OnInit {
 
+  @Input()
   selectedUsersAndGroups: Array<UserOrGroup>;
   selectedUsersAndGroups$: BehaviorSubject<Array<UserOrGroup>>;
   groupListId = 'groupList';
   userListId = 'userList';
 
   constructor() {
-    this.selectedUsersAndGroups = new Array<UserOrGroup>();
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
   }
 
@@ -33,11 +33,4 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
     this.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
   }
 
-  submit(): void {
-
-  }
-
-  onNoClick(): void {
-
-  }
 }
