@@ -10,7 +10,7 @@ import {Observable} from 'rxjs';
 export class FileDetailDataComponent implements OnInit {
 
   @Input()
-  document$: Observable<KimiosDocument>;
+  document: KimiosDocument;
 
   constructor() {}
 
