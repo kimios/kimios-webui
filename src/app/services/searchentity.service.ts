@@ -220,7 +220,7 @@ export class SearchEntityService implements Resolve<any> {
     }
 
     searchWithFilters(content: string, filename: string, tagList: Tag[]): Observable<DMEntity[]> {
-        const criterias = new Array<Criteria>();
+        let criterias = new Array<Criteria>();
         if (content) {
             criterias.push({
                 fieldName: 'DocumentBody',
@@ -229,11 +229,7 @@ export class SearchEntityService implements Resolve<any> {
             });
         }
         if (filename) {
-            criterias.push({
-                fieldName: 'DocumentName',
-                query: filename,
-//            filterQuery: true
-            });
+            criterias = criterias.concat(this.filenameTermsToCriterias(filename));
         }
         if (tagList.length > 0) {
             tagList.forEach(tag => criterias.push({
@@ -258,24 +254,38 @@ export class SearchEntityService implements Resolve<any> {
     // extractFacets()
 
     searchDocumentsByName(searchTerm: string): Observable<SearchResponse> {
-        const criterias = [{
-            fieldName: 'DocumentName',
-            query: searchTerm,
-//            filterQuery: true
-        }];
+        const criterias = this.filenameTermsToCriterias(searchTerm);
 
         return this.searchService.advancedSearchDocuments(
             this.sessionService.sessionToken,
             0,
             25,
             'DocumentName',
-            '',
+            'asc',
             null,
             -1,
             false,
             criterias,
             null,
             false
+        );
+    }
+
+    private filenameTermsToCriterias(searchTerm: string): Criteria[] {
+        return searchTerm.split(' ')
+            .filter(w => w.length > 2)
+            .map(w => ({
+                fieldName: 'DocumentName',
+                query: w,
+//            filterQuery: true
+            }));
+    }
+
+    searchDocumentsNames(searchTerm: string): Observable<Array<string>> {
+        return this.searchDocumentsByName(searchTerm).pipe(
+            map(
+                res => res.rows.map(dmEntity => dmEntity.name)
+            )
         );
     }
 

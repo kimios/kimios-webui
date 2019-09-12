@@ -1,9 +1,9 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {Observable, of, ReplaySubject, Subject} from 'rxjs';
-import {TagService} from '../../../services/tag.service';
-import {SearchEntityService} from '../../../services/searchentity.service';
-import {map, startWith} from 'rxjs/operators';
+import {TagService} from 'app/services/tag.service';
+import {SearchEntityService} from 'app/services/searchentity.service';
+import {concatMap, map, startWith} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
@@ -34,7 +34,7 @@ export class FileSearchBarComponent implements OnInit {
 
     tagFilter = new FormControl('');
 
-    filenames$: Observable<string>;
+    filenames$: Observable<string[]>;
     terms$: Observable<string>;
     tags$: Observable<Tag[]>;
     tags: Tag[];
@@ -73,6 +73,7 @@ export class FileSearchBarComponent implements OnInit {
         }, {
             validators: searchParamsValidator
         });
+        this.filenames$ = new Observable<string[]>();
     }
 
     ngOnInit(): void {
@@ -130,6 +131,14 @@ export class FileSearchBarComponent implements OnInit {
                     this.selectedTags.splice(index, 1);
                 }
             }
+        );
+
+        this.filenames$ = this.searchParams.get('filename').valueChanges.pipe(
+            concatMap(
+                term => typeof term === 'string' && term.length > 2 ?
+                    this.searchEntityService.searchDocumentsNames(term) :
+                    []
+            )
         );
     }
 
