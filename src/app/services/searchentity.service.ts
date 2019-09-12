@@ -8,8 +8,8 @@ import {concatMap, map} from 'rxjs/operators';
 import {Tag} from '../main/model/tag';
 
 export const PAGE_SIZE_DEFAULT = 20;
-const DEFAULT_SORT_FIELD = 'DocumentName';
-const DEFAULT_SORT_DIRECTION = 'asc';
+const DEFAULT_SORT_FIELD = 'versionUpdateDate';
+const DEFAULT_SORT_DIRECTION = 'desc';
 const DEFAULT_PAGE = 0;
 
 @Injectable({
@@ -134,10 +134,12 @@ export class SearchEntityService implements Resolve<any> {
         sortDirection = DEFAULT_SORT_DIRECTION,
         page = DEFAULT_PAGE,
         pageSize = PAGE_SIZE_DEFAULT,
-        query: string, criterias = [],
+        query: string,
+        criterias = [],
         onlyTags = false
     ): Promise<any> {
 
+        // TODO: enhance search requests history
         this.sortField = sortField;
         this.sortDirection = sortDirection;
         this.pageSize = pageSize ? pageSize : this.pageSize;
@@ -163,27 +165,18 @@ export class SearchEntityService implements Resolve<any> {
                     length: 'DocumentVersionLength'
                 };
 
-                this.tagService.loadTagsRaw()
-                    .pipe(
-                        map(
-                            (tagList) => tagList.map((field) => ({
-                                fieldName: TAG_META_DATA_PREFIX + field.uid,
-                                faceted: true
-                            }))
-                        )
-                    )
-                    .pipe(
-                        concatMap(
-                            (res) =>
-                                this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
-                                page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias.concat(res), null, false)
-                        )
-                    )
-                    .subscribe((response: any) => {
-                        console.log('loaded results', response);
-                        this.handleFilesLoad(response, onlyTags);
-                        resolve(response.rows);
-                    }, reject);
+                this.getSearchResponse(
+                    searchFieldMapping[sortField],
+                    sortDirection,
+                    page,
+                    pageSize,
+                    query,
+                    criterias
+                ).subscribe((response: any) => {
+                    console.log('loaded results', response);
+                    this.handleFilesLoad(response, onlyTags);
+                    resolve(response.rows);
+                }, reject);
             }
         }).catch(function(error): void {
             console.log('we catched the error !');
@@ -205,6 +198,31 @@ export class SearchEntityService implements Resolve<any> {
             );
             console.log(error);
         });
+    }
+
+    getSearchResponse(
+        sortField = DEFAULT_SORT_FIELD,
+        sortDirection = DEFAULT_SORT_DIRECTION,
+        page = DEFAULT_PAGE,
+        pageSize = PAGE_SIZE_DEFAULT,
+        query: string, criterias = []
+    ): Observable<SearchResponse> {
+        return this.tagService.loadTagsRaw()
+            .pipe(
+                map(
+                    (tagList) => tagList.map((field) => ({
+                        fieldName: TAG_META_DATA_PREFIX + field.uid,
+                        faceted: true
+                    }))
+                )
+            )
+            .pipe(
+                concatMap(
+                    (res) =>
+                        this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
+                            page * pageSize, pageSize, sortField, sortDirection, null, -1, false, criterias.concat(res), null, false)
+                )
+            );
     }
 
     handleFilesLoad(response: any, onlyTags: boolean): void {
