@@ -27,7 +27,7 @@ import { ConverterDescriptor } from '../model/converterDescriptor';
 @Injectable()
 export class ConverterService {
 
-    protected basePath = 'http://localhost/rest/';
+    protected basePath = 'http://localhost/rest';
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 
@@ -110,7 +110,7 @@ export class ConverterService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<any>(`${this.basePath}/convertDocument`,
+        return this.httpClient.get<any>(`${this.basePath}/converter/convertDocument`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
@@ -170,7 +170,7 @@ export class ConverterService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<string>(`${this.basePath}/convertDocumentUrlOnly`,
+        return this.httpClient.get<string>(`${this.basePath}/converter/convertDocumentUrlOnly`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
