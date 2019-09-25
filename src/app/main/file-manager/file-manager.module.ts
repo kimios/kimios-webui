@@ -53,6 +53,7 @@ import {FileDetailDataComponent} from 'app/main/components/file-detail-data/file
 import {UsersGroupsSearchPanelComponent} from 'app/main/components/users-groups-search-panel/users-groups-search-panel.component';
 import {UsersAndGroupsSelectionPanelComponent} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
+import {FilePreviewComponent} from 'app/main/components/file-preview/file-preview.component';
 
 
 @NgModule({
@@ -76,7 +77,8 @@ import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-
         FileDetailDataComponent,
         UsersGroupsSearchPanelComponent,
         UsersAndGroupsSelectionPanelComponent,
-        UsersAndGroupsSelectionDialogComponent
+        UsersAndGroupsSelectionDialogComponent,
+        FilePreviewComponent
     ],
     imports: [
         FileManagerRoutingModule,

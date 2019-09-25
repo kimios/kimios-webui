@@ -7,97 +7,107 @@
     <div class="content">
 
 <!-- File details -->
-<div *ngIf="documentData$ | async as data">
+        <div *ngIf="documentData$ | async as data">
 
-    <span id="docTitle">{{data.name + (data.extension ? '.' + data.extension : '')}}</span>
+            <span id="docTitle">{{data.name + (data.extension ? '.' + data.extension : '')}}</span>
 
-    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+            <div fxLayout="row" fxLayoutAlign="space-between start">
 
-    <mat-tab-group dynamicHeight>
-        <mat-tab label="Data">
+                <div style="margin-right: 20px">
 
-    <!-- file properties : name, type, size, author, creation date -->
-            <file-detail-data [document]="data"></file-detail-data>
+                    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
 
-    <!-- tags -->
-    <div>
-        <mat-form-field style="width: 100%;" *ngIf="canWrite$ | async; else elseBlockTags">
-            <mat-chip-list #chipList>
-                <mat-chip
-                        *ngFor="let tag of documentTags$ | async"
-                        [selectable]="selectable"
-                        [removable]="removable"
-                        (removed)="remove(tag)">
-                    {{tag.name}}
-                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                </mat-chip>
-                <input
-                        placeholder="Tags"
-                        #tagInput
-                        [formControl]="tagCtrl"
-                        [matAutocomplete]="auto"
-                        [matChipInputFor]="chipList"
-                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="addOnBlur"
-                        (matChipInputTokenEnd)="createAndAddTag($event)">
-            </mat-chip-list>
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
-                    {{tag.name}}
-                </mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-        <ng-template #elseBlockTags>
-            <mat-chip-list #chipList>
-                <mat-chip
-                        *ngFor="let tag of documentTags$ | async"
-                        [selectable]="false"
-                        [removable]="false"
-                        (removed)="remove(tag)">
-                    {{tag.name}}
-                </mat-chip>
-            </mat-chip-list>
-        </ng-template>
-    </div>
+                    <mat-tab-group dynamicHeight>
+                        <mat-tab label="Data">
 
-        </mat-tab>
+                            <!-- file properties : name, type, size, author, creation date -->
+                            <file-detail-data [document]="data"></file-detail-data>
 
-    <!-- file versions -->
-<!--    <div *ngIf="documentVersions$ | async as versions">-->
+                            <!-- tags -->
+                            <div>
+                                <mat-form-field style="width: 100%;" *ngIf="canWrite$ | async; else elseBlockTags">
+                                    <mat-chip-list #chipList>
+                                        <mat-chip
+                                                *ngFor="let tag of documentTags$ | async"
+                                                [selectable]="selectable"
+                                                [removable]="removable"
+                                                (removed)="remove(tag)">
+                                            {{tag.name}}
+                                            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                                        </mat-chip>
+                                        <input
+                                                placeholder="Tags"
+                                                #tagInput
+                                                [formControl]="tagCtrl"
+                                                [matAutocomplete]="auto"
+                                                [matChipInputFor]="chipList"
+                                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                                [matChipInputAddOnBlur]="addOnBlur"
+                                                (matChipInputTokenEnd)="createAndAddTag($event)">
+                                    </mat-chip-list>
+                                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                                        <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+                                            {{tag.name}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                                <ng-template #elseBlockTags>
+                                    <mat-chip-list #chipList>
+                                        <mat-chip
+                                                *ngFor="let tag of documentTags$ | async"
+                                                [selectable]="false"
+                                                [removable]="false"
+                                                (removed)="remove(tag)">
+                                            {{tag.name}}
+                                        </mat-chip>
+                                    </mat-chip-list>
+                                </ng-template>
+                            </div>
 
-        <mat-tab *ngIf="documentVersions$ | async as versions" [disabled]="versions.length <= 1" label="Versions">
+                        </mat-tab>
 
-        <!--<div *ngIf="versions.length > 1; else versionsElseBlock">
+                        <!-- file versions -->
+                        <!--    <div *ngIf="documentVersions$ | async as versions">-->
+
+                        <mat-tab *ngIf="documentVersions$ | async as versions" [disabled]="versions.length <= 1" label="Versions">
+
+                            <!--<div *ngIf="versions.length > 1; else versionsElseBlock">
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
-                <mat-list>
-                    <mat-list-item *ngFor="let version of versions">
-                        <mat-icon mat-list-icon
-                                  (click)="handleVersionDownload(version.uid)">
-                            cloud_download
-                        </mat-icon>
-                        <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
-                    </mat-list-item>
-                </mat-list>
-            <!--</mat-expansion-panel>
+                            <mat-list>
+                                <mat-list-item *ngFor="let version of versions">
+                                    <mat-icon mat-list-icon
+                                              (click)="handleVersionDownload(version.uid)">
+                            <cloud_download></cloud_download>
+                                    </mat-icon>
+                                    <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
+                                </mat-list-item>
+                            </mat-list>
+                            <!--</mat-expansion-panel>
         </div>
         <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
 -->
-        </mat-tab>
+                        </mat-tab>
 
-        <mat-tab label="Security">
-            <file-security [documentId]="documentId"></file-security>
-        </mat-tab>
-    </mat-tab-group>
-<!--    </div>-->
+                        <mat-tab label="Security">
+                            <file-security [documentId]="documentId"></file-security>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <!--    </div>-->
+
+                </div>
+
+                <div>
+                    <file-preview [documentId]="documentId"></file-preview>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
-
-</div>
-
-</div>
-
-
 
