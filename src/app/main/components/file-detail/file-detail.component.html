@@ -80,7 +80,7 @@
                                 <mat-list-item *ngFor="let version of versions">
                                     <mat-icon mat-list-icon
                                               (click)="handleVersionDownload(version.uid)">
-                            <cloud_download></cloud_download>
+                                        cloud_download
                                     </mat-icon>
                                     <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
                                 </mat-list-item>
