@@ -6,6 +6,7 @@ import {SessionService} from './session.service';
 import {TagService} from './tag.service';
 import {Tag} from 'app/main/model/tag';
 import {APP_CONFIG} from 'app/app-config/config';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 
 @Injectable({
@@ -17,7 +18,8 @@ export class DocumentDetailService {
       private documentService: DocumentService,
       private documentVersionService: DocumentVersionService,
       private sessionService: SessionService,
-      private filetransferService: FiletransferService
+      private filetransferService: FiletransferService,
+      private sanitizer: DomSanitizer
   ) {
 
   }
@@ -61,5 +63,21 @@ export class DocumentDetailService {
               window.open(link.href);
           }
       );
+  }
+
+  makeDownloadLink(documentVersionId: number): Observable<SafeResourceUrl> {
+      return this.startDownloadTransaction(documentVersionId)
+          .pipe(
+              map(
+                  res => this.sanitizer.bypassSecurityTrustResourceUrl(
+                      APP_CONFIG.KIMIOS_API_BASE_PATH
+                      + '/filetransfer/downloadDocumentVersion?sessionId='
+                      + this.sessionService.sessionToken
+                      + '&transactionId='
+                      + res.uid
+                      + '&inline=true'
+                  )
+              )
+          );
   }
 }

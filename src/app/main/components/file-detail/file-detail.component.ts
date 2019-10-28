@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Inject, Input, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
@@ -12,7 +12,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
-import { Location } from '@angular/common';
+import { Location, formatDate } from '@angular/common';
 
 @Component({
   selector: 'file-detail',
@@ -37,6 +37,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     createdTagName: string;
     canWrite$: Observable<boolean>;
     hasFullAccess$: Observable<boolean>;
+    previewTitle$: Observable<string>;
 
     visible = true;
     selectable = true;
@@ -61,7 +62,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private searchEntityService: SearchEntityService,
         private documentRefreshService: DocumentRefreshService,
         private securityService: SecurityService,
-        private location: Location
+        private location: Location,
+        @Inject(LOCALE_ID) private locale: string
     ) {
         this.allTags$ = this.tagService.loadTags()
             .pipe(
@@ -74,6 +76,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.canWrite$ = new Observable<boolean>();
         this.hasFullAccess$ = new Observable<boolean>();
         this.loading$ = of(true);
+        this.previewTitle$ = new Observable<string>();
     }
 
     ngOnInit(): void {
@@ -99,8 +102,19 @@ export class FileDetailComponent implements OnInit, OnDestroy {
             );
 
         this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
-            .map(
-                res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
+            .pipe(
+                map(
+                    res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
+                ),
+                tap(
+                    res => this.previewTitle$ = of(
+                        (res instanceof Array) ?
+                            (res.length === 0) ?
+                                'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
+                                this.makePreviewTitle(0, res) :
+                            'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
+                    )
+                )
             );
 
         this.filteredTags$ = this.initFilteredTags();
@@ -154,6 +168,37 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
         );
+    }
+
+    makePreviewTitle(versionId: number, versions: Array<DocumentVersion>): string {
+        let version = versions[versions.length - 1];
+        versions.sort((a, b) => (a.modificationDate < b.modificationDate) ? -1 : 1);
+        switch (versionId) {
+            case null:
+            case 0:
+                version = versions[versions.length - 1];
+                break;
+
+            case -1:
+                version = versions[0];
+                break;
+
+            default:
+                version = versions.filter(v => v.uid === versionId)[0];
+        }
+
+        let title = '';
+        if (versions.length === 1) {
+            title = 'Unique version, created on ' + formatDate(version.modificationDate, 'longDate', this.locale);
+        } else {
+            const versionIndexStr = versions.indexOf(version) + 1 + ' of ' + (versions.length + 1)
+            title = 'Version '
+            + (version.customVersion != null) ?
+                version.customVersion + '(' + versionIndexStr + ')' :
+                versionIndexStr;
+        }
+
+        return title;
     }
 
     ngOnDestroy(): void {

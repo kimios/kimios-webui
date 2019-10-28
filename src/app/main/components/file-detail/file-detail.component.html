@@ -99,8 +99,19 @@
 
                 </div>
 
-                <div>
-                    <file-preview [documentId]="documentId"></file-preview>
+                <div fxLayout="column" fxLayoutAlign="start start">
+                    <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%;">
+                        <div><mat-icon>navigate_before</mat-icon></div>
+                        <div style="text-align: center">{{previewTitle$ | async}}</div>
+                        <div><mat-icon>navigate_next</mat-icon></div>
+                    </div>
+                    <div>
+                        <file-preview
+                                [documentId]="documentId"
+                                [documentExtension]="document.extension"
+                                [documentVersionId]="document.lastVersionId"
+                        ></file-preview>
+                    </div>
                 </div>
 
             </div>
