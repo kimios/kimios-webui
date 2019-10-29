@@ -26,6 +26,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     document: KimiosDocument;
     documentData$: Observable<KimiosDocument>;
     documentVersions$: Observable<Array<DocumentVersion>>;
+    documentVersions: Array<DocumentVersion>;
     allTags$: Observable<Tag[]>;
     allTags: Tag[];
     documentTags$: BehaviorSubject<Tag[]>;
@@ -37,7 +38,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     createdTagName: string;
     canWrite$: Observable<boolean>;
     hasFullAccess$: Observable<boolean>;
-    previewTitle$: Observable<string>;
+    previewTitle: string;
+    currentVersionId: number;
 
     visible = true;
     selectable = true;
@@ -76,7 +78,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.canWrite$ = new Observable<boolean>();
         this.hasFullAccess$ = new Observable<boolean>();
         this.loading$ = of(true);
-        this.previewTitle$ = new Observable<string>();
+        this.previewTitle = '';
+        this.currentVersionId = 0;
+        this.documentVersions = new Array<DocumentVersion>();
     }
 
     ngOnInit(): void {
@@ -89,6 +93,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                tap(res => this.currentVersionId = res.lastVersionId),
                 tap(res => this.document = res),
                 tap(res => this.loading$ = of(false))
             );
@@ -98,21 +103,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 next => this.documentTags$.next(next)
             );
 
-        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
-            .pipe(
-                map(
-                    res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
-                ),
-                tap(
-                    res => this.previewTitle$ = of(
-                        (res instanceof Array) ?
-                            (res.length === 0) ?
-                                'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
-                                this.makePreviewTitle(0, res) :
-                            'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
-                    )
-                )
-            );
+        this.documentVersions$ = this.initDocumentVersions();
 
         this.filteredTags$ = this.initFilteredTags();
 
@@ -167,28 +158,48 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         );
     }
 
+    initDocumentVersions(): Observable<Array<DocumentVersion>> {
+        return this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
+            .pipe(
+                map(
+                    res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
+                ),
+                tap(
+                    res => this.previewTitle =
+                        (res instanceof Array) ?
+                            (res.length === 0) ?
+                                'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
+                                this.makePreviewTitle(this.currentVersionId, res) :
+                            'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
+                ),
+                tap(
+                    res => this.documentVersions = res
+                )
+            );
+    }
+
     makePreviewTitle(versionId: number, versions: Array<DocumentVersion>): string {
         let version = versions[versions.length - 1];
-        versions.sort((a, b) => (a.modificationDate < b.modificationDate) ? -1 : 1);
+        const sortedVersions = versions.slice().sort((a, b) => (a.modificationDate < b.modificationDate) ? -1 : 1);
         switch (versionId) {
             case null:
             case 0:
-                version = versions[versions.length - 1];
+                version = sortedVersions[sortedVersions.length - 1];
                 break;
 
             case -1:
-                version = versions[0];
+                version = sortedVersions[0];
                 break;
 
             default:
-                version = versions.filter(v => v.uid === versionId)[0];
+                version = sortedVersions.filter(v => v.uid === versionId)[0];
         }
 
         let title = '';
-        if (versions.length === 1) {
+        if (sortedVersions.length === 1) {
             title = 'Unique version, created on ' + formatDate(version.modificationDate, 'longDate', this.locale);
         } else {
-            const versionIndexStr = (versions.indexOf(version) + 1) + ' of ' + (versions.length);
+            const versionIndexStr = (sortedVersions.indexOf(version) + 1) + ' of ' + (sortedVersions.length);
             title = 'Version '
             + ((version.customVersion !== null) ?
                 version.customVersion + '(' + versionIndexStr + ')' :
@@ -321,10 +332,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 next => this.documentTags$.next(next)
             );
 
-        this.documentVersions$ = this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
-            .map(
-                res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
-            );
+        this.documentVersions$ = this.initDocumentVersions();
 
         this.filteredTags$ = this.initFilteredTags();
     }
@@ -333,5 +341,10 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         $event.stopPropagation();
         $event.preventDefault();
         this.location.back();
+    }
+
+    handleVersionPreview(uid: number): void {
+        this.previewTitle = this.makePreviewTitle(uid, this.documentVersions);
+        this.currentVersionId = uid;
     }
 }

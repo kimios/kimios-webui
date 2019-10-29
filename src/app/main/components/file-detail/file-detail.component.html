@@ -78,9 +78,13 @@
                 </mat-expansion-panel-header>-->
                             <mat-list>
                                 <mat-list-item *ngFor="let version of versions">
-                                    <mat-icon mat-list-icon
+                                    <mat-icon mat-list-icon class="cursor-pointer"
                                               (click)="handleVersionDownload(version.uid)">
                                         cloud_download
+                                    </mat-icon>
+                                    <mat-icon mat-list-icon class="cursor-pointer"
+                                              (click)="handleVersionPreview(version.uid)">
+                                        visibility
                                     </mat-icon>
                                     <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
                                 </mat-list-item>
@@ -101,15 +105,15 @@
 
                 <div fxLayout="column" fxLayoutAlign="start start">
                     <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%;">
-                        <div><mat-icon>navigate_before</mat-icon></div>
-                        <div style="text-align: center">{{previewTitle$ | async}}</div>
-                        <div><mat-icon>navigate_next</mat-icon></div>
+                        <div><mat-icon class="cursor-pointer">navigate_before</mat-icon></div>
+                        <div style="text-align: center">{{previewTitle}}</div>
+                        <div><mat-icon class="cursor-pointer">navigate_next</mat-icon></div>
                     </div>
                     <div>
                         <file-preview
                                 [documentId]="documentId"
                                 [documentExtension]="document.extension"
-                                [documentVersionId]="document.lastVersionId"
+                                [documentVersionId]="currentVersionId"
                         ></file-preview>
                     </div>
                 </div>

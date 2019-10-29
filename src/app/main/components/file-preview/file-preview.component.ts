@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChange} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {ConverterService, FiletransferService} from 'app/kimios-client-api';
 import {environment} from 'environments/environment';
@@ -13,7 +13,7 @@ import {DocumentUtils} from 'app/main/utils/document-utils';
   templateUrl: './file-preview.component.html',
   styleUrls: ['./file-preview.component.scss']
 })
-export class FilePreviewComponent implements OnInit {
+export class FilePreviewComponent implements OnInit, OnChanges {
 
   @Input()
   documentId: number;
@@ -92,6 +92,12 @@ export class FilePreviewComponent implements OnInit {
         (this.documentExtension.toLowerCase() === 'pdf' || DocumentUtils.extensionIsImg(this.documentExtension.toLowerCase())) ?
             this.documentDetailService.makeDownloadLink(this.documentVersionId) :
             of('');
+  }
+
+  ngOnChanges(changes: {[propKey: string]: SimpleChange}): void {
+    if (changes['documentVersionId'] !== null) {
+      this.ngOnInit();
+    }
   }
 
   private makeApiCallForPreview(docId: number): SafeResourceUrl {

@@ -1,16 +1,14 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {DocumentService} from 'app/kimios-client-api';
-import {BehaviorSubject, combineLatest, forkJoin, from, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, forkJoin, from, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
-import {catchError, concatMap, map, mergeAll, switchMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
-import {isNumeric} from 'rxjs/internal-compatibility';
 import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
-import {updateContextWithBindings} from '@angular/core/src/render3/styling/class_and_style_bindings';
 
 
 interface TagJob {
@@ -71,36 +69,40 @@ export class FileUploadService {
 
         this.uploadFinished$.subscribe(
             next => {
-                from(next).pipe(
-                    map(
-                        uploadId => {
-                            const index = this.uploadingFiles.indexOf(uploadId);
-                            if (index > -1) {
-                                this.uploadingFiles.splice(index, 1);
+                if (next !== undefined) {
+                    from(next).pipe(
+                        map(
+                            uploadId => {
+                                const index = this.uploadingFiles.indexOf(uploadId);
+                                if (index > -1) {
+                                    this.uploadingFiles.splice(index, 1);
+                                }
+                                return uploadId;
                             }
-                            return uploadId;
-                        }
-                    ),
-                    concatMap(
-                        uploadId => {
-                            return combineLatest(
-                                of(uploadId),
-                                (this.filesProgress.get(uploadId) !== undefined &&
-                                    this.filesProgress.get(uploadId).getValue().status === 'done') ?
-                                    this.tagFile(Number(uploadId), this.allUploads.get(uploadId)[7]) :
-                                    of([])
-                            );
-                        }
-                    ),
-                    concatMap(
-                        ([uploadId, tags]) => {
-                            if (tags.length > 0) {
-                                this.filesUploaded.get(uploadId).next(tags);
+                        ),
+                        concatMap(
+                            uploadId => {
+                                return combineLatest(
+                                    of(uploadId),
+                                    (this.filesProgress.get(uploadId) !== undefined &&
+                                        this.filesProgress.get(uploadId).getValue().status === 'done') ?
+                                        this.tagFile(Number(uploadId), this.allUploads.get(uploadId)[7]) :
+                                        of([])
+                                );
                             }
-                            return uploadId;
-                        }
-                    )
-                );
+                        ),
+                        concatMap(
+                            ([uploadId, tags]) => {
+                                if (tags.length > 0) {
+                                    this.filesUploaded.get(uploadId).next(tags);
+                                }
+                                return uploadId;
+                            }
+                        )
+                    );
+                } else {
+                    return of();
+                }
             }
         );
     }
