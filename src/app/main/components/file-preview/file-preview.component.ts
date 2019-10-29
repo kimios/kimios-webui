@@ -94,7 +94,7 @@ export class FilePreviewComponent implements OnInit {
         (res) => content += res,
         (error) => null,
         () => this.fileCompleteContent$ = of(content)
-    )
+    );
 
     this.link$ = this.docNeedsConversionToPdf(this.documentExtension) ?
         of(this.makeApiCallForPreview(this.documentId)) :
@@ -105,7 +105,7 @@ export class FilePreviewComponent implements OnInit {
 
   private makeApiCallForPreview(docId: number): SafeResourceUrl {
     let link = environment.apiPath;
-    link += '/services/rest/converter/convertDocument'
+    link += '/services/rest/converter/convertDocument';
     link += '?';
     link += 'sessionId=' + this.sessionService.sessionToken;
     link += '&';
