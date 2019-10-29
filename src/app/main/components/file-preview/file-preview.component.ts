@@ -6,16 +6,7 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {Observable, of} from 'rxjs';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-
-const textExtensions = ['txt', 'java', 'cs', 'js', 'cpp', 'c', 'cc', 'html', 'log', 'sql', 'py', 'xml', 'java', 'eml', 'pl', 'caml'
-  , 'css', 'scss', 'sh', 'bat'];
-const extensionsToBeConvertedToPdf = ['odt', 'odp', 'xls', 'xlsx', 'docx', 'doc'];
-const imgExtensions = ['png', 'jpg', 'jpeg', 'tif', 'tiff', 'gif', 'pdf'];
-
-const viewableExtensions = ['asciidoc', 'adoc', 'ps']
-    .concat(textExtensions)
-    .concat(extensionsToBeConvertedToPdf)
-    .concat(imgExtensions);
+import {DocumentUtils} from 'app/main/utils/document-utils';
 
 @Component({
   selector: 'file-preview',
@@ -98,7 +89,7 @@ export class FilePreviewComponent implements OnInit {
 
     this.link$ = this.docNeedsConversionToPdf(this.documentExtension) ?
         of(this.makeApiCallForPreview(this.documentId)) :
-        (this.documentExtension.toLowerCase() === 'pdf' || imgExtensions.includes(this.documentExtension.toLowerCase())) ?
+        (this.documentExtension.toLowerCase() === 'pdf' || DocumentUtils.extensionIsImg(this.documentExtension.toLowerCase())) ?
             this.documentDetailService.makeDownloadLink(this.documentVersionId) :
             of('');
   }
@@ -121,14 +112,14 @@ export class FilePreviewComponent implements OnInit {
   }
 
   private docIsTextFormat(docExtension: string): boolean {
-    return textExtensions.includes(docExtension.toLowerCase());
+    return DocumentUtils.extensionIsText(docExtension);
   }
 
   private docNeedsConversionToPdf(docExtension: string): boolean {
-    return extensionsToBeConvertedToPdf.includes(docExtension.toLowerCase());
+      return DocumentUtils.extensionHasToBeConvertedToPdf(docExtension.toLowerCase());
   }
 
   private docIsImg(docExtension: string): boolean {
-    return imgExtensions.includes(docExtension.toLowerCase());
+      return DocumentUtils.extensionIsImg(docExtension.toLowerCase());
   }
 }
