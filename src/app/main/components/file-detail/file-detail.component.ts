@@ -188,11 +188,11 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         if (versions.length === 1) {
             title = 'Unique version, created on ' + formatDate(version.modificationDate, 'longDate', this.locale);
         } else {
-            const versionIndexStr = versions.indexOf(version) + 1 + ' of ' + (versions.length + 1)
+            const versionIndexStr = (versions.indexOf(version) + 1) + ' of ' + (versions.length);
             title = 'Version '
-            + (version.customVersion != null) ?
+            + ((version.customVersion !== null) ?
                 version.customVersion + '(' + versionIndexStr + ')' :
-                versionIndexStr;
+                versionIndexStr);
         }
 
         return title;
