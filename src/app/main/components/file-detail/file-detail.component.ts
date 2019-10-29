@@ -86,10 +86,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
         this.documentData$ = this.allTags$
             .pipe(
-                concatMap(res => {
-                    this.loading$ = of(true);
-                    return res;
-                }),
+                tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
                 tap(res => this.document = res),
