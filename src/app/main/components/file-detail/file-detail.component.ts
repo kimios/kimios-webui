@@ -14,6 +14,11 @@ import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
 import { Location, formatDate } from '@angular/common';
 
+export enum Direction {
+    NEXT = 1,
+    PREVIOUS = -1
+}
+
 @Component({
   selector: 'file-detail',
   templateUrl: './file-detail.component.html',
@@ -27,6 +32,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     documentData$: Observable<KimiosDocument>;
     documentVersions$: Observable<Array<DocumentVersion>>;
     documentVersions: Array<DocumentVersion>;
+    documentVersionIds: Array<number>;
     allTags$: Observable<Tag[]>;
     allTags: Tag[];
     documentTags$: BehaviorSubject<Tag[]>;
@@ -50,6 +56,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     loading$: Observable<boolean>;
     spinnerColor = 'primary';
     spinnerMode = 'indeterminate';
+
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -81,6 +88,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.previewTitle = '';
         this.currentVersionId = 0;
         this.documentVersions = new Array<DocumentVersion>();
+        this.documentVersionIds = new Array<number>();
     }
 
     ngOnInit(): void {
@@ -174,6 +182,11 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 ),
                 tap(
                     res => this.documentVersions = res
+                ),
+                tap(
+                    res => this.documentVersionIds = this.documentVersions.slice()
+                        .sort((a, b) => a.modificationDate < b.modificationDate ? -1 : 1)
+                        .map(version => version.uid)
                 )
             );
     }
@@ -346,5 +359,46 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     handleVersionPreview(uid: number): void {
         this.previewTitle = this.makePreviewTitle(uid, this.documentVersions);
         this.currentVersionId = uid;
+    }
+
+    handleVersionPreviewNextOrPrev(direction: Direction): void {
+        if (
+            (direction === Direction.PREVIOUS && this.currentVersionIsFirst())
+            || (direction === Direction.NEXT && this.currentVersionIsLast())
+        ) {
+            return;
+        }
+        const uid = this.computeVersionUidToDisplay(this.currentVersionId, this.documentVersions, direction);
+        this.handleVersionPreview(uid);
+    }
+
+    private computeVersionUidToDisplay(currentVersionId: number, documentVersions: Array<DocumentVersion>, direction: Direction): number {
+        let curVersionIndex = -1;
+        documentVersions = documentVersions.slice().sort((a, b) => a.modificationDate < b.modificationDate ? -1 : 1);
+        documentVersions.forEach((version, index) => {
+            if (version.uid === currentVersionId) {
+                curVersionIndex = index;
+            }
+        });
+
+        const nbVersions = documentVersions.length;
+        let versionSelected: DocumentVersion;
+        if (direction === Direction.NEXT && curVersionIndex < (nbVersions - 1)) {
+                versionSelected = documentVersions[curVersionIndex + 1];
+        } else {
+            if (direction === Direction.PREVIOUS && curVersionIndex > 0) {
+                versionSelected = documentVersions[curVersionIndex - 1];
+            }
+        }
+
+        return versionSelected.uid;
+    }
+
+    currentVersionIsLast(): boolean {
+        return (this.documentVersionIds.indexOf(this.currentVersionId) === this.documentVersionIds.length - 1);
+    }
+
+    currentVersionIsFirst(): boolean {
+        return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
     }
 }

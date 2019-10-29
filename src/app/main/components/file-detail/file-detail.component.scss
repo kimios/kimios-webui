@@ -17,3 +17,20 @@
 #docTitle {
   font-size: 50px;
 }
+
+.disabledIcon {
+  opacity: 40%;
+  cursor: default;
+}
+
+#versionList > mat-list-item:hover {
+  background-color: #e3e6e6;
+}
+
+#versionList > mat-list-item.selected {
+  background-color: #cacdcd;
+}
+
+#versionList > mat-list-item mat-icon:hover {
+  background-color: #039be5
+}

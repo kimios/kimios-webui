@@ -76,14 +76,17 @@
                 <mat-expansion-panel-header>
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
-                            <mat-list>
-                                <mat-list-item *ngFor="let version of versions">
-                                    <mat-icon mat-list-icon class="cursor-pointer"
+                            <mat-list id="versionList">
+                                <mat-list-item
+                                        *ngFor="let version of versions"
+                                        [ngClass]="{'selected' : version.uid === currentVersionId}"
+                                        (click)="handleVersionPreview(version.uid)"
+                                        class="cursor-pointer">
+                                    <mat-icon id="downloadVersion" mat-list-icon class="cursor-pointer"
                                               (click)="handleVersionDownload(version.uid)">
                                         cloud_download
                                     </mat-icon>
-                                    <mat-icon mat-list-icon class="cursor-pointer"
-                                              (click)="handleVersionPreview(version.uid)">
+                                    <mat-icon mat-list-icon>
                                         visibility
                                     </mat-icon>
                                     <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
@@ -105,9 +108,23 @@
 
                 <div fxLayout="column" fxLayoutAlign="start start">
                     <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%;">
-                        <div><mat-icon class="cursor-pointer">navigate_before</mat-icon></div>
+                        <div>
+                            <mat-icon
+                                    [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
+                                    'disabledIcon': currentVersionIsFirst()}"
+                                    (click)="handleVersionPreviewNextOrPrev(-1)">
+                                navigate_before
+                            </mat-icon>
+                        </div>
                         <div style="text-align: center">{{previewTitle}}</div>
-                        <div><mat-icon class="cursor-pointer">navigate_next</mat-icon></div>
+                        <div>
+                            <mat-icon
+                                    [ngClass]="{'cursor-pointer': !currentVersionIsLast(),
+                                    'disabledIcon': currentVersionIsLast()}"
+                                    (click)="handleVersionPreviewNextOrPrev(1)">
+                                navigate_next
+                            </mat-icon>
+                        </div>
                     </div>
                     <div>
                         <file-preview
