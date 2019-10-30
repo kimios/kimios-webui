@@ -23,7 +23,7 @@ import {
     MatSlideToggleModule,
     MatSortModule,
     MatTableModule,
-    MatTabsModule
+    MatTabsModule, MatTreeModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -54,6 +54,7 @@ import {UsersGroupsSearchPanelComponent} from 'app/main/components/users-groups-
 import {UsersAndGroupsSelectionPanelComponent} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {FilePreviewComponent} from 'app/main/components/file-preview/file-preview.component';
+import {BrowseComponent} from 'app/main/components/browse/browse.component';
 
 
 @NgModule({
@@ -78,7 +79,8 @@ import {FilePreviewComponent} from 'app/main/components/file-preview/file-previe
         UsersGroupsSearchPanelComponent,
         UsersAndGroupsSelectionPanelComponent,
         UsersAndGroupsSelectionDialogComponent,
-        FilePreviewComponent
+        FilePreviewComponent,
+        BrowseComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -109,6 +111,7 @@ import {FilePreviewComponent} from 'app/main/components/file-preview/file-previe
         FuseSearchBarModule,
         MatExpansionModule,
         MatProgressSpinnerModule,
+        MatTreeModule,
 
         DragDropModule
     ],
