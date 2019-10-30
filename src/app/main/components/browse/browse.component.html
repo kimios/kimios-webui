@@ -14,9 +14,10 @@
           </mat-icon>
         </button>
         {{node.item}}
-        <mat-progress-bar *ngIf="node.isLoading"
+        <mat-progress-spinner *ngIf="node.isLoading"
                           mode="indeterminate"
-                          class="example-tree-progress-bar"></mat-progress-bar>
+                          class="example-tree-progress-bar"
+                              diameter="25"></mat-progress-spinner>
       </mat-tree-node>
     </mat-tree>
 
