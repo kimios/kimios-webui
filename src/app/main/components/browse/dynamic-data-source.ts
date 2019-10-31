@@ -17,14 +17,14 @@ export interface HasAName {
     name: string;
 }
 
-class ObjectWithAName implements HasAName {
+/*class ObjectWithAName implements HasAName {
     
     name: string;
 
     constructor(name: string) {
         this.name = name;
     }
-}
+}*/
 
 @Injectable()
 export class DynamicDataSource<T extends HasAName> {
