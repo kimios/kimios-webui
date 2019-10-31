@@ -7,14 +7,18 @@ import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 
 export class DynamicDatabase {
 
-    dataMap = new Map<number, number[]>([
-        [1, [2, 3, 4]],
-        [5, [6, 7, 8]],
-        [2, [9, 10]],
-        [8, [11, 12, 13]]
-    ]);
+    dataMap = new Map<number, number[]>(
+        /*[
+            [1, [2, 3, 4]],
+            [5, [6, 7, 8]],
+            [2, [9, 10]],
+            [8, [11, 12, 13]]
+        ]*/
+    );
 
-    private _rootLevelNodes: number[] = [1, 5];
+    private _rootLevelNodes: number[] = [
+        /*1, 5*/
+    ];
 
     /*/!** Initial data from database *!/
     initialData(): DynamicFlatNodeWithUid[] {

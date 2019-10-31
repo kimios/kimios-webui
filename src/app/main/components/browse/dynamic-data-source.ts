@@ -41,7 +41,7 @@ export class DynamicDataSource<T extends HasAName> {
 
     constructor(private _treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
                 protected _database: DynamicDatabase) {
-        this.entities.set(1, new ObjectWithAName('Fruits'));
+        /*this.entities.set(1, new ObjectWithAName('Fruits'));
         this.entities.set(2, new ObjectWithAName('Apple'));
         this.entities.set(3, new ObjectWithAName('Orange'));
         this.entities.set(4, new ObjectWithAName('Banana'));
@@ -53,7 +53,7 @@ export class DynamicDataSource<T extends HasAName> {
         this.entities.set(10, new ObjectWithAName('Macintosh'));
         this.entities.set(11, new ObjectWithAName('Yellow'));
         this.entities.set(12, new ObjectWithAName('White'));
-        this.entities.set(13, new ObjectWithAName('Purple'));
+        this.entities.set(13, new ObjectWithAName('Purple'));*/
 
     }
 
