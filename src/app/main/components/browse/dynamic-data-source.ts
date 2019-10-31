@@ -52,7 +52,7 @@ export class DynamicDataSource {
      * Toggle the node, remove from display list
      */
     toggleNode(node: DynamicFlatNode, expand: boolean): void {
-        const children = this._database.getChildren(node.item);
+        const children = this._database.getChildren(node.uid);
         const index = this.data.indexOf(node);
         if (!children || index < 0) { // If no children, or cannot find the node, no op
             return;
@@ -62,8 +62,8 @@ export class DynamicDataSource {
 
         setTimeout(() => {
             if (expand) {
-                const nodes = children.map(name =>
-                    new DynamicFlatNode(name, node.level + 1, this._database.isExpandable(name)));
+                const nodes = children.map(uid =>
+                    new DynamicFlatNode(name, uid, node.level + 1, this._database.isExpandable(name)));
                 this.data.splice(index + 1, 0, ...nodes);
             } else {
                 let count = 0;

@@ -5,25 +5,20 @@
 import {DynamicFlatNode} from './dynamic-flat-node';
 
 export class DynamicDatabase {
-    dataMap = new Map<string, string[]>([
-        ['Fruits', ['Apple', 'Orange', 'Banana']],
-        ['Vegetables', ['Tomato', 'Potato', 'Onion']],
-        ['Apple', ['Fuji', 'Macintosh']],
-        ['Onion', ['Yellow', 'White', 'Purple']]
-    ]);
-
-    rootLevelNodes: string[] = ['Fruits', 'Vegetables'];
+    dataMap = new Map<number, number[]>();
 
     /** Initial data from database */
-    initialData(): DynamicFlatNode[] {
-        return this.rootLevelNodes.map(name => new DynamicFlatNode(name, 0, true));
+    initialData(uidAndNamesMap: Map<number, string>): DynamicFlatNode[] {
+        const initialData = new Array<DynamicFlatNode>();
+        uidAndNamesMap.forEach((value, key) => initialData.push(new DynamicFlatNode(value, key, 0, true)));
+        return initialData;
     }
 
-    getChildren(node: string): string[] | undefined {
+    getChildren(node: number): number[] | undefined {
         return this.dataMap.get(node);
     }
 
-    isExpandable(node: string): boolean {
+    isExpandable(node: number): boolean {
         return this.dataMap.has(node);
     }
 }
