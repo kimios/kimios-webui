@@ -6,6 +6,7 @@ import {FlatTreeControl, NestedTreeControl} from '@angular/cdk/tree';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNode} from './dynamic-flat-node';
 import {DynamicDataSource} from './dynamic-data-source';
+import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 
 interface EntityNode {
   uid: number;
@@ -25,7 +26,7 @@ export class BrowseComponent implements OnInit {
   dataSource = new MatTreeNestedDataSource<EntityNode>();
 */
 
-  treeControl: FlatTreeControl<DynamicFlatNode>;
+  treeControl: FlatTreeControl<DynamicFlatNodeWithUid>;
 
   dataSource: DynamicDataSource;
 
@@ -34,19 +35,19 @@ export class BrowseComponent implements OnInit {
       private browseEntityService: BrowseEntityService,
       database: DynamicDatabase
   ) {
-    this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
+    this.treeControl = new FlatTreeControl<DynamicFlatNodeWithUid>(this.getLevel, this.isExpandable);
     this.dataSource = new DynamicDataSource(this.treeControl, database);
 
-    this.dataSource.findInitialData();
+    this.dataSource.setInitialData();
   }
 
 
 
-  getLevel = (node: DynamicFlatNode) => node.level;
+  getLevel = (node: DynamicFlatNodeWithUid) => node.level;
 
-  isExpandable = (node: DynamicFlatNode) => node.expandable;
+  isExpandable = (node: DynamicFlatNodeWithUid) => node.expandable;
 
-  hasChild = (_: number, _nodeData: DynamicFlatNode) => _nodeData.expandable;
+  hasChild = (_: number, _nodeData: DynamicFlatNodeWithUid) => _nodeData.expandable;
 
   ngOnInit(): void {
   }
