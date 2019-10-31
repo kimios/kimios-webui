@@ -37,7 +37,7 @@ export class BrowseComponent implements OnInit {
     this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new DynamicDataSource(this.treeControl, database);
 
-    this.dataSource.data = database.initialData();
+    this.dataSource.findInitialData();
   }
 
 
@@ -49,9 +49,6 @@ export class BrowseComponent implements OnInit {
   hasChild = (_: number, _nodeData: DynamicFlatNode) => _nodeData.expandable;
 
   ngOnInit(): void {
-    this.browseEntityService
-        .findEntitiesAtPath();
-    // this.dataSource.data =
   }
 
 }
