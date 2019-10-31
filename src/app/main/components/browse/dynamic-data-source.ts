@@ -13,12 +13,25 @@ import {CollectionViewer, SelectionChange} from '@angular/cdk/collections';
 import {map} from 'rxjs/operators';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 
+export interface HasAName {
+    name: string;
+}
+
+class ObjectWithAName implements HasAName {
+    
+    name: string;
+
+    constructor(name: string) {
+        this.name = name;
+    }
+}
+
 @Injectable()
-export class DynamicDataSource {
+export class DynamicDataSource<T extends HasAName> {
 
     dataChange = new BehaviorSubject<DynamicFlatNodeWithUid[]>([]);
 
-    entities = new Map<number, string>();
+    entities = new Map<number, HasAName>();
 
     get data(): DynamicFlatNodeWithUid[] { return this.dataChange.value; }
     set data(value: DynamicFlatNodeWithUid[]) {
@@ -28,19 +41,19 @@ export class DynamicDataSource {
 
     constructor(private _treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
                 protected _database: DynamicDatabase) {
-        this.entities.set(1, 'Fruits');
-        this.entities.set(2, 'Apple');
-        this.entities.set(3, 'Orange');
-        this.entities.set(4, 'Banana');
-        this.entities.set(5, 'Vegetables');
-        this.entities.set(6, 'Tomato');
-        this.entities.set(7, 'Potato');
-        this.entities.set(8, 'Onion');
-        this.entities.set(9, 'Fuji');
-        this.entities.set(10, 'Macintosh');
-        this.entities.set(11, 'Yellow');
-        this.entities.set(12, 'White');
-        this.entities.set(13, 'Purple');
+        this.entities.set(1, new ObjectWithAName('Fruits'));
+        this.entities.set(2, new ObjectWithAName('Apple'));
+        this.entities.set(3, new ObjectWithAName('Orange'));
+        this.entities.set(4, new ObjectWithAName('Banana'));
+        this.entities.set(5, new ObjectWithAName('Vegetables'));
+        this.entities.set(6, new ObjectWithAName('Tomato'));
+        this.entities.set(7, new ObjectWithAName('Potato'));
+        this.entities.set(8, new ObjectWithAName('Onion'));
+        this.entities.set(9, new ObjectWithAName('Fuji'));
+        this.entities.set(10, new ObjectWithAName('Macintosh'));
+        this.entities.set(11, new ObjectWithAName('Yellow'));
+        this.entities.set(12, new ObjectWithAName('White'));
+        this.entities.set(13, new ObjectWithAName('Purple'));
 
     }
 
@@ -80,7 +93,7 @@ export class DynamicDataSource {
         setTimeout(() => {
             if (expand) {
                 const nodes = children.map(uid =>
-                    new DynamicFlatNodeWithUid(this.entities.get(uid), node.level + 1, this._database.isExpandable(uid), false, uid));
+                    new DynamicFlatNodeWithUid(this.entities.get(uid).name, node.level + 1, this._database.isExpandable(uid), false, uid));
                 this.data.splice(index + 1, 0, ...nodes);
             } else {
                 let count = 0;
@@ -96,6 +109,6 @@ export class DynamicDataSource {
     }
 
     setInitialData(): void {
-        this.data = this._database.rootLevelNodes.map(uid => new DynamicFlatNodeWithUid(this.entities.get(uid), 0, true, false, uid));
+        this.data = this._database.rootLevelNodes.map(uid => new DynamicFlatNodeWithUid(this.entities.get(uid).name, 0, true, false, uid));
     }
 }
