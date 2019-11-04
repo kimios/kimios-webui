@@ -29,6 +29,14 @@ export class DynamicDatabase {
         return this._rootLevelNodes;
     }
 
+    addRootLevelNode(uid: number): void {
+        this._rootLevelNodes.push(uid);
+    }
+
+    setChildren(uid: number, children: number[]): void {
+        this.dataMap.set(uid, children);
+    }
+
     getChildren(node: number): number[] | undefined {
         return this.dataMap.get(node);
     }

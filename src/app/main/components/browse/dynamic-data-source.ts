@@ -14,7 +14,7 @@ import {map} from 'rxjs/operators';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 
 export interface HasAName {
-    name: string;
+    name?: string;
 }
 
 /*class ObjectWithAName implements HasAName {
@@ -93,7 +93,15 @@ export class DynamicDataSource<T extends HasAName> {
         setTimeout(() => {
             if (expand) {
                 const nodes = children.map(uid =>
-                    new DynamicFlatNodeWithUid(this.entities.get(uid).name, node.level + 1, this._database.isExpandable(uid), false, uid));
+                    new DynamicFlatNodeWithUid(
+                        (this.entities.get(uid).name != null && this.entities.get(uid).name !== undefined) ?
+                            this.entities.get(uid).name :
+                            '<NO_NAME>',
+                        node.level + 1, this._database.isExpandable(uid),
+                        false,
+                        uid
+                    )
+                );
                 this.data.splice(index + 1, 0, ...nodes);
             } else {
                 let count = 0;
@@ -108,7 +116,17 @@ export class DynamicDataSource<T extends HasAName> {
         }, 1000);
     }
 
-    setInitialData(): void {
-        this.data = this._database.rootLevelNodes.map(uid => new DynamicFlatNodeWithUid(this.entities.get(uid).name, 0, true, false, uid));
+    public setInitialData(): void {
+        this.data = this._database.rootLevelNodes.map(uid =>
+            new DynamicFlatNodeWithUid(
+                (this.entities.get(uid).name != null && this.entities.get(uid).name !== undefined) ?
+                    this.entities.get(uid).name :
+                    '<NO_NAME>',
+                0,
+                true,
+                false,
+                uid
+            )
+        );
     }
 }

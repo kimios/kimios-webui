@@ -3,7 +3,24 @@
   <div fxFlex="25">
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
+        <ng-container *ngIf="node.isLoading; else notLoading">
+          <mat-progress-spinner
+                  mode="indeterminate"
+                  diameter="25"></mat-progress-spinner>
+        </ng-container>
+        <ng-template #notLoading>
+          <ng-container *ngIf="node.expandable; else default">
+            <button mat-icon-button
+                    [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+          </ng-container>
+        </ng-template>
+        <ng-template #default>
+          <button mat-icon-button disabled></button>
+        </ng-template>
         {{node.item}}
       </mat-tree-node>
       <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
@@ -14,10 +31,6 @@
           </mat-icon>
         </button>
         {{node.item}}
-        <mat-progress-spinner *ngIf="node.isLoading"
-                          mode="indeterminate"
-                          class="example-tree-progress-bar"
-                              diameter="25"></mat-progress-spinner>
       </mat-tree-node>
     </mat-tree>
 
