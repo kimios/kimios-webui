@@ -10,10 +10,13 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable()
 export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
+    loadedEntities: number[];
+
     constructor(_treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
                 _database: DynamicDatabase,
                 private browseEntityService: BrowseEntityService) {
         super(_treeControl, _database);
+        this.loadedEntities = [];
     }
 
     /**
@@ -34,8 +37,11 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
                             this.entities.get(uid).name :
                             '<NO_NAME>',
                         node.level + 1,
-                        false,
-                        true,
+                        this.loadedEntities.includes(uid)
+                        && this._database.getChildren(uid) !== null
+                        && this._database.getChildren(uid) !== undefined
+                        && this._database.getChildren(uid).length > 0,
+                        ! this.loadedEntities.includes(uid),
                         uid
                     )
                 );
@@ -44,7 +50,7 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
                 this.dataChange.next(this.data);
 
                 from(
-                    children
+                    children.filter(uid => ! this.loadedEntities.includes(uid))
                 ).pipe(
                     concatMap(
                         child => combineLatest(of(child), this.browseEntityService.findContainerEntitiesAtPath(child))
@@ -61,6 +67,7 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
                                 this._database.setChildren(entityUid, filtered.map(e => e.uid));
                             }
                             this.data = this.updateNodeInData(this.data, entityUid, false, (filtered.length > 0));
+                            this.loadedEntities.push(entityUid);
                             return of(filtered);
                         }
                     )
@@ -118,6 +125,7 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
                                 });
                                 this._database.setChildren(entity.uid, filtered.map(e => e.uid));
                                 this.data = this.updateNodeInData(this.data, entity.uid, false, expandable);
+                                this.loadedEntities.push(entity.uid);
                                 return of(
 
                                 );
