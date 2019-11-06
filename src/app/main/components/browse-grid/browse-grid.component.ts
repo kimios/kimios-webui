@@ -50,6 +50,6 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
   }
 
   onResize($event): void {
-
+      this.gridNbCols = Math.floor(this.entityList.nativeElement.offsetWidth / this.widthPerEntity);
   }
 }
