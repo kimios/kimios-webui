@@ -11,6 +11,7 @@ import {
     MatDividerModule,
     MatExpansionModule,
     MatFormFieldModule,
+    MatGridListModule,
     MatIconModule,
     MatInputModule,
     MatListModule,
@@ -56,6 +57,8 @@ import {UsersAndGroupsSelectionPanelComponent} from 'app/main/components/users-a
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {FilePreviewComponent} from 'app/main/components/file-preview/file-preview.component';
 import {BrowseComponent} from 'app/main/components/browse/browse.component';
+import {BrowseGridComponent} from '../components/browse-grid/browse-grid.component';
+import {EntityGridTileComponent} from '../components/entity-grid-tile/entity-grid-tile.component';
 
 
 @NgModule({
@@ -81,7 +84,9 @@ import {BrowseComponent} from 'app/main/components/browse/browse.component';
         UsersAndGroupsSelectionPanelComponent,
         UsersAndGroupsSelectionDialogComponent,
         FilePreviewComponent,
-        BrowseComponent
+        BrowseComponent,
+        BrowseGridComponent,
+        EntityGridTileComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -114,7 +119,8 @@ import {BrowseComponent} from 'app/main/components/browse/browse.component';
         MatProgressSpinnerModule,
         MatTreeModule,
 
-        DragDropModule
+        DragDropModule,
+        MatGridListModule
     ],
     providers   : [
         EntityService,
