@@ -1,5 +1,5 @@
 <mat-grid-list #entityList [cols]="gridNbCols" rowHeight="2:0.5" (window:resize)="onResize($event)">
-    <mat-grid-tile *ngFor="let entityFromList of entities$ | async">
+    <mat-grid-tile *ngFor="let entityFromList of entities">
         <entity-grid-tile [entity]="entityFromList"></entity-grid-tile>
     </mat-grid-tile>
 </mat-grid-list>

@@ -50,9 +50,7 @@
       <mat-divider></mat-divider>
     </div>-->
     <div class="content" fusePerfectScrollbar>
-      <browse-grid
-              [entityContainer$]="selectedEntity$"
-      ></browse-grid>
+      <entity-listing [entityContainer$]="selectedEntity$"></entity-listing>
     </div>
   </div>
 

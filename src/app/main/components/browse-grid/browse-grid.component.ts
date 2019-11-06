@@ -1,8 +1,6 @@
 import {AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntity} from 'app/kimios-client-api';
-import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {BehaviorSubject} from 'rxjs';
-import {concatMap, filter} from 'rxjs/operators';
 
 @Component({
   selector: 'browse-grid',
@@ -13,35 +11,28 @@ import {concatMap, filter} from 'rxjs/operators';
 export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   gridNbCols: number;
+  @Input()
   entities$: BehaviorSubject<Array<DMEntity>>;
+  entities: Array<DMEntity>;
 
   widthPerEntity = 200;
 
   @ViewChild('entityList', {read: ElementRef}) entityList: ElementRef;
 
-  @Input()
-  entityContainer$: BehaviorSubject<DMEntity>;
-
   constructor(
-      private browseEntityService: BrowseEntityService,
       private cd: ChangeDetectorRef
   ) {
-    this.entities$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.gridNbCols = 4;
+    this.entities = [];
   }
 
   ngOnInit(): void {
-      this.entityContainer$
-          .pipe(
-              filter(entity => entity !== undefined),
-              concatMap(res => this.browseEntityService.findEntitiesAtPath(res)),
-          )
-          .subscribe(
-              res => {
-                  this.entities$.next(res);
-                  this.cd.markForCheck();
-              }
-          );
+      this.entities$.subscribe(
+          res => {
+              this.entities = res;
+              this.cd.markForCheck();
+          }
+      );
   }
 
   ngAfterContentInit(): void {

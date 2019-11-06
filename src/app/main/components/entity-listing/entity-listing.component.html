@@ -1,0 +1,8 @@
+
+<ng-container *ngIf="isGrid | async as displayGrid">
+  <ng-container *ngIf="displayGrid; else displayListTemplate">
+    <browse-grid [entities$]="entities$" ></browse-grid>
+  </ng-container>
+</ng-container>
+<ng-template #displayListTemplate>
+</ng-template>

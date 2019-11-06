@@ -57,8 +57,9 @@ import {UsersAndGroupsSelectionPanelComponent} from 'app/main/components/users-a
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {FilePreviewComponent} from 'app/main/components/file-preview/file-preview.component';
 import {BrowseComponent} from 'app/main/components/browse/browse.component';
-import {BrowseGridComponent} from '../components/browse-grid/browse-grid.component';
-import {EntityGridTileComponent} from '../components/entity-grid-tile/entity-grid-tile.component';
+import {BrowseGridComponent} from 'app/main/components/browse-grid/browse-grid.component';
+import {EntityGridTileComponent} from 'app/main/components/entity-grid-tile/entity-grid-tile.component';
+import {EntityListingComponent} from 'app/main/components/entity-listing/entity-listing.component';
 
 
 @NgModule({
@@ -86,7 +87,8 @@ import {EntityGridTileComponent} from '../components/entity-grid-tile/entity-gri
         FilePreviewComponent,
         BrowseComponent,
         BrowseGridComponent,
-        EntityGridTileComponent
+        EntityGridTileComponent,
+        EntityListingComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -135,7 +137,8 @@ import {EntityGridTileComponent} from '../components/entity-grid-tile/entity-gri
     exports: [
         FileUploadListComponent,
         FileUploadProgressComponent,
-        ShareFormComponent
+        ShareFormComponent,
+        BrowseGridComponent
     ]
 })
 export class FileManagerModule { }
