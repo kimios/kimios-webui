@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {DMEntity} from '../../../kimios-client-api';
-import {DMEntityUtils} from '../../utils/dmentity-utils';
+import {DMEntity} from 'app/kimios-client-api';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Component({
   selector: 'entity-grid-tile',

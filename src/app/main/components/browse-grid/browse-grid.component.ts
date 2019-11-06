@@ -1,7 +1,6 @@
-import {AfterContentInit, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {DMEntity} from '../../../kimios-client-api';
-import {BrowseEntityService} from '../../../services/browse-entity.service';
-import {BehaviorSubject} from 'rxjs';
+import {AfterContentInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {DMEntity} from 'app/kimios-client-api';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'browse-grid',
@@ -12,7 +11,7 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   gridNbCols: number;
   entities: Array<DMEntity>;
-  entityListHtmlId = 'entityList';
+
   widthPerEntity = 200;
 
   @ViewChild('entityList', {read: ElementRef}) entityList: ElementRef;
