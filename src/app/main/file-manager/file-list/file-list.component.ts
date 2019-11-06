@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {DataSource} from '@angular/cdk/collections';
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {fuseAnimations} from '@fuse/animations';
 import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
@@ -11,6 +10,7 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileDetailDialogComponent} from 'app/main/components/file-detail-dialog/file-detail-dialog.component';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {Router} from '@angular/router';
+import {FilesDataSource} from 'app/main/file-manager/file-data-source';
 
 @Component({
     selector     : 'file-list',
@@ -138,42 +138,6 @@ export class FileManagerFileListComponent implements OnInit, OnDestroy, AfterVie
     toggleSidebar(name): void
     {
         this._fuseSidebarService.getSidebar(name).toggleOpen();
-    }
-}
-
-export class FilesDataSource extends DataSource<any>
-{
-    /**
-     * Constructor
-     *
-     * @param {FileManagerService} _fileManagerService
-     */
-    constructor(
-        private _fileManagerService: SearchEntityService
-    )
-    {
-        super();
-    }
-
-    /**
-     * Connect function called by the table to retrieve one stream containing the data to render.
-     *
-     * @returns {Observable<any[]>}
-     */
-    connect(): Observable<any[]>
-    {
-        return this._fileManagerService.onFilesChanged;
-    }
-
-    /**
-     * Disconnect
-     */
-    disconnect(): void
-    {
-    }
-
-    loadDocuments(sortField: string, sortDir, page: number): void {
-        this._fileManagerService.changeSort(sortField, sortDir, page).subscribe();
     }
 }
 

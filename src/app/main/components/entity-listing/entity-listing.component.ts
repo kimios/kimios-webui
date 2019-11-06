@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {concatMap, filter} from 'rxjs/operators';
-import {BrowseEntityService} from '../../../services/browse-entity.service';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 export enum ListingType {
   GRID = 1,
