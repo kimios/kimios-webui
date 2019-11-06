@@ -2,7 +2,7 @@
 
   <div fxFlex="25">
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="selectNode(node.uid)" class="cursor-pointer">
         <ng-container *ngIf="node.isLoading; else notLoading">
           <mat-progress-spinner
                   mode="indeterminate"
@@ -51,7 +51,7 @@
     </div>-->
     <div class="content" fusePerfectScrollbar>
       <browse-grid
-              [entityContainer]="entityContainer"
+              [entityContainer$]="selectedEntity$"
       ></browse-grid>
     </div>
   </div>

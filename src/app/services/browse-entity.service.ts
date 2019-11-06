@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
-import {DMEntity, DocumentService, Folder, FolderService, SearchService, WorkspaceService} from '../kimios-client-api';
+import {DMEntity, DocumentService, FolderService, SearchService, WorkspaceService} from '../kimios-client-api';
 import {TagService} from './tag.service';
-import {currentId} from 'async_hooks';
 import {combineLatest, Observable, of} from 'rxjs';
-import {map, concatMap} from 'rxjs/operators';
-import {DMEntityImpl} from '../kimios-client-api/model/dMEntityImpl';
+import {concatMap} from 'rxjs/operators';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -34,20 +33,21 @@ export class BrowseEntityService {
     }
   }
 
-    findEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
-        if (parentUid === null
-            || parentUid === undefined) {
+    findEntitiesAtPath(parent?: DMEntity): Observable<DMEntity[]> {
+        if (parent === null
+            || parent === undefined) {
             return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
         } else {
-            return this.folderService.getFolders(this.sessionService.sessionToken, parentUid)
+            return this.folderService.getFolders(this.sessionService.sessionToken, parent.uid)
                 .pipe(
                     concatMap(
-                        res => {
-                            return combineLatest(
-                                of(res),
-                                this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
-                            );
-                        }
+                        res => combineLatest(
+                            of(res),
+                            DMEntityUtils.dmEntityIsWorkspace(parent) ?
+                                of([]) :
+                                this.documentService.getDocuments(this.sessionService.sessionToken, parent.uid)
+                        )
+
                     ),
                     concatMap(
                         ([folders, documents]) => of(folders.concat(documents))
