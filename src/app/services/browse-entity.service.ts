@@ -35,21 +35,26 @@ export class BrowseEntityService {
   }
 
     findEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
-        return this.folderService.getFolders(this.sessionService.sessionToken, parentUid)
-            .pipe(
-                concatMap(
-                    res => {
-                        return combineLatest(
-                            of(res),
-                            this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
-                        );
-                    }
-                ),
-                concatMap(
-                    ([folders, documents]) => of(folders.concat(documents))
-                )
-            );
+        if (parentUid === null
+            || parentUid === undefined) {
+            return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
+        } else {
+            return this.folderService.getFolders(this.sessionService.sessionToken, parentUid)
+                .pipe(
+                    concatMap(
+                        res => {
+                            return combineLatest(
+                                of(res),
+                                this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
+                            );
+                        }
+                    ),
+                    concatMap(
+                        ([folders, documents]) => of(folders.concat(documents))
+                    )
+                );
 
+        }
     }
 
 }
