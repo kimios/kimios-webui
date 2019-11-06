@@ -13,7 +13,7 @@ interface EntityNode {
 }
 
 @Component({
-  selector: 'app-browse',
+  selector: 'browse',
   templateUrl: './browse.component.html',
   styleUrls: ['./browse.component.scss'],
   providers: [DynamicDatabase]
