@@ -23,7 +23,8 @@ import {
     MatSlideToggleModule,
     MatSortModule,
     MatTableModule,
-    MatTabsModule, MatTreeModule
+    MatTabsModule,
+    MatTreeModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
