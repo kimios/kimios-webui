@@ -182,9 +182,7 @@ export class SearchEntityService implements Resolve<any> {
                         fieldName: TAG_META_DATA_PREFIX + field.uid,
                         faceted: true
                     }))
-                )
-            )
-            .pipe(
+                ),
                 concatMap(
                     (res) =>
                         this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,

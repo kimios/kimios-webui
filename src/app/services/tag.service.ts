@@ -37,28 +37,19 @@ export class TagService implements OnInit {
                 concatMap(
                     (res) => {
                         const docTypes = res.filter(docType => docType.name === DOC_TYPE_TAGGABLE);
-                        let metas = new Observable<Meta[]>();
-                        if (docTypes.length === 0) {
-                            this.documentType = null;
-                        } else {
-                            this.documentType = docTypes[0];
-
-                            metas = this.documentVersionService.getUnheritedMetas(
-                                this.sessionService.sessionToken,
-                                this.documentType.uid
-                            );
-                        }
-                        return metas;
+                        return (docTypes.length === 0 ?
+                                [] :
+                                this.documentVersionService.getUnheritedMetas(
+                                    this.sessionService.sessionToken,
+                                    docTypes[0].uid
+                                )
+                        );
                     }
-                )
-            )
-            .pipe(
+                ),
                 map(
                     (res) => res.map((meta) => ({ 'name': meta.name, 'uid': meta.uid }))
                         .filter(val => val.name.startsWith(TagService.TAG_NAME_PREFIX))
-                )
-            )
-            .pipe(
+                ),
                 tap(
                     (res) => res.forEach(
                         tag => this.allTagsMap.set(tag.uid, tag)
