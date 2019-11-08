@@ -343,4 +343,13 @@ export class SearchEntityService implements Resolve<any> {
         this.onSortChanged.next(sortField + ' ' + sortDirection);
         return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this._criterias);
     }
+
+    public getDocumentsInDir(sortField: string, sortDirection: string, page: number, parentDirUid: number): Observable<DMEntity[]> {
+        const criterias = new Array<Criteria>();
+        criterias.push({
+            fieldName: 'DocumentParentId',
+            query: parentDirUid.toString()
+        });
+        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, criterias);
+    }
 }
