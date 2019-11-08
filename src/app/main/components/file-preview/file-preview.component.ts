@@ -117,11 +117,11 @@ export class FilePreviewComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustResourceUrl(link);
   }
 
-  private docIsTextFormat(docExtension: string): boolean {
+  public docIsTextFormat(docExtension: string): boolean {
     return DocumentUtils.extensionIsText(docExtension);
   }
 
-  private docNeedsConversionToPdf(docExtension: string): boolean {
+  public docNeedsConversionToPdf(docExtension: string): boolean {
       return DocumentUtils.extensionHasToBeConvertedToPdf(docExtension.toLowerCase());
   }
 
