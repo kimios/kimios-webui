@@ -90,7 +90,6 @@ export class LoginComponent implements OnInit, OnDestroy {
                 catchError(error => {
                     console.log('server is not responding: ' + error);
                     return of();
-                    throwError(error);
                 })
             )
             .subscribe(
