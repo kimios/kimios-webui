@@ -162,7 +162,9 @@ export class SearchEntityService implements Resolve<any> {
                 response => {
                     console.log('loaded results', response);
                     this.handleFilesLoad(response, onlyTags);
-                    return response.rows;
+                    return (response.rows == null || response.rows === undefined ) ?
+                        [] :
+                        response.rows;
                 }
             )
         );
@@ -193,11 +195,15 @@ export class SearchEntityService implements Resolve<any> {
 
     handleFilesLoad(response: any, onlyTags: boolean): void {
         if (! onlyTags) {
-            this.onFilesChanged.next(response.rows);
-            this.onFileSelected.next(response.rows[0]);
-            this.onTotalFilesChanged.next(response.results);
+            this.onFilesChanged.next((response.rows == null || response.rows === undefined ) ? [] : response.rows);
+            if (response.rows != null
+                && response.rows !== undefined
+                && response.rows.length !== 0 ) {
+                this.onFileSelected.next(response.rowsresponse.rows[0]);
+            }
+            this.onTotalFilesChanged.next((response.results == null || response.results === undefined ) ? [] : response.results);
         }
-        this.onTagsDataChanged.next(this.extractTags(response.allfacetsData));
+        this.onTagsDataChanged.next((response.allfacetsData == null || response.allfacetsData === undefined ) ? [] : this.extractTags(response.allfacetsData));
     }
 
     reloadFiles(): Observable<DMEntity[]> {
