@@ -199,7 +199,7 @@ export class SearchEntityService implements Resolve<any> {
             if (response.rows != null
                 && response.rows !== undefined
                 && response.rows.length !== 0 ) {
-                this.onFileSelected.next(response.rowsresponse.rows[0]);
+                this.onFileSelected.next(response.rows[0]);
             }
             this.onTotalFilesChanged.next((response.results == null || response.results === undefined ) ? [] : response.results);
         }
