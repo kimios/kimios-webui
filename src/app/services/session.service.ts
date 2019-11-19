@@ -3,7 +3,7 @@ import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
 import {Observable, of, throwError} from 'rxjs';
 import {Router} from '@angular/router';
-import {catchError} from 'rxjs/operators';
+import {catchError, concatMap, tap} from 'rxjs/operators';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -86,6 +86,20 @@ export class SessionService implements OnDestroy {
         this.stopSessionCheck();
     }
 
+    disconnect(): Observable<string> {
+        return this.securityService.endSession(this.sessionToken).pipe(
+            tap(
+                res => {
+                    this.cookieService.delete(KIMIOS_COOKIE);
+                    this.sessionToken = '';
+                }
+            ),
+            concatMap(
+                res => of(res)
+            )
+        );
+    }
+
     callStartSession(login: string, source: string, pwd: string): Observable<any> {
         return this.securityService
             .startSession(login, source, pwd);
@@ -123,6 +137,26 @@ export class SessionService implements OnDestroy {
                         });
                     }
                 }
+            );
+    }
+
+    connect(login: string, authenticationSource: string, password: string): Observable<string> {
+        return this.callStartSession(login, authenticationSource, password)
+            .pipe(
+                catchError(err => {
+                    if (err.status === 200
+                        && err.statusText === 'OK') {
+                        const token = err.error.text;
+                        return of(token);
+                    }
+                    throwError(err);
+                }),
+                tap(
+                    res => {
+                        this.sessionToken = res;
+                        this.sessionAlive = true;
+                    }
+                )
             );
     }
 
