@@ -57,7 +57,7 @@ export class BrowseEntityService {
         }
     }
 
-    findAllParents(uid: number): Observable<DMEntity> {
+    findAllParents(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
         return this.retrieveContainerEntity(uid).pipe(
             expand(
                 res => res !== undefined && DMEntityUtils.dmEntityIsFolder(res) ?
@@ -65,7 +65,7 @@ export class BrowseEntityService {
                     of()
             ),
             map(res => res),
-            filter(res => res.uid !== uid)
+            filter(res => includeEntity || res.uid !== uid)
         );
     }
 
