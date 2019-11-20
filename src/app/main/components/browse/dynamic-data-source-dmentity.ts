@@ -7,16 +7,20 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {combineLatest, from, Observable, of} from 'rxjs';
 import {concatMap, tap} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {DMEntity} from 'app/kimios-client-api';
 
 @Injectable()
 export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
     loadedEntities: number[];
+    entityId: number;
 
     constructor(_treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
                 _database: DynamicDatabase,
-                private browseEntityService: BrowseEntityService) {
+                private browseEntityService: BrowseEntityService,
+    ) {
         super(_treeControl, _database);
         this.loadedEntities = [];
+        this.entityId = -1;
     }
 
     /**
@@ -87,7 +91,11 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
     }
 
     public setInitialData(): void {
-        const obs: Observable<DynamicFlatNodeWithUid> = this.browseEntityService.findContainerEntitiesAtPath().pipe(
+        this.retrieveNodes().subscribe();
+    }
+
+    private retrieveNodes(): Observable<Array<DynamicFlatNodeWithUid>> {
+        return this.browseEntityService.findContainerEntitiesAtPath().pipe(
             tap(res => {
                 const collection = new Array<DynamicFlatNodeWithUid>();
                 res.forEach(entity => {
@@ -134,13 +142,6 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
                     )
             )
         );
-
-        const collected = new Array<DynamicFlatNodeWithUid>();
-        obs.subscribe(
-            res => collected.push(res),
-            error => 'error',
-            () => null
-        );
     }
 
     updateNodeInData(data: DynamicFlatNodeWithUid[], uid: number, isLoading: boolean, expandable: boolean): DynamicFlatNodeWithUid[] {
@@ -152,5 +153,23 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
         dataCopy[nodeIndex] = entityNode;
 
         return dataCopy;
+    }
+
+    setInitialDataWithOpenFolder(uid: number): Observable<Array<DMEntity>> {
+        this.setInitialData();
+        return of(new Array<DMEntity>());
+/*        return this.retrieveNodes().pipe(
+            concatMap(
+                res => this.browseEntityService.findEntitiesAtPathFromId(uid)
+            ),
+            concatMap(
+                res =>  {
+                    // get all parents
+                    this.
+                    // toggle parents one by one
+                    // => refactor to toggle when children are available
+                }
+            )
+        );*/
     }
 }

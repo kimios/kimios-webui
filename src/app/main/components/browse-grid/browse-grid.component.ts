@@ -1,6 +1,8 @@
 import {AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntity} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'browse-grid',
@@ -20,7 +22,8 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
   @ViewChild('entityList', {read: ElementRef}) entityList: ElementRef;
 
   constructor(
-      private cd: ChangeDetectorRef
+      private cd: ChangeDetectorRef,
+      private router: Router
   ) {
     this.gridNbCols = 4;
     this.entities = [];
@@ -42,5 +45,9 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   onResize($event): void {
       this.gridNbCols = Math.floor(this.entityList.nativeElement.offsetWidth / this.widthPerEntity);
+  }
+
+  goToDocument(entityFromList: DMEntity): void {
+    DocumentUtils.navigateToFile(this.router, entityFromList.uid);
   }
 }

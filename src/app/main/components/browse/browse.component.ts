@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {FlatTreeControl} from '@angular/cdk/tree';
@@ -30,6 +30,9 @@ export class BrowseComponent implements OnInit {
   dataSource: DynamicDataSourceDMEntity;
   selectedEntity$: BehaviorSubject<DMEntity>;
 
+  @Input()
+  entityId: number;
+
   constructor(
       private sessionService: SessionService,
       private browseEntityService: BrowseEntityService,
@@ -37,7 +40,7 @@ export class BrowseComponent implements OnInit {
   ) {
     this.treeControl = new FlatTreeControl<DynamicFlatNodeWithUid>(this.getLevel, this.isExpandable);
     this.dataSource = new DynamicDataSourceDMEntity(this.treeControl, database, browseEntityService);
-    this.dataSource.setInitialData();
+    this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null);
     this.selectedEntity$ = new BehaviorSubject<DMEntity>(undefined);
   }
 

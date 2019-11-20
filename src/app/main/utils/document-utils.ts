@@ -1,3 +1,5 @@
+import {Router} from '@angular/router';
+
 export class DocumentUtils {
     static textExtensions = ['txt', 'java', 'cs', 'js', 'cpp', 'c', 'cc', 'html', 'log', 'sql', 'py', 'xml', 'java', 'eml', 'pl', 'caml'
         , 'css', 'scss', 'sh', 'bat'];
@@ -19,5 +21,9 @@ export class DocumentUtils {
 
     public static extensionIsImg(extension: string): boolean {
         return this.imgExtensions.includes(extension.toLowerCase());
+    }
+
+    public static navigateToFile(router: Router, docUid: number): void {
+        router.navigate(['/document', docUid]);
     }
 }
