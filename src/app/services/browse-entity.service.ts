@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
 import {combineLatest, Observable, of} from 'rxjs';
-import {catchError, concatMap, expand, filter, map, switchMap} from 'rxjs/operators';
+import {catchError, concatMap, expand, filter, map, switchMap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
@@ -57,7 +57,7 @@ export class BrowseEntityService {
         }
     }
 
-    findAllParents(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
+    findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
         return this.retrieveContainerEntity(uid).pipe(
             expand(
                 res => res !== undefined && DMEntityUtils.dmEntityIsFolder(res) ?
@@ -67,6 +67,11 @@ export class BrowseEntityService {
             map(res => res),
             filter(res => includeEntity || res.uid !== uid)
         );
+    }
+
+    findAllParents(uid: number, includeEntity: boolean = false): Observable<Array<DMEntity>> {
+        const parents = new Array<DMEntity>();
+        return this.findAllParentsRec(uid, includeEntity).pipe(toArray());
     }
 
     retrieveContainerEntity(uid: number): Observable<DMEntity> {

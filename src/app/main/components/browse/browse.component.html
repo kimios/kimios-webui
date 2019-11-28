@@ -1,8 +1,14 @@
 <div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
 
   <div fxFlex="25">
-    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="selectNode(node.uid)" class="cursor-pointer">
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" id="matTree">
+      <mat-tree-node *matTreeNodeDef="let node"
+                     matTreeNodePadding
+                     (click)="selectNode(node.uid)"
+                     class="cursor-pointer"
+                     [id]="'mat-tree-node-' + node.uid"
+                     [attr.data-nodeuid]="node.uid"
+      >
         <ng-container *ngIf="node.isLoading; else notLoading">
           <mat-progress-spinner
                   mode="indeterminate"

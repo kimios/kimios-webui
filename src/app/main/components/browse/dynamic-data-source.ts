@@ -6,7 +6,7 @@
  * structure.
  */
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, merge, Observable} from 'rxjs';
+import {BehaviorSubject, merge, Observable, of} from 'rxjs';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {DynamicDatabase} from './dynamic-database';
 import {CollectionViewer, SelectionChange} from '@angular/cdk/collections';
@@ -39,7 +39,7 @@ export class DynamicDataSource<T extends HasAName> {
         this.dataChange.next(value);
     }
 
-    constructor(private _treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
+    constructor(protected _treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
                 protected _database: DynamicDatabase) {
         /*this.entities.set(1, new ObjectWithAName('Fruits'));
         this.entities.set(2, new ObjectWithAName('Apple'));
@@ -58,7 +58,7 @@ export class DynamicDataSource<T extends HasAName> {
     }
 
     connect(collectionViewer: CollectionViewer): Observable<DynamicFlatNodeWithUid[]> {
-        this._treeControl.expansionModel.onChange.subscribe(change => {
+        this._treeControl.expansionModel.changed.subscribe(change => {
             if ((change as SelectionChange<DynamicFlatNodeWithUid>).added ||
                 (change as SelectionChange<DynamicFlatNodeWithUid>).removed) {
                 this.handleTreeControl(change as SelectionChange<DynamicFlatNodeWithUid>);
@@ -71,17 +71,17 @@ export class DynamicDataSource<T extends HasAName> {
     /** Handle expand/collapse behaviors */
     handleTreeControl(change: SelectionChange<DynamicFlatNodeWithUid>): void {
         if (change.added) {
-            change.added.forEach(node => this.toggleNode(node, true));
+            change.added.forEach(node => this.toggleNode(node, true).subscribe());
         }
         if (change.removed) {
-            change.removed.slice().reverse().forEach(node => this.toggleNode(node, false));
+            change.removed.slice().reverse().forEach(node => this.toggleNode(node, false).subscribe());
         }
     }
 
     /**
      * Toggle the node, remove from display list
      */
-    toggleNode(node: DynamicFlatNodeWithUid, expand: boolean): void {
+    toggleNode(node: DynamicFlatNodeWithUid, expand: boolean): Observable<number> {
         const children = this._database.getChildren(node.uid);
         const index = this.data.indexOf(node);
         if (!children || index < 0) { // If no children, or cannot find the node, no op
@@ -113,10 +113,12 @@ export class DynamicDataSource<T extends HasAName> {
             // notify the change
             this.dataChange.next(this.data);
             node.isLoading = false;
+
+            return of();
         }, 1000);
     }
 
-    public setInitialData(): void {
+    public setInitialData(): Observable<Array<DynamicFlatNodeWithUid>> {
         this.data = this._database.rootLevelNodes.map(uid =>
             new DynamicFlatNodeWithUid(
                 (this.entities.get(uid).name != null && this.entities.get(uid).name !== undefined) ?
@@ -128,5 +130,6 @@ export class DynamicDataSource<T extends HasAName> {
                 uid
             )
         );
+        return of(this.data);
     }
 }

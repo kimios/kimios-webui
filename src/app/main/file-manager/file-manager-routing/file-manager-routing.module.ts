@@ -27,7 +27,15 @@ const fileManagerRoutes: Routes = [
     /*resolve: {
       files: BrowseService
     }*/
-  }
+  },
+    {
+        path: 'browse/:entityId',
+        component: BrowseComponent,
+        canActivate: [ LoggedInGuard ],
+        /*resolve: {
+          files: BrowseService
+        }*/
+    }
 ];
 
 @NgModule({
