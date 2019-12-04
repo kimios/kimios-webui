@@ -67,10 +67,8 @@ describe('DynamicDataSourceDMEntity', () => {
     }
   };
 
-  const sessionToken$ = new Subject<string>();
   const initDone$ = new BehaviorSubject<string>('');
   const allTestsDone$ = new BehaviorSubject<string>('');
-  const testDone$ = new Subject();
 
   const TEST1 = 'test1';
   const testList = [TEST1];
@@ -104,12 +102,7 @@ describe('DynamicDataSourceDMEntity', () => {
               WorkspaceService,
               FolderService,
               CookieService,
-              /*{
-                provide: Router,
-                useClass: class {
-                  navigate = jasmine.createSpy('navigate');
-                }
-              },*/
+
               SessionService,
               {
                   provide: 'fuseCustomConfig',
@@ -125,43 +118,7 @@ describe('DynamicDataSourceDMEntity', () => {
       fs = TestBed.get(FolderService);
       ds = TestBed.get(DocumentService);
 
-      /*.subscribe(
-        res => {
-          console.log('entities created ');
-          console.dir(res);
-          done();
-        },
-        error => {
-          console.log('error while create entity : ');
-          console.log(error);
-        },
-        () => {
-            console.log('entities all created');
-            done();
-        }
-    )*/
-//      console.log('fin beforeAll');
-//  });
-
-//  beforeEach( () => {
-//      console.log('beforeEach now');
-      console.log('sessionService: ' + sessionService);
-      // return new Promise(function(resolve, reject): void {
-
-      /*const ws: WorkspaceService = TestBed.get(WorkspaceService);
-      const fs: FolderService = TestBed.get(FolderService);
-      const ds: DocumentService = TestBed.get(DocumentService);
-*/
       const workspaceName = 'workspace_' + (new Date().valueOf());
-
-      /*console.log('dirsTest >>>>>>>');
-      const map = new Map<string, number>();
-      for (const key of Object.keys(dirsTest)) {
-        console.log(key);
-        map.set(key);
-      }
-      console.log('dirsTest <<<<<<<<');*/
-
 
       const parents = new Map<string, string>();
       Object.keys(dirsTest).forEach(dir => {
@@ -172,22 +129,7 @@ describe('DynamicDataSourceDMEntity', () => {
 
       const entitiesIdMap = new Map<string, number>();
 
-      /*
-          if (!sessionService.sessionAlive) {
-            sessionService.connect('admin', 'kimios', 'kimios2018').subscribe(
-                null,
-                error => console.log('connect failed'),
-                () => {
-                  console.log('sessionToken: ' + sessionService.sessionToken);
-                  console.log('sessionAlive: ' + sessionService.sessionAlive);
-                  sessionToken$.next(sessionService.sessionToken);
-                });
-          } else {
-            sessionToken$.next(sessionService.sessionToken);
-          }
-      */
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
-
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 
       sessionService.connect('admin', 'kimios', 'kimios2018').pipe(
           concatMap(
@@ -203,7 +145,6 @@ describe('DynamicDataSourceDMEntity', () => {
           ),
           concatMap(
               workspaceId => from(Array.from(parents.keys())).pipe(
-                  tap(folderName => console.log('folderName: ' + folderName)),
                   concatMap(
                       folderName => combineLatest(of(folderName), createFolder(fs, sessionService, folderName, entitiesIdMap.get(parents.get(folderName))))
                   ),
@@ -217,9 +158,7 @@ describe('DynamicDataSourceDMEntity', () => {
           takeWhile(
               res => dirsTestTmp.length > 0
           ),
-          tap(res => console.log('before toArray() ' + res[0] + ' ' + res[1])),
           toArray(),
-          tap(res => console.log('after toArray() '))
       ).subscribe(
           res => {
               console.log('entities created ');
@@ -228,7 +167,6 @@ describe('DynamicDataSourceDMEntity', () => {
           error => {
               console.log('error while create entity : ');
               console.log(error);
-//              reject();
           },
           () => {
               console.log('entities all created');
@@ -238,23 +176,6 @@ describe('DynamicDataSourceDMEntity', () => {
           }
       );
 
-      // return obs.toPromise().then(function(): void {});
-      /*.subscribe(
-          res => {
-            console.log('entities created ');
-            console.dir(res);
-            done();
-          },
-          error => {
-            console.log('error while create entity : ');
-            console.log(error);
-          },
-          () => {
-              console.log('entities all created');
-              done();
-          }
-      );*/
-      // });
   };
 
   beforeAll( () => {
@@ -263,58 +184,8 @@ describe('DynamicDataSourceDMEntity', () => {
       });
   });
 
-  /*beforeEach(() => {
-    console.log('beforeEach');
-    TestBed.overrideProvider(FuseConfigService, {useValue: new MockFuseConfigService()});
-    TestBed.configureTestingModule({
-      imports: [
-        FileManagerModule,
-        RouterTestingModule.withRoutes([]),
-        HttpClientModule
-      ],
-      providers: [
-        {
-          provide: BASE_PATH,
-          useValue: APP_CONFIG.KIMIOS_API_BASE_PATH
-        },
-        BrowseEntityService,
-        DocumentService,
-        WorkspaceService,
-        FolderService,
-        CookieService,
-        /!*{
-          provide: Router,
-          useClass: class {
-            navigate = jasmine.createSpy('navigate');
-          }
-        },*!/
-        SessionService,
-        {
-          provide: 'fuseCustomConfig',
-          useValue: {}
-        }
-      ]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(BrowseComponent);
-    dataSource = fixture.componentInstance.dataSource;
-
-    sessionService = TestBed.get(SessionService);
-    console.log('sessionService: ' + sessionService);
-    if (!sessionService.sessionAlive) {
-      sessionService.connect('admin', 'kimios', 'kimios2018').subscribe(
-          null,
-          error => console.log('connect failed'),
-          () => {
-            console.log('sessionToken: ' + sessionService.sessionToken);
-            console.log('sessionAlive: ' + sessionService.sessionAlive);
-          });
-    }
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
-  });*/
-
-  it('should have been created when component have been created', function(done): void {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
+ it('should have been created when component have been created', function(done): void {
+      // jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
     initDone$.pipe(
         filter(res => res !== '')
     ).subscribe(
@@ -326,45 +197,11 @@ describe('DynamicDataSourceDMEntity', () => {
             console.log('test finished');
             done();
         }
-   );
+    );
   });
 
 
   afterAll((doneAfterAll) => {
-    console.log('afterAll');
-
-    console.log('sessionService: ' + sessionService);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
-
-
-    /* from(entitiesId.reverse()).pipe(
-        concatMap(
-            entityId => fs.deleteFolder(sessionService.sessionToken, entityId)
-        )
-    ).pipe(
-        concatMap(
-            res => */
-
-      /*allTestsDone$.pipe(
-          filter(res => res !== ''),
-          concatMap(
-              res =>
-                  ws.deleteWorkspace(sessionService.sessionToken, wId)
-          ),
-          switchMap(
-              res => of(res).catch(error => of(error))
-          ),
-          catchError(error => {
-              console.log('error while deleting ' + wId + ' ' + error);
-              return of('uh');
-          }),
-          concatMap(
-              res => {
-                  console.log('disconnection now');
-                  return sessionService.disconnect();
-              }
-          )
-      ).subscribe();*/
 
       ws.deleteWorkspace(sessionService.sessionToken, wId)
       //        )
