@@ -6,185 +6,264 @@ import {APP_CONFIG} from '../../../app-config/config';
 import {BrowseEntityService} from '../../../services/browse-entity.service';
 import {CookieService} from 'ngx-cookie-service';
 import {SessionService} from '../../../services/session.service';
-import {Observable, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of, Subject} from 'rxjs';
 import {BrowseComponent} from './browse.component';
 import {FileManagerModule} from '../../file-manager/file-manager.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FuseConfigService} from '../../../../@fuse/services/config.service';
 import {MockFuseConfigService} from '../../../tests/mock/mock-fuse-config-service';
+import {catchError, concatMap, filter, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 
 function createFolder(folderService: FolderService, sessionService: SessionService, dirName: string, parentId: number): Observable<number> {
   return folderService.createFolder(sessionService.sessionToken, dirName, parentId, true);
 }
 
+function getChildrenRec(dir: string, dirsTestElement: any, mapParam: Map<string, string>): void {
+    if (dirsTestElement !== null) {
+        let elements = new Array<string>();
+        if (Array.isArray(dirsTestElement)) {
+            elements = dirsTestElement;
+        } else {
+            if (typeof dirsTestElement === 'object' && dirsTestElement !== null) {
+                elements = Object.keys(dirsTestElement);
+            }
+        }
+        elements.forEach(elem => {
+            mapParam.set(elem, dir);
+            if (dirsTestElement[elem] !== null) {
+                getChildrenRec(elem, dirsTestElement[elem], mapParam);
+            }
+        });
+    }
+}
+
 describe('DynamicDataSourceDMEntity', () => {
   let fixture: ComponentFixture<BrowseComponent>;
   let sessionService: SessionService;
+    let ws: WorkspaceService;
+    let fs: FolderService;
+    let ds: DocumentService;
+    
   let dataSource: DynamicDataSourceDMEntity;
+  let wId: number;
 
   const entitiesId = new Array<number>();
 
-  const dirsTest = [
-    {
-      'dir1' : [
-        {
-          'dir1.1' : ['dir1.1.1', 'dir1.1.2', 'dir1.1.3']
-        },
-        {
-          'dir1.2' : ['dir1.2.1', 'dir1.2.2', 'dir1.2.3']
-        },
-        {
-          'dir1.3' : ['dir1.3.1', 'dir1.3.2', 'dir1.3.3']
-        }
-      ]
+  const dirsTest = {
+    'dir1': {
+        'dir1.1': ['dir1.1.1', 'dir1.1.2', 'dir1.1.3'],
+        'dir1.2': ['dir1.2.1', 'dir1.2.2', 'dir1.2.3'],
+        'dir1.3': ['dir1.3.1', 'dir1.3.2', 'dir1.3.3']
+      },
+    'dir2': {
+        'dir2.1': ['dir2.1.1', 'dir2.1.2', 'dir2.1.3'],
+        'dir2.2': ['dir2.2.1', 'dir2.2.2', 'dir2.2.3'],
+        'dir2.3': ['dir2.3.1', 'dir2.3.2', 'dir2.3.3']
     },
-    {
-      'dir2' : [
-        {
-          'dir2.1' : ['dir2.1.1', 'dir2.1.2', 'dir2.1.3']
-        },
-        {
-          'dir2.2' : ['dir2.2.1', 'dir2.2.2', 'dir2.2.3']
-        },
-        {
-          'dir2.3' : ['dir2.3.1', 'dir2.3.2', 'dir2.3.3']
-        }
-      ]
-    },
-    {
-      'dir3' : [
-        {
-          'dir3.1' : ['dir3.1.1', 'dir3.1.2', 'dir3.1.3']
-        },
-        {
-          'dir3.2' : ['dir3.2.1', 'dir3.2.2', 'dir3.2.3']
-        },
-        {
-          'dir3.3' : ['dir3.3.1', 'dir3.3.2', 'dir3.3.3']
-        }
-      ]
+    'dir3': {
+        'dir3.1': ['dir3.1.1', 'dir3.1.2', 'dir3.1.3'],
+        'dir3.2': ['dir3.2.1', 'dir3.2.2', 'dir3.2.3'],
+        'dir3.3': ['dir3.3.1', 'dir3.3.2', 'dir3.3.3']
     }
-  ];
+  };
 
   const sessionToken$ = new Subject<string>();
+  const initDone$ = new BehaviorSubject<string>('');
+  const allTestsDone$ = new BehaviorSubject<string>('');
+  const testDone$ = new Subject();
 
-  /*beforeAll(() => {
-    console.log('beforeAll');
-    TestBed.configureTestingModule({
-      imports: [HttpClientModule],
-      providers: [
-        {
-          provide: BASE_PATH,
-          useValue: APP_CONFIG.KIMIOS_API_BASE_PATH
+  const TEST1 = 'test1';
+  const testList = [TEST1];
+
+  const markTestDone = function (testName: string): void {
+      const indexTestName = testList.indexOf(testName);
+      if (indexTestName !== -1) {
+          testList.splice(indexTestName, 1);
+      }
+      if (testList.length === 0) {
+          allTestsDone$.next('yes');
+      }
+  };
+
+  const before = function(resolve): void {
+      console.log('beforeAll');
+      TestBed.overrideProvider(FuseConfigService, {useValue: new MockFuseConfigService()});
+      TestBed.configureTestingModule({
+          imports: [
+              HttpClientModule,
+              FileManagerModule,
+              RouterTestingModule.withRoutes([])
+          ],
+          providers: [
+              {
+                  provide: BASE_PATH,
+                  useValue: APP_CONFIG.KIMIOS_API_BASE_PATH
+              },
+              BrowseEntityService,
+              DocumentService,
+              WorkspaceService,
+              FolderService,
+              CookieService,
+              /*{
+                provide: Router,
+                useClass: class {
+                  navigate = jasmine.createSpy('navigate');
+                }
+              },*/
+              SessionService,
+              {
+                  provide: 'fuseCustomConfig',
+                  useValue: {}
+              }
+          ]
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(BrowseComponent);
+      dataSource = fixture.componentInstance.dataSource;
+      sessionService = TestBed.get(SessionService);
+      ws = TestBed.get(WorkspaceService);
+      fs = TestBed.get(FolderService);
+      ds = TestBed.get(DocumentService);
+
+      /*.subscribe(
+        res => {
+          console.log('entities created ');
+          console.dir(res);
+          done();
         },
-        BrowseEntityService,
-        DocumentService,
-        WorkspaceService,
-        FolderService,
-        CookieService,
-        {
-          provide: Router,
-          useClass: class {
-            navigate = jasmine.createSpy('navigate');
+        error => {
+          console.log('error while create entity : ');
+          console.log(error);
+        },
+        () => {
+            console.log('entities all created');
+            done();
+        }
+    )*/
+//      console.log('fin beforeAll');
+//  });
+
+//  beforeEach( () => {
+//      console.log('beforeEach now');
+      console.log('sessionService: ' + sessionService);
+      // return new Promise(function(resolve, reject): void {
+
+      /*const ws: WorkspaceService = TestBed.get(WorkspaceService);
+      const fs: FolderService = TestBed.get(FolderService);
+      const ds: DocumentService = TestBed.get(DocumentService);
+*/
+      const workspaceName = 'workspace_' + (new Date().valueOf());
+
+      /*console.log('dirsTest >>>>>>>');
+      const map = new Map<string, number>();
+      for (const key of Object.keys(dirsTest)) {
+        console.log(key);
+        map.set(key);
+      }
+      console.log('dirsTest <<<<<<<<');*/
+
+
+      const parents = new Map<string, string>();
+      Object.keys(dirsTest).forEach(dir => {
+          parents.set(dir, workspaceName);
+          getChildrenRec(dir, dirsTest[dir], parents);
+      });
+      const dirsTestTmp = Array.from(parents.keys());
+
+      const entitiesIdMap = new Map<string, number>();
+
+      /*
+          if (!sessionService.sessionAlive) {
+            sessionService.connect('admin', 'kimios', 'kimios2018').subscribe(
+                null,
+                error => console.log('connect failed'),
+                () => {
+                  console.log('sessionToken: ' + sessionService.sessionToken);
+                  console.log('sessionAlive: ' + sessionService.sessionAlive);
+                  sessionToken$.next(sessionService.sessionToken);
+                });
+          } else {
+            sessionToken$.next(sessionService.sessionToken);
           }
-        },
-        SessionService
-      ]
-    }).compileComponents();
+      */
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
 
-    service = TestBed.get(BrowseEntityService);
 
-    sessionService = TestBed.get(SessionService);
-    console.log('sessionService: ' + sessionService);
-    if (!sessionService.sessionAlive) {
-      sessionService.connect('admin', 'kimios', 'kimios2018').subscribe(
-          null,
-          error => console.log('connect failed'),
+      sessionService.connect('admin', 'kimios', 'kimios2018').pipe(
+          concatMap(
+              res => ws.createWorkspace(sessionService.sessionToken, workspaceName)
+          ),
+          concatMap(
+              workspaceId => {
+                  entitiesId.push(workspaceId);
+                  wId = workspaceId;
+                  entitiesIdMap.set(workspaceName, workspaceId);
+                  return of(workspaceId);
+              }
+          ),
+          concatMap(
+              workspaceId => from(Array.from(parents.keys())).pipe(
+                  tap(folderName => console.log('folderName: ' + folderName)),
+                  concatMap(
+                      folderName => combineLatest(of(folderName), createFolder(fs, sessionService, folderName, entitiesIdMap.get(parents.get(folderName))))
+                  ),
+                  tap(([folderN, folderId]) => {
+                      entitiesIdMap.set(folderN, folderId);
+                      const folderIndex = dirsTestTmp.indexOf(folderN);
+                      dirsTestTmp.splice(folderIndex, 1);
+                  })
+              )
+          ),
+          takeWhile(
+              res => dirsTestTmp.length > 0
+          ),
+          tap(res => console.log('before toArray() ' + res[0] + ' ' + res[1])),
+          toArray(),
+          tap(res => console.log('after toArray() '))
+      ).subscribe(
+          res => {
+              console.log('entities created ');
+              console.dir(res);
+          },
+          error => {
+              console.log('error while create entity : ');
+              console.log(error);
+//              reject();
+          },
           () => {
-            console.log('sessionToken: ' + sessionService.sessionToken);
-            console.log('sessionAlive: ' + sessionService.sessionAlive);
-          });
-    }
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+              console.log('entities all created');
 
-    const ws: WorkspaceService = TestBed.get(WorkspaceService);
-    const fs: FolderService = TestBed.get(FolderService);
-    const ds: DocumentService = TestBed.get(DocumentService);
+              initDone$.next('go');
+              resolve();
+          }
+      );
 
-    ws.createWorkspace(sessionService.sessionToken, 'workspace_karma_test').pipe(
-        tap(
-            folderId => entitiesId.push(folderId)
-        ),
-        concatMap(
-            workspaceId => from(Object.keys(dirsTest)).pipe(
-                concatMap(
-                    folderName1 => combineLatest(of(folderName1), createFolder(fs, sessionService, folderName1, workspaceId))
-                ),
-                tap(
-                    ([folderName, folderId]) => entitiesId.push(folderId)
-                ),
-                concatMap(
-                    ([folderName1, folderId1]) => from(Object.keys(dirsTest[folderName1])).pipe(
-                        concatMap(
-                            folderName2 => combineLatest(of(folderName2), createFolder(fs, sessionService, folderName2, folderId1))
-
-                        ),
-                        tap(
-                            ([folderName, folderId]) => entitiesId.push(folderId)
-                        ),
-                        concatMap(
-                            ([folderName2, folderId2]) => from(Object.keys(dirsTest[folderName1][folderName2])).pipe(
-                                concatMap(
-                                    folderName3 => createFolder(fs, sessionService, folderName3, folderId2)
-                                ),
-                                tap(
-                                    folderId => entitiesId.push(folderId)
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        )
-    );
-  });*/
-
-  /*afterAll(() => {
-    console.log('afterAll');
-
-    service = TestBed.get(BrowseEntityService);
-
-    sessionService = TestBed.get(SessionService);
-    console.log('sessionService: ' + sessionService);
-    if (!sessionService.sessionAlive) {
-      sessionService.connect('admin', 'kimios', 'kimios2018').subscribe(
-          null,
-          error => console.log('connect failed'),
+      // return obs.toPromise().then(function(): void {});
+      /*.subscribe(
+          res => {
+            console.log('entities created ');
+            console.dir(res);
+            done();
+          },
+          error => {
+            console.log('error while create entity : ');
+            console.log(error);
+          },
           () => {
-            console.log('sessionToken: ' + sessionService.sessionToken);
-            console.log('sessionAlive: ' + sessionService.sessionAlive);
-          });
-    }
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+              console.log('entities all created');
+              done();
+          }
+      );*/
+      // });
+  };
 
-    const ws: WorkspaceService = TestBed.get(WorkspaceService);
-    const fs: FolderService = TestBed.get(FolderService);
-    const ds: DocumentService = TestBed.get(DocumentService);
+  beforeAll( () => {
+      new Promise(before).then(() => {
+          console.log('done beforeAll');
+      });
+  });
 
-    const wId: number = entitiesId.shift();
-
-    from(entitiesId.reverse()).pipe(
-        concatMap(
-            entityId => fs.deleteFolder(sessionService.sessionToken, entityId)
-        )
-    ).pipe(
-        concatMap(
-            res => ws.deleteWorkspace(sessionService.sessionToken, wId)
-        )
-    );
-  });*/
-
-  beforeEach(() => {
+  /*beforeEach(() => {
     console.log('beforeEach');
     TestBed.overrideProvider(FuseConfigService, {useValue: new MockFuseConfigService()});
     TestBed.configureTestingModule({
@@ -203,12 +282,12 @@ describe('DynamicDataSourceDMEntity', () => {
         WorkspaceService,
         FolderService,
         CookieService,
-        /*{
+        /!*{
           provide: Router,
           useClass: class {
             navigate = jasmine.createSpy('navigate');
           }
-        },*/
+        },*!/
         SessionService,
         {
           provide: 'fuseCustomConfig',
@@ -229,14 +308,92 @@ describe('DynamicDataSourceDMEntity', () => {
           () => {
             console.log('sessionToken: ' + sessionService.sessionToken);
             console.log('sessionAlive: ' + sessionService.sessionAlive);
-            sessionToken$.next(sessionService.sessionToken);
           });
     }
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+  });*/
+
+  it('should have been created when component have been created', function(done): void {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
+    initDone$.pipe(
+        filter(res => res !== '')
+    ).subscribe(
+        res => {
+            console.log('test now');
+            expect(dataSource).toBeTruthy();
+            expect(dataSource).toBeDefined();
+            markTestDone(TEST1);
+            console.log('test finished');
+            done();
+        }
+   );
   });
 
-  it('should have been created when component have been created', () => {
-    expect(dataSource).toBeTruthy();
-    expect(dataSource).toBeDefined();
+
+  afterAll((doneAfterAll) => {
+    console.log('afterAll');
+
+    console.log('sessionService: ' + sessionService);
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000000;
+
+
+    /* from(entitiesId.reverse()).pipe(
+        concatMap(
+            entityId => fs.deleteFolder(sessionService.sessionToken, entityId)
+        )
+    ).pipe(
+        concatMap(
+            res => */
+
+      /*allTestsDone$.pipe(
+          filter(res => res !== ''),
+          concatMap(
+              res =>
+                  ws.deleteWorkspace(sessionService.sessionToken, wId)
+          ),
+          switchMap(
+              res => of(res).catch(error => of(error))
+          ),
+          catchError(error => {
+              console.log('error while deleting ' + wId + ' ' + error);
+              return of('uh');
+          }),
+          concatMap(
+              res => {
+                  console.log('disconnection now');
+                  return sessionService.disconnect();
+              }
+          )
+      ).subscribe();*/
+
+      ws.deleteWorkspace(sessionService.sessionToken, wId)
+      //        )
+      //    )
+          .pipe(
+              switchMap(
+                  res => of(res).catch(error => of(error))
+              ),
+              tap(
+                  res => console.log('removed workspace')
+              ),
+              catchError(error => {
+                  console.log('error while deleting ' + wId + ' ' + error);
+                  return of('uh');
+              }),
+              concatMap(
+                  res => {
+                      console.log('disconnection now');
+                      return sessionService.disconnect();
+                  }
+              )
+          ).subscribe(
+          null,
+          null,
+          () => {
+              console.log('removed workspace and disconnected');
+              doneAfterAll();
+          }
+      );
   });
+
 });

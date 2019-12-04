@@ -9,7 +9,6 @@ module.exports = function (config)
         plugins                 : [
             require('karma-jasmine'),
             require('karma-chrome-launcher'),
-            require('karma-phantomjs-launcher'),
             require('karma-jasmine-html-reporter'),
             require('karma-coverage-istanbul-reporter'),
             require('@angular-devkit/build-angular/plugins/karma')
@@ -28,14 +27,13 @@ module.exports = function (config)
         colors                  : true,
         logLevel                : config.LOG_LOG,
         autoWatch               : true,
-        browsers: ['PhantomJS'],
-        singleRun: true,
-        // Allow remote debugging when using PhantomJS
-        /*customLaunchers: {
-            'PhantomJS_custom': {
-                base: 'PhantomJS',
-                debug: true,
-            },
-        },*/
+        browsers                : ['Chrome'],
+        singleRun               : false,
+        customLaunchers: {
+            ChromeHeadlessCI: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox']
+            }
+        },
     });
 };
