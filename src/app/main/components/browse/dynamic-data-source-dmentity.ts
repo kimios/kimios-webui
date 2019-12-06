@@ -4,7 +4,7 @@ import {FlatTreeControl} from '@angular/cdk/tree';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {combineLatest, EMPTY, from, Observable, of} from 'rxjs';
+import {combineLatest, forkJoin, from, Observable, of} from 'rxjs';
 import {concatMap, expand, map, mergeMap, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DMEntity} from 'app/kimios-client-api';
@@ -175,7 +175,7 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
             false,
             true,
             entity.uid
-        );
+            );
     }
 
     loadChildrenNodesDataInDatabase(entity: DMEntity): Observable<Array<DMEntity>> {
@@ -202,10 +202,33 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
         );
     }
 
+    loadChildrenNodesDataInDatabaseForkJoin(entities: Array<DMEntity>): Observable<DynamicFlatNodeWithUid[]> {
+//    loadChildrenNodesDataInDatabaseRec(entities: Array<DMEntity>): Observable<DMEntity[]> {
+        const array = entities.map(entity => this.loadChildrenNodesDataInDatabase(entity).pipe(
+            map(res => this.constructDynamicNodeFromDMEntity(entity))
+        ));
+        return forkJoin(array)/*.pipe(
+            map(res => from(res).pipe(
+                map(entity => this.constructDynamicNodeFromDMEntity(entity))
+            ))
+        )*/;
+
+        /*return this.loadChildrenNodesDataInDatabaseReturnTodo(entities).pipe(
+            expand((res) => (res != null && res.next && res.next !== undefined && res.next !== null && res.next.length) > 0 ?
+                this.loadChildrenNodesDataInDatabaseReturnTodo(res.next) :
+                of(null)
+            ),
+            concatMap(res => (res !== null) ? of(this.constructDynamicNodeFromDMEntity(res['done'])) : of()),
+            // map(res => this.constructDynamicNodeFromDMEntity(res))
+//            map(res => res)
+        );*/
+    }
+
     loadChildrenNodesDataInDatabaseRec(entities: Array<DMEntity>): Observable<DynamicFlatNodeWithUid> {
         return this.loadChildrenNodesDataInDatabaseReturnTodo(entities).pipe(
-            expand(({ next }) => next ? this.loadChildrenNodesDataInDatabaseReturnTodo(next) : EMPTY),
-            concatMap(({ done }) => of(this.constructDynamicNodeFromDMEntity(done)))
+            expand(({ next }) => (next && next.length > 0) ? this.loadChildrenNodesDataInDatabaseReturnTodo(next) : of({next: [], done: null})),
+            concatMap(res => (res !== null && res.done !== null) ? of(this.constructDynamicNodeFromDMEntity(res.done)) : of(null)),
+//             map(res => res)
         );
     }
 

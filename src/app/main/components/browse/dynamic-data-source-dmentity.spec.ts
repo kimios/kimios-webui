@@ -6,7 +6,7 @@ import {APP_CONFIG} from '../../../app-config/config';
 import {BrowseEntityService} from '../../../services/browse-entity.service';
 import {CookieService} from 'ngx-cookie-service';
 import {SessionService} from '../../../services/session.service';
-import {BehaviorSubject, combineLatest, from, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
 import {BrowseComponent} from './browse.component';
 import {FileManagerModule} from '../../file-manager/file-manager.module';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -43,13 +43,23 @@ describe('DynamicDataSourceDMEntity', () => {
     let ws: WorkspaceService;
     let fs: FolderService;
     let ds: DocumentService;
+    let bes: BrowseEntityService;
     
   let dataSource: DynamicDataSourceDMEntity;
   let wId: number;
 
   const entitiesId = new Array<number>();
+    const entitiesIdMap = new Map<string, number>();
 
-  const dirsTest = {
+  const initDone$ = new BehaviorSubject<string>('');
+  const allTestsDone$ = new BehaviorSubject<string>('');
+
+  const TEST1 = 'test1';
+    const TEST2 = 'test2';
+  const testList = [ TEST1, TEST2 ];
+    const DIR_TEST_LOAD_REC = 'dir2.2.3';
+
+    const dirsTest = {
     'dir1': {
         'dir1.1': ['dir1.1.1', 'dir1.1.2', 'dir1.1.3'],
         'dir1.2': ['dir1.2.1', 'dir1.2.2', 'dir1.2.3'],
@@ -57,7 +67,7 @@ describe('DynamicDataSourceDMEntity', () => {
       },
     'dir2': {
         'dir2.1': ['dir2.1.1', 'dir2.1.2', 'dir2.1.3'],
-        'dir2.2': ['dir2.2.1', 'dir2.2.2', 'dir2.2.3'],
+        'dir2.2': ['dir2.2.1', 'dir2.2.2', DIR_TEST_LOAD_REC],
         'dir2.3': ['dir2.3.1', 'dir2.3.2', 'dir2.3.3']
     },
     'dir3': {
@@ -67,11 +77,6 @@ describe('DynamicDataSourceDMEntity', () => {
     }
   };
 
-  const initDone$ = new BehaviorSubject<string>('');
-  const allTestsDone$ = new BehaviorSubject<string>('');
-
-  const TEST1 = 'test1';
-  const testList = [TEST1];
 
   const markTestDone = function (testName: string): void {
       const indexTestName = testList.indexOf(testName);
@@ -117,6 +122,7 @@ describe('DynamicDataSourceDMEntity', () => {
       ws = TestBed.get(WorkspaceService);
       fs = TestBed.get(FolderService);
       ds = TestBed.get(DocumentService);
+      bes = TestBed.get(BrowseEntityService);
 
       const workspaceName = 'workspace_' + (new Date().valueOf());
 
@@ -126,8 +132,6 @@ describe('DynamicDataSourceDMEntity', () => {
           getChildrenRec(dir, dirsTest[dir], parents);
       });
       const dirsTestTmp = Array.from(parents.keys());
-
-      const entitiesIdMap = new Map<string, number>();
 
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 
@@ -200,13 +204,49 @@ describe('DynamicDataSourceDMEntity', () => {
     );
   });
 
+    it('loadChildrenNodesDataInDatabaseLoop', function (done): void {
+        initDone$.pipe(
+            filter(res => res !== ''),
+            concatMap(
+                res => bes.findAllParents(entitiesIdMap.get(DIR_TEST_LOAD_REC))
+            ),
+            concatMap(
+                res => dataSource.loadChildrenNodesDataInDatabaseRec(res.reverse())
+            ),
+            tap(res => console.log('loadChildrenNodesDataInDatabaseRec returned ' + res)),
+//            take(3),
+            takeWhile(res => res !== null),
+            toArray()
+        ).subscribe(
+            res => {
+                console.log('received result ' + res);
+                expect(res).toBeDefined();
+//                markTestDone(TEST2);
+//                done();
+                initDone$.complete();
+            },
+            error => {
+                console.log(TEST2 + ' : subscribe error ');
+                console.log(error);
+            },
+            () => {
+                console.log(TEST2 + ' : subscribe completed')
+                markTestDone(TEST2);
+                done();
+            }
+        );
+    });
 
   afterAll((doneAfterAll) => {
 
-      ws.deleteWorkspace(sessionService.sessionToken, wId)
+      allTestsDone$.pipe(
+          filter(res => res !== ''),
+          concatMap(
+              res => ws.deleteWorkspace(sessionService.sessionToken, wId)
+          ),
       //        )
       //    )
-          .pipe(
+      //    .pipe(
               switchMap(
                   res => of(res).catch(error => of(error))
               ),
@@ -223,9 +263,13 @@ describe('DynamicDataSourceDMEntity', () => {
                       return sessionService.disconnect();
                   }
               )
-          ).subscribe(
-          null,
-          null,
+         ).subscribe(
+          res => {
+              console.log(res);
+              allTestsDone$.complete();
+          },
+          error => console.log(error)
+          ,
           () => {
               console.log('removed workspace and disconnected');
               doneAfterAll();
