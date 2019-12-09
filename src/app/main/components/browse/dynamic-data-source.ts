@@ -57,6 +57,10 @@ export class DynamicDataSource<T extends HasAName> {
 
     }
 
+    get database(): DynamicDatabase {
+        return this._database;
+    }
+
     connect(collectionViewer: CollectionViewer): Observable<DynamicFlatNodeWithUid[]> {
         this._treeControl.expansionModel.changed.subscribe(change => {
             if ((change as SelectionChange<DynamicFlatNodeWithUid>).added ||

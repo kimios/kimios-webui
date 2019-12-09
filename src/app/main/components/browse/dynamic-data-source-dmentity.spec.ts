@@ -50,6 +50,7 @@ describe('DynamicDataSourceDMEntity', () => {
 
   const entitiesId = new Array<number>();
     const entitiesIdMap = new Map<string, number>();
+    const parents = new Map<string, string>();
 
   const initDone$ = new BehaviorSubject<string>('');
   const allTestsDone$ = new BehaviorSubject<string>('');
@@ -126,7 +127,6 @@ describe('DynamicDataSourceDMEntity', () => {
 
       const workspaceName = 'workspace_' + (new Date().valueOf());
 
-      const parents = new Map<string, string>();
       Object.keys(dirsTest).forEach(dir => {
           parents.set(dir, workspaceName);
           getChildrenRec(dir, dirsTest[dir], parents);
@@ -221,6 +221,29 @@ describe('DynamicDataSourceDMEntity', () => {
                 expect(res).toBeDefined();
 //                markTestDone(TEST2);
 //                done();
+                expect(res);
+                expect(res.length).toEqual(3);
+                const workspaceId = entitiesIdMap.get(parents.get(parents.get(parents.get(DIR_TEST_LOAD_REC))));
+                const folderLv1Id = entitiesIdMap.get(parents.get(parents.get(DIR_TEST_LOAD_REC)));
+                const folderLv2Id = entitiesIdMap.get(parents.get(DIR_TEST_LOAD_REC));
+                expect(res[2].uid).toEqual(folderLv2Id);
+                expect(res[1].uid).toEqual(folderLv1Id);
+                expect(res[0].uid).toEqual(workspaceId);
+                expect(dataSource.data).toBeDefined();
+                expect(dataSource.database.dataMap.size).toBeGreaterThan(0);
+
+                expect(dataSource.database.getChildren(folderLv2Id)).toBeDefined();
+                expect(dataSource.database.getChildren(folderLv2Id).length).toEqual(3);
+                expect(dataSource.database.getChildren(folderLv2Id).includes(entitiesIdMap.get(DIR_TEST_LOAD_REC))).toEqual(true);
+
+                expect(dataSource.database.getChildren(folderLv1Id)).toBeDefined();
+                expect(dataSource.database.getChildren(folderLv1Id).length).toEqual(3);
+                expect(dataSource.database.getChildren(folderLv1Id).includes(folderLv2Id)).toEqual(true);
+
+                expect(dataSource.database.getChildren(workspaceId)).toBeDefined();
+                expect(dataSource.database.getChildren(workspaceId).length).toEqual(3);
+                expect(dataSource.database.getChildren(workspaceId).includes(folderLv1Id)).toEqual(true);
+
                 initDone$.complete();
             },
             error => {
@@ -263,7 +286,6 @@ describe('DynamicDataSourceDMEntity', () => {
               )
          ).subscribe(
           res => {
-              console.log(res);
               allTestsDone$.complete();
           },
           error => console.log(error)
