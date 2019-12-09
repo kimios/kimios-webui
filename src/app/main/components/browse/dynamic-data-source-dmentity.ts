@@ -5,7 +5,7 @@ import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {combineLatest, forkJoin, from, Observable, of} from 'rxjs';
-import {concatMap, expand, map, mergeMap, tap, toArray} from 'rxjs/operators';
+import {concatMap, expand, map, mergeMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DMEntity} from 'app/kimios-client-api';
 
@@ -229,6 +229,13 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
             expand(({ next }) => (next && next.length > 0) ? this.loadChildrenNodesDataInDatabaseReturnTodo(next) : of({next: [], done: null})),
             concatMap(res => (res !== null && res.done !== null) ? of(this.constructDynamicNodeFromDMEntity(res.done)) : of(null)),
 //             map(res => res)
+        );
+    }
+
+    loadChildrenNodesDataInDatabaseReturnNodesLoaded(entities: Array<DMEntity>): Observable<Array<DynamicFlatNodeWithUid>> {
+        return this.loadChildrenNodesDataInDatabaseRec(entities).pipe(
+            takeWhile(res => res != null),
+            toArray()
         );
     }
 

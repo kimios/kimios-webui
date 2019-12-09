@@ -211,12 +211,10 @@ describe('DynamicDataSourceDMEntity', () => {
                 res => bes.findAllParents(entitiesIdMap.get(DIR_TEST_LOAD_REC))
             ),
             concatMap(
-                res => dataSource.loadChildrenNodesDataInDatabaseRec(res.reverse())
+                res => dataSource.loadChildrenNodesDataInDatabaseReturnNodesLoaded(res.reverse())
             ),
             tap(res => console.log('loadChildrenNodesDataInDatabaseRec returned ' + res)),
 //            take(3),
-            takeWhile(res => res !== null),
-            toArray()
         ).subscribe(
             res => {
                 console.log('received result ' + res);
