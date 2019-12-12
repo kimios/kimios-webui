@@ -122,7 +122,8 @@ import {EntityListingComponent} from 'app/main/components/entity-listing/entity-
         MatTreeModule,
 
         DragDropModule,
-        MatGridListModule
+        MatGridListModule,
+
     ],
     providers   : [
         EntityService,

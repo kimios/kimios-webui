@@ -1,46 +1,29 @@
 <div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
 
   <div fxFlex="25">
-    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" id="matTree">
-      <mat-tree-node *matTreeNodeDef="let node"
-                     matTreeNodePadding
-                     (click)="selectNode(node.uid)"
-                     class="cursor-pointer"
-                     [id]="'mat-tree-node-' + node.uid"
-                     [attr.data-nodeuid]="node.uid"
-      >
-        <ng-container *ngIf="node.isLoading; else notLoading">
-          <mat-progress-spinner
-                  mode="indeterminate"
-                  diameter="25"></mat-progress-spinner>
-        </ng-container>
-        <ng-template #notLoading>
-          <ng-container *ngIf="node.expandable; else default">
-            <button mat-icon-button
-                    [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
-              <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-              </mat-icon>
-            </button>
-          </ng-container>
-        </ng-template>
-        <ng-template #default>
-          <button mat-icon-button disabled></button>
-        </ng-template>
-        {{node.item}}
-      </mat-tree-node>
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-        <button mat-icon-button
-                [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
-          <mat-icon class="mat-icon-rtl-mirror">
-            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-          </mat-icon>
-        </button>
-        {{node.item}}
-      </mat-tree-node>
-    </mat-tree>
 
+    <!--<tree-root [nodes]="nodes" #tree>
+      <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+        <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+          <tree-node-expander [node]="node"></tree-node-expander>
+          <div class="node-content-wrapper"
+               [class.node-content-wrapper-active]="node.isActive"
+               [class.node-content-wrapper-focused]="node.isFocused"
+               (click)="node.mouseAction('click', $event)"
+               (dblclick)="node.mouseAction('dblClick', $event)"
+               (contextmenu)="node.mouseAction('contextMenu', $event)"
+               (treeDrop)="node.onDrop($event)"
+               [treeAllowDrop]="node.allowDrop"
+               [treeDrag]="node"
+               [treeDragEnabled]="node.allowDrag()">
 
+            <tree-node-content [node]="node" [index]="index"></tree-node-content>
+          </div>
+        </div>
+      </ng-template>
+    </tree-root>-->
+
+    uh
   </div>
 
   <div fxFlex="70">

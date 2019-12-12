@@ -8,7 +8,7 @@ import {DynamicDataSourceDMEntity} from './dynamic-data-source-dmentity';
 import {BehaviorSubject, from, of, zip} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {concatMap, switchMap} from 'rxjs/operators';
+import {concatMap, filter, switchMap} from 'rxjs/operators';
 
 interface EntityNode {
   uid: number;
@@ -28,8 +28,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   dataSource = new MatTreeNestedDataSource<EntityNode>();
 */
 
-  treeControl: FlatTreeControl<DynamicFlatNodeWithUid>;
-  dataSource: DynamicDataSourceDMEntity;
+  // dataSource: DynamicDataSourceDMEntity;
   selectedEntity$: BehaviorSubject<DMEntity>;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   nodeUidsToExpand$: BehaviorSubject<Array<DMEntity>>;
@@ -37,7 +36,30 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   @Input()
   entityId: number;
 
-  @ViewChild('matTree', {read: ElementRef}) matTree: ElementRef;
+  @ViewChild('tree') tree;
+
+    nodes = [
+        {
+            name: 'root1',
+            children: [
+                { name: 'child1' },
+                { name: 'child2' }
+            ]
+        },
+        {
+            id: 'root2',
+            name: 'root2',
+            children: [
+                { name: 'child2.1', children: [] },
+                { name: 'child2.2', children: [
+                        {name: 'grandchild2.2.1'}
+                    ] }
+            ]
+        },
+        { name: 'root3' },
+        { name: 'root4', children: [] },
+        { name: 'root5', children: null }
+    ];
 
   constructor(
       private sessionService: SessionService,
@@ -46,8 +68,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       private router: Router,
       database: DynamicDatabase
   ) {
-    this.treeControl = new FlatTreeControl<DynamicFlatNodeWithUid>(this.getLevel, this.isExpandable);
-    this.dataSource = new DynamicDataSourceDMEntity(this.treeControl, database, browseEntityService);
+    // this.dataSource = new DynamicDataSourceDMEntity(database, browseEntityService);
 
     this.selectedEntity$ = new BehaviorSubject<DMEntity>(undefined);
     this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
@@ -61,28 +82,36 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   hasChild = (_: number, _nodeData: DynamicFlatNodeWithUid) => _nodeData.expandable;
 
   ngOnInit(): void {
-    this.dataSource.setInitialData().subscribe(
+    /*this.dataSource.setInitialData().subscribe(
         res => {
           const value = this.loadedEntities$.getValue();
           this.loadedEntities$.next(value.concat(res));
         }
-    );
+    );*/
 
-    this.browseEntityService.findAllParents(this.entityId)
-        .subscribe(
-            res => this.nodeUidsToExpand$.next(res)
-        );
+
   }
 
   ngAfterViewInit(): void {
-    this.route.paramMap.pipe(
-        switchMap((params: ParamMap) => {
-          this.entityId = Number(params.get('entityId'));
-          // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
+      // this.tree.treeModel.getNodeById('root2').expand();
+      /*setTimeout(() => {
+          this.nodes[0].name = 'uh';
+      });*/
 
-          return of();
-        })
-    ).subscribe();
+    /*this.route.paramMap.pipe(
+        switchMap((params: ParamMap) => {
+          const entityId = Number(params.get('entityId'));
+          // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
+            this.entityId = entityId;
+            return of(entityId);
+        }),
+        filter(res => res !== null),
+        concatMap(
+            eId => this.browseEntityService.findAllParents(eId)
+        )
+    ).subscribe(
+        res => this.nodeUidsToExpand$.next(res)
+    );
 
     zip(this.loadedEntities$, this.nodeUidsToExpand$).pipe(
         concatMap(
@@ -92,9 +121,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                       entity => {
                         loaded.filter(node1 => toExpand.map(e => e.uid).includes(node1.uid))
                             .forEach(node1 => {
-                              if (!this.treeControl.isExpanded(node1)) {
-                                this.treeControl.expand(node1);
-                              }
+                              this.tree.treeModel.getNodeById(entity.uid.toString()).expand();
                             });
                         return of(entity);
                       }
@@ -103,12 +130,12 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               return of();
             }
         )
-    ).subscribe();
+    ).subscribe();*/
   }
 
   expandNodes(): void {}
 
   selectNode(uid: number): void {
-    this.selectedEntity$.next(this.dataSource.entities.get(uid));
+    // this.selectedEntity$.next(this.dataSource.entities.get(uid));
   }
 }

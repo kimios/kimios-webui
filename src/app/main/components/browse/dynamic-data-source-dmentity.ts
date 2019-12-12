@@ -10,23 +10,25 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DMEntity} from 'app/kimios-client-api';
 
 @Injectable()
-export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
+export class DynamicDataSourceDMEntity {
     loadedEntities: number[];
     entityId: number;
+    private entities: Map<number, DMEntity>;
+    private parents: Map<number, number>;
 
-    constructor(_treeControl: FlatTreeControl<DynamicFlatNodeWithUid>,
-                _database: DynamicDatabase,
+    constructor(private _database: DynamicDatabase,
                 private browseEntityService: BrowseEntityService,
     ) {
-        super(_treeControl, _database);
         this.loadedEntities = [];
         this.entityId = -1;
+        this.entities = new Map<number, DMEntity>();
+        this.parents = new Map<number, number>();
     }
 
     /**
      * Toggle the node, remove from display list
      */
-    toggleNode(node: DynamicFlatNodeWithUid, doExpand: boolean): Observable<number> {
+    /*toggleNode(node: DynamicFlatNodeWithUid, doExpand: boolean): Observable<number> {
         const children = this._database.getChildren(node.uid);
         const index = this.data.indexOf(node);
         if (!children || index < 0) { // If no children, or cannot find the node, no op
@@ -90,15 +92,15 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
 
         return obs;
 
-    }
+    }*/
 
-    public setInitialData(): Observable<Array<DynamicFlatNodeWithUid>> {
+    /*public setInitialData(): Observable<Array<DynamicFlatNodeWithUid>> {
         return this.retrieveNodes().pipe(
             toArray()
         );
-    }
+    }*/
 
-    private retrieveNodes(): Observable<DynamicFlatNodeWithUid> {
+    /*private retrieveNodes(): Observable<DynamicFlatNodeWithUid> {
         return this.browseEntityService.findContainerEntitiesAtPath().pipe(
             tap(res => {
                 const collection = new Array<DynamicFlatNodeWithUid>();
@@ -154,8 +156,8 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
             )
         );
     }
-
-    updateNodeInData(data: DynamicFlatNodeWithUid[], uid: number, isLoading: boolean, expandable: boolean): DynamicFlatNodeWithUid[] {
+*/
+/*    updateNodeInData(data: DynamicFlatNodeWithUid[], uid: number, isLoading: boolean, expandable: boolean): DynamicFlatNodeWithUid[] {
         const nodeIndex = data.findIndex(node => node.uid === uid);
         const entityNode = data[nodeIndex];
         entityNode.isLoading = false;
@@ -178,7 +180,7 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
             );
     }
 
-    loadChildrenNodesDataInDatabase(entity: DMEntity): Observable<Array<DMEntity>> {
+    /*loadChildrenNodesDataInDatabase(entity: DMEntity): Observable<Array<DMEntity>> {
         return this.browseEntityService.findContainerEntitiesAtPath(entity.uid).pipe(
             tap(res => {
                 this._database.setChildren(entity.uid, res.map(ent => ent.uid));
@@ -203,25 +205,10 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
     }
 
     loadChildrenNodesDataInDatabaseForkJoin(entities: Array<DMEntity>): Observable<DynamicFlatNodeWithUid[]> {
-//    loadChildrenNodesDataInDatabaseRec(entities: Array<DMEntity>): Observable<DMEntity[]> {
         const array = entities.map(entity => this.loadChildrenNodesDataInDatabase(entity).pipe(
             map(res => this.constructDynamicNodeFromDMEntity(entity))
         ));
-        return forkJoin(array)/*.pipe(
-            map(res => from(res).pipe(
-                map(entity => this.constructDynamicNodeFromDMEntity(entity))
-            ))
-        )*/;
-
-        /*return this.loadChildrenNodesDataInDatabaseReturnTodo(entities).pipe(
-            expand((res) => (res != null && res.next && res.next !== undefined && res.next !== null && res.next.length) > 0 ?
-                this.loadChildrenNodesDataInDatabaseReturnTodo(res.next) :
-                of(null)
-            ),
-            concatMap(res => (res !== null) ? of(this.constructDynamicNodeFromDMEntity(res['done'])) : of()),
-            // map(res => this.constructDynamicNodeFromDMEntity(res))
-//            map(res => res)
-        );*/
+        return forkJoin(array);
     }
 
     loadChildrenNodesDataInDatabaseRec(entities: Array<DMEntity>): Observable<DynamicFlatNodeWithUid> {
@@ -237,135 +224,5 @@ export class DynamicDataSourceDMEntity extends DynamicDataSource<HasAName> {
             takeWhile(res => res != null),
             toArray()
         );
-    }
-
-    /*setInitialDataWithOpenFolder(uid: number, matTree: ElementRef): void {
-        if (uid !== null) {
-            this.retrieveNodes().pipe(
-                toArray(),
-                concatMap(
-                    entities => combineLatest(entities, this.browseEntityService.findAllParents(uid))
-                ),
-                concatMap(
-                    ([entities, parents]) => from(parents.reverse()).pipe(
-                        concatMap(
-                            parent => of(parent)
-                        )
-                    )
-                ),
-                concatMap(
-                    parent => {
-                        console.log('parent to be opened: ' + parent.uid);
-                        const unsubscribe$ = new Subject();
-                        return this.dataChange.pipe(
-                            concatMap(
-                                res => {
-                                    let parentFound: Element;
-                                    const matTreeNodes = matTree.nativeElement.getElementsByTagName('mat-tree-node');
-                                    for (const matTreeNode of matTreeNodes) {
-                                        if (matTreeNode.dataset.nodeuid !== null
-                                            && matTreeNode.dataset.nodeuid !== undefined
-                                            && Number(matTreeNode.dataset.nodeuid) === parent.uid) {
-                                            parentFound = matTreeNode;
-                                            console.log(parent.uid + ' parentFound: ' + parentFound);
-                                        }
-                                    }
-                                    return of(parentFound);
-                                }
-                            ),
-                            filter(res => res !== undefined),
-                            concatMap(
-                                parentFound => {
-                                    if (parentFound !== undefined) {
-                                        const buttons = parentFound.getElementsByTagName('button');
-                                        if (buttons[0] === undefined) {
-                                            console.log(parent.uid + ' click');
-                                            buttons[0].click();
-                                        }
-                                        unsubscribe$.next();
-                                        unsubscribe$.complete();
-                                    }
-                                    return of(parentFound);
-                                }
-                            )
-                        );
-                    }
-                )
-            ).subscribe(
-                res => {
-                    console.log('what is res ? ');
-                    console.log(res);
-                },
-                error => console.log('error'),
-                () => console.log('complete')
-            );
-        } else {
-            this.setInitialData();
-        }
-    }*/
-
-    /*setInitialDataWithOpenFolderOld(uid: number, matTree: ElementRef): void {
-        if (uid !== null) {
-            this.retrieveNodes().pipe(
-                toArray(),
-                concatMap(
-                    entities => combineLatest(entities, this.browseEntityService.findAllParents(uid))
-                ),
-                concatMap(
-                    ([entities, parents]) => from(parents.reverse()).pipe(
-                        concatMap(
-                            parent => of(parent)
-                        )
-                    )
-                ),
-                concatMap(
-                    parent => {
-                        console.log('parent to be opened: ' + parent.uid);
-                        const unsubscribe$ = new Subject();
-                        return this.dataChange.pipe(
-                            concatMap(
-                                res => {
-                                    let parentFound: Element;
-                                    const matTreeNodes = matTree.nativeElement.getElementsByTagName('mat-tree-node');
-                                    for (const matTreeNode of matTreeNodes) {
-                                        if (matTreeNode.dataset.nodeuid !== null
-                                            && matTreeNode.dataset.nodeuid !== undefined
-                                            && Number(matTreeNode.dataset.nodeuid) === parent.uid) {
-                                            parentFound = matTreeNode;
-                                            console.log(parent.uid + ' parentFound: ' + parentFound);
-                                        }
-                                    }
-                                    return of(parentFound);
-                                }
-                            ),
-                            filter(res => res !== undefined),
-                            concatMap(
-                                parentFound => {
-                                    if (parentFound !== undefined) {
-                                        const buttons = parentFound.getElementsByTagName('button');
-                                        if (buttons[0] === undefined) {
-                                            console.log(parent.uid + ' click');
-                                            buttons[0].click();
-                                        }
-                                        unsubscribe$.next();
-                                        unsubscribe$.complete();
-                                    }
-                                    return of(parentFound);
-                                }
-                            )
-                        );
-                    }
-                )
-            ).subscribe(
-                res => {
-                    console.log('what is res ? ');
-                    console.log(res);
-                },
-                error => console.log('error'),
-                () => console.log('complete')
-            );
-        } else {
-            this.setInitialData();
-        }
     }*/
 }
