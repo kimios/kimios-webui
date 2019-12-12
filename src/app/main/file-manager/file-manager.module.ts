@@ -60,6 +60,7 @@ import {BrowseComponent} from 'app/main/components/browse/browse.component';
 import {BrowseGridComponent} from 'app/main/components/browse-grid/browse-grid.component';
 import {EntityGridTileComponent} from 'app/main/components/entity-grid-tile/entity-grid-tile.component';
 import {EntityListingComponent} from 'app/main/components/entity-listing/entity-listing.component';
+import {TreeModule} from 'angular-tree-component';
 
 
 @NgModule({
@@ -124,6 +125,7 @@ import {EntityListingComponent} from 'app/main/components/entity-listing/entity-
         DragDropModule,
         MatGridListModule,
 
+        TreeModule.forRoot()
     ],
     providers   : [
         EntityService,
