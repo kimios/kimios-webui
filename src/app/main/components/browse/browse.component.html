@@ -19,7 +19,8 @@
                 && node.data.children !== undefined
                 && node.data.children.length > 0">
                     <button mat-icon-button
-                            [attr.aria-label]="'toggle ' + node.name" >
+                            [attr.aria-label]="'toggle ' + node.name"
+                            (click)="node.toggleExpanded()">
                         <mat-icon class="mat-icon-rtl-mirror">
                             {{tree.treeModel.expandedNodeIds[node.id] !== null
                             && tree.treeModel.expandedNodeIds[node.id] !== undefined

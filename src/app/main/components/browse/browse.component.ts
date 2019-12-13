@@ -38,6 +38,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     nodes = [
         {
             name: 'root1',
+            id: 'root1',
             children: [
                 { name: 'child1' },
                 { name: 'child2' }
@@ -50,17 +51,18 @@ export class BrowseComponent implements OnInit, AfterViewInit {
             isLoading: false,
             children: [
                 { name: 'child2.1', id: 'child2.1', children: [] },
-                { name: 'child2.2', children: [
+                { name: 'child2.2', id: 'child2.2', children: [
                         {name: 'grandchild2.2.1'}
                     ] }
             ]
         },
         {
             name: 'root3',
+            id: 'root3',
             isLoading: true
         },
-        { name: 'root4', children: [] },
-        { name: 'root5', children: null }
+        { name: 'root4', id: 'root4', children: [] },
+        { name: 'root5', id: 'root5', children: null }
     ];
 
   constructor(
@@ -103,7 +105,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       setTimeout(() => {
           self.nodes[0]['isLoading'] = false;
           self.nodes[2]['isLoading'] = false;
-          self.updateNode(self.nodes, 'child2.1', 'isLoading', true);
+          this.tree.treeModel.getNodeById('child2.2').data.name = 'uh !';
       }, 5000);
 
 
@@ -153,32 +155,4 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     // this.selectedEntity$.next(this.dataSource.entities.get(uid));
   }
 
-  updateNode(nodes: any[], id: string, fieldName: string, fieldValue: any): boolean {
-      const node = this.findNode(nodes, id);
-      if (node !== null) {
-          node[fieldName] = fieldValue;
-          this.tree.treeModel.update();
-      }
-      return node !== null;
-  }
-
-  findNode(nodes: any[], id: string): any {
-
-      const filtered = nodes.filter(node => node.id === id);
-      if (filtered.length === 1) {
-          return filtered[0];
-      } else {
-          let nodeFound;
-          for (const node of nodes) {
-              if (node.children !== null
-                  && node.children !== undefined) {
-                  nodeFound = this.findNode(node.children, id);
-              }
-              if (nodeFound) {
-                  break;
-              }
-          }
-          return nodeFound;
-      }
-  }
 }
