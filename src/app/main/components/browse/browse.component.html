@@ -7,27 +7,28 @@
         <div class="node-wrapper"
              [style.padding-left]="node.getNodePadding()"
              [attr.data-nodeuid]="node.uid"
-             [ngClass]="{'tree-node-loading': node.data.isLoading !== null && node.data.isLoading}"
         >
-          <tree-node-expander [node]="node">
-
-            <!--<ng-container *ngIf="node.isLoading; else notLoading">
-              <mat-progress-spinner
-                      mode="indeterminate"
-                      diameter="25"></mat-progress-spinner>
+            <div style="width: 40px;">
+            <ng-container *ngIf="node.data.isLoading; else notLoading">
+                <mat-progress-spinner
+                        mode="indeterminate"
+                        diameter="20"></mat-progress-spinner>
             </ng-container>
             <ng-template #notLoading>
-              <ng-container *ngIf="node.expandable; else default">
-                <button mat-icon-button
-                        [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
-                  <mat-icon class="mat-icon-rtl-mirror">
-                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-                  </mat-icon>
-                </button>
-              </ng-container>
-            </ng-template>-->
-
-          </tree-node-expander>
+                <ng-container *ngIf="node.data.children !== null
+                && node.data.children !== undefined
+                && node.data.children.length > 0">
+                    <button mat-icon-button
+                            [attr.aria-label]="'toggle ' + node.name" >
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{tree.treeModel.expandedNodeIds[node.id] !== null
+                            && tree.treeModel.expandedNodeIds[node.id] !== undefined
+                            && tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                    </button>
+                </ng-container>
+            </ng-template>
+            </div>
           <div class="node-content-wrapper"
                [class.node-content-wrapper-active]="node.isActive"
                [class.node-content-wrapper-focused]="node.isFocused"

@@ -55,7 +55,10 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                     ] }
             ]
         },
-        { name: 'root3' },
+        {
+            name: 'root3',
+            isLoading: true
+        },
         { name: 'root4', children: [] },
         { name: 'root5', children: null }
     ];
@@ -98,7 +101,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
       const self = this;
       setTimeout(() => {
-          self.nodes[1]['isLoading'] = false;
+          self.nodes[0]['isLoading'] = false;
+          self.nodes[2]['isLoading'] = false;
           self.updateNode(self.nodes, 'child2.1', 'isLoading', true);
       }, 5000);
 
