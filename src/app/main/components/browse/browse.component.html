@@ -1,11 +1,33 @@
 <div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
 
-  <div fxFlex="25">
+  <div fxFlex="25" >
 
-    <tree-root [nodes]="nodes" #tree>
+    <tree-root [nodes]="nodes" #tree class="kimios-browse-tree">
       <ng-template #treeNodeWrapperTemplate let-node let-index="index">
-        <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
-          <tree-node-expander [node]="node"></tree-node-expander>
+        <div class="node-wrapper"
+             [style.padding-left]="node.getNodePadding()"
+             [attr.data-nodeuid]="node.uid"
+             [ngClass]="{'tree-node-loading': node.data.isLoading !== null && node.data.isLoading}"
+        >
+          <tree-node-expander [node]="node">
+
+            <!--<ng-container *ngIf="node.isLoading; else notLoading">
+              <mat-progress-spinner
+                      mode="indeterminate"
+                      diameter="25"></mat-progress-spinner>
+            </ng-container>
+            <ng-template #notLoading>
+              <ng-container *ngIf="node.expandable; else default">
+                <button mat-icon-button
+                        [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                  </mat-icon>
+                </button>
+              </ng-container>
+            </ng-template>-->
+
+          </tree-node-expander>
           <div class="node-content-wrapper"
                [class.node-content-wrapper-active]="node.isActive"
                [class.node-content-wrapper-focused]="node.isFocused"

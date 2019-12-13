@@ -1,14 +1,11 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {FlatTreeControl} from '@angular/cdk/tree';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
-import {DynamicDataSourceDMEntity} from './dynamic-data-source-dmentity';
-import {BehaviorSubject, from, of, zip} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {concatMap, filter, switchMap} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
 
 interface EntityNode {
   uid: number;
@@ -44,13 +41,15 @@ export class BrowseComponent implements OnInit, AfterViewInit {
             children: [
                 { name: 'child1' },
                 { name: 'child2' }
-            ]
+            ],
+            isLoading: true
         },
         {
             id: 'root2',
             name: 'root2',
+            isLoading: false,
             children: [
-                { name: 'child2.1', children: [] },
+                { name: 'child2.1', id: 'child2.1', children: [] },
                 { name: 'child2.2', children: [
                         {name: 'grandchild2.2.1'}
                     ] }
@@ -93,6 +92,17 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+      // this.nodes[1]['isLoading'] = true;
+      // this.tree.treeModel.getNodeById('root2')['isLoading'] = true;
+      // this.tree.treeModel.update();
+
+      const self = this;
+      setTimeout(() => {
+          self.nodes[1]['isLoading'] = false;
+          self.updateNode(self.nodes, 'child2.1', 'isLoading', true);
+      }, 5000);
+
+
       // this.tree.treeModel.getNodeById('root2').expand();
       /*setTimeout(() => {
           this.nodes[0].name = 'uh';
@@ -137,5 +147,34 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
   selectNode(uid: number): void {
     // this.selectedEntity$.next(this.dataSource.entities.get(uid));
+  }
+
+  updateNode(nodes: any[], id: string, fieldName: string, fieldValue: any): boolean {
+      const node = this.findNode(nodes, id);
+      if (node !== null) {
+          node[fieldName] = fieldValue;
+          this.tree.treeModel.update();
+      }
+      return node !== null;
+  }
+
+  findNode(nodes: any[], id: string): any {
+
+      const filtered = nodes.filter(node => node.id === id);
+      if (filtered.length === 1) {
+          return filtered[0];
+      } else {
+          let nodeFound;
+          for (const node of nodes) {
+              if (node.children !== null
+                  && node.children !== undefined) {
+                  nodeFound = this.findNode(node.children, id);
+              }
+              if (nodeFound) {
+                  break;
+              }
+          }
+          return nodeFound;
+      }
   }
 }
