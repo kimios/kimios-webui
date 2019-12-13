@@ -6,7 +6,7 @@ import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 import {BehaviorSubject, combineLatest, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute, Router} from '@angular/router';
-import {concatMap, flatMap, map} from 'rxjs/operators';
+import {concatMap, filter, flatMap, map, skip, switchMap, takeWhile, tap} from 'rxjs/operators';
 
 interface EntityNode {
   uid: number;
@@ -30,6 +30,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   selectedEntity$: BehaviorSubject<DMEntity>;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   nodeUidsToExpand$: BehaviorSubject<Array<DMEntity>>;
+    nodeUidsToExpand: Array<number>;
+  initDataDone$: BehaviorSubject<boolean>;
 
   @Input()
   entityId: number;
@@ -78,6 +80,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     this.selectedEntity$ = new BehaviorSubject<DMEntity>(undefined);
     this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
     this.nodeUidsToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
+    this.initDataDone$ = new BehaviorSubject(false);
+    this.nodeUidsToExpand = new Array<number>();
   }
 
   getLevel = (node: DynamicFlatNodeWithUid) => node.level;
@@ -146,7 +150,68 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       ).subscribe(
           res => console.log(res),
           error => console.log('error : ' + error),
-          () => console.log(this.nodes)
+          () => {
+              console.log(this.nodes);
+              this.initDataDone$.next(true);
+          }
+      );
+
+      this.initDataDone$.pipe(
+          filter(res => res === true),
+          concatMap(
+              res => this.route.paramMap
+          ),
+          switchMap(
+              params => {
+              const entityId = Number(params.get('entityId'));
+              // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
+              this.entityId = entityId;
+              return of(entityId);
+          }),
+//          filter(res => res !== null),
+          concatMap(
+              eId => this.browseEntityService.findAllParents(eId)
+          ),
+          map(res => res.reverse()),
+          tap(res => this.nodeUidsToExpand = res.map(entity => entity.uid)),
+          flatMap(entities => entities),
+          map((entityRet, index) => {
+              if (index === 0) {
+                  this.tree.treeModel.getNodeById(entityRet.uid).expand();
+              }
+              return entityRet;
+          }),
+          skip(1),
+          concatMap(
+              (entityRet, index) => combineLatest(of(entityRet.uid), this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid), of(index))
+          ),
+          tap(
+              ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.map(entityChild => {
+                  return {
+                      name: entityChild.name,
+                      id: entityChild.uid.toString(),
+                      children: null,
+                      isLoading: false
+                  };
+              })
+          ),
+          tap(
+              ([parentUid, entities]) => this.tree.treeModel.update()
+          ),
+          map(
+              ([parentUid, entities, index]) => {
+                  console.log(this.nodeUidsToExpand.length + ' ' + index);
+                  this.tree.treeModel.getNodeById(parentUid).expand();
+                  return index;
+              }
+          ),
+          takeWhile(
+              index => (index < (this.nodeUidsToExpand.length - 2))
+          )
+      ).subscribe(
+          res => this.initDataDone$.complete(),
+          null,
+          () => console.log('will I complete ? Yes !')
       );
 
       // this.nodes[1]['isLoading'] = true;
