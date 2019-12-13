@@ -116,7 +116,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   return newNode;
               }
           ),
-          concatMap(
+          flatMap(
               node => {
                   if (node['id'] !== null
                       && node['id'] !== undefined) {
@@ -124,7 +124,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   } else {
                       return combineLatest(of(node), of([]));
                   }
-              }
+              }, 5
           ),
           map(
               ([nodeRet, res2]) => {
