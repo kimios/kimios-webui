@@ -26,4 +26,8 @@ export class DocumentUtils {
     public static navigateToFile(router: Router, docUid: number): void {
         router.navigate(['/document', docUid]);
     }
+
+    public static navigateToFolderOrWorkspace(router: Router, folderUid: number): void {
+        router.navigate(['/browse', folderUid]);
+    }
 }

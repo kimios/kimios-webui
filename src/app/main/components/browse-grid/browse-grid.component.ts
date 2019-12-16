@@ -3,6 +3,7 @@ import {DMEntity} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Component({
   selector: 'browse-grid',
@@ -48,6 +49,10 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
   }
 
   goToDocument(entityFromList: DMEntity): void {
-    DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+    if (DMEntityUtils.dmEntityIsFolder(entityFromList) || DMEntityUtils.dmEntityIsWorkspace(entityFromList)) {
+      DocumentUtils.navigateToFolderOrWorkspace(this.router, entityFromList.uid);
+    } else {
+      DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+    }
   }
 }

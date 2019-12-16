@@ -172,7 +172,13 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           }),
           filter(res => res !== 0),
           concatMap(
-              eId => this.browseEntityService.findAllParents(eId)
+              entityId => this.browseEntityService.retrieveContainerEntity(entityId)
+          ),
+          tap(
+              entity => this.browseEntityService.selectedEntity$.next(entity)
+          ),
+          concatMap(
+              entity => this.browseEntityService.findAllParents(entity.uid)
           ),
           map(res => res.reverse()),
           tap(res => this.nodeUidsToExpand = res.map(entity => entity.uid)),

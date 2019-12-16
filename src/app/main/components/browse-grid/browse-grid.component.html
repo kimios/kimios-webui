@@ -2,7 +2,7 @@
     <mat-grid-tile *ngFor="let entityFromList of entities">
         <entity-grid-tile
                 [entity]="entityFromList"
-                (click)="goToDocument(entityFromList)"
+                (dblclick)="goToDocument(entityFromList)"
                 class="cursor-pointer">
         </entity-grid-tile>
     </mat-grid-tile>
