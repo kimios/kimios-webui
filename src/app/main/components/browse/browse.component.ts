@@ -3,10 +3,10 @@ import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
-import {BehaviorSubject, combineLatest, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute, Router} from '@angular/router';
-import {concatMap, filter, flatMap, map, skip, switchMap, takeWhile, tap} from 'rxjs/operators';
+import {concatMap, mergeMap, filter, flatMap, map, skip, switchMap, takeWhile, tap} from 'rxjs/operators';
 
 interface EntityNode {
   uid: number;
@@ -30,8 +30,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   selectedEntity$: BehaviorSubject<DMEntity>;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   nodeUidsToExpand$: BehaviorSubject<Array<DMEntity>>;
-    nodeUidsToExpand: Array<number>;
+  nodeUidsToExpand: Array<number>;
   initDataDone$: BehaviorSubject<boolean>;
+  entitiesLoaded: Map<number, DMEntity>;
 
   @Input()
   entityId: number;
@@ -82,6 +83,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     this.nodeUidsToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
     this.nodeUidsToExpand = new Array<number>();
+    this.entitiesLoaded = new Map<number, DMEntity>();
   }
 
   getLevel = (node: DynamicFlatNodeWithUid) => node.level;
@@ -117,6 +119,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   };
                   this.nodes.push(newNode);
                   this.tree.treeModel.update();
+                  this.entitiesLoaded.set(entity.uid, entity);
                   return newNode;
               }
           ),
@@ -142,6 +145,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                           isLoading: false
                       };
                   });
+                  res2.forEach(entityChild => this.entitiesLoaded.set(entityChild.uid, entityChild));
                   treeNode.data.isLoading = false;
                   this.tree.treeModel.update();
                   return treeNode;
@@ -168,14 +172,18 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               this.entityId = entityId;
               return of(entityId);
           }),
-//          filter(res => res !== null),
+          filter(res => res !== 0),
           concatMap(
               eId => this.browseEntityService.findAllParents(eId)
           ),
           map(res => res.reverse()),
           tap(res => this.nodeUidsToExpand = res.map(entity => entity.uid)),
+          tap(res => console.log('entities =>>>>>>>>>>>')),
+          tap(res => console.log(res)),
           flatMap(entities => entities),
           map((entityRet, index) => {
+              console.log('entityRet');
+              console.log(entityRet);
               if (index === 0) {
                   this.tree.treeModel.getNodeById(entityRet.uid).expand();
               }
@@ -197,6 +205,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           ),
           tap(
               ([parentUid, entities]) => this.tree.treeModel.update()
+          ),
+          tap(
+              ([parentUid, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
           ),
           map(
               ([parentUid, entities, index]) => {
@@ -286,7 +297,47 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   expandNodes(): void {}
 
   selectNode(uid: number): void {
-    // this.selectedEntity$.next(this.dataSource.entities.get(uid));
+      this.selectedEntity$.next(
+          this.entitiesLoaded.get(uid)
+      );
   }
 
+    onToggleExpanded(event): void {
+        from(this.tree.treeModel.getNodeById(event.node.id).data.children.filter(child =>
+            child.children === null
+        )).pipe(
+            tap(
+                child => {
+                    if (child['id'] !== null) {
+                        this.tree.treeModel.getNodeById(child['id']).data.isLoading = true;
+                    }
+                }
+            ),
+            mergeMap(
+                child => combineLatest(of(child['id']), this.browseEntityService.findContainerEntitiesAtPath(child['id']))
+            ),
+            tap(
+                ([parentUid, entities]) => this.tree.treeModel.getNodeById(event.node.id).data.children = entities.length === 0 ?
+                    [] :
+                    entities.map(entityChild => {
+                    return {
+                        name: entityChild.name,
+                        id: entityChild.uid.toString(),
+                        children: null,
+                        isLoading: false
+                    };
+                })
+            ),
+            tap(
+                ([parentUid, entities]) => this.tree.treeModel.update()
+            ),
+            tap(
+                ([parentUid, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+            )
+        ).subscribe(
+            ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.isLoading = false,
+            null,
+            () => console.log('children loading finished')
+        );
+    }
 }

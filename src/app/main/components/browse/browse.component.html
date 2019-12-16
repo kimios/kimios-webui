@@ -2,47 +2,49 @@
 
   <div fxFlex="25" >
 
-    <tree-root [nodes]="nodes" #tree class="kimios-browse-tree">
+    <tree-root [nodes]="nodes" #tree class="kimios-browse-tree"
+               (toggleExpanded)="onToggleExpanded($event)">
       <ng-template #treeNodeWrapperTemplate let-node let-index="index">
         <div class="node-wrapper"
              [style.padding-left]="node.getNodePadding()"
              [attr.data-nodeuid]="node.uid"
         >
             <div style="width: 40px;">
-            <ng-container *ngIf="node.data.isLoading; else notLoading">
-                <mat-progress-spinner
-                        mode="indeterminate"
-                        diameter="20"></mat-progress-spinner>
-            </ng-container>
-            <ng-template #notLoading>
-                <ng-container *ngIf="node.data.children !== null
+                <ng-container *ngIf="node.data.isLoading; else notLoading">
+                    <mat-progress-spinner
+                            mode="indeterminate"
+                            diameter="20"></mat-progress-spinner>
+                </ng-container>
+                <ng-template #notLoading>
+                    <ng-container *ngIf="node.data.children !== null
                 && node.data.children !== undefined
-                && node.data.children.length > 0">
-                    <button mat-icon-button
-                            [attr.aria-label]="'toggle ' + node.name"
-                            (click)="node.toggleExpanded()">
-                        <mat-icon class="mat-icon-rtl-mirror">
-                            {{tree.treeModel.expandedNodeIds[node.id] !== null
+                && node.data.children.length > 0"
+                    >
+                        <button mat-icon-button
+                                [attr.aria-label]="'toggle ' + node.name"
+                                (click)="node.toggleExpanded()">
+                            <mat-icon class="mat-icon-rtl-mirror">
+                                {{tree.treeModel.expandedNodeIds[node.id] !== null
                             && tree.treeModel.expandedNodeIds[node.id] !== undefined
                             && tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
-                        </mat-icon>
-                    </button>
-                </ng-container>
-            </ng-template>
+                            </mat-icon>
+                        </button>
+                    </ng-container>
+                </ng-template>
             </div>
-          <div class="node-content-wrapper"
-               [class.node-content-wrapper-active]="node.isActive"
-               [class.node-content-wrapper-focused]="node.isFocused"
-               (click)="node.mouseAction('click', $event)"
-               (dblclick)="node.mouseAction('dblClick', $event)"
-               (contextmenu)="node.mouseAction('contextMenu', $event)"
-               (treeDrop)="node.onDrop($event)"
-               [treeAllowDrop]="node.allowDrop"
-               [treeDrag]="node"
-               [treeDragEnabled]="node.allowDrag()">
+            <div class="node-content-wrapper"
+                 [class.node-content-wrapper-active]="node.isActive"
+                 [class.node-content-wrapper-focused]="node.isFocused"
+                 (click)="node.mouseAction('click', $event)"
+                 (dblclick)="node.mouseAction('dblClick', $event)"
+                 (contextmenu)="node.mouseAction('contextMenu', $event)"
+                 (treeDrop)="node.onDrop($event)"
+                 [treeAllowDrop]="node.allowDrop"
+                 [treeDrag]="node"
+                 [treeDragEnabled]="node.allowDrag()">
 
-            <tree-node-content [node]="node" [index]="index"></tree-node-content>
-          </div>
+                <tree-node-content [node]="node" [index]="index"></tree-node-content>
+            </div>
         </div>
       </ng-template>
     </tree-root>
