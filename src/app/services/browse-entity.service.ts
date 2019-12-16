@@ -41,12 +41,15 @@ export class BrowseEntityService {
             || parentUid === undefined) {
             return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
         } else {
-            return this.folderService.getFolders(this.sessionService.sessionToken, parentUid)
+            return this.retrieveContainerEntity(parentUid)
                 .pipe(
                     concatMap(
-                        res => combineLatest(
-                            of(res),
-                            DMEntityUtils.dmEntityIsWorkspace(parent) ?
+                        res => combineLatest(of(res), this.folderService.getFolders(this.sessionService.sessionToken, parentUid))
+                    ),
+                    concatMap(
+                        ([parentEntity, folders]) => combineLatest(
+                            of(folders),
+                            DMEntityUtils.dmEntityIsWorkspace(parentEntity) ?
                                 of([]) :
                                 this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
                         )
