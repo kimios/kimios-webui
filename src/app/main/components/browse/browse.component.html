@@ -35,7 +35,7 @@
             <div class="node-content-wrapper"
                  [class.node-content-wrapper-active]="node.isActive"
                  [class.node-content-wrapper-focused]="node.isFocused"
-                 (click)="node.mouseAction('click', $event)"
+                 (click)="selectNode(node.id)"
                  (dblclick)="node.mouseAction('dblClick', $event)"
                  (contextmenu)="node.mouseAction('contextMenu', $event)"
                  (treeDrop)="node.onDrop($event)"
@@ -64,7 +64,7 @@
       <mat-divider></mat-divider>
     </div>-->
     <div class="content" fusePerfectScrollbar>
-      <entity-listing [entityContainer$]="selectedEntity$"></entity-listing>
+      <entity-listing></entity-listing>
     </div>
   </div>
 

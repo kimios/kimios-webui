@@ -27,7 +27,6 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 */
 
   // dataSource: DynamicDataSourceDMEntity;
-  selectedEntity$: BehaviorSubject<DMEntity>;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   nodeUidsToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
@@ -78,7 +77,6 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   ) {
     // this.dataSource = new DynamicDataSourceDMEntity(database, browseEntityService);
 
-    this.selectedEntity$ = new BehaviorSubject<DMEntity>(undefined);
     this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
     this.nodeUidsToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -297,8 +295,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   expandNodes(): void {}
 
   selectNode(uid: number): void {
-      this.selectedEntity$.next(
-          this.entitiesLoaded.get(uid)
+      this.browseEntityService.selectedEntity$.next(
+          this.entitiesLoaded.get(Number(uid))
       );
   }
 
@@ -317,7 +315,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                 child => combineLatest(of(child['id']), this.browseEntityService.findContainerEntitiesAtPath(child['id']))
             ),
             tap(
-                ([parentUid, entities]) => this.tree.treeModel.getNodeById(event.node.id).data.children = entities.length === 0 ?
+                ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.length === 0 ?
                     [] :
                     entities.map(entityChild => {
                     return {
