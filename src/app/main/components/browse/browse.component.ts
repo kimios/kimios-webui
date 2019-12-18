@@ -33,35 +33,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
   @ViewChild('tree') tree;
 
-    nodes = [
-        {
-            name: 'root1',
-            id: 'root1',
-            children: [
-                { name: 'child1' },
-                { name: 'child2' }
-            ],
-            isLoading: true
-        },
-        {
-            id: 'root2',
-            name: 'root2',
-            isLoading: false,
-            children: [
-                { name: 'child2.1', id: 'child2.1', children: [] },
-                { name: 'child2.2', id: 'child2.2', children: [
-                        {name: 'grandchild2.2.1'}
-                    ] }
-            ]
-        },
-        {
-            name: 'root3',
-            id: 'root3',
-            isLoading: true
-        },
-        { name: 'root4', id: 'root4', children: [] },
-        { name: 'root5', id: 'root5', children: null }
-    ];
+    nodes = [];
 
   constructor(
       private sessionService: SessionService,
