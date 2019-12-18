@@ -3,10 +3,10 @@ import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
-import {BehaviorSubject, combineLatest, from, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute, Router} from '@angular/router';
-import {concatMap, mergeMap, filter, flatMap, map, skip, switchMap, takeWhile, tap} from 'rxjs/operators';
+import {concatMap, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 interface EntityNode {
   uid: number;
@@ -28,7 +28,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
   // dataSource: DynamicDataSourceDMEntity;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
-  nodeUidsToExpand$: BehaviorSubject<Array<DMEntity>>;
+  entitiesToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
   initDataDone$: BehaviorSubject<boolean>;
   entitiesLoaded: Map<number, DMEntity>;
@@ -78,7 +78,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     // this.dataSource = new DynamicDataSourceDMEntity(database, browseEntityService);
 
     this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
-    this.nodeUidsToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
+    this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
     this.nodeUidsToExpand = new Array<number>();
     this.entitiesLoaded = new Map<number, DMEntity>();
@@ -102,11 +102,15 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+
       // load initial nodes
-      this.browseEntityService.findContainerEntitiesAtPath().pipe(
+      this.retrieveEntitiesToExpand().pipe(
+          tap(res => this.entitiesToExpand$.next(res)),
+          concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
           flatMap(
               res => res
           ),
+//          filter(entity => this.tree.treeModel.getNodeById(entity.uid.toString()) === undefined),
           map(
               entity => {
                   const newNode = {
@@ -115,40 +119,23 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                       children: null,
                       isLoading: true
                   };
-                  this.nodes.push(newNode);
-                  this.tree.treeModel.update();
+//                  if (this.tree.treeModel.getNodeById(entity.uid.toString()) === undefined) {
+                      this.nodes.push(newNode);
+                      this.tree.treeModel.update();
+//                  }
                   this.entitiesLoaded.set(entity.uid, entity);
-                  return newNode;
+                  return entity;
               }
           ),
           flatMap(
-              node => {
-                  if (node['id'] !== null
-                      && node['id'] !== undefined) {
-                      return combineLatest(of(node), this.browseEntityService.findContainerEntitiesAtPath(Number(node['id'])));
+              entityRet => {
+                  if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
+                      return combineLatest(of(entityRet), this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)));
                   } else {
-                      return combineLatest(of(node), of([]));
+                      return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
                   }
               }, 5
           ),
-          map(
-              ([nodeRet, res2]) => {
-                  // this.nodes.push(
-                  const treeNode = this.tree.treeModel.getNodeById(nodeRet.id);
-                  treeNode.data.children = res2.map(entityChild => {
-                      return {
-                          name: entityChild.name,
-                          id: entityChild.uid.toString(),
-                          children: null,
-                          isLoading: false
-                      };
-                  });
-                  res2.forEach(entityChild => this.entitiesLoaded.set(entityChild.uid, entityChild));
-                  treeNode.data.isLoading = false;
-                  this.tree.treeModel.update();
-                  return treeNode;
-              }
-          )
       ).subscribe(
           res => console.log(res),
           error => console.log('error : ' + error),
@@ -158,47 +145,54 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           }
       );
 
-      this.initDataDone$.pipe(
-          filter(res => res === true),
-          concatMap(
-              res => this.route.paramMap
-          ),
+ }
+
+  retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {
+      return this.route.paramMap.pipe(
           switchMap(
               params => {
-              const entityId = Number(params.get('entityId'));
-              // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
-              this.entityId = entityId;
-              return of(entityId);
-          }),
-          filter(res => res !== 0),
+                  const entityId = Number(params.get('entityId'));
+                  // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
+                  this.entityId = entityId;
+                  return of(entityId);
+              }),
           concatMap(
-              entityId => this.browseEntityService.retrieveContainerEntity(entityId)
-          ),
-          tap(
-              entity => this.browseEntityService.selectedEntity$.next(entity)
-          ),
-          concatMap(
-              entity => this.browseEntityService.findAllParents(entity.uid)
-          ),
-          map(res => res.reverse()),
-          tap(res => this.nodeUidsToExpand = res.map(entity => entity.uid)),
-          tap(res => console.log('entities =>>>>>>>>>>>')),
-          tap(res => console.log(res)),
-          flatMap(entities => entities),
-          map((entityRet, index) => {
-              console.log('entityRet');
-              console.log(entityRet);
-              if (index === 0) {
-                  this.tree.treeModel.getNodeById(entityRet.uid).expand();
+              res => res === 0 ?
+                  of([]) :
+                  this.browseEntityService.retrieveContainerEntity(res).pipe(
+                      tap(
+                          entity => this.browseEntityService.selectedEntity$.next(entity)
+                      ),
+                      concatMap(
+                          entity => this.browseEntityService.findAllParents(entity.uid)
+                      ),
+                      map(entities => entities.reverse())
+                  )
+          )
+      );
+  }
+
+  loadNodeAndChildren(entity: DMEntity): Observable<DMEntity> {
+      return of(entity).pipe(
+          map(
+              entityRet => {
+                  const newNode = {
+                      name: entityRet.name,
+                      id: entityRet.uid.toString(),
+                      children: null,
+                      isLoading: true
+                  };
+                  this.nodes.push(newNode);
+                  this.tree.treeModel.update();
+                  this.entitiesLoaded.set(entityRet.uid, entityRet);
+                  return entityRet;
               }
-              return entityRet;
-          }),
-          skip(1),
+          ),
           concatMap(
-              (entityRet, index) => combineLatest(of(entityRet.uid), this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid), of(index))
+              entityRet => combineLatest(of(entityRet), this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid))
           ),
           tap(
-              ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.map(entityChild => {
+              ([entityRet, entities]) => this.tree.treeModel.getNodeById(entityRet.uid).data.children = entities.map(entityChild => {
                   return {
                       name: entityChild.name,
                       id: entityChild.uid.toString(),
@@ -208,97 +202,57 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               })
           ),
           tap(
-              ([parentUid, entities]) => this.tree.treeModel.update()
+              ([entityRet, entities]) => this.tree.treeModel.getNodeById(entityRet.uid.toString()).data.isLoading = false
           ),
           tap(
-              ([parentUid, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+              ([entityRet, entities]) => this.tree.treeModel.update()
+          ),
+          tap(
+              ([entityRet, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
           ),
           map(
-              ([parentUid, entities, index]) => {
-                  console.log(this.nodeUidsToExpand.length + ' ' + index);
-                  this.tree.treeModel.getNodeById(parentUid).expand();
-                  return index;
-              }
-          ),
-          takeWhile(
-              index => (index < (this.nodeUidsToExpand.length - 2))
+              ([entityRet, entities]) => entityRet
           )
-      ).subscribe(
-          res => this.initDataDone$.complete(),
-          null,
-          () => console.log('will I complete ? Yes !')
       );
-
-      // this.nodes[1]['isLoading'] = true;
-      // this.tree.treeModel.getNodeById('root2')['isLoading'] = true;
-
-
-      /*const self = this;
-      setTimeout(() => {
-          self.nodes[0]['isLoading'] = false;
-          self.nodes[2]['isLoading'] = false;
-          this.tree.treeModel.getNodeById('child2.2').data.name = 'uh !';
-      }, 5000);*/
-
-      /*this.route.paramMap.pipe(
-          switchMap((params: ParamMap) => {
-              const entityId = Number(params.get('entityId'));
-              // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
-              this.entityId = entityId;
-              return of(entityId);
-          }),
-          filter(res => res !== null),
-          concatMap(
-              eId => this.browseEntityService.findAllParents(eId)
-          ),
-          concatMap(
-              res => from(toExpand.reverse()).pipe(
-          )
-      ).subscribe(
-          res => this.nodeUidsToExpand$.next(res)
-      );*/
-
-      // this.tree.treeModel.getNodeById('root2').expand();
-      /*setTimeout(() => {
-          this.nodes[0].name = 'uh';
-      });*/
-
-    /*this.route.paramMap.pipe(
-        switchMap((params: ParamMap) => {
-          const entityId = Number(params.get('entityId'));
-          // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
-            this.entityId = entityId;
-            return of(entityId);
-        }),
-        filter(res => res !== null),
-        concatMap(
-            eId => this.browseEntityService.findAllParents(eId)
-        )
-    ).subscribe(
-        res => this.nodeUidsToExpand$.next(res)
-    );
-
-    zip(this.loadedEntities$, this.nodeUidsToExpand$).pipe(
-        concatMap(
-            ([loaded, toExpand]) => {
-              from(toExpand.reverse()).pipe(
-                  concatMap(
-                      entity => {
-                        loaded.filter(node1 => toExpand.map(e => e.uid).includes(node1.uid))
-                            .forEach(node1 => {
-                              this.tree.treeModel.getNodeById(entity.uid.toString()).expand();
-                            });
-                        return of(entity);
-                      }
-                  )
-              );
-              return of();
-            }
-        )
-    ).subscribe();*/
   }
 
-  expandNodes(): void {}
+  loadChildren(entityUid: number): Observable<number> {
+      this.tree.treeModel.getNodeById(entityUid.toString()).data.isLoading = true;
+      return combineLatest(of(entityUid), this.browseEntityService.findContainerEntitiesAtPath(entityUid)).pipe(
+          tap(
+              ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityChild => {
+                  return {
+                      name: entityChild.name,
+                      id: entityChild.uid.toString(),
+                      children: null,
+                      isLoading: false
+                  };
+              })
+          ),
+          tap(
+              ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUidRet.toString()).data.isLoading = false
+          ),
+          tap(
+              ([entityUidRet, entities]) => this.tree.treeModel.update()
+          ),
+          tap(
+              ([entityUidRet, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+          ),
+          map(
+              ([entityUidRet, entities]) => entityUidRet
+          )
+      );
+  }
+
+
+
+  loadNodesChildren(ids: Array<number>): Observable<number> {
+      return from(ids).pipe(
+//          takeWhile(uid => uid !== -1),
+          concatMap(res => this.loadChildren(res)),
+          tap(res => this.tree.treeModel.getNodeById(res).expand())
+      );
+  }
 
   selectNode(uid: number): void {
       this.browseEntityService.selectedEntity$.next(
