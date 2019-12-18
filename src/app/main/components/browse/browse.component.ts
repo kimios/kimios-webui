@@ -3,9 +3,9 @@ import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DynamicDatabase} from './dynamic-database';
 import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
-import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {concatMap, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 interface EntityNode {
@@ -91,15 +91,17 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           ),
           map(
               entity => {
-                  const newNode = {
-                      name: entity.name,
-                      id: entity.uid.toString(),
-                      children: null,
-                      isLoading: true
-                  };
-                  this.nodes.push(newNode);
-                  this.tree.treeModel.update();
-                  this.entitiesLoaded.set(entity.uid, entity);
+                  if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
+                      const newNode = {
+                          name: entity.name,
+                          id: entity.uid.toString(),
+                          children: null,
+                          isLoading: true
+                      };
+                      this.nodes.push(newNode);
+                      this.tree.treeModel.update();
+                      this.entitiesLoaded.set(entity.uid, entity);
+                  }
                   return entity;
               }
           ),
@@ -108,7 +110,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
                       return combineLatest(of(entityRet), this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)));
                   } else {
-                      return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
+                      if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
+                          return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
+                      }
                   }
               }, 5
           ),
@@ -224,7 +228,13 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   loadNodesChildren(ids: Array<number>): Observable<number> {
       return from(ids).pipe(
 //          takeWhile(uid => uid !== -1),
-          concatMap(res => this.loadChildren(res)),
+          concatMap(
+              res => iif(
+                  () => this.tree.treeModel.getNodeById(res).data.children === null,
+                  this.loadChildren(res),
+                  of(res)
+              )
+          ),
           tap(res => this.tree.treeModel.getNodeById(res).expand())
       );
   }
