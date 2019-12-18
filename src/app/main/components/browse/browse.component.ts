@@ -22,11 +22,6 @@ interface EntityNode {
 })
 export class BrowseComponent implements OnInit, AfterViewInit {
 
-  /*treeControl = new NestedTreeControl<EntityNode>(node => node.children);
-  dataSource = new MatTreeNestedDataSource<EntityNode>();
-*/
-
-  // dataSource: DynamicDataSourceDMEntity;
   loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   entitiesToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
@@ -72,10 +67,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       private sessionService: SessionService,
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,
-      private router: Router,
-      database: DynamicDatabase
   ) {
-    // this.dataSource = new DynamicDataSourceDMEntity(database, browseEntityService);
 
     this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
@@ -84,20 +76,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     this.entitiesLoaded = new Map<number, DMEntity>();
   }
 
-  getLevel = (node: DynamicFlatNodeWithUid) => node.level;
-
-  isExpandable = (node: DynamicFlatNodeWithUid) => node.expandable;
-
-  hasChild = (_: number, _nodeData: DynamicFlatNodeWithUid) => _nodeData.expandable;
-
   ngOnInit(): void {
-    /*this.dataSource.setInitialData().subscribe(
-        res => {
-          const value = this.loadedEntities$.getValue();
-          this.loadedEntities$.next(value.concat(res));
-        }
-    );*/
-
 
   }
 
@@ -110,7 +89,6 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           flatMap(
               res => res
           ),
-//          filter(entity => this.tree.treeModel.getNodeById(entity.uid.toString()) === undefined),
           map(
               entity => {
                   const newNode = {
@@ -119,10 +97,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                       children: null,
                       isLoading: true
                   };
-//                  if (this.tree.treeModel.getNodeById(entity.uid.toString()) === undefined) {
-                      this.nodes.push(newNode);
-                      this.tree.treeModel.update();
-//                  }
+                  this.nodes.push(newNode);
+                  this.tree.treeModel.update();
                   this.entitiesLoaded.set(entity.uid, entity);
                   return entity;
               }
@@ -152,7 +128,6 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           switchMap(
               params => {
                   const entityId = Number(params.get('entityId'));
-                  // this.dataSource.setInitialDataWithOpenFolder(this.entityId != null && this.entityId !== undefined ? this.entityId : null, this.matTree);
                   this.entityId = entityId;
                   return of(entityId);
               }),
