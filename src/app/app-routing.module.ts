@@ -8,7 +8,7 @@ import {LoggedInGuard} from './logged-in.guard';
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: '/search',
+        redirectTo: '/browse',
         pathMatch: 'full' ,
         canActivate: [ LoggedInGuard ]
     },
