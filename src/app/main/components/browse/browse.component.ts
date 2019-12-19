@@ -1,8 +1,6 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {DynamicDatabase} from './dynamic-database';
-import {DynamicFlatNodeWithUid} from './dynamic-flat-node-with-uid';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
@@ -17,12 +15,10 @@ interface EntityNode {
 @Component({
   selector: 'browse',
   templateUrl: './browse.component.html',
-  styleUrls: ['./browse.component.scss'],
-  providers: [DynamicDatabase]
+  styleUrls: ['./browse.component.scss']
 })
 export class BrowseComponent implements OnInit, AfterViewInit {
 
-  loadedEntities$: BehaviorSubject<Array<DynamicFlatNodeWithUid>>;
   entitiesToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
   initDataDone$: BehaviorSubject<boolean>;
@@ -41,7 +37,6 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       private route: ActivatedRoute,
   ) {
 
-    this.loadedEntities$ = new BehaviorSubject<Array<DynamicFlatNodeWithUid>>([]);
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
     this.nodeUidsToExpand = new Array<number>();
