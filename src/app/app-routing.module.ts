@@ -8,7 +8,7 @@ import {LoggedInGuard} from './logged-in.guard';
 export const routes: Routes = [
     {
         path: '',
-        redirectTo: '/browse',
+        redirectTo: '/doc-manager',
         pathMatch: 'full' ,
         canActivate: [ LoggedInGuard ]
     },

@@ -5,8 +5,26 @@ import {LoggedInGuard} from 'app/logged-in.guard';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
 import {BrowseComponent} from 'app/main/components/browse/browse.component';
+import {FileManagerComponent} from '../file-manager.component';
 
 const fileManagerRoutes: Routes = [
+    {
+        path: '',
+        component: FileManagerComponent,
+        canActivate: [ LoggedInGuard ],
+        children: [
+            {
+                path: '',
+                component: BrowseComponent,
+                canActivate: [ LoggedInGuard ]
+            },
+            {
+                path: 'doc/:documentId',
+                component: FileDetailComponent,
+                canActivate: [ LoggedInGuard ]
+            }
+        ]
+    },
   {
     path: 'search',
     component: FileSearchPanelComponent,
