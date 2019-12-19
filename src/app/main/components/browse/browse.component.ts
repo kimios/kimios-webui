@@ -5,6 +5,7 @@ import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
 import {concatMap, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 
 interface EntityNode {
   uid: number;
@@ -15,7 +16,8 @@ interface EntityNode {
 @Component({
   selector: 'browse',
   templateUrl: './browse.component.html',
-  styleUrls: ['./browse.component.scss']
+  styleUrls: ['./browse.component.scss'],
+    providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}]
 })
 export class BrowseComponent implements OnInit, AfterViewInit {
 
@@ -92,6 +94,12 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           }
       );
 
+      this.browseEntityService.selectedEntity$.subscribe(
+          next => {
+              this.tree.treeModel.getNodeById(next['parentUid'].toString()).expand();
+              this.tree.treeModel.getNodeById(next.uid).focus(true);
+          }
+      );
  }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {

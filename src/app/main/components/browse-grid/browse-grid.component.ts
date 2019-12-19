@@ -4,6 +4,7 @@ import {BehaviorSubject} from 'rxjs';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'browse-grid',
@@ -24,7 +25,8 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   constructor(
       private cd: ChangeDetectorRef,
-      private router: Router
+      private router: Router,
+      private bes: BrowseEntityService
   ) {
     this.gridNbCols = 4;
     this.entities = [];
@@ -50,7 +52,7 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   goToDocument(entityFromList: DMEntity): void {
     if (DMEntityUtils.dmEntityIsFolder(entityFromList) || DMEntityUtils.dmEntityIsWorkspace(entityFromList)) {
-      DocumentUtils.navigateToFolderOrWorkspace(this.router, entityFromList.uid);
+      this.bes.selectedEntity$.next(entityFromList);
     } else {
       DocumentUtils.navigateToFile(this.router, entityFromList.uid);
     }
