@@ -5,7 +5,7 @@ import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
 import {concatMap, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
-import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
+import {TreeNodesService} from 'app/services/tree-nodes.service';
 
 interface EntityNode {
   uid: number;
@@ -16,8 +16,7 @@ interface EntityNode {
 @Component({
   selector: 'browse',
   templateUrl: './browse.component.html',
-  styleUrls: ['./browse.component.scss'],
-    providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}]
+  styleUrls: ['./browse.component.scss']
 })
 export class BrowseComponent implements OnInit, AfterViewInit {
 
@@ -37,6 +36,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       private sessionService: SessionService,
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,
+      private treeNodesService: TreeNodesService
   ) {
 
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
@@ -46,53 +46,63 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-
+      if (this.treeNodesService.treeNodes.length > 0) {
+          this.nodes = this.treeNodesService.treeNodes;
+      }
   }
 
   ngAfterViewInit(): void {
 
       // load initial nodes
-      this.retrieveEntitiesToExpand().pipe(
-          tap(res => this.entitiesToExpand$.next(res)),
-          concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
-          flatMap(
-              res => res
-          ),
-          map(
-              entity => {
-                  if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
-                      const newNode = {
-                          name: entity.name,
-                          id: entity.uid.toString(),
-                          children: null,
-                          isLoading: true
-                      };
-                      this.nodes.push(newNode);
-                      this.tree.treeModel.update();
-                      this.entitiesLoaded.set(entity.uid, entity);
-                  }
-                  return entity;
-              }
-          ),
-          flatMap(
-              entityRet => {
-                  if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
-                      return combineLatest(of(entityRet), this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)));
-                  } else {
-                      if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
-                          return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
+      if (this.treeNodesService.treeNodes.length > 0) {
+          // this.tree.treeModel.nodes.push(this.treeNodesService.treeNodes);
+          // this.tree.treeModel.update();
+      } else {
+          this.retrieveEntitiesToExpand().pipe(
+              tap(res => this.entitiesToExpand$.next(res)),
+              concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
+              flatMap(
+                  res => res
+              ),
+              map(
+                  entity => {
+                      if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
+                          const newNode = {
+                              name: entity.name,
+                              id: entity.uid.toString(),
+                              children: null,
+                              isLoading: true
+                          };
+                          this.nodes.push(newNode);
+                          this.tree.treeModel.update();
+                          this.entitiesLoaded.set(entity.uid, entity);
                       }
+                      return entity;
                   }
-              }, 5
-          ),
-      ).subscribe(
-          res => console.log(res),
-          error => console.log('error : ' + error),
-          () => {
-              console.log(this.nodes);
-              this.initDataDone$.next(true);
-          }
-      );
+              ),
+              flatMap(
+                  entityRet => {
+                      if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
+                          return combineLatest(of(entityRet), this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)));
+                      } else {
+                          if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
+                              return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
+                          }
+                      }
+                  }, 5
+              ),
+          ).subscribe(
+              res => {
+                  console.log(res);
+                  this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+              },
+              error => console.log('error : ' + error),
+              () => {
+                  console.log(this.nodes);
+                  this.initDataDone$.next(true);
+              }
+          );
+      }
 
       this.browseEntityService.selectedEntity$.subscribe(
           next => {
