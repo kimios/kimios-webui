@@ -4,8 +4,9 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
-import {concatMap, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 interface EntityNode {
   uid: number;
@@ -55,8 +56,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
       // load initial nodes
       if (this.treeNodesService.treeNodes.length > 0) {
-          // this.tree.treeModel.nodes.push(this.treeNodesService.treeNodes);
-          // this.tree.treeModel.update();
+          // if (this.browseEntityService.selectedEntity$.)
       } else {
           this.retrieveEntitiesToExpand().pipe(
               tap(res => this.entitiesToExpand$.next(res)),
@@ -104,12 +104,45 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           );
       }
 
-      this.browseEntityService.selectedEntity$.subscribe(
-          next => {
-              this.tree.treeModel.getNodeById(next['parentUid'].toString()).expand();
-              this.tree.treeModel.getNodeById(next.uid).focus(true);
-          }
-      );
+      this.browseEntityService.selectedEntity$
+          .pipe(
+              filter(entity => entity !== undefined),
+              concatMap(
+                  entity => this.browseEntityService.findAllParents(entity.uid)
+              ),
+              flatMap(
+                  entities => entities.reverse()
+              ),
+              concatMap(
+                  entityRet => combineLatest(
+                      of(entityRet),
+                      this.tree.treeModel.getNodeById(entityRet.uid).data.children === null ?
+                          this.loadChildren(entityRet.uid) :
+                          of(entityRet.uid)
+                  )
+              ),
+              tap(([entity, entityUid]) => {
+                  console.log(this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.uid.toString()));
+                  if (! DMEntityUtils.dmEntityIsDocument(entity)
+                      && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.uid.toString()).length === 0
+                  ) {
+                      this.tree.treeModel.getNodeById(entityUid).expand();
+                  }
+              })
+          )
+          .subscribe(
+              next => this.treeNodesService.treeNodes = this.tree.treeModel.nodes,
+              null,
+              () => {
+                  const entitySelected = this.browseEntityService.selectedEntity$.getValue();
+                  if (DMEntityUtils.dmEntityIsFolder(entitySelected) || DMEntityUtils.dmEntityIsWorkspace(entitySelected)) {
+                      this.tree.treeModel.getNodeById(entitySelected.uid).focus(true);
+                      this.tree.treeModel.getNodeById(entitySelected.uid).expand();
+                  } else {
+                      this.tree.treeModel.getNodeById(entitySelected['parentUid']).focus(true);
+                  }
+              }
+          );
  }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {

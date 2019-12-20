@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
-import {combineLatest, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
@@ -10,7 +10,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 })
 export class BrowseEntityService {
 
-    public selectedEntity$: Subject<DMEntity>;
+    public selectedEntity$: BehaviorSubject<DMEntity>;
 
   constructor(
       // Set the defaults
@@ -20,7 +20,7 @@ export class BrowseEntityService {
       private workspaceService: WorkspaceService,
       private folderService: FolderService
   ) {
-      this.selectedEntity$ = new Subject();
+      this.selectedEntity$ = new BehaviorSubject(undefined);
   }
 
   findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
