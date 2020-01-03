@@ -61,6 +61,7 @@ import {BrowseGridComponent} from 'app/main/components/browse-grid/browse-grid.c
 import {EntityGridTileComponent} from 'app/main/components/entity-grid-tile/entity-grid-tile.component';
 import {EntityListingComponent} from 'app/main/components/entity-listing/entity-listing.component';
 import {TreeModule} from 'angular-tree-component';
+import {KimiosNavBarComponent} from 'app/main/components/kimios-nav-bar/kimios-nav-bar.component';
 
 
 @NgModule({
@@ -89,7 +90,8 @@ import {TreeModule} from 'angular-tree-component';
         BrowseComponent,
         BrowseGridComponent,
         EntityGridTileComponent,
-        EntityListingComponent
+        EntityListingComponent,
+        KimiosNavBarComponent
     ],
     imports: [
         FileManagerRoutingModule,
