@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {Observable, of, ReplaySubject, Subject} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
@@ -55,6 +55,9 @@ export class FileSearchBarComponent implements OnInit {
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
+    @Input()
+    collapsed = false;
 
     constructor(
         private tagService: TagService,
@@ -245,4 +248,21 @@ export class FileSearchBarComponent implements OnInit {
             }
         });
     }
+
+    /**
+     * Collapse
+     */
+    collapse(): void
+    {
+        this.collapsed = true;
+    }
+
+    /**
+     * Expand
+     */
+    expand(): void
+    {
+        this.collapsed = false;
+    }
+
 }

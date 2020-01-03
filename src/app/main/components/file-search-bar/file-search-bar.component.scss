@@ -1,0 +1,31 @@
+@import "src/@fuse/components/search-bar/search-bar.component.scss";
+
+:host {
+
+  .fuse-search-bar {
+
+    .fuse-search-bar-content {
+
+      #form-search {
+        display: none;
+        flex: 1 0 auto;
+        min-height: 64px;
+        font-size: 16px;
+        background-color: transparent;
+        color: currentColor;
+      }
+    }
+
+    &.expanded {
+      position: relative;
+
+      .fuse-search-bar-content {
+
+        #form-search {
+          display: flex;
+        }
+
+      }
+    }
+  }
+}
