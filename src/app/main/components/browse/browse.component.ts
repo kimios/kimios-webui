@@ -33,7 +33,16 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
     nodes = [];
 
-  constructor(
+    pageSize: number;
+    pageIndex: number;
+    pageSizeOptions = [5, 10, 20];
+
+    length: number;
+
+    explorerMode: 'browse' | 'search';
+
+
+    constructor(
       private sessionService: SessionService,
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,

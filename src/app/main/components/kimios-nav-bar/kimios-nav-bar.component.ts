@@ -8,14 +8,6 @@ import {PageEvent} from '@angular/material';
 })
 export class KimiosNavBarComponent implements OnInit {
 
-  pageSize: number;
-  pageIndex: number;
-  pageSizeOptions = [5, 10, 20];
-
-  length: number;
-
-  explorerMode: 'browse' | 'search';
-
   constructor() {
   }
 

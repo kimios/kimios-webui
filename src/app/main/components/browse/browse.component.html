@@ -1,6 +1,18 @@
 <div fxLayout="column" >
 
     <kimios-nav-bar></kimios-nav-bar>
+        <div>
+            <mat-paginator
+                    [length]="length"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (page)="paginatorHandler($event)"
+                    [pageIndex]="pageIndex"
+                    showFirstLastButtons>
+            </mat-paginator>
+        </div>
+<!--        <mat-divider></mat-divider>-->
+    </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
 
