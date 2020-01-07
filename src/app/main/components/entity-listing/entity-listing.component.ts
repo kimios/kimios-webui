@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
-import {concatMap, filter} from 'rxjs/operators';
+import {concatMap, filter, tap} from 'rxjs/operators';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 export enum ListingType {
@@ -38,6 +38,11 @@ export class EntityListingComponent implements OnInit {
 
     this.browseEntityService.selectedEntity$
         .pipe(
+            tap(entity => {
+                if (entity === undefined) {
+                    this.entities$.next([]);
+                }
+            }),
             filter(entity => entity !== undefined),
             concatMap(res => this.browseEntityService.findEntitiesAtPath(res)),
         )

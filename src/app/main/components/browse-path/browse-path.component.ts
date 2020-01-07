@@ -30,7 +30,8 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
   }
 
   goToHome(): void {
-
+      this.browseEntityService.selectedEntity$.next(undefined);
+      this.browseEntityService.currentPath.next([]);
   }
 
   goToDir(dir: DMEntity): void {
