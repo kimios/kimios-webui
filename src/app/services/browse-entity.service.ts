@@ -1,18 +1,22 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
 import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
-import {catchError, concatMap, expand, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
+import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BrowseEntityService {
-
+export class BrowseEntityService implements OnInit, OnDestroy {
     public selectedEntity$: BehaviorSubject<DMEntity>;
 
     public loadedEntities: Map<number, DMEntity[]>;
+    public entitiesPath: Map<number, DMEntity[]>;
+
+    public currentPath: BehaviorSubject<Array<DMEntity>>;
+
+    private subsOk = true;
 
   constructor(
       // Set the defaults
@@ -24,9 +28,23 @@ export class BrowseEntityService {
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.loadedEntities = new Map<number, DMEntity[]>();
+      this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
+      this.entitiesPath = new Map<number, DMEntity[]>();
   }
 
-  findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
+    ngOnInit(): void {
+        this.currentPath.pipe(
+            takeWhile(next => this.subsOk)
+        ).subscribe(
+            next => this.entitiesPath.set(next.reverse()[0].uid, next)
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subsOk = false;
+    }
+
+    findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
     if (parentUid === null
         || parentUid === undefined) {
       return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);

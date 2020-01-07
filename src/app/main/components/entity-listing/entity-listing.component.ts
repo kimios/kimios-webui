@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {concatMap, filter} from 'rxjs/operators';
 import {BrowseEntityService} from 'app/services/browse-entity.service';

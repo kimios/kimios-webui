@@ -270,6 +270,16 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       this.browseEntityService.selectedEntity$.next(
           this.entitiesLoaded.get(Number(uid))
       );
+      if (this.browseEntityService.entitiesPath.get(uid) !== null
+          && this.browseEntityService.entitiesPath.get(uid) !== undefined) {
+          this.browseEntityService.currentPath.next(this.browseEntityService.entitiesPath.get(uid));
+      } else {
+          this.browseEntityService.findAllParents(uid, true).subscribe(
+              next => {
+                  this.browseEntityService.currentPath.next(next.reverse());
+              }
+          );
+      }
   }
 
     onToggleExpanded(event): void {
