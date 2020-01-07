@@ -1,7 +1,28 @@
 <div fxLayout="column" >
+    <div fxLayout="row">
+        <div class="actionsButtonDiv" fxLayout="row" fxFlex>
+            <!-- ADD FILE BUTTON -->
+            <div class="file-uploader" style="padding:20px">
+                <form (ngSubmit)="onSubmitFileUpload()">
+                    <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
+                    <button mat-fab
+                            color="warn"
 
-    <kimios-nav-bar></kimios-nav-bar>
-        <div>
+                            (click)="fileInput.click($event.target.files)"
+                            aria-label="Add file">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </form>
+            </div>
+            <!-- / ADD FILE BUTTON -->
+
+            <div>
+                <kimios-nav-bar></kimios-nav-bar>
+            </div>
+
+        </div>
+
+        <div class="paginatorBrowseComponent">
             <mat-paginator
                     [length]="length"
                     [pageSize]="pageSize"
@@ -11,6 +32,7 @@
                     showFirstLastButtons>
             </mat-paginator>
         </div>
+
 <!--        <mat-divider></mat-divider>-->
     </div>
 
