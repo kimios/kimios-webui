@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
 import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
-import {catchError, concatMap, expand, filter, map, switchMap, toArray} from 'rxjs/operators';
+import {catchError, concatMap, expand, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
@@ -11,6 +11,8 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 export class BrowseEntityService {
 
     public selectedEntity$: BehaviorSubject<DMEntity>;
+
+    public loadedEntities: Map<number, DMEntity[]>;
 
   constructor(
       // Set the defaults
@@ -21,6 +23,7 @@ export class BrowseEntityService {
       private folderService: FolderService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
+      this.loadedEntities = new Map<number, DMEntity[]>();
   }
 
   findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
@@ -41,8 +44,10 @@ export class BrowseEntityService {
             || parentUid === undefined) {
             return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
         } else {
-            return this.retrieveContainerEntity(parentUid)
-                .pipe(
+            return (this.loadedEntities.get(parentUid) !== null
+                && this.loadedEntities.get(parentUid) !== undefined) ?
+                of(this.loadedEntities.get(parentUid)) :
+                this.retrieveContainerEntity(parentUid).pipe(
                     concatMap(
                         res => combineLatest(of(res), this.folderService.getFolders(this.sessionService.sessionToken, parentUid))
                     ),
@@ -57,6 +62,9 @@ export class BrowseEntityService {
                     ),
                     concatMap(
                         ([folders, documents]) => of(folders.concat(documents))
+                    ),
+                    tap(
+                        entities => this.loadedEntities.set(parentUid, entities)
                     )
                 );
         }
