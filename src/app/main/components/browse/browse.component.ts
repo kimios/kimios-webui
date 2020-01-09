@@ -320,4 +320,12 @@ export class BrowseComponent implements OnInit, AfterViewInit {
             () => console.log('children loading finished')
         );
     }
+
+    historyHasBack(): boolean {
+        return false;
+    }
+
+    historyHasForward(): boolean {
+        return false;
+    }
 }

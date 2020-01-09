@@ -1,25 +1,36 @@
 <div fxLayout="column" >
     <div fxLayout="row">
-        <div class="actionsButtonDiv" fxLayout="row" fxFlex>
-            <!-- ADD FILE BUTTON -->
-            <div class="file-uploader" style="padding:20px">
-                <form (ngSubmit)="onSubmitFileUpload()">
-                    <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
-                    <button mat-fab
-                            color="warn"
+        <!-- ADD FILE BUTTON -->
+        <div class="file-uploader" style="padding:20px">
+            <form (ngSubmit)="onSubmitFileUpload()">
+                <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
+                <button mat-fab
+                        color="warn"
 
-                            (click)="fileInput.click($event.target.files)"
-                            aria-label="Add file">
-                        <mat-icon>add</mat-icon>
-                    </button>
-                </form>
-            </div>
-            <!-- / ADD FILE BUTTON -->
+                        (click)="fileInput.click($event.target.files)"
+                        aria-label="Add file">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </form>
+        </div>
+        <!-- / ADD FILE BUTTON -->
 
-            <div>
-                <kimios-nav-bar></kimios-nav-bar>
-            </div>
+    </div>
 
+<!--        <mat-divider></mat-divider>-->
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+        <div>
+            <mat-icon id="historyBackButton" [ngClass]="historyHasBack() ? 'icon-active' : 'icon-inactive'">
+                arrow_back_ios
+            </mat-icon>
+            <mat-icon id="historyForwardButton" [ngClass]="historyHasForward() ? 'icon-active' : 'icon-inactive'">
+                arrow_forward_ios
+            </mat-icon>
+        </div>
+
+        <div>
+            <browse-path></browse-path>
         </div>
 
         <div class="paginatorBrowseComponent">
@@ -32,12 +43,6 @@
                     showFirstLastButtons>
             </mat-paginator>
         </div>
-
-<!--        <mat-divider></mat-divider>-->
-    </div>
-
-    <div>
-        <browse-path></browse-path>
     </div>
 
 <div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
