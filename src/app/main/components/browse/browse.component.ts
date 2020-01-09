@@ -14,6 +14,11 @@ interface EntityNode {
   children?: EntityNode[];
 }
 
+enum EXPLORER_MODE {
+    BROWSE = 0,
+    SEARCH = 1
+}
+
 @Component({
   selector: 'browse',
   templateUrl: './browse.component.html',

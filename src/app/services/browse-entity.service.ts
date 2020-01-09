@@ -13,6 +13,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     public loadedEntities: Map<number, DMEntity[]>;
     public entitiesPath: Map<number, DMEntity[]>;
+    public entities: Map<number, DMEntity>;
 
     public currentPath: BehaviorSubject<Array<DMEntity>>;
 
@@ -30,6 +31,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.loadedEntities = new Map<number, DMEntity[]>();
       this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
       this.entitiesPath = new Map<number, DMEntity[]>();
+      // this.history = new Array<number>();
+      this.entities = new Map<number, DMEntity>();
   }
 
     ngOnInit(): void {
@@ -47,9 +50,23 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
     if (parentUid === null
         || parentUid === undefined) {
-      return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
+      return this.workspaceService.getWorkspaces(this.sessionService.sessionToken).pipe(
+          tap(next => next.forEach(entity => {
+              if (this.entities.get(entity.uid) === null
+                  || this.entities.get(entity.uid) === undefined) {
+                  this.entities.set(entity.uid, entity);
+              }
+          }))
+      );
     } else {
-      return this.folderService.getFolders(this.sessionService.sessionToken, parentUid);
+      return this.folderService.getFolders(this.sessionService.sessionToken, parentUid).pipe(
+          tap(next => next.forEach(entity => {
+              if (this.entities.get(entity.uid) === null
+                  || this.entities.get(entity.uid) === undefined) {
+                  this.entities.set(entity.uid, entity);
+              }
+          }))
+      );
     }
   }
 
@@ -60,7 +77,14 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
         if (parentUid === null
             || parentUid === undefined) {
-            return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
+            return this.workspaceService.getWorkspaces(this.sessionService.sessionToken).pipe(
+                tap(next => next.forEach(entity => {
+                    if (this.entities.get(entity.uid) === null
+                        || this.entities.get(entity.uid) === undefined) {
+                        this.entities.set(entity.uid, entity);
+                    }
+                }))
+            );
         } else {
             return (this.loadedEntities.get(parentUid) !== null
                 && this.loadedEntities.get(parentUid) !== undefined) ?
@@ -83,7 +107,13 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                     ),
                     tap(
                         entities => this.loadedEntities.set(parentUid, entities)
-                    )
+                    ),
+                    tap(next => next.forEach(entity => {
+                        if (this.entities.get(entity.uid) === null
+                            || this.entities.get(entity.uid) === undefined) {
+                            this.entities.set(entity.uid, entity);
+                        }
+                    }))
                 );
         }
     }
