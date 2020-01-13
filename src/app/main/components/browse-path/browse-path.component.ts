@@ -30,12 +30,12 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
   }
 
   goToHome(): void {
-      this.browseEntityService.selectedEntity$.next(undefined);
+      this.browseEntityService.selectedEntityFromGridOrTree$.next(undefined);
       this.browseEntityService.currentPath.next([]);
   }
 
   goToDir(dir: DMEntity): void {
-    this.browseEntityService.selectedEntity$.next(dir);
+    this.browseEntityService.selectedEntityFromGridOrTree$.next(dir);
     const index = this.browseEntityService.currentPath.getValue().findIndex(dirPath => dirPath.uid === dir.uid);
     if (index !== -1) {
       this.browseEntityService.currentPath.next(this.browseEntityService.currentPath.getValue().slice(0, index + 1));

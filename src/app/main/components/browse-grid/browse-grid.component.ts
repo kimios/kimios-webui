@@ -52,7 +52,7 @@ export class BrowseGridComponent implements OnInit, AfterContentInit {
 
   goToDocument(entityFromList: DMEntity): void {
     if (DMEntityUtils.dmEntityIsFolder(entityFromList) || DMEntityUtils.dmEntityIsWorkspace(entityFromList)) {
-      this.bes.selectedEntity$.next(entityFromList);
+      this.bes.selectedEntityFromGridOrTree$.next(entityFromList);
       const currentPath = this.bes.currentPath.getValue();
       if (currentPath.filter(dir => dir.uid === entityFromList.uid).length === 0) {
         currentPath.push(entityFromList);

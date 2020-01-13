@@ -46,6 +46,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
     explorerMode: 'browse' | 'search';
 
+    historyHasBack = false;
+    historyHasForward = false;
 
     constructor(
       private sessionService: SessionService,
@@ -64,6 +66,14 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       if (this.treeNodesService.treeNodes.length > 0) {
           this.nodes = this.treeNodesService.treeNodes;
       }
+
+      this.browseEntityService.historyHasForward.subscribe(
+          next => this.historyHasForward = next
+      );
+
+      this.browseEntityService.historyHasBackward.subscribe(
+          next => this.historyHasBack = next
+      );
   }
 
   ngAfterViewInit(): void {
@@ -172,7 +182,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   of([]) :
                   this.browseEntityService.retrieveContainerEntity(res).pipe(
                       tap(
-                          entity => this.browseEntityService.selectedEntity$.next(entity)
+                          entity => this.browseEntityService.selectedEntityFromGridOrTree$.next(entity)
                       ),
                       concatMap(
                           entity => this.browseEntityService.findAllParents(entity.uid)
@@ -272,12 +282,18 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   }
 
   selectNode(uid: number): void {
-      this.browseEntityService.selectedEntity$.next(
+      this.browseEntityService.selectedEntityFromGridOrTree$.next(
           this.entitiesLoaded.get(Number(uid))
       );
-      if (this.browseEntityService.entitiesPath.get(uid) !== null
-          && this.browseEntityService.entitiesPath.get(uid) !== undefined) {
-          this.browseEntityService.currentPath.next(this.browseEntityService.entitiesPath.get(uid));
+//      if (this.browseEntityService.entitiesPath.get(uid) !== null
+//          && this.browseEntityService.entitiesPath.get(uid) !== undefined) {
+      if (this.browseEntityService.entitiesPathIds.get(uid) !== null
+          && this.browseEntityService.entitiesPathIds.get(uid) !== undefined) {
+      // const idx = this.browseEntityService.entitiesPathId.findIndex(elem => elem === Number(uid));
+      // if (idx !== -1) {
+          this.browseEntityService.currentPath.next(this.browseEntityService.entitiesPathIds.get(uid).map(elem =>
+              this.browseEntityService.entities.get(elem)
+          ));
       } else {
           this.browseEntityService.findAllParents(uid, true).subscribe(
               next => {
@@ -326,11 +342,11 @@ export class BrowseComponent implements OnInit, AfterViewInit {
         );
     }
 
-    historyHasBack(): boolean {
-        return false;
+    historyBack(): void {
+        this.browseEntityService.goHistoryBack();
     }
 
-    historyHasForward(): boolean {
-        return false;
+    historyForward(): void {
+        this.browseEntityService.goHistoryForward();
     }
 }

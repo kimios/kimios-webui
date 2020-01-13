@@ -21,12 +21,20 @@
 
     <div fxLayout="row" fxLayoutAlign="space-between center">
         <div>
-            <mat-icon id="historyBackButton" [ngClass]="historyHasBack() ? 'icon-active' : 'icon-inactive'">
-                arrow_back_ios
-            </mat-icon>
-            <mat-icon id="historyForwardButton" [ngClass]="historyHasForward() ? 'icon-active' : 'icon-inactive'">
-                arrow_forward_ios
-            </mat-icon>
+            <button id="historyBackButton"
+                    [ngClass]="historyHasBack ? 'icon-active' : 'icon-inactive'"
+                    [disabled]="!historyHasBack"
+                    (click)="historyBack()"
+            >
+                <mat-icon>arrow_back_ios</mat-icon>
+            </button>
+            <button id="historyForwardButton"
+                    [ngClass]="historyHasForward ? 'icon-active' : 'icon-inactive'"
+                    [disabled]="!historyHasForward"
+                    (click)="historyForward()"
+            >
+                <mat-icon>arrow_forward_ios</mat-icon>
+            </button>
         </div>
 
         <div>

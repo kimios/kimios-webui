@@ -1,7 +1,7 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
-import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
@@ -9,15 +9,28 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
   providedIn: 'root'
 })
 export class BrowseEntityService implements OnInit, OnDestroy {
+    public selectedEntityFromGridOrTree$: BehaviorSubject<DMEntity>;
     public selectedEntity$: BehaviorSubject<DMEntity>;
 
     public loadedEntities: Map<number, DMEntity[]>;
     public entitiesPath: Map<number, DMEntity[]>;
+    public entitiesPathId: number[];
+    public entitiesPathValue: number[][];
+    public entitiesPathIds: Map<number, number[]>;
+
     public entities: Map<number, DMEntity>;
 
     public currentPath: BehaviorSubject<Array<DMEntity>>;
 
     private subsOk = true;
+
+    private history: Array<number>;
+    private historyCurrentIndex: BehaviorSubject<number>;
+    public historyBack: Subject<number>;
+    public historyForward: Subject<number>;
+    public historyNewEntry: Subject<number>;
+    public historyHasForward: BehaviorSubject<boolean>;
+    public historyHasBackward: BehaviorSubject<boolean>;
 
   constructor(
       // Set the defaults
@@ -28,19 +41,102 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private folderService: FolderService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
+      this.selectedEntityFromGridOrTree$ = new BehaviorSubject<DMEntity>(undefined);
       this.loadedEntities = new Map<number, DMEntity[]>();
       this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
       this.entitiesPath = new Map<number, DMEntity[]>();
-      // this.history = new Array<number>();
+      this.entitiesPathId = Array<number>();
+      this.entitiesPathValue = Array<Array<number>>();
+      this.entitiesPathIds = new Map<number, Array<number>>();
+
+      this.history = new Array<number>();
       this.entities = new Map<number, DMEntity>();
+      this.historyCurrentIndex = new BehaviorSubject<number>(-1);
+      this.historyBack = new Subject<number>();
+      this.historyForward = new Subject<number>();
+      this.historyNewEntry = new Subject<number>();
+      this.historyHasForward = new BehaviorSubject<boolean>(false);
+      this.historyHasBackward = new BehaviorSubject<boolean>(false);
+
+      this.ngOnInit();
   }
+
+    updateEntitiesPathCache(next: DMEntity[]): void {
+        const lastEntity = next[next.length - 1];
+        if (this.entitiesPath.get(lastEntity.uid) === null || this.entitiesPath.get(lastEntity.uid) === undefined) {
+            this.entitiesPath.set(lastEntity.uid, next);
+        }
+        this.entitiesPathId.push(lastEntity.uid);
+        const index = this.entitiesPathId.findIndex(elem => elem === lastEntity.uid);
+        next.forEach(elem => this.entities.set(elem.uid, elem));
+        this.entitiesPathValue[index] = next.map(elem => elem.uid);
+        if (! this.entitiesPathIds.has(lastEntity.uid)) {
+        // if (this.entitiesPathIds.get(lastEntity.uid) === null || this.entitiesPath.get(lastEntity.uid) === undefined) {
+            this.entitiesPathIds.set(lastEntity.uid, next.map(elem => elem.uid));
+        }
+        console.log('entitiesPath');
+        // console.log(this.entitiesPathId);
+        // console.log(this.entitiesPathValue);
+        console.log(this.entitiesPathIds);
+    }
 
     ngOnInit(): void {
         this.currentPath.pipe(
-            takeWhile(next => this.subsOk)
+            takeWhile(next => this.subsOk),
+            filter(next => next.length > 0)
         ).subscribe(
-            next => this.entitiesPath.set(next.reverse()[0].uid, next)
+            next => {
+                this.updateEntitiesPathCache(next);
+            }
         );
+
+/*    .pipe(
+            takeWhile(next => this.subsOk)
+        )*/
+        this.historyNewEntry.subscribe(
+            next => {
+                this.history.push(next);
+            }
+        );
+
+        this.historyCurrentIndex.pipe(
+            takeWhile(next => this.subsOk),
+            filter(next => next > -1)
+        ).subscribe(
+            next => {
+                console.log(this.history);
+                this.historyHasForward.next(this.history.length > 1 && next < this.history.length - 1);
+                this.historyHasBackward.next(this.history.length > 1 && next > 0);
+                this.selectedEntity$.next(this.entities.get(this.history[next]) ? this.entities.get(this.history[next]) : undefined);
+                if (this.history[next] === undefined) {
+                    this.currentPath.next([]);
+                } else {
+                    if (this.entities.get(this.history[next]) !== null && this.entities.get(this.history[next]) !== undefined) {
+                        const entity = this.entities.get(this.history[next]);
+                        if (this.entitiesPathIds.get(entity.uid) !== null && this.entitiesPathIds.get(entity.uid) !== undefined) {
+                            // const idx = this.entitiesPathId.findIndex(elem => elem === entity.uid);
+                            // if (idx !== -1) {
+                            // this.currentPath.next(this.entitiesPathValue[entity.uid].map(elem => this.entities.get(elem)));
+                            this.currentPath.next(this.entitiesPathIds.get(entity.uid).map(elem => this.entities.get(elem)));
+                        }
+                    }
+                }
+            }
+        );
+
+        this.selectedEntityFromGridOrTree$.subscribe(
+            next => {
+                this.setHistoryNewEntry(next === undefined ? undefined : next.uid);
+                this.goHistoryForward();
+            }
+        );
+    }
+
+    setHistoryNewEntry(uid: number): void {
+      if (this.historyCurrentIndex.getValue() < this.history.length - 1) {
+          this.history = this.history.slice(0, this.historyCurrentIndex.getValue() + 1);
+      }
+        this.history.push(uid);
     }
 
     ngOnDestroy(): void {
@@ -169,6 +265,24 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }),
             map(res => res)
         );
+    }
+
+    goHistoryBack(): void {
+        if (this.history.length > 1
+            && this.historyCurrentIndex.getValue() > 0) {
+            this.historyCurrentIndex.next(this.historyCurrentIndex.getValue() - 1);
+        }
+    }
+
+    goHistoryForward(): void {
+        if (this.history.length > 1
+            && this.historyCurrentIndex.getValue() < (this.history.length - 1)) {
+            this.historyCurrentIndex.next(this.historyCurrentIndex.getValue() + 1);
+        } else {
+            if (this.history.length === 1) {
+                this.historyCurrentIndex.next(0);
+            }
+        }
     }
 }
 
