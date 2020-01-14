@@ -37,8 +37,16 @@
             </button>
         </div>
 
-        <div>
-            <browse-path></browse-path>
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="50">
+            <ng-container *ngIf="explorerMode === 0; else searchModeBar">
+                <browse-path></browse-path>
+                <button (click)="searchModeOn()">
+                    <mat-icon>search</mat-icon>
+                </button>
+            </ng-container>
+            <ng-template #searchModeBar>
+                <button (click)="searchModeOff()" class="cursor-pointer"><mat-icon>arrow_back</mat-icon></button><file-search-bar style="width: 100%"></file-search-bar>
+            </ng-template>
         </div>
 
         <div class="paginatorBrowseComponent">
@@ -53,7 +61,7 @@
         </div>
     </div>
 
-<div fxLayout="row" fxLayoutAlign="space-between start" style="width: 100%">
+<div fxLayout="row" fxLayoutAlign="start" style="width: 100%; margin-top: 20px" fxLayoutGap="20px">
 
   <div fxFlex="25" >
 
@@ -119,7 +127,12 @@
       <mat-divider></mat-divider>
     </div>-->
     <div class="content" fusePerfectScrollbar>
-      <entity-listing></entity-listing>
+        <!--<ng-container *ngIf="explorerMode === 0; else searchModeContent">-->
+            <entity-listing></entity-listing>
+        <!--</ng-container>
+        <ng-template #searchModeContent>
+            <file-list></file-list>
+        </ng-template>-->
     </div>
   </div>
 

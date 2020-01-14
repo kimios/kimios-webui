@@ -365,4 +365,12 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     paginatorHandler($event: PageEvent): void {
         this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
     }
+
+    searchModeOn(): void {
+        this.explorerMode = EXPLORER_MODE.SEARCH;
+    }
+
+    searchModeOff(): void {
+        this.explorerMode = EXPLORER_MODE.BROWSE;
+    }
 }

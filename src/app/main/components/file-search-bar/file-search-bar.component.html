@@ -1,23 +1,4 @@
-<div class="fuse-search-bar" [ngClass]="{'expanded':!collapsed}">
-
-<div class="fuse-search-bar-content">
-
-    <label for="form-search">
-        <button mat-icon-button class="fuse-search-bar-expander" aria-label="Expand Search Bar" (click)="expand()"
-                *ngIf="collapsed">
-            <mat-icon class="s-24 secondary-text">search</mat-icon>
-        </button>
-    </label>
-
-<div id="form-search">
-<form
-        class="full-width"
-        fxLayout="column"
-        #form
-        [formGroup]="searchParams"
-        (ngSubmit)="onSubmit()"
-        (keyup)="$event.key === 'Enter' ? onSubmit():1"
->
+<form class="full-width"  fxLayout="column" #form [formGroup]="searchParams" (ngSubmit)="onSubmit()" (keyup)="$event.key === 'Enter' ? onSubmit():1" >
   <mat-expansion-panel>
     <mat-expansion-panel-header>
         <div fxLayout="row" fxLayoutAlign="space-between center" style="width: 100%;">
@@ -120,14 +101,3 @@
 </mat-expansion-panel>
 
 </form>
-</div>
-
-
-    <button mat-icon-button class="fuse-search-bar-collapser" (click)="collapse()"
-            aria-label="Collapse Search Bar">
-        <mat-icon class="s-24 secondary-text">close</mat-icon>
-    </button>
-
-</div>
-
-</div>
