@@ -21,10 +21,10 @@ export class SearchEntityService implements Resolve<any> {
         return this._criterias;
     }
 
-    onFilesChanged: BehaviorSubject<any>;
+    onFilesChanged: BehaviorSubject<Array<DMEntity>>;
     onFileSelected: BehaviorSubject<any>;
     onTagsDataChanged: BehaviorSubject<Array<Tag>>;
-    onTotalFilesChanged: BehaviorSubject<any>;
+    onTotalFilesChanged: BehaviorSubject<number>;
     onSortChanged: BehaviorSubject<any>;
 
     // keep last query parameters to be able to reload
@@ -60,10 +60,10 @@ export class SearchEntityService implements Resolve<any> {
         private searchService: SearchService,
         private tagService: TagService
     ) {
-        this.onFilesChanged = new BehaviorSubject({});
+        this.onFilesChanged = new BehaviorSubject<Array<DMEntity>>([]);
         this.onFileSelected = new BehaviorSubject({});
         this.onTagsDataChanged = new BehaviorSubject([]);
-        this.onTotalFilesChanged = new BehaviorSubject({});
+        this.onTotalFilesChanged = new BehaviorSubject(undefined);
         this.onSortChanged = new BehaviorSubject({});
         this.pageSize = PAGE_SIZE_DEFAULT;
         this._criterias = new Array<Criteria>();

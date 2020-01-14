@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
-import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.service';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
@@ -13,11 +13,6 @@ interface EntityNode {
   uid: number;
   label: string;
   children?: EntityNode[];
-}
-
-enum EXPLORER_MODE {
-    BROWSE = 0,
-    SEARCH = 1
 }
 
 @Component({
@@ -81,10 +76,18 @@ export class BrowseComponent implements OnInit, AfterViewInit {
           next => this.length = next.length
       );
 
+      this.browseEntityService.length.subscribe(
+          next => this.length = next
+      );
+
       this.pageSize = this.browseEntityService.pageSize;
 
       this.browseEntityService.pageIndex.subscribe(
           next => this.pageIndex = next
+      );
+
+      this.browseEntityService.explorerMode.subscribe(
+          next => this.explorerMode = next
       );
   }
 
@@ -367,10 +370,10 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     }
 
     searchModeOn(): void {
-        this.explorerMode = EXPLORER_MODE.SEARCH;
+        this.browseEntityService.explorerMode.next(EXPLORER_MODE.SEARCH);
     }
 
     searchModeOff(): void {
-        this.explorerMode = EXPLORER_MODE.BROWSE;
+        this.browseEntityService.explorerMode.next(EXPLORER_MODE.BROWSE);
     }
 }

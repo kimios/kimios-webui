@@ -4,8 +4,14 @@ import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceSe
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {SearchEntityService} from './searchentity.service';
 
 const PAGE_SIZE_DEFAULT = 20;
+
+export enum EXPLORER_MODE {
+    BROWSE = 0,
+    SEARCH = 1
+}
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +43,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public historyHasForward: BehaviorSubject<boolean>;
     public historyHasBackward: BehaviorSubject<boolean>;
 
+    public explorerMode: BehaviorSubject<EXPLORER_MODE>;
+
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
@@ -47,7 +55,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private sessionService: SessionService,
       private documentService: DocumentService,
       private workspaceService: WorkspaceService,
-      private folderService: FolderService
+      private folderService: FolderService,
+      private searchEntityService: SearchEntityService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.selectedEntityFromGridOrTree$ = new BehaviorSubject<DMEntity>(undefined);
@@ -72,6 +81,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
       this.pageIndex = new BehaviorSubject<number>(0);
       this.pageSize = PAGE_SIZE_DEFAULT;
+      this.length = new BehaviorSubject<number>(undefined);
+
+      this.explorerMode = new BehaviorSubject<EXPLORER_MODE>(EXPLORER_MODE.BROWSE);
 
       this.ngOnInit();
   }
@@ -166,6 +178,22 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                     this.makePage(this.pageIndex.getValue(), this.pageSize);
                 }
             );
+
+        this.explorerMode.pipe(
+            filter(next => next === EXPLORER_MODE.SEARCH),
+            concatMap(
+                next => this.searchEntityService.onFilesChanged
+            ),
+            map(
+                next => this.entitiesToDisplay$.next(next)
+            ),
+            concatMap(
+                next => this.searchEntityService.onTotalFilesChanged
+            ),
+            map(
+                next => this.length.next(next)
+            )
+        ).subscribe();
     }
 
     setHistoryNewEntry(uid: number): void {
