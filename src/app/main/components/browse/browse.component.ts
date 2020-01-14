@@ -7,6 +7,7 @@ import {ActivatedRoute} from '@angular/router';
 import {concatMap, filter, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {PageEvent} from '@angular/material';
 
 interface EntityNode {
   uid: number;
@@ -40,11 +41,11 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
     pageSize: number;
     pageIndex: number;
-    pageSizeOptions = [5, 10, 20];
+    pageSizeOptions = [10, 20, 50];
 
     length: number;
 
-    explorerMode: 'browse' | 'search';
+    explorerMode: EXPLORER_MODE.BROWSE | EXPLORER_MODE.SEARCH;
 
     historyHasBack = false;
     historyHasForward = false;
@@ -60,6 +61,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     this.initDataDone$ = new BehaviorSubject(false);
     this.nodeUidsToExpand = new Array<number>();
     this.entitiesLoaded = new Map<number, DMEntity>();
+    this.explorerMode = EXPLORER_MODE.BROWSE;
   }
 
   ngOnInit(): void {
@@ -73,6 +75,16 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
       this.browseEntityService.historyHasBackward.subscribe(
           next => this.historyHasBack = next
+      );
+
+      this.browseEntityService.totalEntitiesToDisplay$.subscribe(
+          next => this.length = next.length
+      );
+
+      this.pageSize = this.browseEntityService.pageSize;
+
+      this.browseEntityService.pageIndex.subscribe(
+          next => this.pageIndex = next
       );
   }
 
@@ -348,5 +360,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
     historyForward(): void {
         this.browseEntityService.goHistoryForward();
+    }
+
+    paginatorHandler($event: PageEvent): void {
+        this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
     }
 }

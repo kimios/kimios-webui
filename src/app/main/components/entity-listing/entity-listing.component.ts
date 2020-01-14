@@ -36,16 +36,7 @@ export class EntityListingComponent implements OnInit {
   ngOnInit(): void {
     this.isGrid.next(this.gridOrList === ListingType.GRID);
 
-    this.browseEntityService.selectedEntity$
-        .pipe(
-            tap(entity => {
-                if (entity === undefined) {
-                    this.entities$.next([]);
-                }
-            }),
-            filter(entity => entity !== undefined),
-            concatMap(res => this.browseEntityService.findEntitiesAtPath(res)),
-        )
+    this.browseEntityService.entitiesToDisplay$
         .subscribe(
             res => {
               this.entities$.next(res);

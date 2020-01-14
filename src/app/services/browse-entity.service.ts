@@ -5,12 +5,17 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
+const PAGE_SIZE_DEFAULT = 20;
+
 @Injectable({
   providedIn: 'root'
 })
 export class BrowseEntityService implements OnInit, OnDestroy {
     public selectedEntityFromGridOrTree$: BehaviorSubject<DMEntity>;
     public selectedEntity$: BehaviorSubject<DMEntity>;
+
+    public totalEntitiesToDisplay$: BehaviorSubject<DMEntity[]>;
+    public entitiesToDisplay$: BehaviorSubject<DMEntity[]>;
 
     public loadedEntities: Map<number, DMEntity[]>;
     public entitiesPath: Map<number, DMEntity[]>;
@@ -31,6 +36,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public historyNewEntry: Subject<number>;
     public historyHasForward: BehaviorSubject<boolean>;
     public historyHasBackward: BehaviorSubject<boolean>;
+
+    pageSize: number;
+    pageIndex: BehaviorSubject<number>;
+    length: BehaviorSubject<number>;
 
   constructor(
       // Set the defaults
@@ -57,6 +66,12 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.historyNewEntry = new Subject<number>();
       this.historyHasForward = new BehaviorSubject<boolean>(false);
       this.historyHasBackward = new BehaviorSubject<boolean>(false);
+
+      this.totalEntitiesToDisplay$ = new BehaviorSubject<DMEntity[]>([]);
+      this.entitiesToDisplay$ = new BehaviorSubject<DMEntity[]>([]);
+
+      this.pageIndex = new BehaviorSubject<number>(0);
+      this.pageSize = PAGE_SIZE_DEFAULT;
 
       this.ngOnInit();
   }
@@ -130,6 +145,27 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 this.goHistoryForward();
             }
         );
+
+        this.selectedEntity$
+            .pipe(
+                tap(entity => {
+                    if (entity === undefined) {
+                        this.totalEntitiesToDisplay$.next([]);
+                        this.entitiesToDisplay$.next([]);
+                    }
+                }),
+                tap(entity => {
+                    this.pageIndex.next(0);
+                }),
+                filter(entity => entity !== undefined),
+                concatMap(res => this.findEntitiesAtPath(res)),
+            )
+            .subscribe(
+                res => {
+                    this.totalEntitiesToDisplay$.next(res);
+                    this.makePage(this.pageIndex.getValue(), this.pageSize);
+                }
+            );
     }
 
     setHistoryNewEntry(uid: number): void {
@@ -283,6 +319,14 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 this.historyCurrentIndex.next(0);
             }
         }
+    }
+
+    public makePage(pageIndex: number, pageSize: number): void {
+        this.pageSize = pageSize;
+        this.pageIndex.next(pageIndex);
+        const indexBeginning = (this.pageIndex.getValue()) * this.pageSize;
+        const indexEnd = indexBeginning + this.pageSize;
+        this.entitiesToDisplay$.next(this.totalEntitiesToDisplay$.getValue().slice(indexBeginning, indexEnd));
     }
 }
 
