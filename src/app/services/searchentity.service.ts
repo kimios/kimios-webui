@@ -66,6 +66,7 @@ export class SearchEntityService implements Resolve<any> {
         this.onTotalFilesChanged = new BehaviorSubject({});
         this.onSortChanged = new BehaviorSubject({});
         this.pageSize = PAGE_SIZE_DEFAULT;
+        this._criterias = new Array<Criteria>();
     }
 
     /**
