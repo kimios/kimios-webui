@@ -7,6 +7,7 @@ import {concatMap, map, startWith} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
     const content = control.get('content');
@@ -45,6 +46,8 @@ export class FileSearchBarComponent implements OnInit {
     deselectedTag$: Subject<Tag>;
     selectedTags: Tag[];
 
+    documentParent: string;
+
     visible = true;
     selectable = true;
     removable = true;
@@ -62,6 +65,7 @@ export class FileSearchBarComponent implements OnInit {
     constructor(
         private tagService: TagService,
         private searchEntityService: SearchEntityService,
+        private browseEntityService: BrowseEntityService,
         private fb: FormBuilder
     ) {
         this.selectedTags = new Array<Tag>();
@@ -77,6 +81,7 @@ export class FileSearchBarComponent implements OnInit {
             validators: searchParamsValidator
         });
         this.filenames$ = new Observable<string[]>();
+        this.documentParent = '';
     }
 
     ngOnInit(): void {
@@ -143,6 +148,10 @@ export class FileSearchBarComponent implements OnInit {
                     []
             )
         );
+
+        this.browseEntityService.currentPath.subscribe(
+            next => this.documentParent = '/' + next.map(elem => elem.name).join('/')
+        );
     }
 
     private _filterTags(value: string): Tag[] {
@@ -161,7 +170,8 @@ export class FileSearchBarComponent implements OnInit {
             this.searchEntityService.searchWithFilters(
                 this.searchParams.get('content').value,
                 this.searchParams.get('filename').value,
-                (this.searchParams.get('tagList') as FormArray).getRawValue().filter(e => e !== '')
+                (this.searchParams.get('tagList') as FormArray).getRawValue().filter(e => e !== ''),
+                this.documentParent
             ).subscribe();
         }
     }
