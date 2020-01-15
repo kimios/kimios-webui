@@ -87,7 +87,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       );
 
       this.browseEntityService.explorerMode.subscribe(
-          next => this.explorerMode = next
+          next => {
+              this.explorerMode = next;
+          }
       );
   }
 

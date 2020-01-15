@@ -144,7 +144,7 @@ export class FileSearchBarComponent implements OnInit {
         this.filenames$ = this.searchParams.get('filename').valueChanges.pipe(
             concatMap(
                 term => typeof term === 'string' && term.length > 2 ?
-                    this.searchEntityService.searchDocumentsNames(term) :
+                    this.searchEntityService.searchDocumentsNames(term, this.documentParent) :
                     []
             )
         );

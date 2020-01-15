@@ -354,7 +354,13 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         this.pageIndex.next(pageIndex);
         const indexBeginning = (this.pageIndex.getValue()) * this.pageSize;
         const indexEnd = indexBeginning + this.pageSize;
-        this.entitiesToDisplay$.next(this.totalEntitiesToDisplay$.getValue().slice(indexBeginning, indexEnd));
+        if (this.explorerMode.getValue() === EXPLORER_MODE.BROWSE) {
+            this.entitiesToDisplay$.next(this.totalEntitiesToDisplay$.getValue().slice(indexBeginning, indexEnd));
+        } else {
+            this.searchEntityService.changePage(this.pageIndex.getValue(), this.pageSize).subscribe(
+                next => this.entitiesToDisplay$.next(next)
+            );
+        }
     }
 }
 

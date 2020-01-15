@@ -265,8 +265,14 @@ export class SearchEntityService implements Resolve<any> {
 
     // extractFacets()
 
-    searchDocumentsByName(searchTerm: string): Observable<SearchResponse> {
+    searchDocumentsByName(searchTerm: string, documentParent = ''): Observable<SearchResponse> {
         const criterias = this.filenameTermsToCriterias(searchTerm);
+        if (documentParent !== '') {
+            criterias.push({
+                fieldName: 'DocumentParent',
+                query: documentParent
+            });
+        }
 
         return this.searchService.advancedSearchDocuments(
             this.sessionService.sessionToken,
@@ -293,8 +299,8 @@ export class SearchEntityService implements Resolve<any> {
             }));
     }
 
-    searchDocumentsNames(searchTerm: string): Observable<Array<string>> {
-        return this.searchDocumentsByName(searchTerm).pipe(
+    searchDocumentsNames(searchTerm: string, documentParent = ''): Observable<Array<string>> {
+        return this.searchDocumentsByName(searchTerm, documentParent).pipe(
             map(
                 res => res.rows.map(dmEntity => dmEntity.name)
             )
