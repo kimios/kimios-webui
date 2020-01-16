@@ -5,7 +5,11 @@
     >
         <div  fxLayout="column" >
             <div  fxLayout="row" fxLayoutAlign="end" >
-                <div class="icon-action-tile"><mat-icon *ngIf="secEnt.fullAccess">remove_circle</mat-icon></div>
+                <div class="icon-action-tile">
+                    <button (click)="sendDelete(entity)">
+                        <mat-icon *ngIf="secEnt.fullAccess">remove_circle</mat-icon>
+                    </button>
+                </div>
             </div>
             <div>
                 <mat-icon>{{iconName}}</mat-icon>

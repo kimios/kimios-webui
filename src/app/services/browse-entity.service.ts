@@ -366,6 +366,51 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public deleteCacheEntry(uid: number): void {
       this.loadedEntities.delete(uid);
     }
+
+    deleteEntity(entity: DMEntity): void {
+        if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
+            this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).subscribe(
+                () => console.log('TODO: delete workspace tree node')
+            );
+        } else {
+            if (DMEntityUtils.dmEntityIsFolder(entity)) {
+                this.folderService.deleteFolder(this.sessionService.sessionToken, entity.uid).subscribe(
+                    () => {
+                        console.log('TODO: delete folder tree node');
+                        this.updateListAfterDelete(entity);
+                    }
+                );
+            } else {
+                if (DMEntityUtils.dmEntityIsDocument(entity)) {
+                    this.documentService.deleteDocument(this.sessionService.sessionToken, entity.uid).subscribe(
+                        () => this.updateListAfterDelete(entity)
+                    );
+                }
+            }
+        }
+    }
+
+    updateListAfterDelete(entity: DMEntity): void {
+        let parentUid: number;
+        if (entity['parentUid']) {
+            parentUid = entity['parentUid'];
+        } else {
+            if (entity['folderUid']) {
+                parentUid = entity['folderUid'];
+            }
+        }
+
+        this.deleteCacheEntry(parentUid);
+        // this.selectedEntity$.next(this.entities.get(parentUid));
+        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+        const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
+        if (idx !== -1) {
+            totalEntities.splice(idx, 1);
+            this.totalEntitiesToDisplay$.next(totalEntities);
+        }
+        this.makePage(this.pageIndex.getValue(), this.pageSize);
+
+    }
 }
 
 

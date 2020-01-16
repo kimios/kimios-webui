@@ -3,6 +3,7 @@ import {DMEntity} from 'app/kimios-client-api';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {Observable} from 'rxjs';
 import {CacheSecurityService, SecurityEnt} from 'app/services/cache-security.service';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'entity-grid-tile',
@@ -17,7 +18,10 @@ export class EntityGridTileComponent implements OnInit {
   iconName: string;
   securityEnt$: Observable<SecurityEnt>;
 
-  constructor(private cacheSecService: CacheSecurityService) {
+  constructor(
+      private cacheSecService: CacheSecurityService,
+      private browseEntityService: BrowseEntityService
+  ) {
     this.securityEnt$ = new Observable<SecurityEnt>();
   }
 
@@ -39,5 +43,9 @@ export class EntityGridTileComponent implements OnInit {
   handleDragOver(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+  }
+
+  sendDelete(entity: DMEntity): void {
+    this.browseEntityService.deleteEntity(entity);
   }
 }
