@@ -3,11 +3,11 @@ import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, Valida
 import {Observable, of, ReplaySubject, Subject} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
-import {concatMap, map, startWith} from 'rxjs/operators';
+import {concatMap, filter, map, startWith} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
-import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.service';
 
 export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
     const content = control.get('content');
@@ -152,6 +152,19 @@ export class FileSearchBarComponent implements OnInit {
         this.browseEntityService.currentPath.subscribe(
             next => this.documentParent = '/' + next.map(elem => elem.name).join('/')
         );
+
+        this.browseEntityService.explorerMode.pipe(
+            filter(next => next === EXPLORER_MODE.SEARCH)
+        )
+            .subscribe(
+                next => {
+                    this._initTags();
+                }
+            );
+    }
+
+    private _initTags(): void {
+        this.searchEntityService.searchWithFilters('', '', [], this.documentParent, true).subscribe();
     }
 
     private _filterTags(value: string): Tag[] {

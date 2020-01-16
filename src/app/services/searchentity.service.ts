@@ -224,7 +224,7 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 
-    searchWithFilters(content: string, filename: string, tagList: Tag[], documentParent = ''): Observable<DMEntity[]> {
+    searchWithFilters(content: string, filename: string, tagList: Tag[], documentParent = '', onlyTags = false): Observable<DMEntity[]> {
         let criterias = new Array<Criteria>();
         if (documentParent !== '') {
             criterias.push({
@@ -251,7 +251,7 @@ export class SearchEntityService implements Resolve<any> {
                 // filterQuery: true
             }));
         }
-        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
+        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
     }
 
     searchInContentWithFacets(content: string, facetFields: string[]): Observable<DMEntity[]> {
