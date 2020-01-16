@@ -1,2 +1,6 @@
-<mat-icon>{{iconName}}</mat-icon>
-{{entity.name}}
+<div (drop)="handleDrop($event, entity)"
+     (dragover)="handleDragOver($event)"
+>
+    <mat-icon>{{iconName}}</mat-icon>
+    {{entity.name}}
+</div>

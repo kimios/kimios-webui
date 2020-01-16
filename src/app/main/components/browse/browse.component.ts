@@ -393,7 +393,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
         if (event['dataTransfer'] != null
             && event['dataTransfer']['files'] != null) {
             Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
-            this.openFilesUploadDialog(event['dataTransfer']['files']);
+            this.openFilesUploadDialog(event['dataTransfer']['files'], event['droppedInDir'] ? event['droppedInDir'] : '');
         }
     }
 
@@ -402,7 +402,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
         event.preventDefault();
     }
 
-    openFilesUploadDialog(list: FileList): void {
+    openFilesUploadDialog(list: FileList, droppedInDir?: DMEntity): void {
         const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
             // width: '250px',
             data: {
@@ -420,12 +420,20 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
             const currentPath = this.browseEntityService.currentPath.getValue();
             let path: string;
-            let parentDir: DMEntity;
+            let currentDir: DMEntity;
             if (currentPath.length > 0) {
                 path = '/' + currentPath.map(elem => elem.name).join('/');
-                parentDir = currentPath[currentPath.length - 1];
+                currentDir = currentPath[currentPath.length - 1];
             } else {
                 return;
+            }
+
+            let parentDir: DMEntity;
+            if (droppedInDir !== null && droppedInDir !== undefined) {
+                path += '/' + droppedInDir.name;
+                parentDir = droppedInDir;
+            } else {
+                parentDir = currentDir;
             }
 
             this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
@@ -452,7 +460,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                     null,
                     () => {
                         this.browseEntityService.deleteCacheEntry(parentDir.uid);
-                        this.browseEntityService.selectedEntity$.next(parentDir);
+                        this.browseEntityService.selectedEntity$.next(currentDir);
                     }
                 );
         });

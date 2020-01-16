@@ -22,4 +22,15 @@ export class EntityGridTileComponent implements OnInit {
         'crop_portrait';
   }
 
+  handleDrop(event: Event, droppedInDir: DMEntity): void {
+    event.preventDefault();
+    // event.stopPropagation();
+
+    event['droppedInDir'] = droppedInDir;
+  }
+
+  handleDragOver(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+  }
 }
