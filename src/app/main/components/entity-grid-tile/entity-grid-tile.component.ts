@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DMEntity} from 'app/kimios-client-api';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {Observable} from 'rxjs';
+import {CacheSecurityService, SecurityEnt} from 'app/services/cache-security.service';
 
 @Component({
   selector: 'entity-grid-tile',
@@ -13,13 +15,18 @@ export class EntityGridTileComponent implements OnInit {
   entity: DMEntity;
   
   iconName: string;
+  securityEnt$: Observable<SecurityEnt>;
 
-  constructor() { }
+  constructor(private cacheSecService: CacheSecurityService) {
+    this.securityEnt$ = new Observable<SecurityEnt>();
+  }
 
   ngOnInit(): void {
     this.iconName = DMEntityUtils.dmEntityIsWorkspace(this.entity) || DMEntityUtils.dmEntityIsFolder(this.entity) ?
         'folder' :
         'crop_portrait';
+
+    this.securityEnt$ = this.cacheSecService.getSecurityEnt(this.entity.uid);
   }
 
   handleDrop(event: Event, droppedInDir: DMEntity): void {

@@ -1,6 +1,16 @@
-<div (drop)="handleDrop($event, entity)"
-     (dragover)="handleDragOver($event)"
->
-    <mat-icon>{{iconName}}</mat-icon>
-    {{entity.name}}
-</div>
+<ng-container  *ngIf="securityEnt$ | async as secEnt">
+    <div (drop)="handleDrop($event, entity)"
+         (dragover)="handleDragOver($event)"
+         [ngClass]="{'canRead': secEnt.read, 'canWrite': secEnt.write, 'hasFullAccess': secEnt.fullAccess}"
+    >
+        <div  fxLayout="column" >
+            <div  fxLayout="row" fxLayoutAlign="end" >
+                <div class="icon-action-tile"><mat-icon *ngIf="secEnt.fullAccess">remove_circle</mat-icon></div>
+            </div>
+            <div>
+                <mat-icon>{{iconName}}</mat-icon>
+                {{entity.name}}
+            </div>
+        </div>
+    </div>
+</ng-container>
