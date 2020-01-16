@@ -4,10 +4,13 @@ import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.ser
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
-import {concatMap, filter, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
-import {PageEvent} from '@angular/material';
+import {MatDialog, PageEvent} from '@angular/material';
+import {FilesUploadDialogComponent} from '../files-upload-dialog/files-upload-dialog.component';
+import {Tag} from 'app/main/model/tag';
+import {FileUploadService} from 'app/services/file-upload.service';
 
 interface EntityNode {
   uid: number;
@@ -49,7 +52,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       private sessionService: SessionService,
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,
-      private treeNodesService: TreeNodesService
+      private treeNodesService: TreeNodesService,
+      private fileUploadService: FileUploadService,
+      public filesUploadDialog: MatDialog
   ) {
 
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
@@ -89,6 +94,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       this.browseEntityService.explorerMode.subscribe(
           next => {
               this.explorerMode = next;
+              if (this.explorerMode === EXPLORER_MODE.BROWSE) {
+                  this.browseEntityService.selectedEntity$.next(this.browseEntityService.selectedEntity$.getValue());
+              }
           }
       );
   }
@@ -377,5 +385,76 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
     searchModeOff(): void {
         this.browseEntityService.explorerMode.next(EXPLORER_MODE.BROWSE);
+    }
+
+    handleDrop(event: Event): void {
+        event.preventDefault();
+
+        if (event['dataTransfer'] != null
+            && event['dataTransfer']['files'] != null) {
+            Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
+            this.openFilesUploadDialog(event['dataTransfer']['files']);
+        }
+    }
+
+    handleDragOver(event: Event): void {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    openFilesUploadDialog(list: FileList): void {
+        const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
+            // width: '250px',
+            data: {
+                filesList: Array.from(list),
+                filesTags: new Map<string, Map<number, Tag>>()
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (! result) {
+                return;
+            }
+            console.log('The dialog was closed');
+            console.dir(dialogRef.componentInstance.data.filesList);
+
+            const currentPath = this.browseEntityService.currentPath.getValue();
+            let path: string;
+            let parentDir: DMEntity;
+            if (currentPath.length > 0) {
+                path = '/' + currentPath.map(elem => elem.name).join('/');
+                parentDir = currentPath[currentPath.length - 1];
+            } else {
+                return;
+            }
+
+            this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
+                v,
+                path + '/' + v.name,
+                true,
+                '[]',
+                true,
+                -1,
+                '[]',
+                dialogRef.componentInstance.data.filesTags.get(v.name) ?
+                    Array.from(dialogRef.componentInstance.data.filesTags.get(v.name).keys()) :
+                    []
+            ]))
+                .pipe(
+                    catchError(error => {
+                        console.log('server error: ');
+                        console.dir(error);
+                        return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
+                    })
+                )
+                .subscribe(
+                    null,
+                    null,
+                    () => {
+                        this.browseEntityService.deleteCacheEntry(parentDir.uid);
+                        this.browseEntityService.selectedEntity$.next(parentDir);
+                    }
+                );
+        });
     }
 }

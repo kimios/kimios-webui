@@ -1,4 +1,6 @@
-<div fxLayout="column" >
+<div fxLayout="column"
+     (drop)="handleDrop($event)"
+     (dragover)="handleDragOver($event)" >
     <div fxLayout="row">
         <!-- ADD FILE BUTTON -->
         <div class="file-uploader" style="padding:20px">

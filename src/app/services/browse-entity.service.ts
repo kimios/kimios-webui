@@ -362,6 +362,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             );
         }
     }
+
+    public deleteCacheEntry(uid: number): void {
+      this.loadedEntities.delete(uid);
+    }
 }
 
 
