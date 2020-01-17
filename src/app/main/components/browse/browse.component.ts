@@ -330,20 +330,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       );
 //      if (this.browseEntityService.entitiesPath.get(uid) !== null
 //          && this.browseEntityService.entitiesPath.get(uid) !== undefined) {
-      if (this.browseEntityService.entitiesPathIds.get(uid) !== null
-          && this.browseEntityService.entitiesPathIds.get(uid) !== undefined) {
-      // const idx = this.browseEntityService.entitiesPathId.findIndex(elem => elem === Number(uid));
-      // if (idx !== -1) {
-          this.browseEntityService.currentPath.next(this.browseEntityService.entitiesPathIds.get(uid).map(elem =>
-              this.browseEntityService.entities.get(elem)
-          ));
-      } else {
-          this.browseEntityService.findAllParents(uid, true).subscribe(
-              next => {
-                  this.browseEntityService.currentPath.next(next.reverse());
-              }
-          );
-      }
+
   }
 
     onToggleExpanded(event): void {
@@ -482,5 +469,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                     }
                 );
         });
+    }
+
+    onFocus($event): void {
+        this.browseEntityService.selectedEntityFromGridOrTree$.next(this.entitiesLoaded.get(Number($event.node.data.id)));
     }
 }

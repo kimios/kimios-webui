@@ -159,6 +159,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             next => {
                 this.setHistoryNewEntry(next === undefined ? undefined : next.uid);
                 this.goHistoryForward();
+                if (next !== undefined) {
+                    this.setCurrentPathForEntityUid(next.uid);
+                }
             }
         );
 
@@ -198,6 +201,23 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 next => this.length.next(next)
             )
         ).subscribe();
+    }
+
+    setCurrentPathForEntityUid(uid: number): void {
+        if (this.entitiesPathIds.get(uid) !== null
+            && this.entitiesPathIds.get(uid) !== undefined) {
+            // const idx = this.browseEntityService.entitiesPathId.findIndex(elem => elem === Number(uid));
+            // if (idx !== -1) {
+            this.currentPath.next(this.entitiesPathIds.get(uid).map(elem =>
+                this.entities.get(elem)
+            ));
+        } else {
+            this.findAllParents(uid, true).subscribe(
+                next => {
+                    this.currentPath.next(next.reverse());
+                }
+            );
+        }
     }
 
     setHistoryNewEntry(uid: number): void {
