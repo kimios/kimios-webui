@@ -192,6 +192,23 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                   }
               }
           );
+
+      this.browseEntityService.nodeToRemoveFromTree.subscribe(
+          next => {
+              let parentUid: number;
+              if (next['parentUid'] !== null && next['parentUid'] !== undefined) {
+                  parentUid = next['parentUid'];
+              }
+              const children = this.tree.treeModel.getNodeById(parentUid).data.children;
+              const idx = children.findIndex(elem => Number(elem.id) === next.uid);
+              if (idx !== -1) {
+                  children.splice(idx, 1);
+              }
+              this.tree.treeModel.getNodeById(parentUid).data.children = children;
+              this.tree.treeModel.update();
+              this.entitiesLoaded.delete(next.uid);
+          }
+      );
  }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {

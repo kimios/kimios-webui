@@ -45,6 +45,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     public explorerMode: BehaviorSubject<EXPLORER_MODE>;
 
+    public nodeToRemoveFromTree: Subject<DMEntity>;
+
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
@@ -84,6 +86,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.length = new BehaviorSubject<number>(undefined);
 
       this.explorerMode = new BehaviorSubject<EXPLORER_MODE>(EXPLORER_MODE.BROWSE);
+
+      this.nodeToRemoveFromTree = new Subject<DMEntity>();
 
       this.ngOnInit();
   }
@@ -409,7 +413,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             this.totalEntitiesToDisplay$.next(totalEntities);
         }
         this.makePage(this.pageIndex.getValue(), this.pageSize);
-
+        this.nodeToRemoveFromTree.next(entity);
     }
 }
 
