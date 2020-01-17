@@ -156,6 +156,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
       this.browseEntityService.selectedEntity$
           .pipe(
               filter(entity => entity !== undefined),
+              tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
               concatMap(
                   entity => this.browseEntityService.findAllParents(entity.uid)
               ),
