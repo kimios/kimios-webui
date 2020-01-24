@@ -41,11 +41,22 @@ export class EntityGridTileComponent implements OnInit {
   }
 
   handleDragOver(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
+    // event.stopPropagation();
+    if (event.preventDefault) {
+      event.preventDefault(); // Necessary. Allows us to drop.
+    }
   }
 
   sendDelete(entity: DMEntity): void {
     this.browseEntityService.deleteEntity(entity);
+  }
+
+    dragStart($event: DragEvent, entityUid: number): void {
+      $event['kimiosEntityMove'] = true;
+      $event.dataTransfer.setData('text/plain', 'kimiosEntityMove:' + entityUid);
+    }
+
+  handleDragEnter(event: Event): void {
+    event.preventDefault();
   }
 }

@@ -1,9 +1,15 @@
 <ng-container  *ngIf="securityEnt$ | async as secEnt">
     <div (drop)="handleDrop($event, entity)"
          (dragover)="handleDragOver($event)"
+         (dragenter)="handleDragEnter($event)"
          [ngClass]="{'canRead': secEnt.read, 'canWrite': secEnt.write, 'hasFullAccess': secEnt.fullAccess}"
+         draggable="{{secEnt.fullAccess}}"
+         (dragstart)="dragStart($event, entity.uid)"
     >
-        <div  fxLayout="column" >
+        <div  fxLayout="column" class="kimiosEntity"
+              attr.data-kimiosEntity="true"
+              draggable="false"
+        >
             <div  fxLayout="row" fxLayoutAlign="end" >
                 <div class="icon-action-tile">
                     <button (click)="sendDelete(entity)">

@@ -395,6 +395,27 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     handleDrop(event: Event): void {
         event.preventDefault();
 
+        if (event['dataTransfer']
+            && event['dataTransfer'].getData('text/plain') !== null
+            && event['dataTransfer'].getData('text/plain') !== undefined
+            && event['dataTransfer'].getData('text/plain').startsWith('kimiosEntityMove')
+            && event['droppedInDir'] !== null
+            && event['droppedInDir'] !== undefined) {
+
+            const data = event['dataTransfer'].getData('text/plain');
+            const dataSplitted = data.split(':');
+            if (dataSplitted.length !== 2
+                || Number(dataSplitted[1]) === NaN) {
+                return;
+            }
+            console.log(dataSplitted.join(' : '));
+            /*this.openEntityMoveConfirmDialog(
+                this.browseEntityService.entities.get(dataSplitted[1]),
+                event['droppedInDir']
+            );*/
+            return;
+        }
+
         if (event['dataTransfer'] != null
             && event['dataTransfer']['files'] != null) {
             Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
@@ -474,4 +495,14 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     onFocus($event): void {
         this.browseEntityService.selectedEntityFromGridOrTree$.next(this.entitiesLoaded.get(Number($event.node.data.id)));
     }
+
+    /*private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
+        const dialogRef = this.filesUploadDialog.open(EntityMoveDialogComponent, {
+            // width: '250px',
+            data: {
+                entityMoved: entityMoved,
+                entityTarget: entityTarget
+            }
+        });
+    }*/
 }
