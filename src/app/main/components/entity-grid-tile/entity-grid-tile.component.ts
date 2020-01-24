@@ -17,6 +17,7 @@ export class EntityGridTileComponent implements OnInit {
   
   iconName: string;
   securityEnt$: Observable<SecurityEnt>;
+  private _isDir: boolean;
 
   constructor(
       private cacheSecService: CacheSecurityService,
@@ -31,10 +32,14 @@ export class EntityGridTileComponent implements OnInit {
         'crop_portrait';
 
     this.securityEnt$ = this.cacheSecService.getSecurityEnt(this.entity.uid);
+      this._isDir = DMEntityUtils.dmEntityIsFolder(this.entity);
   }
 
   handleDrop(event: Event, droppedInDir: DMEntity): void {
     event.preventDefault();
+    if (! this.isDir) {
+        event.stopPropagation();
+    }
     // event.stopPropagation();
 
     event['droppedInDir'] = droppedInDir;
@@ -59,4 +64,9 @@ export class EntityGridTileComponent implements OnInit {
   handleDragEnter(event: Event): void {
     event.preventDefault();
   }
+
+    get isDir(): boolean {
+        return this._isDir;
+    }
+
 }
