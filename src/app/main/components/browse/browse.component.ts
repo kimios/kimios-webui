@@ -11,6 +11,7 @@ import {MatDialog, PageEvent} from '@angular/material';
 import {FilesUploadDialogComponent} from '../files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {FileUploadService} from 'app/services/file-upload.service';
+import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 
 interface EntityNode {
   uid: number;
@@ -409,10 +410,10 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                 return;
             }
             console.log(dataSplitted.join(' : '));
-            /*this.openEntityMoveConfirmDialog(
-                this.browseEntityService.entities.get(dataSplitted[1]),
+            this.openEntityMoveConfirmDialog(
+                this.browseEntityService.entities.get(Number(dataSplitted[1])),
                 event['droppedInDir']
-            );*/
+            );
             return;
         }
 
@@ -496,7 +497,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
         this.browseEntityService.selectedEntityFromGridOrTree$.next(this.entitiesLoaded.get(Number($event.node.data.id)));
     }
 
-    /*private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
+    private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
         const dialogRef = this.filesUploadDialog.open(EntityMoveDialogComponent, {
             // width: '250px',
             data: {
@@ -504,5 +505,38 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                 entityTarget: entityTarget
             }
         });
-    }*/
+
+        dialogRef.afterClosed().subscribe(next => {
+            if (next !== true) {
+                return;
+            }
+            this.browseEntityService.moveEntity(entityMoved, entityTarget).subscribe(
+                null,
+                // TODO : catch error and show message
+                null,
+                () => {
+                    console.log(
+                        'moved entity '
+                        + entityMoved.name
+                        + ' to '
+                        + entityTarget.name
+                    );
+                    if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
+                        this.updateMoveTreeNode(entityMoved, entityTarget);
+                    }
+                    this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
+                }
+            );
+        });
+    }
+
+    private updateMoveTreeNode(entityMoved: DMEntity, entityTarget: DMEntity): void {
+        this.tree.treeModel.moveNode(
+            this.tree.treeModel.getNodeById(entityMoved.uid),
+            // {
+            //    parent:
+                    this.tree.treeModel.getNodeById(entityTarget.uid)
+            // }
+        );
+    }
 }

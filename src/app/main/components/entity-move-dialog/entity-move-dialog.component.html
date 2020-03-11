@@ -1,0 +1,11 @@
+<div fxLayout="column" fxLayoutAlign="center">
+  <div>
+    Move entity {{data.entityMoved.name}}<br />
+    from path {{data.entityMoved.path}} <br />
+    to path {{data.entityTarget.path + '/' + data.entityTarget.name}}
+  </div>
+  <div fxLayout="row" fxLayoutAlign="center center">
+    <button (click)="confirm()"><mat-icon>check</mat-icon></button>
+    <button (click)="abort()"><mat-icon>close</mat-icon></button>
+  </div>
+</div>

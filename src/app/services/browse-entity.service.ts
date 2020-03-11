@@ -432,8 +432,53 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             totalEntities.splice(idx, 1);
             this.totalEntitiesToDisplay$.next(totalEntities);
         }
+        if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
+            this.pageIndex.next(this.pageIndex.getValue() - 1);
+        }
         this.makePage(this.pageIndex.getValue(), this.pageSize);
         this.nodeToRemoveFromTree.next(entity);
+    }
+
+    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity): void {
+        let parentUid: number;
+        if (entityMoved['parentUid']) {
+            parentUid = entityMoved['parentUid'];
+        } else {
+            if (entityMoved['folderUid']) {
+                parentUid = entityMoved['folderUid'];
+            }
+        }
+
+        this.deleteCacheEntry(parentUid);
+        this.deleteCacheEntry(entityTarget.uid);
+        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+        const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
+        if (idx !== -1) {
+            totalEntities.splice(idx, 1);
+            this.totalEntitiesToDisplay$.next(totalEntities);
+        }
+        /*if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
+            this.pageIndex.next(this.pageIndex.getValue() - 1);
+        }*/
+        this.makePage(this.pageIndex.getValue(), this.pageSize);
+    }
+
+    moveEntity(entity: DMEntity, targetEntity: DMEntity): Observable<any> {
+        return DMEntityUtils.dmEntityIsFolder(entity) ?
+            this.folderService.updateFolder(
+                this.sessionService.sessionToken,
+                entity.uid,
+                entity.name,
+                targetEntity.uid
+            ) :
+            this.documentService.updateDocument(
+                this.sessionService.sessionToken,
+                entity.uid,
+                entity.name,
+                entity['extension'],
+                entity['mimeType'],
+                targetEntity.uid
+            );
     }
 }
 
