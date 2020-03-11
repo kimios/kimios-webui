@@ -512,8 +512,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
             }
             this.browseEntityService.moveEntity(entityMoved, entityTarget).subscribe(
                 null,
-                // TODO : catch error and show message
-                null,
+                // TODO : enhance dialog and message
+                error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
                 () => {
                     console.log(
                         'moved entity '
