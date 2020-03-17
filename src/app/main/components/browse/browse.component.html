@@ -4,7 +4,7 @@
     <div fxLayout="row">
         <!-- ADD FILE BUTTON -->
         <div class="file-uploader" style="padding:20px">
-            <form (ngSubmit)="onSubmitFileUpload()">
+            <form>
                 <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
                 <button mat-fab
                         color="warn"

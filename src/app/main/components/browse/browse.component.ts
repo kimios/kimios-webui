@@ -449,8 +449,8 @@ export class BrowseComponent implements OnInit, AfterViewInit {
             let path: string;
             let currentDir: DMEntity;
             if (currentPath.length > 0) {
-                path = '/' + currentPath.map(elem => elem.name).join('/');
                 currentDir = currentPath[currentPath.length - 1];
+                path = currentDir.path;
             } else {
                 return;
             }
@@ -538,5 +538,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
                     this.tree.treeModel.getNodeById(entityTarget.uid)
             // }
         );
+    }
+
+    handleFileInput(files: FileList): void {
+        this.openFilesUploadDialog(files, null);
     }
 }
