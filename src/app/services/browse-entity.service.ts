@@ -316,7 +316,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     findAllParents(uid: number, includeEntity: boolean = false): Observable<Array<DMEntity>> {
         const parents = new Array<DMEntity>();
-        return this.findAllParentsRec(uid, includeEntity).pipe(toArray());
+        return this.findAllParentsRec(uid, includeEntity).pipe(
+            filter(elem => elem !== null && elem !== undefined && elem !== ''),
+            toArray()
+        );
     }
 
     retrieveContainerEntity(uid: number): Observable<DMEntity> {
