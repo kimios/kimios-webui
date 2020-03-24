@@ -68,6 +68,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
       if (this.treeNodesService.treeNodes.length > 0) {
           this.nodes = this.treeNodesService.treeNodes;
+          this.tree.treeModel.update();
       }
 
       this.browseEntityService.historyHasForward.subscribe(
@@ -143,12 +144,10 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               ),
           ).subscribe(
               res => {
-                  console.log(res);
                   this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
               },
               error => console.log('error : ' + error),
               () => {
-                  console.log(this.nodes);
                   this.initDataDone$.next(true);
               }
           );
@@ -163,6 +162,27 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               ),
               flatMap(
                   entities => entities.reverse()
+              ),
+              tap(
+                  entityRet => {
+                      this.tree.treeModel.update();
+                      if (this.tree === null) {
+                          console.log('this.tree is null');
+                      } else {
+                          if (this.tree.treeModel === null) {
+                              console.log('this.tree.treeModele is null');
+                          } else {
+
+                              if (this.tree.treeModel.getNodeById(entityRet.uid.toString()) === null) {
+                                  console.log('>>>>>>>>>>>>');
+                                  console.log('this.tree.treeModel.getNodeById( ' + entityRet.uid + ' ) === null');
+                                  console.log(entityRet);
+                                  console.log(this.nodes);
+                                  console.log('<<<<<<<<<<<<<<<<<<<<<<<<');
+                              }
+                          }
+                      }
+                  }
               ),
               concatMap(
                   entityRet => combineLatest(
@@ -182,7 +202,9 @@ export class BrowseComponent implements OnInit, AfterViewInit {
               })
           )
           .subscribe(
-              next => this.treeNodesService.treeNodes = this.tree.treeModel.nodes,
+              next => {
+                  this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+              },
               null,
               () => {
                   const entitySelected = this.browseEntityService.selectedEntity$.getValue();
@@ -327,7 +349,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
 
   selectNode(uid: number): void {
       this.browseEntityService.selectedEntityFromGridOrTree$.next(
-          this.entitiesLoaded.get(Number(uid))
+          this.browseEntityService.entities.get(Number(uid))
       );
 //      if (this.browseEntityService.entitiesPath.get(uid) !== null
 //          && this.browseEntityService.entitiesPath.get(uid) !== undefined) {
@@ -494,7 +516,7 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     }
 
     onFocus($event): void {
-        this.browseEntityService.selectedEntityFromGridOrTree$.next(this.entitiesLoaded.get(Number($event.node.data.id)));
+        this.browseEntityService.selectedEntityFromGridOrTree$.next(this.browseEntityService.entities.get(Number($event.node.data.id)));
     }
 
     private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {

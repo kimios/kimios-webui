@@ -305,7 +305,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
         return this.retrieveContainerEntity(uid).pipe(
             expand(
-                res => res !== undefined && DMEntityUtils.dmEntityIsFolder(res) ?
+                res => res !== undefined && (DMEntityUtils.dmEntityIsFolder(res) /*|| DMEntityUtils.dmEntityIsWorkspace(res)*/) ?
                     this.retrieveContainerEntity(res['parentUid']) :
                     of()
             ),
