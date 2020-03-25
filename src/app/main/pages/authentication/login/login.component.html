@@ -10,6 +10,10 @@
 
             <div class="title">LOGIN TO YOUR ACCOUNT</div>
 
+            <div [ngClass]="{'hidden': !showMessage || message === ''}">
+                <mat-error><mat-icon class="text-align-center">warning</mat-icon> <span class="text-align-center">{{message}}</span></mat-error>
+            </div>
+
             <form name="loginForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
                 <mat-form-field appearance="outline">

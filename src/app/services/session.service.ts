@@ -105,38 +105,37 @@ export class SessionService implements OnDestroy {
             .startSession(login, source, pwd);
     }
 
-    login(login: string, authenticationSource: string, password: string): void {
+    login(login: string, authenticationSource: string, password: string): Observable<boolean> {
         let token = null;
         // const router = this.router;
 
-        this.callStartSession(login, authenticationSource, password)
+        return this.callStartSession(login, authenticationSource, password)
             .pipe(
                 catchError(err => {
                     if (err.status === 200
                         && err.statusText === 'OK') {
                         token = err.error.text;
-                        return of();
+                        return of(true);
+                    } else {
+                        if (err.status === 500) {
+                            return of(false);
+                        }
                     }
-                    throwError(err);
-                })
-            )
-            .subscribe(
-                res => {
-                },
-                error => {
-                },
-                () => {
-                    if (token != null) {
-                        this._zone.run(() => {
-                            this.sessionToken = token;
-                            this.sessionAlive = true;
-                            this.router.navigate(['']);
-                            if (! this.isSessionCheckStarted()) {
-                                this.startSessionCheck();
-                            }
-                        });
+                }),
+                tap(
+                    res => {
+                        if (res) {
+                            this._zone.run(() => {
+                                this.sessionToken = token;
+                                this.sessionAlive = true;
+                                this.router.navigate(['']);
+                                if (! this.isSessionCheckStarted()) {
+                                    this.startSessionCheck();
+                                }
+                            });
+                        }
                     }
-                }
+                )
             );
     }
 

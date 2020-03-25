@@ -22,6 +22,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     authenticationSources$: Observable<{} | AuthenticationSource[]>;
     private intervalId: number;
 
+    public showMessage: boolean;
+    public message: string;
+
     loginForm = new FormGroup({
         login: new FormControl(''),
         password: new FormControl(''),
@@ -59,6 +62,8 @@ export class LoginComponent implements OnInit, OnDestroy {
                 }
             }
         };
+        this.showMessage = false;
+        this.message = '';
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -114,6 +119,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.sessionService.login(this.loginForm.get('login').value,
             this.loginForm.get('authenticationSource').value,
             this.loginForm.get('password').value
+        ).subscribe(
+            next => {
+                this.showMessage = !next;
+                this.message = !next ? 'The username or password is invalid.' : '';
+            },
+            null,
+            null
         );
     }
 

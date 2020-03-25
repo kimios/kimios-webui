@@ -37,6 +37,14 @@ login {
                     margin: 16px 0 32px 0;
                 }
 
+                .hidden {
+                    visibility: hidden;
+                }
+
+                .text-align-center {
+                    vertical-align: middle;
+                }
+
                 form {
                     width: 100%;
                     text-align: left;
