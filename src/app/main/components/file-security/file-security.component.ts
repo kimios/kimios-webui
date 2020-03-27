@@ -8,6 +8,7 @@ import {MatDialog, MatTableDataSource} from '@angular/material';
 import {map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {EntityCreationService} from 'app/services/entity-creation.service';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -29,6 +30,9 @@ export class FileSecurityComponent implements OnInit {
   @Input()
   documentId: number;
 
+    @Input()
+    showFormButtons = true;
+
   dmEntitySecuritiesForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
 
@@ -41,7 +45,8 @@ export class FileSecurityComponent implements OnInit {
       private fb: FormBuilder,
       private securityService: SecurityService,
       private sessionService: SessionService,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private entityCreationservice: EntityCreationService
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -64,7 +69,43 @@ export class FileSecurityComponent implements OnInit {
           this.showSpinner = false;
         }
     );
+
+      this.entityCreationservice.newUserOrGroupTmp$.subscribe(
+          next =>  this.addNewSecurityToDatasource(next)
+      );
+      this.entityCreationservice.removedUserOrGroupTmp$.subscribe(
+          next =>  this.removeSecurityInDatasource(next)
+      );
   }
+
+    private addNewSecurityToDatasource(userOrGroup: UserOrGroup): void {
+      this.dataSource.data = this.dataSource.data.slice().concat(
+        <DMEntitySecurity> {
+            dmEntityUid: this.documentId,
+            dmEntityType: DMENTITYTYPE_DOCUMENT,
+            name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
+            source: userOrGroup.element.source,
+            fullName: userOrGroup.element.name,
+            type: userOrGroup.type === 'user' ? SECURITY_ENTITY_TYPE.USER : SECURITY_ENTITY_TYPE.GROUP,
+            read: false,
+            write: false,
+            fullAccess: false
+        });
+//        this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(this.dataSource.data));
+        this.updateFormGroup(this.dataSource.data, this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup);
+    }
+
+    private removeSecurityInDatasource(userOrGroup: UserOrGroup): void {
+        const idx = this.dataSource.data.findIndex(security =>
+            security.name === userOrGroup.element['uid'] ?
+                userOrGroup.element['uid'] :
+                userOrGroup.element['gid']
+        );
+        const dataTmp = this.dataSource.data.slice();
+        dataTmp.splice(idx, 1);
+        this.dataSource.data = dataTmp.slice();
+        this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(this.dataSource.data));
+    }
 
   private loadData(): Observable<Array<DMEntitySecurity>> {
     return this.securityService.getDMEntitySecurities(
@@ -74,10 +115,22 @@ export class FileSecurityComponent implements OnInit {
   }
 
   deleteRow(rowIndex: number, event): void {
-      this.dataSource.data.splice(rowIndex, 1);
-      const newData = this.dataSource.data.slice();
-      this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(newData));
-      this.dataSource.data = newData;
+      let newIndex = 0;
+      const newFormGroup = this.fb.group({});
+      this.dataSource.data.slice().forEach((security, index) => {
+          if (index === rowIndex) {
+              this.dataSource.data.splice(rowIndex, 1);
+              const newData = this.dataSource.data.slice();
+              this.dataSource.data = newData;
+          } else {
+              newFormGroup.addControl(
+                  newIndex.toString(),
+                  (this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).get(index.toString())
+              );
+              newIndex++;
+          }
+      });
+      this.dmEntitySecuritiesForm.setControl('formGroupSecurities', newFormGroup);
   }
 
     cancel($event: MouseEvent): void {
@@ -104,6 +157,32 @@ export class FileSecurityComponent implements OnInit {
             )
         );
         return fg;
+    }
+
+    private updateFormGroup(newSecurityRules: Array<DMEntitySecurity>, formGroup: FormGroup): number {
+      let nbAdd = 0;
+      newSecurityRules.forEach(security => {
+          // not in form group yet => add it
+          if (! this.formGroupContainsDmSecurityEntity(formGroup, security)) {
+              formGroup.addControl(
+                  Object.keys(formGroup.controls).length.toString(),
+                  this.createSecurityFormGroup(security)
+              );
+              nbAdd++;
+          }
+      });
+      return nbAdd;
+    }
+
+    private formGroupContainsDmSecurityEntity(formGroup: FormGroup, security: DMEntitySecurity): boolean {
+        return Object.keys(formGroup.controls).filter(controlKey => {
+            const name = formGroup.get(controlKey).get('name');
+            const source = formGroup.get(controlKey).get('source');
+            return name !== null
+                && source !== null
+                && name.value === security.name
+                && source.value === security.source;
+        }).length > 0;
     }
 
     private createSecurityFormGroup(security: DMEntitySecurity): FormGroup {
