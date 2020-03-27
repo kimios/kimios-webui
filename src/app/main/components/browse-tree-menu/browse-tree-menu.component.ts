@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {MatDialog} from '@angular/material';
+import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 
 @Component({
   selector: 'browse-tree-menu',
@@ -7,16 +9,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BrowseTreeMenuComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+      public createContainerEntityDialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
   }
 
   createWorkspaceDialog(): void {
-
+    this.openDialog('workspace');
   }
 
   createFolderDialog(): void {
+    this.openDialog('folder');
+  }
 
+  private openDialog(entityType: 'workspace' | 'folder'): void {
+    const dialogRef = this.createContainerEntityDialog.open(ContainerEntityCreationDialogComponent, {
+      data: {
+        entityType: entityType
+      }
+    });
   }
 }

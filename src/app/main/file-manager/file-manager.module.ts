@@ -65,7 +65,8 @@ import {TreeModule} from 'angular-tree-component';
 import {KimiosNavBarComponent} from 'app/main/components/kimios-nav-bar/kimios-nav-bar.component';
 import {BrowsePathComponent} from 'app/main/components/browse-path/browse-path.component';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
-import {BrowseTreeMenuComponent} from '../components/browse-tree-menu/browse-tree-menu.component';
+import {BrowseTreeMenuComponent} from 'app/main/components/browse-tree-menu/browse-tree-menu.component';
+import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 
 
 @NgModule({
@@ -98,7 +99,8 @@ import {BrowseTreeMenuComponent} from '../components/browse-tree-menu/browse-tre
         KimiosNavBarComponent,
         BrowsePathComponent,
         EntityMoveDialogComponent,
-        BrowseTreeMenuComponent
+        BrowseTreeMenuComponent,
+        ContainerEntityCreationDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -146,7 +148,8 @@ import {BrowseTreeMenuComponent} from '../components/browse-tree-menu/browse-tre
         FileDetailDialogComponent,
         ShareDialogComponent,
         UsersAndGroupsSelectionDialogComponent,
-        EntityMoveDialogComponent
+        EntityMoveDialogComponent,
+        ContainerEntityCreationDialogComponent
     ],
     exports: [
         FileUploadListComponent,
