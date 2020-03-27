@@ -565,4 +565,12 @@ export class BrowseComponent implements OnInit, AfterViewInit {
     handleFileInput(files: FileList): void {
         this.openFilesUploadDialog(files, null);
     }
+
+    createWorkspaceDialog() {
+
+    }
+
+    createFolderDialog() {
+
+    }
 }

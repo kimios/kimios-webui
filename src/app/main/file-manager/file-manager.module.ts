@@ -25,7 +25,8 @@ import {
     MatSortModule,
     MatTableModule,
     MatTabsModule,
-    MatTreeModule
+    MatTreeModule,
+    MatMenuModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -127,6 +128,7 @@ import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/
         MatExpansionModule,
         MatProgressSpinnerModule,
         MatTreeModule,
+        MatMenuModule,
 
         DragDropModule,
         MatGridListModule,
