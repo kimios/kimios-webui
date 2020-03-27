@@ -1,0 +1,7 @@
+<div fxLayout="row" fxLayoutAlign="start" style="width: 100%;">
+  <button mat-button [matMenuTriggerFor]="menu"><mat-icon>menu</mat-icon></button>
+</div>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item><mat-icon (click)="createWorkspaceDialog()">create_new_folder</mat-icon> New workspace</button>
+  <button mat-menu-item><mat-icon (click)="createFolderDialog()">create_new_folder</mat-icon> New folder</button>
+</mat-menu>

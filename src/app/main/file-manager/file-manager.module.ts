@@ -65,6 +65,7 @@ import {TreeModule} from 'angular-tree-component';
 import {KimiosNavBarComponent} from 'app/main/components/kimios-nav-bar/kimios-nav-bar.component';
 import {BrowsePathComponent} from 'app/main/components/browse-path/browse-path.component';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
+import {BrowseTreeMenuComponent} from '../components/browse-tree-menu/browse-tree-menu.component';
 
 
 @NgModule({
@@ -96,7 +97,8 @@ import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/
         EntityListingComponent,
         KimiosNavBarComponent,
         BrowsePathComponent,
-        EntityMoveDialogComponent
+        EntityMoveDialogComponent,
+        BrowseTreeMenuComponent
     ],
     imports: [
         FileManagerRoutingModule,
