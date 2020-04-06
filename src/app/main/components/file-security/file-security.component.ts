@@ -33,6 +33,9 @@ export class FileSecurityComponent implements OnInit {
     @Input()
     showFormButtons = true;
 
+    @Input()
+    showButtonForSearchUsersAndGroups = true;
+
   dmEntitySecuritiesForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
 

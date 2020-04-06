@@ -2,9 +2,10 @@
   container-entity-creation-dialog works!
   we will create now a container entity which is a: {{data.entityType}}
 </p>
-<div fxLayout="row">
+<div fxLayout="row" fxLayoutAlign="space-between">
     <file-security
             [documentId]="undefined"
+            [showButtonForSearchUsersAndGroups]="false"
             [showFormButtons]="false"
             cdkDropList
             [id]="'selectedUsersAndGroups'"
@@ -12,12 +13,15 @@
             (cdkDropListDropped)="drop($event)"
             (cdkDropListEntered)="dropListEnter($event)"
             (cdkDropListEntered)="dropListExited($event)"
+            style="width: 48%"
     ></file-security>
 
   <users-groups-search-panel
           [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
           [userListId]="userListId"
-          [groupListId]="groupListId">
+          [groupListId]="groupListId"
+          style="width: 48%"
+  >
   </users-groups-search-panel>
 </div>
 <div fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
