@@ -204,7 +204,19 @@ export class FileSecurityComponent implements OnInit {
         $event.preventDefault();
 
         this.showSpinner = true;
-      const updateSecurityCommand = <UpdateSecurityCommand> {
+        this.updateSecuritiesFromForm()
+          .pipe(
+              map(res => this.loadData())
+          )
+          .subscribe(
+              null,
+              null,
+              () => this.showSpinner = false
+          );
+  }
+
+  createUpdateSecurityCommandFormForm(): UpdateSecurityCommand {
+      return <UpdateSecurityCommand> {
           sessionId: this.sessionService.sessionToken,
           dmEntityId: this.documentId,
           appendMode: true,
@@ -223,15 +235,14 @@ export class FileSecurityComponent implements OnInit {
           ),
           recursive: false
       };
-      this.securityService.updateDMEntitySecurities(updateSecurityCommand)
-          .pipe(
-              map(res => this.loadData())
-          )
-          .subscribe(
-              null,
-              null,
-              () => this.showSpinner = false
-          );
+  }
+
+  updateSecurities(updateSecurityCommand: UpdateSecurityCommand): Observable<TaskInfo> {
+      return this.securityService.updateDMEntitySecurities(updateSecurityCommand);
+  }
+
+  updateSecuritiesFromForm(): Observable<TaskInfo> {
+      return this.updateSecurities(this.createUpdateSecurityCommandFormForm());
   }
 
     add(): void {
