@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
-import {Subject} from 'rxjs';
-import {UserOrGroup} from '../main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {FolderService, WorkspaceService} from 'app/kimios-client-api';
+import {SessionService} from 'app/services/session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +11,23 @@ export class EntityCreationService {
 
   public newUserOrGroupTmp$: Subject<UserOrGroup>;
   public removedUserOrGroupTmp$: Subject<UserOrGroup>;
-  public onFormSubmitted$: Subject<boolean>;
+  public onFormSubmitted$: Subject<number>;
+  public onFormSecuritiesSubmitted$: Subject<boolean>;
 
-  constructor() {
+  constructor(
+      private workspaceService: WorkspaceService,
+      private folderService: FolderService,
+      private sessionService: SessionService
+  ) {
     this.newUserOrGroupTmp$ = new Subject<UserOrGroup>();
     this.removedUserOrGroupTmp$ = new Subject<UserOrGroup>();
+    this.onFormSubmitted$ = new Subject<number>();
+    this.onFormSecuritiesSubmitted$ = new Subject<boolean>();
   }
 
-
+  createContainerEntity(entityName: string, entityType: string, parentId?: number): Observable<number> {
+    return entityType === 'workspace' && (parentId === null || parentId === undefined) ?
+        this.workspaceService.createWorkspace(this.sessionService.sessionToken, entityName) :
+        this.folderService.createFolder(this.sessionService.sessionToken, entityName, parentId);
+  }
 }

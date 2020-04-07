@@ -1,11 +1,11 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
-import {DMEntitySecurity, SecurityService, UpdateSecurityCommand} from 'app/kimios-client-api';
+import {DMEntitySecurity, SecurityService, TaskInfo, UpdateSecurityCommand} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatDialog, MatTableDataSource} from '@angular/material';
-import {map} from 'rxjs/operators';
+import {concatMap, map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
@@ -49,7 +49,7 @@ export class FileSecurityComponent implements OnInit {
       private securityService: SecurityService,
       private sessionService: SessionService,
       public dialog: MatDialog,
-      private entityCreationservice: EntityCreationService
+      private entityCreationService: EntityCreationService
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -73,12 +73,25 @@ export class FileSecurityComponent implements OnInit {
         }
     );
 
-      this.entityCreationservice.newUserOrGroupTmp$.subscribe(
+      this.entityCreationService.newUserOrGroupTmp$.subscribe(
           next =>  this.addNewSecurityToDatasource(next)
       );
-      this.entityCreationservice.removedUserOrGroupTmp$.subscribe(
+      this.entityCreationService.removedUserOrGroupTmp$.subscribe(
           next =>  this.removeSecurityInDatasource(next)
       );
+
+      this.entityCreationService.onFormSubmitted$.pipe(
+          concatMap(next => {
+              this.documentId = next;
+              return this.updateSecuritiesFromForm();
+          }),
+          map(res => this.loadData())
+      ).subscribe(
+          next => this.entityCreationService.onFormSecuritiesSubmitted$.next(true),
+          error => this.entityCreationService.onFormSecuritiesSubmitted$.next(false)
+      );
+
+
   }
 
     private addNewSecurityToDatasource(userOrGroup: UserOrGroup): void {
@@ -215,14 +228,14 @@ export class FileSecurityComponent implements OnInit {
           );
   }
 
-  createUpdateSecurityCommandFormForm(): UpdateSecurityCommand {
+  createUpdateSecurityCommandFormForm(docId?: number): UpdateSecurityCommand {
       return <UpdateSecurityCommand> {
           sessionId: this.sessionService.sessionToken,
           dmEntityId: this.documentId,
           appendMode: true,
           securities: Object.keys((this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).controls).map(control =>
               <DMEntitySecurity> {
-                  dmEntityUid: this.documentId,
+                  dmEntityUid: docId ? docId : this.documentId,
                   dmEntityType: DMENTITYTYPE_DOCUMENT,
                   name: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('name').value,
                   source: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('source').value,
@@ -241,8 +254,8 @@ export class FileSecurityComponent implements OnInit {
       return this.securityService.updateDMEntitySecurities(updateSecurityCommand);
   }
 
-  updateSecuritiesFromForm(): Observable<TaskInfo> {
-      return this.updateSecurities(this.createUpdateSecurityCommandFormForm());
+  updateSecuritiesFromForm(docId?: number): Observable<TaskInfo> {
+      return this.updateSecurities(this.createUpdateSecurityCommandFormForm(docId));
   }
 
     add(): void {
