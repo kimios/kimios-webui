@@ -5,6 +5,7 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {SearchEntityService} from './searchentity.service';
+import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 
 const PAGE_SIZE_DEFAULT = 20;
 
@@ -46,6 +47,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public explorerMode: BehaviorSubject<EXPLORER_MODE>;
 
     public nodeToRemoveFromTree: Subject<DMEntity>;
+    public updateMoveTreeNode$: Subject<TreeNodeMoveUpdate>;
 
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
@@ -88,6 +90,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.explorerMode = new BehaviorSubject<EXPLORER_MODE>(EXPLORER_MODE.BROWSE);
 
       this.nodeToRemoveFromTree = new Subject<DMEntity>();
+
+      this.updateMoveTreeNode$ = new Subject<TreeNodeMoveUpdate>();
 
       this.ngOnInit();
   }
