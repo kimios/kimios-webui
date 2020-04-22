@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 export interface EntityMoveDialogData {
   entityMoved: DMEntity;
   entityTarget: DMEntity;
+  fromPath: string;
 }
 
 @Component({

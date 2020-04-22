@@ -42,7 +42,8 @@ export class BrowseComponent implements OnInit {
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,
       private fileUploadService: FileUploadService,
-      public filesUploadDialog: MatDialog
+      public filesUploadDialog: MatDialog,
+      public entityMoveDialog: MatDialog
   ) {
     this.explorerMode = EXPLORER_MODE.BROWSE;
   }
@@ -203,11 +204,12 @@ export class BrowseComponent implements OnInit {
     }
 
     private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
-        const dialogRef = this.filesUploadDialog.open(EntityMoveDialogComponent, {
+        const dialogRef = this.entityMoveDialog.open(EntityMoveDialogComponent, {
             // width: '250px',
             data: {
                 entityMoved: entityMoved,
-                entityTarget: entityTarget
+                entityTarget: entityTarget,
+                fromPath: this.browseEntityService.currentPath.getValue().reverse()[0].path
             }
         });
 
