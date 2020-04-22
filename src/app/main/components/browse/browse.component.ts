@@ -165,7 +165,7 @@ export class BrowseComponent implements OnInit {
             }
 
             let parentDir: DMEntity;
-            if (droppedInDir !== null && droppedInDir !== undefined) {
+            if (droppedInDir !== null && droppedInDir !== undefined && droppedInDir !== '') {
                 path += '/' + droppedInDir.name;
                 parentDir = droppedInDir;
             } else {
