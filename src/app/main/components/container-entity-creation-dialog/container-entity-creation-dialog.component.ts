@@ -6,7 +6,7 @@ import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {concatMap} from 'rxjs/operators';
+import {concatMap, tap} from 'rxjs/operators';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -87,6 +87,10 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
             this.documentId = uidCreated;
             this.entityCreationService.onFormSubmitted$.next(uidCreated);
             return this.entityCreationService.onFormSecuritiesSubmitted$.asObservable();
+          }),
+          tap(res => {
+            this.browseEntityService.deleteCacheEntry(this.entityCreationForm.get('parent').value['uid']);
+            this.browseEntityService.selectedEntity$.next(this.browseEntityService.currentPath.getValue().reverse()[0])
           })
       ).subscribe(
           next => next ? alert('securities have been created') : alert('securities NOT created'),
