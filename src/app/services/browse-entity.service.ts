@@ -52,6 +52,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
+    onNewWorkspace: Subject<number>;
 
   constructor(
       // Set the defaults
@@ -92,6 +93,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.nodeToRemoveFromTree = new Subject<DMEntity>();
 
       this.updateMoveTreeNode$ = new Subject<TreeNodeMoveUpdate>();
+
+      this.onNewWorkspace = new Subject<number>();
 
       this.ngOnInit();
   }

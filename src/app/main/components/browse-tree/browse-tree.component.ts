@@ -186,6 +186,23 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
           this.entitiesLoaded.delete(next.uid);
         }
     );
+
+    this.browseEntityService.onNewWorkspace.pipe(
+        concatMap(workspaceId => this.browseEntityService.retrieveWorkspaceEntity(workspaceId)),
+        tap(entity => {
+            const newNode = {
+                name: entity.name,
+                id: entity.uid.toString(),
+                children: null,
+                isLoading: false
+            };
+            this.nodes.push(newNode);
+            this.tree.treeModel.update();
+            this.entitiesLoaded.set(entity.uid, entity);
+        })
+    ).subscribe(
+
+    );
   }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {

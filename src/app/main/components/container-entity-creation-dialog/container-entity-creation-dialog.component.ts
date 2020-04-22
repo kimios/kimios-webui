@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, combineLatest, of} from 'rxjs';
 import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
@@ -75,22 +75,26 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           error => console.log('error when creating entity: ' + error.error.message)
       );
     } else {
-      this.entityCreationService.createContainerEntity(
+      combineLatest(of(this.data.entityType), this.entityCreationService.createContainerEntity(
           this.entityCreationForm.get('name').value,
           this.data.entityType,
           this.entityCreationForm.get('parent') !== null ?
               this.entityCreationForm.get('parent').value['uid'] :
               null
-      ).pipe(
+      )).pipe(
           // make securities form submit securities
-          concatMap(uidCreated => {
+          concatMap(([entityType, uidCreated]) => {
             this.documentId = uidCreated;
             this.entityCreationService.onFormSubmitted$.next(uidCreated);
-            return this.entityCreationService.onFormSecuritiesSubmitted$.asObservable();
+            return combineLatest(of(entityType), this.entityCreationService.onFormSecuritiesSubmitted$.asObservable(), of(uidCreated));
           }),
-          tap(res => {
-            this.browseEntityService.deleteCacheEntry(this.entityCreationForm.get('parent').value['uid']);
-            this.browseEntityService.selectedEntity$.next(this.browseEntityService.currentPath.getValue().reverse()[0])
+          tap(([entityType, res, uidCreated]) => {
+            if (entityType === 'folder') {
+              this.browseEntityService.deleteCacheEntry(this.entityCreationForm.get('parent').value['uid']);
+              this.browseEntityService.selectedEntity$.next(this.browseEntityService.currentPath.getValue().reverse()[0]);
+            } else {
+              this.browseEntityService.onNewWorkspace.next(uidCreated);
+            }
           })
       ).subscribe(
           next => next ? alert('securities have been created') : alert('securities NOT created'),
