@@ -9,73 +9,76 @@
     </div>
 </form>
 -->
-<form [formGroup]="form">
-    <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
-        <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
-            <div fxFlex="45" formArrayName="filesList" >
-                <div
-                        cdkDropList
-                        #filesListDiv
-                        fxLayout="column"
-                        fxLayoutAlign="space-around start"
-                        fxLayoutGap="10px"
-                >
+<!--<mat-dialog-title>Upload files</mat-dialog-title>-->
+<mat-dialog-content>
+    <form [formGroup]="form">
+        <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
+            <div  fxLayout="row" fxLayoutAlign="space-between  center" style="width: 100%">
+                <div fxFlex="45" formArrayName="filesList" >
+                    <div
+                            cdkDropList
+                            #filesListDiv
+                            fxLayout="column"
+                            fxLayoutAlign="space-around start"
+                            fxLayoutGap="10px"
+                    >
 
-                    <div *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index"
-                         class="fileToUpload w100p" >
-                        <!-- not working, bug -->
-                        <!--<mat-divider *ngIf="i > 0"></mat-divider>-->
-                        <hr *ngIf="i > 0" class="hrSeparator" />
+                        <div *ngFor="let fileCtl of form.controls.filesList['controls']; let i = index"
+                             class="fileToUpload w100p" >
+                            <!-- not working, bug -->
+                            <!--<mat-divider *ngIf="i > 0"></mat-divider>-->
+                            <hr *ngIf="i > 0" class="hrSeparator" />
 
-                        <div
-                                cdkDropList
-                                [id]="data.filesList[i]?.name"
-                                [cdkDropListConnectedTo]="fileIds"
-                                (cdkDropListDropped)="addTag($event)"
-                                (cdkDropListEntered)="dragOver($event)"
-                                (cdkDropListExited)="dragExit($event)"
+                            <div
+                                    cdkDropList
+                                    [id]="data.filesList[i]?.name"
+                                    [cdkDropListConnectedTo]="fileIds"
+                                    (cdkDropListDropped)="addTag($event)"
+                                    (cdkDropListEntered)="dragOver($event)"
+                                    (cdkDropListExited)="dragExit($event)"
 
-                                fxLayout="row"
-                                fxLayoutAlign="start start"
-                                fxLayoutGap="7px"
+                                    fxLayout="row"
+                                    fxLayoutAlign="start start"
+                                    fxLayoutGap="7px"
 
-                                class="padding5"
-                        >
-                            <mat-checkbox
-                                    [formControlName]="i"
-                                    name="{{i}}"
+                                    class="padding5"
                             >
-                                {{this.data.filesList[i]?.name}}
-                            </mat-checkbox>
-                            <mat-chip-list>
-                                <mat-chip
-                                        *ngFor="let tag of this.filesTags$.get(this.data.filesList[i]?.name) | async"
-                                        [removable]="true"
-                                        (removed)="removeTag($event)"
-                                        attr.data-filename="{{this.data.filesList[i]?.name}}"
-                                        attr.data-tagid="{{tag.uid}}"
+                                <mat-checkbox
+                                        [formControlName]="i"
+                                        name="{{i}}"
                                 >
-                                    {{tag.name}}
-                                    <mat-icon matChipRemove >cancel</mat-icon>
-                                </mat-chip>
-                            </mat-chip-list>
+                                    {{this.data.filesList[i]?.name}}
+                                </mat-checkbox>
+                                <mat-chip-list>
+                                    <mat-chip
+                                            *ngFor="let tag of this.filesTags$.get(this.data.filesList[i]?.name) | async"
+                                            [removable]="true"
+                                            (removed)="removeTag($event)"
+                                            attr.data-filename="{{this.data.filesList[i]?.name}}"
+                                            attr.data-tagid="{{tag.uid}}"
+                                    >
+                                        {{tag.name}}
+                                        <mat-icon matChipRemove >cancel</mat-icon>
+                                    </mat-chip>
+                                </mat-chip-list>
+                            </div>
+
                         </div>
 
                     </div>
+                </div>
+                <div fxFlex="45">
+
+                    Tag these files
+                    <file-tags [cdkDropListConnectedTo_var]="fileIds"></file-tags>
 
                 </div>
             </div>
-            <div fxFlex="45">
 
-                Tag these files
-                <file-tags [cdkDropListConnectedTo_var]="fileIds"></file-tags>
-
+            <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
+                <button mat-button (click)="onNoClick()">No, Thanks</button>
+                <button mat-button (click)="submit()">Ok</button>
             </div>
         </div>
-
-        <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
-            <button mat-button (click)="onNoClick()">No, Thanks</button>
-            <button mat-button (click)="submit()">Ok</button>
-        </div>
-    </div>
-</form>
+    </form>
+</mat-dialog-content>
