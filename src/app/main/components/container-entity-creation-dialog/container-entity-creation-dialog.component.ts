@@ -97,7 +97,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
             }
           })
       ).subscribe(
-          next => next ? alert('securities have been created') : alert('securities NOT created'),
+          next => // this.dialogRef.close(),
           error => console.log('error when creating entity: ' + error.error.message)
       );
     }
