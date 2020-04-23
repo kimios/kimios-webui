@@ -21,8 +21,8 @@
 
 <!--        <mat-divider></mat-divider>-->
 
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-        <div>
+    <div fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="20px">
+        <div fxFlex="100px">
             <button id="historyBackButton"
                     [ngClass]="historyHasBack ? 'icon-active' : 'icon-inactive'"
                     [disabled]="!historyHasBack"
@@ -39,7 +39,7 @@
             </button>
         </div>
 
-        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="50">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow">
             <ng-container *ngIf="explorerMode === 0; else searchModeBar">
                 <browse-path></browse-path>
                 <button (click)="searchModeOn()">
@@ -51,7 +51,7 @@
             </ng-template>
         </div>
 
-        <div class="paginatorBrowseComponent">
+        <div fxFlex="500px">
             <mat-paginator
                     [length]="length"
                     [pageSize]="pageSize"
