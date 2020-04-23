@@ -103,7 +103,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
     }
   }
 
-  cancel($event: MouseEvent): void {
+  cancel(): void {
 
   }
 }
