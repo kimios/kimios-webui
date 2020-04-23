@@ -14,10 +14,9 @@
                   diameter="20"></mat-progress-spinner>
         </ng-container>
         <ng-template #notLoading>
-          <ng-container *ngIf="node.data.children !== null
-                && node.data.children !== undefined
-                && node.data.children.length > 0"
-          >
+          <div [hidden]="(node.data.children === null
+                || node.data.children === undefined
+                || node.data.children.length === 0)" >
             <button mat-icon-button
                     [attr.aria-label]="'toggle ' + node.name"
                     (click)="node.toggleExpanded()">
@@ -27,7 +26,7 @@
               && tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
               </mat-icon>
             </button>
-          </ng-container>
+          </div>
         </ng-template>
       </div>
       <div class="node-content-wrapper"

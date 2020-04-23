@@ -205,6 +205,29 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     ).subscribe(
 
     );
+
+        this.browseEntityService.onAddedChildToEntity$.pipe(
+            concatMap(
+                entityUid => combineLatest(of(entityUid), this.browseEntityService.findContainerEntitiesAtPath(entityUid))
+            ),
+            tap(([entityUid, childrenEntities]) => {
+                const currentChildrenTmp = this.tree.treeModel.getNodeById(entityUid).data.children.slice();
+                const currentChildren = currentChildrenTmp === null || currentChildrenTmp === undefined ?
+                    [] :
+                    currentChildrenTmp;
+                const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
+                childrenEntities
+                    .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
+                    .forEach(entity => currentChildren.push({
+                        name: entity.name,
+                        id: entity.uid.toString(),
+                        children: null,
+                        isLoading: false
+                    }));
+                this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
+                this.tree.treeModel.update();
+            })
+        ).subscribe();
   }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {

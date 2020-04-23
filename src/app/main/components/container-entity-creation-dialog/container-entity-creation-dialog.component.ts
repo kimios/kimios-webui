@@ -90,8 +90,10 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           }),
           tap(([entityType, res, uidCreated]) => {
             if (entityType === 'folder') {
+              const currentPathEntity = this.browseEntityService.currentPath.getValue().slice().reverse()[0];
               this.browseEntityService.deleteCacheEntry(this.entityCreationForm.get('parent').value['uid']);
-              this.browseEntityService.selectedEntity$.next(this.browseEntityService.currentPath.getValue().reverse()[0]);
+              this.browseEntityService.selectedEntity$.next(currentPathEntity);
+              this.browseEntityService.onAddedChildToEntity$.next(currentPathEntity.uid);
             } else {
               this.browseEntityService.onNewWorkspace.next(uidCreated);
             }

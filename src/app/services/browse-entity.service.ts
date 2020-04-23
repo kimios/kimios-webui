@@ -20,6 +20,7 @@ export enum EXPLORER_MODE {
 export class BrowseEntityService implements OnInit, OnDestroy {
     public selectedEntityFromGridOrTree$: BehaviorSubject<DMEntity>;
     public selectedEntity$: BehaviorSubject<DMEntity>;
+    public onAddedChildToEntity$: Subject<number>;
 
     public totalEntitiesToDisplay$: BehaviorSubject<DMEntity[]>;
     public entitiesToDisplay$: BehaviorSubject<DMEntity[]>;
@@ -95,6 +96,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.updateMoveTreeNode$ = new Subject<TreeNodeMoveUpdate>();
 
       this.onNewWorkspace = new Subject<number>();
+      this.onAddedChildToEntity$ = new Subject<number>();
 
       this.ngOnInit();
   }
