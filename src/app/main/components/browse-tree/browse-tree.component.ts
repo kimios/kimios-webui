@@ -199,6 +199,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             this.nodes.push(newNode);
             this.tree.treeModel.update();
             this.entitiesLoaded.set(entity.uid, entity);
+            this.browseEntityService.entities.set(entity.uid, entity);
+            this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
         })
     ).subscribe(
 
