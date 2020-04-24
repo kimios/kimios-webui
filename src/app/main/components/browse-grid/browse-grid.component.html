@@ -1,9 +1,9 @@
 <mat-grid-list #entityList [cols]="gridNbCols" rowHeight="100px" (window:resize)="onResize($event)">
-    <mat-grid-tile *ngFor="let entityFromList of entities">
+    <mat-grid-tile *ngFor="let entityFromList of entities"
+                   (dblclick)="goToDocument(entityFromList)"
+                   class="cursor-pointer" >
         <entity-grid-tile
-                [entity]="entityFromList"
-                (dblclick)="goToDocument(entityFromList)"
-                class="cursor-pointer">
+                [entity]="entityFromList">
         </entity-grid-tile>
     </mat-grid-tile>
 </mat-grid-list>
