@@ -1,3 +1,13 @@
+<div class="wrapper">
+    <div class="overlay" *ngIf="showSpinner">
+        <div class="spinner-wrapper">
+            <mat-spinner
+                    color="primary"
+                    diameter="50"
+            ></mat-spinner>
+        </div>
+    </div>
+
 <ng-container  *ngIf="securityEnt$ | async as secEnt">
     <div (drop)="handleDrop($event, entity)"
          (dragover)="handleDragOver($event)"
@@ -24,3 +34,5 @@
         </div>
     </div>
 </ng-container>
+
+</div>

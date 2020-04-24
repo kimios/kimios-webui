@@ -1,9 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DMEntity} from 'app/kimios-client-api';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
-import {Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {CacheSecurityService, SecurityEnt} from 'app/services/cache-security.service';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'entity-grid-tile',
@@ -16,23 +17,32 @@ export class EntityGridTileComponent implements OnInit {
   entity: DMEntity;
   
   iconName: string;
-  securityEnt$: Observable<SecurityEnt>;
+  securityEnt$: BehaviorSubject<SecurityEnt>;
   private _isDir: boolean;
+  showSpinner: boolean;
 
   constructor(
       private cacheSecService: CacheSecurityService,
       private browseEntityService: BrowseEntityService
   ) {
-    this.securityEnt$ = new Observable<SecurityEnt>();
+    this.securityEnt$ = new BehaviorSubject<SecurityEnt>(undefined);
   }
 
   ngOnInit(): void {
+    this.showSpinner = true;
     this.iconName = DMEntityUtils.dmEntityIsWorkspace(this.entity) || DMEntityUtils.dmEntityIsFolder(this.entity) ?
         'folder' :
         'crop_portrait';
 
-    this.securityEnt$ = this.cacheSecService.getSecurityEnt(this.entity.uid);
-      this._isDir = DMEntityUtils.dmEntityIsFolder(this.entity);
+    this.cacheSecService.getSecurityEnt(this.entity.uid).subscribe(
+        next => this.securityEnt$.next(next)
+    );
+    this.securityEnt$.pipe(
+        filter(next => next !== undefined)
+    ).subscribe(
+        next => this.showSpinner = false
+    );
+    this._isDir = DMEntityUtils.dmEntityIsFolder(this.entity);
   }
 
   handleDrop(event: Event, droppedInDir: DMEntity): void {
