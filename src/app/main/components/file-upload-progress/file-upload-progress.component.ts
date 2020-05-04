@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
-import {map, mergeMap} from 'rxjs/operators';
+import {filter, map, mergeMap} from 'rxjs/operators';
 
 export const KIMIOS_CURRENT_UPLOADING_FILE = 'KIMIOS_CURRENT_UPLOADING_FILE';
 
@@ -13,7 +13,6 @@ export const KIMIOS_CURRENT_UPLOADING_FILE = 'KIMIOS_CURRENT_UPLOADING_FILE';
 export class FileUploadProgressComponent implements OnInit {
     uploadingFileName: string;
     file: Subject<string>;
-    progress: Observable<{ name: string, status: string, message: number } | number | string >;
     color = 'primary';
     mode = 'determinate';
     value = 0;
@@ -61,8 +60,9 @@ export class FileUploadProgressComponent implements OnInit {
           //         this.hide = false;
           //     }
           // ),
+          filter(res => res !== null && res !== undefined),
           mergeMap(
-              res => res !== null && res !== undefined ? this.fileUploadService.filesProgress.get(res) : of()
+              res => this.fileUploadService.filesProgress.get(res)
           )
       ).subscribe(
           res => {
