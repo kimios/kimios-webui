@@ -29,24 +29,12 @@
             </div>
 
         <div>
-            <!--<ng-container *ngIf="fileProgress.status === 'error'; else elseBlock2">
-                <mat-icon>error</mat-icon>
-                <span>{{fileProgress.message}}</span>
-            </ng-container>
-            <ng-template #elseBlock2>-->
-                {{fileProgress.status}} - {{fileProgress.message}}
-                <mat-progress-bar
-                        *ngIf="fileProgress.status === 'progress' && fileProgress.message < 100;"
-                        [value]="fileProgress.message"
-                        [bufferValue]="1"
-                        [mode] = "'determinate'">
-                </mat-progress-bar>
-                <!--<ng-template #elseBlock>
-                    <ng-container *ngIf="fileProgress.status === 'done'">
-                        <mat-icon>done</mat-icon>
-                    </ng-container>
-                </ng-template>
-            </ng-template>-->
+            <mat-progress-bar
+                    *ngIf="fileProgress.status === 'progress' && fileProgress.message < 100;"
+                    [value]="fileProgress.message"
+                    [bufferValue]="1"
+                    [mode] = "'determinate'">
+            </mat-progress-bar>
         </div>
 
 
