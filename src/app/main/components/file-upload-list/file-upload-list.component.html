@@ -8,16 +8,8 @@
             <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" fxFlex="grow">
 
                 <div>{{fileProgress.name}}</div>
-                <div fxFlex="grow">
-                    <mat-chip-list #chipList>
-                        <mat-chip
-                                *ngFor="let tag of filesUploaded.get(uploadId) | async"
-                        >
-                            {{tag.name}}
-                        </mat-chip>
-                    </mat-chip-list>
-                </div>
-                <div>
+
+                <div fxLayout="row" fxLayoutAlign="start center">
                     <ng-container *ngIf="fileProgress.status === 'done'">
                         <mat-icon class="cursor-default">done</mat-icon>
                     </ng-container>
@@ -29,12 +21,24 @@
             </div>
 
         <div>
-            <mat-progress-bar
-                    *ngIf="fileProgress.status === 'progress' && fileProgress.message < 100;"
-                    [value]="fileProgress.message"
-                    [bufferValue]="1"
-                    [mode] = "'determinate'">
-            </mat-progress-bar>
+            <ng-container *ngIf="fileProgress.status === 'progress' && fileProgress.message < 100; else elseBlock">
+                <mat-progress-bar
+                        [value]="fileProgress.message"
+                        [bufferValue]="1"
+                        [mode] = "'determinate'">
+                </mat-progress-bar>
+            </ng-container>
+            <ng-template #elseBlock >
+                <div fxFlex="grow">
+                    <mat-chip-list #chipList>
+                        <mat-chip
+                                *ngFor="let tag of filesUploaded.get(uploadId) | async"
+                        >
+                            {{tag.name}}
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+            </ng-template>
         </div>
 
 
