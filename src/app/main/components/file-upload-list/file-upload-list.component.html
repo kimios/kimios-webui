@@ -11,6 +11,7 @@
 
                 <div fxLayout="row" fxLayoutAlign="start center">
                     <ng-container *ngIf="fileProgress.status === 'done'">
+                        <document-menu></document-menu>
                         <mat-icon class="cursor-default">done</mat-icon>
                     </ng-container>
                     <ng-container *ngIf="fileProgress.status === 'error'">

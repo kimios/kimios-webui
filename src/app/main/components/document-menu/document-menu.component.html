@@ -1,0 +1,5 @@
+<button mat-button [matMenuTriggerFor]="menu"><mat-icon>more_horiz</mat-icon></button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="navigateToFolder()"><mat-icon title="Open folder">folder_open</mat-icon></button>
+  <button mat-menu-item (click)="navigateToDocument()"><mat-icon title="Open document">forward</mat-icon></button>
+</mat-menu>
