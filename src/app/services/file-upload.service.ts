@@ -9,7 +9,8 @@ import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
 import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
-
+import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {BrowseEntityService} from './browse-entity.service';
 
 interface TagJob {
     docId: number;
@@ -30,6 +31,7 @@ export class FileUploadService {
     uploadingFile: BehaviorSubject<string>;
     filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>;
     filesUploaded: Map<string, BehaviorSubject<Tag[]>>;
+    filesUploadedDocuments: Map<string, BehaviorSubject<KimiosDocument>>;
     uploadQueue$: BehaviorSubject<Array<string>>;
     uploadQueue: Map<string, Array<any>>;
     uploadingFiles$: BehaviorSubject<Array<any>>;
@@ -42,10 +44,12 @@ export class FileUploadService {
         private sessionService: SessionService,
         private tagService: TagService,
         private documentRefreshService: DocumentRefreshService,
-        private documentDetailService: DocumentDetailService
+        private documentDetailService: DocumentDetailService,
+        private browseEntityService: BrowseEntityService
     ) {
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>();
         this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
+        this.filesUploadedDocuments = new Map<string, BehaviorSubject<KimiosDocument>>();
         this.uploadingFile = new BehaviorSubject<string>(undefined);
         this.lastUploadedDocumentId = undefined;
 
@@ -126,6 +130,7 @@ export class FileUploadService {
         }
         this.uploadingFile.next(uploadId);
         this.filesUploaded.set(uploadId, new BehaviorSubject([]));
+        this.filesUploadedDocuments.set(uploadId, new BehaviorSubject(undefined));
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
@@ -220,13 +225,22 @@ export class FileUploadService {
             }),
             tap(
                 (res) => {
-                    if (res['status'] === 'done'
-                        && tags
-                        && tags.length > 0) {
-                        this.tagFile(res['message'], tags)
+                    if (res['status'] === 'done') {
+                        const newDocId = res['message'];
+                        this.documentDetailService.retrieveDocumentFromId(newDocId)
                             .subscribe(
-                                next => this.filesUploaded.get(uploadId).next(next)
+                                kimiosDocument => {
+                                    this.filesUploadedDocuments.get(uploadId).next(kimiosDocument);
+                                    this.browseEntityService.addNewEntityInCache(kimiosDocument);
+                                }
                             );
+                        if (tags
+                            && tags.length > 0) {
+                            this.tagFile(newDocId, tags)
+                                .subscribe(
+                                    next => this.filesUploaded.get(uploadId).next(next)
+                                );
+                        }
                     }
                 }
             )

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {DataTransaction, DocumentService, DocumentVersionService, FiletransferService} from 'app/kimios-client-api';
+import {DataTransaction, DocumentService, DocumentVersionService, FiletransferService, Document as KimiosDocument} from 'app/kimios-client-api';
 import {Observable} from 'rxjs';
 import {concatMap, map, tap} from 'rxjs/operators';
 import {SessionService} from './session.service';
@@ -22,6 +22,10 @@ export class DocumentDetailService {
       private sanitizer: DomSanitizer
   ) {
 
+  }
+
+  retrieveDocumentFromId(docId: number): Observable<KimiosDocument> {
+      return this.documentService.getDocument(this.sessionService.sessionToken, docId);
   }
 
   retrieveDocumentDetails(docId: number): void {

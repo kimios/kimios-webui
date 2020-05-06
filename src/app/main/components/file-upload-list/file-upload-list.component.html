@@ -11,7 +11,11 @@
 
                 <div fxLayout="row" fxLayoutAlign="start center">
                     <ng-container *ngIf="fileProgress.status === 'done'">
-                        <document-menu></document-menu>
+                        <ng-container *ngIf="filesUploadedDocuments.get(uploadId) | async as document">
+                            <ng-container *ngIf="document !== undefined">
+                                <document-menu [entity]="document"></document-menu>
+                            </ng-container>
+                        </ng-container>
                         <mat-icon class="cursor-default">done</mat-icon>
                     </ng-container>
                     <ng-container *ngIf="fileProgress.status === 'error'">

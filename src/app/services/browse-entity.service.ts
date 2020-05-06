@@ -55,6 +55,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
     onNewWorkspace: Subject<number>;
+    openEntityFromFileUploadList$: Subject<number>;
 
   constructor(
       // Set the defaults
@@ -99,6 +100,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
       this.onNewWorkspace = new Subject<number>();
       this.onAddedChildToEntity$ = new Subject<number>();
+
+      this.openEntityFromFileUploadList$ = new Subject<number>();
 
       this.ngOnInit();
   }
@@ -495,6 +498,14 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 entity['mimeType'],
                 targetEntity.uid
             );
+    }
+
+    addNewEntityInCache(entity: DMEntity): void {
+      this.entities.set(entity.uid, entity);
+    }
+
+    checkEntityInCache(entityId: number): boolean {
+      return this.entities.get(entityId) !== null && this.entities.get(entityId) !== undefined;
     }
 }
 
