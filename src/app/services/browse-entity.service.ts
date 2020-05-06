@@ -20,6 +20,7 @@ export enum EXPLORER_MODE {
 export class BrowseEntityService implements OnInit, OnDestroy {
     public selectedEntityFromGridOrTree$: BehaviorSubject<DMEntity>;
     public selectedEntity$: BehaviorSubject<DMEntity>;
+    public selectedFolder$: BehaviorSubject<DMEntity>;
     public onAddedChildToEntity$: Subject<number>;
 
     public totalEntitiesToDisplay$: BehaviorSubject<DMEntity[]>;
@@ -65,6 +66,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private searchEntityService: SearchEntityService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
+      this.selectedFolder$ = new BehaviorSubject<DMEntity>(undefined);
       this.selectedEntityFromGridOrTree$ = new BehaviorSubject<DMEntity>(undefined);
       this.loadedEntities = new Map<number, DMEntity[]>();
       this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
@@ -174,26 +176,28 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         );
 
-        this.selectedEntity$
-            .pipe(
-                tap(entity => {
-                    if (entity === undefined) {
-                        this.totalEntitiesToDisplay$.next([]);
-                        this.entitiesToDisplay$.next([]);
-                    }
-                }),
-                tap(entity => {
-                    this.pageIndex.next(0);
-                }),
-                filter(entity => entity !== undefined),
-                concatMap(res => this.findEntitiesAtPath(res)),
-            )
-            .subscribe(
-                res => {
-                    this.totalEntitiesToDisplay$.next(res);
-                    this.makePage(this.pageIndex.getValue(), this.pageSize);
+        this.selectedEntity$.subscribe(
+            entity => this.selectedFolder$.next(entity)
+        );
+
+        this.selectedFolder$.pipe(
+            tap(entity => {
+                if (entity === undefined) {
+                    this.totalEntitiesToDisplay$.next([]);
+                    this.entitiesToDisplay$.next([]);
                 }
-            );
+            }),
+            tap(entity => {
+                this.pageIndex.next(0);
+            }),
+            filter(entity => entity !== undefined),
+            concatMap(res => this.findEntitiesAtPath(res)),
+        ).subscribe(
+            res => {
+                this.totalEntitiesToDisplay$.next(res);
+                this.makePage(this.pageIndex.getValue(), this.pageSize);
+            }
+        );
 
         this.explorerMode.pipe(
             filter(next => next === EXPLORER_MODE.SEARCH),

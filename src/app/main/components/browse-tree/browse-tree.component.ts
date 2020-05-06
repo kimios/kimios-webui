@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core'
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
-import {concatMap, filter, flatMap, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, flatMap, map, mergeMap, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {ActivatedRoute} from '@angular/router';
@@ -58,53 +58,71 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
 
-      // load initial nodes
-      if (this.treeNodesService.treeNodes.length > 0) {
-      // if (this.browseEntityService.selectedEntity$.)
-    } else {
-      this.retrieveEntitiesToExpand().pipe(
-          tap(res => this.entitiesToExpand$.next(res)),
-          concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
-          flatMap(
-              res => res
-          ),
-          map(
-              entity => {
-                if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
-                  const newNode = {
-                    name: entity.name,
-                    id: entity.uid.toString(),
-                    children: null,
-                    isLoading: true
-                  };
-                  this.nodes.push(newNode);
-                  this.tree.treeModel.update();
-                  this.entitiesLoaded.set(entity.uid, entity);
+        // load initial nodes
+        if (this.treeNodesService.treeNodes.length > 0) {
+            // if (this.browseEntityService.selectedEntity$.)
+        } else {
+            this.retrieveEntitiesToExpand().pipe(
+                tap(res => this.entitiesToExpand$.next(res)),
+                concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
+                take(1),
+                flatMap(
+                    res => res
+                ),
+                map(
+                    entity => {
+                        if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
+                            const newNode = {
+                                name: entity.name,
+                                id: entity.uid.toString(),
+                                children: null,
+                                isLoading: true
+                            };
+                            this.nodes.push(newNode);
+                            this.tree.treeModel.update();
+                            this.entitiesLoaded.set(entity.uid, entity);
+                        }
+                        return entity;
+                    }
+                ),
+                flatMap(
+                    entityRet => {
+                        if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
+                            return combineLatest(of(entityRet),
+                                this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)).pipe(
+                                toArray(),
+                                tap(array => {
+                                    if (array.length > 0) {
+                                        this.tree.treeModel.setFocusedNode(
+                                            this.tree.treeModel.getNodeById(array.reverse()[0])
+                                        );
+                                        this.browseEntityService.selectedFolder$.next(this.entitiesToExpand$.getValue().slice().reverse()[0]);
+                                    }
+                                }),
+//                                tap(array => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(nodeIdToFocus))),
+                                map(array => true)
+                            )).pipe(
+                                map(res => true)
+                            );
+                        } else {
+                            if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
+                                return combineLatest(of(entityRet), this.loadChildren(entityRet.uid)).pipe(
+                                    map(res => true)
+                                );
+                            }
+                        }
+                    }, 5
+                ),
+            ).subscribe(
+                (res) => {
+                    this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+                },
+                error => console.log('error : ' + error),
+                () => {
+                    this.initDataDone$.next(true);
                 }
-                return entity;
-              }
-          ),
-          flatMap(
-              entityRet => {
-                if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
-                  return combineLatest(of(entityRet), this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)));
-                } else {
-                  if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
-                    return combineLatest(of(entityRet), this.loadChildren(entityRet.uid));
-                  }
-                }
-              }, 5
-          ),
-      ).subscribe(
-          res => {
-            this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
-          },
-          error => console.log('error : ' + error),
-          () => {
-            this.initDataDone$.next(true);
-          }
-      );
-    }
+            );
+        }
 
     this.browseEntityService.selectedEntity$
         .pipe(
@@ -246,7 +264,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                         entity => this.browseEntityService.selectedEntityFromGridOrTree$.next(entity)
                     ),
                     concatMap(
-                        entity => this.browseEntityService.findAllParents(entity.uid)
+                        entity => this.browseEntityService.findAllParents(entity.uid, true)
                     ),
                     map(entities => entities.reverse())
                 )
