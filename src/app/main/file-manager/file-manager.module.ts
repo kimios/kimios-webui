@@ -70,6 +70,9 @@ import {ContainerEntityCreationDialogComponent} from 'app/main/components/contai
 import {BrowseTreeComponent} from 'app/main/components/browse-tree/browse-tree.component';
 import {DocumentMenuComponent} from 'app/main/components/document-menu/document-menu.component';
 import {DocumentLinkComponent} from 'app/main/components/document-link/document-link.component';
+import {ContainerEntityComponent} from 'app/main/components/container-entity/container-entity.component';
+import {ContainerEntityDataComponent} from 'app/main/components/container-entity-data/container-entity-data.component';
+import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
 
 
 @NgModule({
@@ -106,7 +109,10 @@ import {DocumentLinkComponent} from 'app/main/components/document-link/document-
         ContainerEntityCreationDialogComponent,
         BrowseTreeComponent,
         DocumentMenuComponent,
-        DocumentLinkComponent
+        DocumentLinkComponent,
+        ContainerEntityComponent,
+        ContainerEntityDataComponent,
+        ContainerEntityDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -155,13 +161,15 @@ import {DocumentLinkComponent} from 'app/main/components/document-link/document-
         ShareDialogComponent,
         UsersAndGroupsSelectionDialogComponent,
         EntityMoveDialogComponent,
-        ContainerEntityCreationDialogComponent
+        ContainerEntityCreationDialogComponent,
+        ContainerEntityDialogComponent
     ],
     exports: [
         FileUploadListComponent,
         FileUploadProgressComponent,
         ShareFormComponent,
-        BrowseGridComponent
+        BrowseGridComponent,
+        ContainerEntityComponent
     ]
 })
 export class FileManagerModule { }

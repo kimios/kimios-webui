@@ -44,7 +44,7 @@
             <tree-node-content [node]="node" [index]="index"></tree-node-content>
           </div>
           <div class="treenode-icon-more">
-            <mat-icon>more_horiz</mat-icon>
+            <mat-icon (click)="openEntityData(node.id)">more_horiz</mat-icon>
           </div>
         </div>
       </div>

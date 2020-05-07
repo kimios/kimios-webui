@@ -7,6 +7,8 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {ActivatedRoute} from '@angular/router';
 import {EntityCreationService} from 'app/services/entity-creation.service';
+import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
+import {MatDialog} from '@angular/material';
 
 @Component({
   selector: 'browse-tree',
@@ -32,6 +34,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
       private browseEntityService: BrowseEntityService,
       private route: ActivatedRoute,
       private entityCreationService: EntityCreationService,
+      public containerEntityDialog: MatDialog,
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -429,5 +432,15 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
     onFocus($event): void {
         this.browseEntityService.selectedEntityFromGridOrTree$.next(this.browseEntityService.entities.get(Number($event.node.data.id)));
+    }
+
+    openEntityData(uid: number): void {
+        const dialogRef = this.containerEntityDialog.open(ContainerEntityDialogComponent, {
+            width: '700px',
+            // width: '250px',
+            data: {
+                uid: uid
+            }
+        });
     }
 }
