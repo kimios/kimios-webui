@@ -1,0 +1,23 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td {
+  padding: 5px;
+  border: 1px solid #e1d8df;
+  width: 1px;
+  white-space:nowrap;
+}
+
+td:last-child {
+  width: 100%;
+}
+
+.talign-right {
+  text-align: right;
+}
+
+.data-title {
+  background-color: #ececec;
+}

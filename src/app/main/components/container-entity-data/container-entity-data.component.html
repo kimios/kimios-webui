@@ -1,0 +1,24 @@
+<table id="table">
+
+  <tr>
+    <td class="talign-right data-title">entity Id:</td>
+    <td>{{entity.uid}}</td>
+  </tr>
+  <tr>
+    <td class="talign-right data-title">entity name:</td>
+    <td>{{entity.name}}</td>
+  </tr>
+  <tr>
+    <td class="talign-right data-title">Type:</td>
+    <td>{{entityType}}</td>
+  </tr>
+  <tr>
+    <td class="talign-right data-title">Owner:</td>
+    <td>{{entity.owner + '@' + entity.ownerSource}}</td>
+  </tr>
+  <tr>
+    <td class="talign-right data-title">Creation date:</td>
+    <td>{{entity.creationDate | date}}</td>
+  </tr>
+
+</table>

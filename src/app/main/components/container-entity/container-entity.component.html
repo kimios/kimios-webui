@@ -1,0 +1,32 @@
+<!-- Container details -->
+<div *ngIf="entityData$ | async as entity" fxLayout="column" fxLayoutAlign="start center"  class="content" fxLayoutGap="20px">
+
+  <div fxLayout="row" fxLayoutAlign="center">
+    <span id="entityTitle">{{entityType}}: {{entity.name}}</span>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="space-between start">
+
+    <div>
+
+      <mat-tab-group dynamicHeight>
+        <mat-tab label="Data">
+
+          <!-- file properties : name, type, size, author, creation date -->
+          <container-entity-data [entity]="entity" [entityType]="entityType" ></container-entity-data>
+
+        </mat-tab>
+
+        <mat-tab label="Security">
+          <file-security [documentId]="entity.uid"></file-security>
+        </mat-tab>
+      </mat-tab-group>
+      <!--    </div>-->
+
+    </div>
+
+  </div>
+
+</div>
+
+
