@@ -69,6 +69,7 @@ import {BrowseTreeMenuComponent} from 'app/main/components/browse-tree-menu/brow
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BrowseTreeComponent} from 'app/main/components/browse-tree/browse-tree.component';
 import {DocumentMenuComponent} from 'app/main/components/document-menu/document-menu.component';
+import {DocumentLinkComponent} from 'app/main/components/document-link/document-link.component';
 
 
 @NgModule({
@@ -104,7 +105,8 @@ import {DocumentMenuComponent} from 'app/main/components/document-menu/document-
         BrowseTreeMenuComponent,
         ContainerEntityCreationDialogComponent,
         BrowseTreeComponent,
-        DocumentMenuComponent
+        DocumentMenuComponent,
+        DocumentLinkComponent
     ],
     imports: [
         FileManagerRoutingModule,

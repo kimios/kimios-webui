@@ -7,7 +7,18 @@
         <div fxLayout="column" fxLayoutAlign="start stretch"  fxFlex="grow">
             <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" fxFlex="grow">
 
-                <div>{{fileProgress.name}}</div>
+                <div>
+                    <ng-container *ngIf="fileProgress.status === 'done'; else elseBlockDocumentLink">
+                        <ng-container *ngIf="filesUploadedDocuments.get(uploadId) | async as document">
+                            <ng-container *ngIf="document !== undefined">
+                                <document-link [document]="document" ></document-link>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <ng-template #elseBlockDocumentLink >
+                        {{fileProgress.name}}
+                    </ng-template>
+                </div>
 
                 <div fxLayout="row" fxLayoutAlign="start center">
                     <ng-container *ngIf="fileProgress.status === 'done'">
