@@ -339,13 +339,16 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     retrieveContainerEntity(uid: number): Observable<DMEntity> {
-        return this.retrieveFolderEntity(uid).pipe(
-            concatMap(
-                res => (res === null || res === undefined || res === '') ?
-                    this.retrieveWorkspaceEntity(uid) :
-                    of(res)
-            )
-        );
+        const entity = this.entities.get(uid);
+        return entity !== null && entity !== undefined ?
+            of(this.entities.get(uid)) :
+            this.retrieveFolderEntity(uid).pipe(
+                concatMap(
+                    res => (res === null || res === undefined || res === '') ?
+                        this.retrieveWorkspaceEntity(uid) :
+                        of(res)
+                )
+            );
     }
 
     retrieveWorkspaceEntity(uid: number): Observable<Workspace> {
