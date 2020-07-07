@@ -7,7 +7,7 @@ export const navigation: FuseNavigation[] = [
         title: 'Overview',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'view_comfy',
         url: '/overview',
         /*badge: {
             title: '1',
@@ -21,7 +21,7 @@ export const navigation: FuseNavigation[] = [
         title: 'Workspaces',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'folder',
         url: '/workspaces', // browse without the search bar
         /*badge: {
             title: '1',
@@ -35,7 +35,7 @@ export const navigation: FuseNavigation[] = [
         title: 'My Bookmarks',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'bookmarks',
         url: '/mybookmarks',
         /*badge: {
             title: '1',
@@ -45,11 +45,11 @@ export const navigation: FuseNavigation[] = [
         }*/
     },
     {
-        id: 'Shares',
-        title: 'shares',
+        id: 'shares',
+        title: 'Shares',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'share',
         url: '/shares',
         /*badge: {
             title: '1',
@@ -63,7 +63,7 @@ export const navigation: FuseNavigation[] = [
         title: 'Search Queries',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'search',
         url: '/searchqueries',
         /*badge: {
             title: '1',
@@ -77,7 +77,7 @@ export const navigation: FuseNavigation[] = [
         title: 'Settings',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
-        icon: 'file',
+        icon: 'settings',
         url: '/settings',
         /*badge: {
             title: '1',

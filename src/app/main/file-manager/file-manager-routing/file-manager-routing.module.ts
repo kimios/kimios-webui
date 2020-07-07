@@ -6,6 +6,12 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileDetailComponent} from 'app/main/components/file-detail/file-detail.component';
 import {BrowseComponent} from 'app/main/components/browse/browse.component';
 import {FileManagerComponent} from '../file-manager.component';
+import {MyBookmarksComponent} from 'app/main/components/my-bookmarks/my-bookmarks.component';
+import {SharesComponent} from 'app/main/components/shares/shares.component';
+import {SearchQueriesComponent} from 'app/main/components/search-queries/search-queries.component';
+import {SettingsComponent} from 'app/main/components/settings/settings.component';
+import {OverviewComponent} from 'app/main/components/overview/overview.component';
+import {WorkspacesComponent} from 'app/main/components/workspaces/workspaces.component';
 
 const fileManagerRoutes: Routes = [
     {
@@ -53,7 +59,38 @@ const fileManagerRoutes: Routes = [
         /*resolve: {
           files: BrowseService
         }*/
+    },
+    {
+        path: 'workspaces',
+        component: WorkspacesComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'mybookmarks',
+        component: MyBookmarksComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'shares',
+        component: SharesComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'searchqueries',
+        component: SearchQueriesComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'settings',
+        component: SettingsComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'overview',
+        component: OverviewComponent,
+        canActivate: [ LoggedInGuard ]
     }
+
 ];
 
 @NgModule({

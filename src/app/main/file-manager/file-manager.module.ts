@@ -73,6 +73,12 @@ import {DocumentLinkComponent} from 'app/main/components/document-link/document-
 import {ContainerEntityComponent} from 'app/main/components/container-entity/container-entity.component';
 import {ContainerEntityDataComponent} from 'app/main/components/container-entity-data/container-entity-data.component';
 import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
+import {WorkspacesComponent} from 'app/main/components/workspaces/workspaces.component';
+import {MyBookmarksComponent} from 'app/main/components/my-bookmarks/my-bookmarks.component';
+import {SharesComponent} from 'app/main/components/shares/shares.component';
+import {SearchQueriesComponent} from 'app/main/components/search-queries/search-queries.component';
+import {SettingsComponent} from 'app/main/components/settings/settings.component';
+import {OverviewComponent} from 'app/main/components/overview/overview.component';
 
 
 @NgModule({
@@ -112,7 +118,13 @@ import {ContainerEntityDialogComponent} from 'app/main/components/container-enti
         DocumentLinkComponent,
         ContainerEntityComponent,
         ContainerEntityDataComponent,
-        ContainerEntityDialogComponent
+        ContainerEntityDialogComponent,
+        WorkspacesComponent,
+        MyBookmarksComponent,
+        SharesComponent,
+        SearchQueriesComponent,
+        SettingsComponent,
+        OverviewComponent
     ],
     imports: [
         FileManagerRoutingModule,
