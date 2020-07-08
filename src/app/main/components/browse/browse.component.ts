@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {Location} from '@angular/common';
 import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.service';
 import {of} from 'rxjs';
@@ -43,7 +44,8 @@ export class BrowseComponent implements OnInit {
       private route: ActivatedRoute,
       private fileUploadService: FileUploadService,
       public filesUploadDialog: MatDialog,
-      public entityMoveDialog: MatDialog
+      public entityMoveDialog: MatDialog,
+      private location: Location
   ) {
     this.explorerMode = EXPLORER_MODE.BROWSE;
   }
@@ -77,6 +79,18 @@ export class BrowseComponent implements OnInit {
               this.explorerMode = next;
               if (this.explorerMode === EXPLORER_MODE.BROWSE) {
                   this.browseEntityService.selectedEntity$.next(this.browseEntityService.selectedEntity$.getValue());
+              }
+          }
+      );
+
+      this.browseEntityService.selectedEntity$.subscribe(
+          entity => {
+              if (entity !== undefined) {
+                  const path = this.location.path();
+                  console.log('current location path: ' + path);
+                  const newPath = path.replace(new RegExp('(?:\/browse.*)?$'), '/browse/' + entity.uid);
+                  console.log('new location path: ' + newPath);
+                  this.location.replaceState(newPath);
               }
           }
       );

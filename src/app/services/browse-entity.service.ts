@@ -1,5 +1,4 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {Location} from '@angular/common';
 import {SessionService} from './session.service';
 import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
@@ -65,8 +64,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private documentService: DocumentService,
       private workspaceService: WorkspaceService,
       private folderService: FolderService,
-      private searchEntityService: SearchEntityService,
-      private location: Location
+      private searchEntityService: SearchEntityService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.selectedFolder$ = new BehaviorSubject<DMEntity>(undefined);
@@ -182,16 +180,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         );
 
         this.selectedEntity$.subscribe(
-            entity => {
-                this.selectedFolder$.next(entity);
-                if (entity !== undefined) {
-                    const path = this.location.path();
-                    console.log('current location path: ' + path);
-                    const newPath = path.replace(new RegExp('(?:\/browse.*)?$'), '/browse/' + entity.uid);
-                    console.log('new location path: ' + newPath);
-                    this.location.replaceState(newPath);
-                }
-            }
+            entity => this.selectedFolder$.next(entity)
         );
 
         this.selectedFolder$.pipe(
