@@ -12,37 +12,47 @@
        fxLayoutAlign="start"
        style="width: 100%;">
 
-    <div fxLayout="row"
+    <div fxLayout="column"
          fxLayoutAlign="start"
-         style="width: 100%; border: 1px solid; margin-left: 20px;"
-         >
+         style="width: 100%; border: 1px solid; margin-left: 20px; margin-right: 20px; margin-bottom: 84px; border-radius: 10px;">
 
-      <div fxFlex="25">
-
-        <browse-tree></browse-tree>
-
+      <div style="width: 100%; margin: 20px;" >
+        <browse-path></browse-path>
       </div>
 
-      <div fxFlex="70">
-        <!--<div>
-          <mat-paginator
-                  [length]="totalFilesFound$ | async"
-                  [pageSize]="pageSize"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="paginatorHandler($event)"
-                  [pageIndex]="pageIndex"
-                  showFirstLastButtons>
-          </mat-paginator>
-          <mat-divider></mat-divider>
-        </div>-->
-        <div class="content" fusePerfectScrollbar>
-          <!--<ng-container *ngIf="explorerMode === 0; else searchModeContent">-->
-          <entity-listing></entity-listing>
-          <!--</ng-container>
-          <ng-template #searchModeContent>
-              <file-list></file-list>
-          </ng-template>-->
+      <div fxLayout="row"
+           fxLayoutAlign="start"
+           style="border-top: 1px solid; padding-top: 20px;"
+           >
+
+        <div fxFlex="25">
+
+          <browse-tree></browse-tree>
+
         </div>
+
+        <div fxFlex="70">
+          <!--<div>
+            <mat-paginator
+                    [length]="totalFilesFound$ | async"
+                    [pageSize]="pageSize"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (page)="paginatorHandler($event)"
+                    [pageIndex]="pageIndex"
+                    showFirstLastButtons>
+            </mat-paginator>
+            <mat-divider></mat-divider>
+          </div>-->
+          <div class="content" fusePerfectScrollbar>
+            <!--<ng-container *ngIf="explorerMode === 0; else searchModeContent">-->
+            <entity-listing></entity-listing>
+            <!--</ng-container>
+            <ng-template #searchModeContent>
+                <file-list></file-list>
+            </ng-template>-->
+          </div>
+        </div>
+
       </div>
 
     </div>
