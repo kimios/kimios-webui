@@ -14,9 +14,9 @@
                   diameter="20"></mat-progress-spinner>
         </ng-container>
         <ng-template #notLoading>
-          <div [hidden]="(node.data.children === null
+          <div [ngClass]="{'kimios-invisible' : (node.data.children === null
                 || node.data.children === undefined
-                || node.data.children.length === 0)" >
+                || node.data.children.length === 0)}" >
             <button mat-icon-button
                     [attr.aria-label]="'toggle ' + node.name"
                     (click)="node.toggleExpanded()"
