@@ -7,7 +7,7 @@
          [style.padding-left]="node.getNodePadding()"
          [attr.data-nodeuid]="node.uid"
     >
-      <div style="width: 40px;">
+      <div style="margin-top: 0;">
         <ng-container *ngIf="node.data.isLoading; else notLoading">
           <mat-progress-spinner
                   mode="indeterminate"
@@ -19,7 +19,8 @@
                 || node.data.children.length === 0)" >
             <button mat-icon-button
                     [attr.aria-label]="'toggle ' + node.name"
-                    (click)="node.toggleExpanded()">
+                    (click)="node.toggleExpanded()"
+            class="kimios-tree-button-expand">
               <mat-icon class="mat-icon-rtl-mirror">
                 {{tree.treeModel.expandedNodeIds[node.id] !== null
               && tree.treeModel.expandedNodeIds[node.id] !== undefined
