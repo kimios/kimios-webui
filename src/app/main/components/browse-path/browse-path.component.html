@@ -1,9 +1,9 @@
-<div fxLayout="row"  fxLayoutGap="15px" fxLayoutAlign=" center" >
+<div fxLayout="row"  fxLayoutGap="8px" fxLayoutAlign=" center" >
   <div (click)="goToHome()" class="cursor-pointer">
     <mat-icon>home</mat-icon>
   </div>
   <ng-container *ngFor="let dir of pathDirs; let index">
-    <div> > </div>
+    <mat-icon>chevron_right</mat-icon>
     <div (click)="goToDir(dir)" class="cursor-pointer">{{dir.name}}</div>
   </ng-container>
 </div>
