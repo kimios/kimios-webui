@@ -31,7 +31,8 @@
             <!-- / TOOLBAR: Below fixed -->
 
             <div id="container-3" class="container"  fusePerfectScrollbar
-                 [fusePerfectScrollbarOptions]="{suppressScrollX: true, updateOnRouteChange : true, suppressScrollY: true}">
+                 [fusePerfectScrollbarOptions]="{suppressScrollX: true, updateOnRouteChange : true, suppressScrollY: true}"
+            style="flex: 1 1 auto;">
 
                 <!-- TOOLBAR: Below static -->
                 <ng-container *ngIf="fuseConfig.layout.toolbar.position === 'below-static'">
@@ -40,7 +41,7 @@
                 <!-- / TOOLBAR: Below static -->
 
                 <!-- CONTENT -->
-                <content></content>
+                <content style="height: 100%"></content>
                 <!-- / CONTENT -->
 
                 <!-- FOOTER: Below static -->
