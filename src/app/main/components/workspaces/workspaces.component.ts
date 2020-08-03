@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 
@@ -7,7 +7,11 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss']
 })
-export class WorkspacesComponent implements OnInit {
+export class WorkspacesComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('contentColumn') contentColumn: ElementRef;
+  @ViewChild('browsePathRow') browsePathRow: ElementRef;
+  @ViewChild('treeAndGridRow') treeAndGridRow: ElementRef;
 
   constructor(
       private browseEntityService: BrowseEntityService,
@@ -27,5 +31,11 @@ export class WorkspacesComponent implements OnInit {
         }
     );
   }
+
+  ngAfterViewInit(): void {
+    console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
+    this.treeAndGridRow.nativeElement.style.height = this.contentColumn.nativeElement.offsetHeight - this.browsePathRow.nativeElement.offsetHeight + 'px';
+    console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
+   }
 
 }

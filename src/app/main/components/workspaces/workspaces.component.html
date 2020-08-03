@@ -14,16 +14,18 @@
 
     <div fxLayout="column"
          fxLayoutAlign="start"
-         style="width: 100%; border: 1px solid; margin-left: 20px; margin-right: 20px; margin-bottom: 84px; border-radius: 10px;">
+         style="width: 100%; border: 1px solid; margin-left: 20px; margin-right: 20px; margin-bottom: 84px; border-radius: 10px;"
+         #contentColumn id="contentColumn" >
 
-      <div style="width: 100%; margin: 20px;" >
+      <div style="width: 100%; margin: 20px;"
+           #browsePathRow id="browsePathRow" >
         <browse-path></browse-path>
       </div>
 
       <div fxLayout="row"
            fxLayoutAlign="start"
            style="border-top: 1px solid; padding-top: 20px; height: 100%;"
-           >
+           #treeAndGridRow id="treeAndGridRow" >
 
         <div fxFlex="18" id="workspacestreecontainer" style="overflow: auto; height: 100%;" >
 
