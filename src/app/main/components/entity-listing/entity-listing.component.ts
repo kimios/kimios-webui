@@ -17,6 +17,7 @@ export enum ListingType {
 export class EntityListingComponent implements OnInit {
 
   entities$: BehaviorSubject<Array<DMEntity>>;
+  @Input()
   gridOrList: ListingType;
   private default = ListingType.GRID;
   isGrid: BehaviorSubject<boolean>;
@@ -29,7 +30,10 @@ export class EntityListingComponent implements OnInit {
       private cd: ChangeDetectorRef
   ) {
     this.entities$ = new BehaviorSubject<Array<DMEntity>>([]);
-    this.gridOrList = this.default;
+    if (this.gridOrList === null
+        || this.gridOrList === undefined) {
+      this.gridOrList = this.default;
+    }
     this.isGrid = new BehaviorSubject(this.gridOrList === ListingType.GRID);
   }
 
