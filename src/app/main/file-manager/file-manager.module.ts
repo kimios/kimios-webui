@@ -26,7 +26,7 @@ import {
     MatTableModule,
     MatTabsModule,
     MatTreeModule,
-    MatMenuModule
+    MatMenuModule, MatButtonToggleModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -79,6 +79,7 @@ import {SharesComponent} from 'app/main/components/shares/shares.component';
 import {SearchQueriesComponent} from 'app/main/components/search-queries/search-queries.component';
 import {SettingsComponent} from 'app/main/components/settings/settings.component';
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
+import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.component';
 
 
 @NgModule({
@@ -124,7 +125,8 @@ import {OverviewComponent} from 'app/main/components/overview/overview.component
         SharesComponent,
         SearchQueriesComponent,
         SettingsComponent,
-        OverviewComponent
+        OverviewComponent,
+        BrowseListComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -157,6 +159,7 @@ import {OverviewComponent} from 'app/main/components/overview/overview.component
         MatProgressSpinnerModule,
         MatTreeModule,
         MatMenuModule,
+        MatButtonToggleModule,
 
         DragDropModule,
         MatGridListModule,

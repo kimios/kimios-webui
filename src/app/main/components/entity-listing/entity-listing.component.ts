@@ -1,7 +1,6 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
-import {concatMap, filter, tap} from 'rxjs/operators';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 export enum ListingType {
@@ -47,5 +46,10 @@ export class EntityListingComponent implements OnInit {
               this.cd.markForCheck();
             }
         );
+  }
+
+  onValChange(value: any): void {
+    this.gridOrList = Number(value);
+    this.isGrid.next(this.gridOrList === ListingType.GRID);
   }
 }
