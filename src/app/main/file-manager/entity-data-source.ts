@@ -4,7 +4,7 @@ import {CollectionViewer} from '@angular/cdk/collections';
 import {Observable} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import * as moment from 'moment';
-import {FilesDataSource} from 'app/main/file-manager/file-data-source';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 export class EntityDataSource extends DataSource<DMEntity> {
 
@@ -55,7 +55,11 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'documentTypeName',
         sticky: false,
         displayName: 'Type',
-        cell: null
+        cell: (row: Document) => `${
+            DMEntityUtils.dmEntityIsDocument(row) ? 'document' :
+                DMEntityUtils.dmEntityIsFolder(row) ? 'folder' :
+                    'workspace'
+        }`
     },
     {
         id: 'versionUpdateDate',
@@ -73,7 +77,11 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'length',
         sticky: false,
         displayName: 'Size',
-        cell: (row: any) => `${ FilesDataSource.humanFileSize(row.length, 1024) }`
+        cell: (row: any) => `${ 
+            DMEntityUtils.dmEntityIsDocument(row) ? 
+                EntityDataSource.humanFileSize(row.length, 1024) :
+                '-'
+        }`
     },
     {
         id: 'extension',
