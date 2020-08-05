@@ -18,11 +18,11 @@
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
   <mat-row *matRowDef="let row; columns: displayedColumns;"
-
+           (dblclick)="goToDocument(row)"
+           (click)="onSelect(row)"
+           [ngClass]="{'selected' : row == selected}"
            matRipple [@animate]="{value:'*',params:{y:'100%'}}"
   >
-<!--    (click)="onSelect(row)"
-    [ngClass]="{'selected' : row == selected}"-->
   </mat-row>
 
 
