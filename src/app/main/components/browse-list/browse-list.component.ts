@@ -1,8 +1,7 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
-import {DEFAULT_DISPLAYED_COLUMNS} from 'app/main/file-manager/file-data-source';
-import {EntityDataSource} from 'app/main/file-manager/entity-data-source';
+import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DocumentUtils} from 'app/main/utils/document-utils';
