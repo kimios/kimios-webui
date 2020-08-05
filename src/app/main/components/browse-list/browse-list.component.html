@@ -21,6 +21,7 @@
            (dblclick)="goToDocument(row)"
            (click)="onSelect(row)"
            [ngClass]="{'selected' : row == selected}"
+           class="cursor-pointer"
            matRipple [@animate]="{value:'*',params:{y:'100%'}}"
   >
   </mat-row>
