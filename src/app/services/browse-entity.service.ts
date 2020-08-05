@@ -510,6 +510,15 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     checkEntityInCache(entityId: number): boolean {
       return this.entities.get(entityId) !== null && this.entities.get(entityId) !== undefined;
     }
+
+    goInContainerEntity(entity: DMEntity): void {
+        this.selectedEntityFromGridOrTree$.next(entity);
+        const currentPath = this.currentPath.getValue();
+        if (currentPath.filter(dir => dir.uid === entity.uid).length === 0) {
+            currentPath.push(entity);
+            this.currentPath.next(currentPath);
+        }
+    }
 }
 
 
