@@ -39,6 +39,17 @@ export class EntityDataSource extends DataSource<DMEntity> {
 }
 
 export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
+   /* {
+        id: 'icon',
+        matColumnDef: 'entityType',
+        position: 1,
+        matHeaderCellDef: 'entityType',
+        sticky: false,
+        displayName: '',
+        cell: (row: Document) => `${
+            DMEntityUtils.dmEntityIsDocument(row) ? 'document' : 'folder'
+        }`
+    },*/
     {
         id: 'name',
         matColumnDef: 'name',
@@ -48,7 +59,7 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         displayName: 'Name',
         cell: null
     },
-    {
+    /*{
         id: 'documentTypeName',
         matColumnDef: 'documentTypeName',
         position: 2,
@@ -60,7 +71,7 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
                 DMEntityUtils.dmEntityIsFolder(row) ? 'folder' :
                     'workspace'
         }`
-    },
+    },*/
     {
         id: 'versionUpdateDate',
         matColumnDef: 'versionUpdateDate',
@@ -70,7 +81,7 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         displayName: 'Last Update',
         cell: (row: Document) => `${ moment(row.updateDate).fromNow() }`
     },
-    {
+    /*{
         id: 'length',
         matColumnDef: 'length',
         position: 4,
@@ -82,7 +93,7 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
                 EntityDataSource.humanFileSize(row.length, 1024) :
                 '-'
         }`
-    },
+    },*/
     {
         id: 'extension',
         matColumnDef: 'extension',
@@ -90,7 +101,13 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'extension',
         sticky: false,
         displayName: 'File Type',
-        cell: null
+        cell: (row: Document) => `${
+            DMEntityUtils.dmEntityIsDocument(row) ? 
+                row.extension != null && row.extension !== undefined ? 
+                    row.extension :
+                    'unknown' :
+                '-'
+        }`
     }
     /*{
         id: 'creationDate',

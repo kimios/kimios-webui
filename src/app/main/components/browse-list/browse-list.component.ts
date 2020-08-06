@@ -7,6 +7,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'browse-list',
@@ -26,11 +27,13 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   constructor(
       private bes: BrowseEntityService,
-      private router: Router
+      private router: Router,
+      private documentDetailService: DocumentDetailService
   ) {
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
     });
+    this.displayedColumns.push('actions');
     // Set the private defaults
     this._unsubscribeAll = new Subject();
   }
@@ -59,5 +62,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     } else {
       DocumentUtils.navigateToFile(this.router, entityFromList.uid);
     }
+  }
+
+  handleFileDownload(versionId: number): void {
+    this.documentDetailService.downloadDocumentVersion(versionId);
   }
 }
