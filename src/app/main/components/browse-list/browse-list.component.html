@@ -1,4 +1,4 @@
-<mat-table #table [dataSource]="dataSource" [@animateStagger]="{value:'50'}" matSort
+<mat-table #table [dataSource]="dataSource" matSort
            matSort matSortActive="updateDate" matSortDirection="desc" matSortDisableClear>
 
   <ng-container
@@ -38,7 +38,7 @@
            (click)="onSelect(row)"
            [ngClass]="{'selected' : row == selected}"
            class="cursor-pointer"
-           matRipple [@animate]="{value:'*',params:{y:'100%'}}"
+           matRipple
   >
   </mat-row>
 
