@@ -21,8 +21,8 @@ const fileManagerRoutes: Routes = [
         children: [
             {
                 path: '',
-                component: BrowseComponent,
-                canActivate: [ LoggedInGuard ]
+                redirectTo: '/overview',
+                pathMatch: 'full'
             },
             {
                 path: 'doc/:documentId',
@@ -62,6 +62,11 @@ const fileManagerRoutes: Routes = [
     },
     {
         path: 'workspaces',
+        component: WorkspacesComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'workspaces/:entityId',
         component: WorkspacesComponent,
         canActivate: [ LoggedInGuard ]
     },
