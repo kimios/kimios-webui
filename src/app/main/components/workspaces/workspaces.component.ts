@@ -16,7 +16,9 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   constructor(
       private browseEntityService: BrowseEntityService,
       private location: Location
-  ) { }
+  ) {
+    console.log('in workspace constructor');
+  }
 
   ngOnInit(): void {
     this.browseEntityService.selectedEntity$.subscribe(

@@ -2,11 +2,8 @@ import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-
-export enum ListingType {
-  GRID = 1,
-  LIST = 2
-}
+import {WorkspaceSessionService} from 'app/services/workspace-session.service';
+import {ListingType} from 'app/main/model/listing-type.enum';
 
 @Component({
   selector: 'entity-listing',
@@ -16,9 +13,7 @@ export enum ListingType {
 export class EntityListingComponent implements OnInit {
 
   entities$: BehaviorSubject<Array<DMEntity>>;
-  @Input()
-  gridOrList: ListingType;
-  private default = ListingType.GRID;
+
   isGrid: BehaviorSubject<boolean>;
 
   @Input()
@@ -26,18 +21,15 @@ export class EntityListingComponent implements OnInit {
 
   constructor(
       private browseEntityService: BrowseEntityService,
-      private cd: ChangeDetectorRef
+      private cd: ChangeDetectorRef,
+      private workspaceSessionService: WorkspaceSessionService
   ) {
     this.entities$ = new BehaviorSubject<Array<DMEntity>>([]);
-    if (this.gridOrList === null
-        || this.gridOrList === undefined) {
-      this.gridOrList = this.default;
-    }
-    this.isGrid = new BehaviorSubject(this.gridOrList === ListingType.GRID);
+    this.isGrid = new BehaviorSubject(this.workspaceSessionService.gridOrList === ListingType.GRID);
   }
 
   ngOnInit(): void {
-    this.isGrid.next(this.gridOrList === ListingType.GRID);
+    this.isGrid.next(this.workspaceSessionService.gridOrList === ListingType.GRID);
 
     this.browseEntityService.entitiesToDisplay$
         .subscribe(
@@ -49,7 +41,7 @@ export class EntityListingComponent implements OnInit {
   }
 
   onValChange(value: any): void {
-    this.gridOrList = Number(value);
-    this.isGrid.next(this.gridOrList === ListingType.GRID);
+    this.workspaceSessionService.gridOrList = Number(value);
+    this.isGrid.next(this.workspaceSessionService.gridOrList === ListingType.GRID);
   }
 }
