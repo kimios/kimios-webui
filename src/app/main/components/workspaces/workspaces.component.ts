@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {PageEvent} from '@angular/material';
 
 @Component({
   selector: 'app-workspaces',
@@ -12,6 +13,12 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   @ViewChild('contentColumn') contentColumn: ElementRef;
   @ViewChild('browsePathRow') browsePathRow: ElementRef;
   @ViewChild('treeAndGridRow') treeAndGridRow: ElementRef;
+
+  // paginator
+  length: number;
+  pageSize: number;
+  pageSizeOptions: number[] = [10, 20, 50];
+  pageIndex: number;
 
   constructor(
       private browseEntityService: BrowseEntityService,
@@ -32,6 +39,10 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
           }
         }
     );
+
+    this.browseEntityService.totalEntitiesToDisplay$.subscribe(
+        next => this.length = next.length
+    );
   }
 
   ngAfterViewInit(): void {
@@ -40,4 +51,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
    }
 
+  paginatorHandler($event: PageEvent): void {
+    this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
+  }
 }

@@ -7,7 +7,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {SearchEntityService} from './searchentity.service';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 
-const PAGE_SIZE_DEFAULT = 20;
+const PAGE_SIZE_DEFAULT = 10;
 
 export enum EXPLORER_MODE {
     BROWSE = 0,
