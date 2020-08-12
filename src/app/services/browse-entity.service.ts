@@ -237,7 +237,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     setHistoryNewEntry(uid: number): void {
-      if (this.historyCurrentIndex.getValue() < this.history.length - 1) {
+      if (this.historyCurrentIndex.getValue() < this.history.length - 1) {
           this.history = this.history.slice(0, this.historyCurrentIndex.getValue() + 1);
       }
         this.history.push(uid);
