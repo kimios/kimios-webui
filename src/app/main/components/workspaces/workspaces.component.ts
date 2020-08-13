@@ -2,6 +2,8 @@ import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/
 import { Location } from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {PageEvent} from '@angular/material';
+import {WorkspaceSessionService} from 'app/services/workspace-session.service';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-workspaces',
@@ -22,7 +24,8 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
   constructor(
       private browseEntityService: BrowseEntityService,
-      private location: Location
+      private location: Location,
+      private workspaceSessionService: WorkspaceSessionService
   ) {
     console.log('in workspace constructor');
   }
@@ -42,6 +45,16 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
     this.browseEntityService.totalEntitiesToDisplay$.subscribe(
         next => this.length = next.length
+    );
+
+    this.workspaceSessionService.sort.pipe(
+        filter(next => next != null)
+    ).subscribe(
+        next => this.browseEntityService.makePage(0, this.pageSize, next)
+    );
+
+    this.browseEntityService.pageIndex.subscribe(
+        next => this.pageIndex = next
     );
   }
 

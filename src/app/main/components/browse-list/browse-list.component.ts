@@ -8,6 +8,16 @@ import {DocumentUtils} from 'app/main/utils/document-utils';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {Sort} from '@angular/material';
+import {WorkspaceSessionService} from 'app/services/workspace-session.service';
+import {DMEntitySort} from 'app/main/model/dmentity-sort';
+import {filter} from 'rxjs/operators';
+
+const sortMapping = {
+  'name': 'name',
+  'versionUpdateDate': 'updateDate',
+  'extension': 'extension'
+};
 
 @Component({
   selector: 'browse-list',
@@ -24,11 +34,13 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   // Private
   private _unsubscribeAll: Subject<any>;
   selected: DMEntity;
+  sort: DMEntitySort = { name: 'name', direction: 'asc' };
 
   constructor(
       private bes: BrowseEntityService,
       private router: Router,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private workspaceSessionService: WorkspaceSessionService
   ) {
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
@@ -40,6 +52,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.dataSource = new EntityDataSource(this.entities$);
+    this.workspaceSessionService.sort.pipe(
+        filter(next => next != null && next !== undefined)
+    ).subscribe(
+        next => this.sort = next
+    );
   }
 
   /**
@@ -66,5 +83,15 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   handleFileDownload(versionId: number): void {
     this.documentDetailService.downloadDocumentVersion(versionId);
+  }
+
+  sortData($event: Sort): void {
+    if (sortMapping[$event.active] !== undefined && sortMapping != null) {
+      const direction = ($event.direction !== 'asc' && $event.direction !== 'desc') ?
+        'asc' :
+        $event.direction;
+
+      this.workspaceSessionService.sort.next({name: sortMapping[$event.active], direction: direction});
+    }
   }
 }

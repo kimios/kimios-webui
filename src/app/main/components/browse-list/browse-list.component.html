@@ -1,5 +1,5 @@
 <mat-table #table [dataSource]="dataSource" matSort
-           matSort matSortActive="updateDate" matSortDirection="desc" matSortDisableClear>
+           matSort matSortActive="{{sort.name}}" matSortDirection="{{sort.direction}}" matSortDisableClear (matSortChange)="sortData($event)">
 
   <ng-container
           *ngFor="let col of columnsDescription"

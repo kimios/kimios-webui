@@ -6,6 +6,8 @@ import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, t
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {SearchEntityService} from './searchentity.service';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
+import {DMEntitySort} from 'app/main/model/dmentity-sort';
+import {WorkspaceSessionService} from './workspace-session.service';
 
 const PAGE_SIZE_DEFAULT = 10;
 
@@ -33,6 +35,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public entitiesPathIds: Map<number, number[]>;
 
     public entities: Map<number, DMEntity>;
+    public entitiesSorted: Array<DMEntity>;
 
     public currentPath: BehaviorSubject<Array<DMEntity>>;
 
@@ -54,6 +57,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
+    sort: DMEntitySort;
     onNewWorkspace: Subject<number>;
     openEntityFromFileUploadList$: Subject<number>;
 
@@ -64,7 +68,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private documentService: DocumentService,
       private workspaceService: WorkspaceService,
       private folderService: FolderService,
-      private searchEntityService: SearchEntityService
+      private searchEntityService: SearchEntityService,
+      private workspaceSessionService: WorkspaceSessionService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.selectedFolder$ = new BehaviorSubject<DMEntity>(undefined);
@@ -198,7 +203,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         ).subscribe(
             res => {
                 this.totalEntitiesToDisplay$.next(res);
-                this.makePage(this.pageIndex.getValue(), this.pageSize);
+                // reset this variable to null to inform it has to be filled
+                this.entitiesSorted = null;
+                this.makePage(this.pageIndex.getValue(), this.pageSize, this.workspaceSessionService.sort.getValue());
             }
         );
 
@@ -395,18 +402,64 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         }
     }
 
-    public makePage(pageIndex: number, pageSize: number): void {
-        this.pageSize = pageSize;
+    private isSortedRequired(sort: DMEntitySort): boolean {
+        return (
+            sort != null
+            && sort !== undefined
+            && this.sort != null
+            && this.sort !== undefined
+            && (
+                this.sort.name !== sort.name
+                || this.sort.direction !== sort.direction
+            )
+        );
+    }
+
+    public makePage(pageIndex: number, pageSize: number, sort?: DMEntitySort): void {
+        if (pageSize != null && pageSize !== undefined) {
+            this.pageSize = pageSize;
+        }
         this.pageIndex.next(pageIndex);
+        const sortRequired = this.isSortedRequired(sort);
+        if (sort != null && sort !== undefined) {
+            this.sort = sort;
+        }
         const indexBeginning = (this.pageIndex.getValue()) * this.pageSize;
         const indexEnd = indexBeginning + this.pageSize;
         if (this.explorerMode.getValue() === EXPLORER_MODE.BROWSE) {
-            this.entitiesToDisplay$.next(this.totalEntitiesToDisplay$.getValue().slice(indexBeginning, indexEnd));
+            if (sortRequired || this.entitiesSorted == null || this.entitiesSorted === undefined) {
+                if (this.sort != null && this.sort !== undefined) {
+                    this.entitiesSorted = this.sortEntities(this.totalEntitiesToDisplay$.getValue().slice(), this.sort);
+                } else {
+                    this.entitiesSorted = this.totalEntitiesToDisplay$.getValue().slice();
+                }
+            }
+            this.entitiesToDisplay$.next(this.entitiesSorted.slice(indexBeginning, indexEnd));
         } else {
             this.searchEntityService.changePage(this.pageIndex.getValue(), this.pageSize).subscribe(
                 next => this.entitiesToDisplay$.next(next)
             );
         }
+    }
+
+    private sortEntities(entities: Array<DMEntity>, sort: DMEntitySort): Array<DMEntity> {
+        let fun = null;
+        const sortOp = (sort.direction === 'asc') ? 1 : -1;
+        const defaultFun = (a, b) => {
+            return sortOp * a.name.localeCompare(b.name);
+        };
+        switch (sort.name) {
+            case 'name': fun = defaultFun;
+                break;
+            case 'extension': fun = defaultFun;
+                break;
+            case 'updateDate': fun = (a, b) => {
+                return sortOp * (a.updateDate < b.updateDate ? -1 : 1);
+            };
+                break;
+            default : fun = defaultFun;
+        }
+        return entities.sort(fun);
     }
 
     public deleteCacheEntry(uid: number): void {
