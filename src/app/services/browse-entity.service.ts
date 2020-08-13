@@ -445,21 +445,41 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     private sortEntities(entities: Array<DMEntity>, sort: DMEntitySort): Array<DMEntity> {
         let fun = null;
         const sortOp = (sort.direction === 'asc') ? 1 : -1;
-        const defaultFun = (a, b) => {
-            return sortOp * a.name.localeCompare(b.name);
-        };
         switch (sort.name) {
-            case 'name': fun = defaultFun;
+            case 'name':
+                fun = (a, b) => {
+                    return sortOp * (a.name.localeCompare(b.name));
+                };
                 break;
-            case 'extension': fun = defaultFun;
+            case 'extension':
+                fun = (a, b) => {
+                    let ret = -1;
+                    if (a.extension == null) {
+                        if (b.extension == null) {
+                            ret = 0;
+                        } else {
+                            ret = 1;
+                        }
+                    } else {
+                        if (b.extension == null) {
+                            ret = -1;
+                        } else {
+                            ret = a.extension.localeCompare(b.extension);
+                        }
+                    }
+                    return ret === 0 ?
+                            a.name.localeCompare(b.name) :
+                            sortOp * ret;
+                };
                 break;
-            case 'updateDate': fun = (a, b) => {
-                return sortOp * (a.updateDate < b.updateDate ? -1 : 1);
-            };
+            case 'updateDate':
+                fun = (a, b) => {
+                    return sortOp * (a.updateDate < b.updateDate ? -1 : 1);
+                };
                 break;
-            default : fun = defaultFun;
+            default :
         }
-        return entities.sort(fun);
+        return fun != null ? entities.sort(fun) : entities;
     }
 
     public deleteCacheEntry(uid: number): void {
