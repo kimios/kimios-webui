@@ -21,7 +21,7 @@ const fileManagerRoutes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: '/overview',
+                redirectTo: '/workspaces',
                 pathMatch: 'full'
             },
             {
