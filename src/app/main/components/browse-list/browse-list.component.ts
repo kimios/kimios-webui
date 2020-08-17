@@ -28,7 +28,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   @Input()
   entities$: BehaviorSubject<Array<DMEntity>>;
-  private dataSource: EntityDataSource;
+  dataSource: EntityDataSource;
   displayedColumns = [];
   columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
   // Private
