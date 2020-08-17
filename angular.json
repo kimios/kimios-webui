@@ -25,7 +25,8 @@
                         "assets": [
                             "src/favicon.ico",
                             "src/assets",
-                            "src/assets_kimios"
+                            "src/assets_kimios",
+                            "src/assets_kimios/icons/kimios-favico.ico"
                         ],
                         "styles": [
                             "src/styles.scss"
