@@ -9,7 +9,7 @@ export const DEFAULT_DMENTITY_SORT = <DMEntitySort>{name: 'name', direction: 'as
   providedIn: 'root'
 })
 export class WorkspaceSessionService {
-  private _gridOrList: ListingType = ListingType.GRID;
+  private _gridOrList: ListingType = ListingType.LIST;
 
   public sort: BehaviorSubject<DMEntitySort> = new BehaviorSubject<DMEntitySort>(DEFAULT_DMENTITY_SORT);
 
