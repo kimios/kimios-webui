@@ -1,10 +1,3 @@
-<p>
-  Choose display:
-  <mat-button-toggle-group name="displayGridOrList" aria-label="Display" #groupDisplay="matButtonToggleGroup">
-    <mat-button-toggle (change)="onValChange($event.value)" value="1">GRID</mat-button-toggle>
-    <mat-button-toggle (change)="onValChange($event.value)" value="2">LIST</mat-button-toggle>
-  </mat-button-toggle-group>
-</p>
 <ng-container *ngIf="isGrid | async; else displayListTemplate">
   <browse-grid [entities$]="entities$" ></browse-grid>
 </ng-container>
