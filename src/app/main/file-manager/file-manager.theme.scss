@@ -5,6 +5,7 @@
     $is-dark: map-get($theme, is-dark);
 
     $kimios-green: greenyellow;
+    $kimios-app-background-color: lightgrey;
 
     file-list {
 
@@ -29,5 +30,9 @@
                 color: $kimios-green;
             }
         }
+    }
+
+    app {
+        background-color: $kimios-app-background-color;
     }
 }
