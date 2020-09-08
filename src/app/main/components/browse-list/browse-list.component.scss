@@ -1,3 +1,7 @@
 .mat-row:hover {
   background-color: lightgrey;
 }
+
+.mat-row, .mat-header-row {
+  border-bottom-width: 0px;
+}
