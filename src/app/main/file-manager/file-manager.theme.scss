@@ -1,11 +1,10 @@
+@import "kimios-global";
+
 @mixin file-manager-theme($theme) {
 
     $background: map-get($theme, background);
     $accent: map-get($theme, accent);
     $is-dark: map-get($theme, is-dark);
-
-    $kimios-green: greenyellow;
-    $kimios-app-background-color: lightgrey;
 
     file-list {
 
@@ -29,6 +28,7 @@
             span.nav-link-title, mat-icon.nav-link-icon {
                 color: $kimios-green;
             }
+            background-color: $kimios-navbar-background-color !important;
         }
     }
 
