@@ -5,3 +5,9 @@
 .mat-row, .mat-header-row {
   border-bottom-width: 0px;
 }
+
+mat-row {
+  &.selected {
+    background-color: lightgrey;
+  }
+}
