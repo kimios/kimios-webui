@@ -35,4 +35,12 @@
     app {
         background-color: $kimios-app-background-color;
     }
+
+    #kimios_site_link {
+        color: $kimios-green;
+    }
+
+    .external_link {
+        color: $kimios-app-default-font-color;
+    }
 }
