@@ -1,5 +1,7 @@
+@import "src/app/main/file-manager/kimios-global";
+
 .mat-row:hover {
-  background-color: lightgrey;
+  background-color: $kimios-app-background-color;
 }
 
 .mat-row, .mat-header-row {
@@ -8,6 +10,6 @@
 
 mat-row {
   &.selected {
-    background-color: lightgrey;
+    background-color: $kimios-app-background-color;
   }
 }
