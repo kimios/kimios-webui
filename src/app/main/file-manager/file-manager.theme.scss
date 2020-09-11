@@ -43,4 +43,14 @@
     .external_link {
         color: $kimios-app-default-font-color;
     }
+
+    navbar {
+        .navbar-scroll-container {
+            background: initial;
+        }
+    }
+
+    fuse-sidebar {
+        background-color: $kimios-navbar-background-color;
+    }
 }
