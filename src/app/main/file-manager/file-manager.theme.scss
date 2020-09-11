@@ -54,4 +54,9 @@
         background-color: $kimios-navbar-background-color;
         box-shadow: none;
     }
+
+    .mat-toolbar {
+        box-shadow: none;
+        background-color: $kimios-app-default-background-color !important;
+    }
 }
