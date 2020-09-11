@@ -26,7 +26,7 @@
         <div><mat-icon title="Download document" (click)="handleFileDownload(element.lastVersionId)">get_app</mat-icon></div>
         <div><mat-icon title="Lock document">lock_open</mat-icon></div>
         <div><mat-icon title="View document" (click)="goToDocument(element)">visibility</mat-icon></div>
-        <div><mat-icon title="See more available actions">more_horiz</mat-icon></div>
+        <div><button mat-button [matMenuTriggerFor]="menu"><mat-icon title="See more available actions">more_horiz</mat-icon></button></div>
       </div>
     </mat-cell>
   </ng-container>
@@ -44,3 +44,10 @@
 
 
 </mat-table>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
+  <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
+  <button mat-menu-item><mat-icon>warning</mat-icon> Permissions</button>
+  <button mat-menu-item><mat-icon>delete</mat-icon> Delete</button>
+</mat-menu>
