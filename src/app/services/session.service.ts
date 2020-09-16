@@ -14,6 +14,7 @@ export class SessionService implements OnDestroy {
     private _sessionToken: string = null;
     private _sessionAlive: boolean;
     private intervalId: number;
+    private _currentUser: User;
 
     constructor(
         private securityService: SecurityService,
@@ -70,12 +71,25 @@ export class SessionService implements OnDestroy {
         this._sessionAlive = alive;
     }
 
+    get currentUser(): User {
+        return this._currentUser;
+    }
+
+    getCurrentUserObs(): Observable<User> {
+        return (this._currentUser == null
+        || this._currentUser === undefined) ?
+            this.retrieveUserData() :
+            of(this._currentUser);
+    }
+
     readSessionTokenFromCookie(): string {
         return this.cookieService.check(KIMIOS_COOKIE) ? this.cookieService.get(KIMIOS_COOKIE) : '';
     }
 
     retrieveUserData(): Observable<User> {
-        return this.securityService.getUser(this.sessionToken);
+        return this.securityService.getUser(this.sessionToken).pipe(
+            tap(res => this._currentUser = res)
+        );
     }
 
     logout(): void {

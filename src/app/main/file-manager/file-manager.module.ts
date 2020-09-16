@@ -80,6 +80,7 @@ import {SearchQueriesComponent} from 'app/main/components/search-queries/search-
 import {SettingsComponent} from 'app/main/components/settings/settings.component';
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
 import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.component';
+import {EntityListLockButtonComponent} from 'app/main/components/entity-list-lock-button/entity-list-lock-button.component';
 
 
 @NgModule({
@@ -126,7 +127,8 @@ import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.c
         SearchQueriesComponent,
         SettingsComponent,
         OverviewComponent,
-        BrowseListComponent
+        BrowseListComponent,
+        EntityListLockButtonComponent
     ],
     imports: [
         FileManagerRoutingModule,
