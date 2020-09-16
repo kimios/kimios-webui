@@ -1,4 +1,5 @@
 <mat-icon title="{{lockMessage}}"
-          [class.cursor-pointer]="!disableButton">
+          [class.cursor-pointer]="!disableButton"
+          (click)="handleClick()">
   {{iconName}}
 </mat-icon>

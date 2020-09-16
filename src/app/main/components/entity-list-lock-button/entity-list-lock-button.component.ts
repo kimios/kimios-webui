@@ -2,7 +2,10 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {LockPossibility} from 'app/main/model/lock-possibility';
-import {tap} from 'rxjs/operators';
+import {concatMap, map} from 'rxjs/operators';
+import {DocumentDetailService} from 'app/services/document-detail.service';
+import {combineLatest, of} from 'rxjs';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'entity-list-lock-button',
@@ -12,20 +15,25 @@ import {tap} from 'rxjs/operators';
 export class EntityListLockButtonComponent implements OnInit {
 
   @Input()
-  doc: KimiosDocument;
+  docId: number;
   lockPossibility: LockPossibility;
   iconName: string;
   disableButton: boolean;
   lockMessage: string;
 
   constructor(
-      private cacheSecurityService: CacheSecurityService
+      private cacheSecurityService: CacheSecurityService,
+      private documentDetailService: DocumentDetailService,
+      private browseEntityService: BrowseEntityService
   ) { }
 
   ngOnInit(): void {
-    this.cacheSecurityService.getLockPossibility(this.doc).pipe(
-        tap(lockPossibility => this.lockPossibility = lockPossibility),
-        tap(lockPossibility => this.computeLockMessage(lockPossibility, this.doc))
+    this.cacheSecurityService.getLockPossibility(this.docId).pipe(
+        concatMap(lockPossibility => combineLatest(of(lockPossibility), this.browseEntityService.getDocument(this.docId))),
+        map(([lockPossibility, kimiosDocument]) => {
+          this.lockPossibility = lockPossibility;
+          this.computeLockMessage(lockPossibility, kimiosDocument);
+        })
     ).subscribe();
   }
 
@@ -57,6 +65,22 @@ export class EntityListLockButtonComponent implements OnInit {
         this.disableButton = true;
         this.iconName = 'lock_open';
         break;
+      }
+    }
+  }
+
+  handleClick(): void {
+    if (!this.disableButton) {
+      if (this.lockPossibility === LockPossibility.CAN_LOCK) {
+        this.documentDetailService.checkOut(this.docId).subscribe(
+            next => this.ngOnInit()
+        );
+      } else {
+        if (this.lockPossibility === LockPossibility.CAN_UNLOCK) {
+          this.documentDetailService.checkIn(this.docId).subscribe(
+              next => this.ngOnInit()
+          );
+        }
       }
     }
   }

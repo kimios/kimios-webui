@@ -1,13 +1,13 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {SessionService} from './session.service';
-import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from '../kimios-client-api';
+import {SessionService} from 'app/services/session.service';
+import {DMEntity, Document as KimiosDocument, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from 'app/kimios-client-api';
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
-import {SearchEntityService} from './searchentity.service';
+import {SearchEntityService} from 'app/services/searchentity.service';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {WorkspaceSessionService} from './workspace-session.service';
+import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 
 const PAGE_SIZE_DEFAULT = 10;
 
@@ -486,6 +486,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.loadedEntities.delete(uid);
     }
 
+    public deleteCacheDocumentEntry(uid: number): void {
+        this.entities.delete(uid);
+    }
+
     deleteEntity(entity: DMEntity): void {
         if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
             this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).subscribe(
@@ -591,6 +595,14 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             currentPath.push(entity);
             this.currentPath.next(currentPath);
         }
+    }
+
+    getDocument(docId: number): Observable<KimiosDocument> {
+        return this.entities.get(docId) != null ?
+            of(this.entities.get(docId)) :
+            this.documentService.getDocument(this.sessionService.sessionToken, docId).pipe(
+                tap(doc => this.entities.set(docId, doc))
+            );
     }
 }
 

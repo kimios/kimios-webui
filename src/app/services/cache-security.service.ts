@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {SessionService} from './session.service';
+import {SessionService} from 'app/services/session.service';
 import {combineLatest, Observable, of} from 'rxjs';
-import {Document as KimiosDocument, SecurityService} from 'app/kimios-client-api';
-import {concatMap, map, tap} from 'rxjs/operators';
+import {SecurityService} from 'app/kimios-client-api';
+import {concatMap, tap} from 'rxjs/operators';
 import {LockPossibility} from 'app/main/model/lock-possibility';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 export interface SecurityEnt {
   read: boolean;
@@ -21,7 +22,8 @@ export class CacheSecurityService {
 
   constructor(
       private sessionService: SessionService,
-      private securityService: SecurityService
+      private securityService: SecurityService,
+      private browseEntityService: BrowseEntityService
   ) {
     this._securitiesMap = new Map<number, SecurityEnt>();
     this._lockPossibilityMap = new Map<number, LockPossibility>();
@@ -51,16 +53,17 @@ export class CacheSecurityService {
     );
   }
 
-  getLockPossibility(doc: KimiosDocument): Observable<LockPossibility> {
-    return this._lockPossibilityMap.get(doc.uid) ?
-        of(this._lockPossibilityMap.get(doc.uid)) :
-        this.computeLockPossibility(doc);
+  getLockPossibility(docId: number): Observable<LockPossibility> {
+    return this._lockPossibilityMap.get(docId) ?
+        of(this._lockPossibilityMap.get(docId)) :
+        this.computeLockPossibility(docId);
   }
 
-  private computeLockPossibility(doc: KimiosDocument): Observable<LockPossibility> {
+  private computeLockPossibility(docId: number): Observable<LockPossibility> {
     return this.sessionService.getCurrentUserObs().pipe(
-        concatMap(currentUser => combineLatest(of(currentUser), this.getSecurityEnt(doc.uid))),
-        map(([currentUser, secEnt]) => {
+        concatMap(currentUser => combineLatest(of(currentUser), this.browseEntityService.getDocument(docId))),
+        concatMap(([currentUser, doc]) => combineLatest(of(currentUser), of(doc), this.getSecurityEnt(doc.uid))),
+        concatMap(([currentUser, doc, secEnt]) => {
           let lockPossibility: LockPossibility = null;
           if (doc.checkedOut) {
             // checked out by current user
@@ -79,8 +82,17 @@ export class CacheSecurityService {
             }
           }
           this._lockPossibilityMap.set(doc.uid, lockPossibility);
-          return lockPossibility;
+          return of(lockPossibility);
         })
     );
+  }
+
+  invalidSecurityEntry(entityId: number): void {
+    this._securitiesMap.delete(entityId);
+  }
+
+  invalidLockEntry(entityId: number): void {
+    this._lockPossibilityMap.delete(entityId);
+    this.browseEntityService.deleteCacheDocumentEntry(entityId);
   }
 }

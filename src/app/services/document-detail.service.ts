@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {DataTransaction, DocumentService, DocumentVersionService, FiletransferService, Document as KimiosDocument} from 'app/kimios-client-api';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {concatMap, map, tap} from 'rxjs/operators';
-import {SessionService} from './session.service';
-import {TagService} from './tag.service';
+import {SessionService} from 'app/services/session.service';
+import {TagService} from 'app/services/tag.service';
 import {Tag} from 'app/main/model/tag';
 import {APP_CONFIG} from 'app/app-config/config';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {CacheSecurityService} from 'app/services/cache-security.service';
 
 
 @Injectable({
@@ -19,7 +20,8 @@ export class DocumentDetailService {
       private documentVersionService: DocumentVersionService,
       private sessionService: SessionService,
       private filetransferService: FiletransferService,
-      private sanitizer: DomSanitizer
+      private sanitizer: DomSanitizer,
+      private cacheSecurityService: CacheSecurityService
   ) {
 
   }
@@ -84,4 +86,22 @@ export class DocumentDetailService {
               )
           );
   }
+
+  checkIn(documentId: number): Observable<any> {
+      return this.documentService.checkinDocument(this.sessionService.sessionToken, documentId).pipe(
+          concatMap(result => {
+              this.cacheSecurityService.invalidLockEntry(documentId);
+              return of(result);
+          })
+      );
+  }
+
+    checkOut(documentId: number): Observable<any> {
+        return this.documentService.checkoutDocument(this.sessionService.sessionToken, documentId).pipe(
+            concatMap(result => {
+                this.cacheSecurityService.invalidLockEntry(documentId);
+                return of(result);
+            })
+        );
+    }
 }
