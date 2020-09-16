@@ -53,7 +53,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dataSource = new EntityDataSource(this.entities$);
     this.workspaceSessionService.sort.pipe(
-        filter(next => next != null && next !== undefined)
+        filter(next => next !== undefined && next != null)
     ).subscribe(
         next => this.sort = next
     );
