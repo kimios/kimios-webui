@@ -9,7 +9,7 @@
             *matHeaderCellDef
             mat-sort-header="{{col.matColumnDef}}"
     > {{col.displayName}} </mat-header-cell>
-    <mat-cell *matCellDef="let element">
+    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
       <!-- display folder icon for folders and workspaces -->
       <mat-icon *ngIf="col.id == 'name' && element.type != 3" class="type-icon" fxFlex="40px">folder</mat-icon>
       <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
@@ -23,12 +23,17 @@
     <mat-cell *matCellDef="let element">
       <!-- only for documents -->
       <div *ngIf="element.type === 3" fxLayout="row" fxLayoutAlign="space-between center" style="margin: auto;" fxLayoutGap="10px">
-        <div><mat-icon title="Download document" (click)="handleFileDownload(element.lastVersionId)">get_app</mat-icon></div>
+        <div><mat-icon
+                title="Download document"
+                (click)="handleFileDownload(element.lastVersionId)"
+                [class.cursor-pointer]="true">
+          get_app
+        </mat-icon></div>
         <div>
           <entity-list-lock-button [docId]="element.uid"></entity-list-lock-button>
         </div>
-        <div><mat-icon title="View document">visibility</mat-icon></div>
-        <div><mat-icon title="See more available actions">more_horiz</mat-icon></div>
+        <div><mat-icon title="View document" [class.cursor-pointer]="true">visibility</mat-icon></div>
+        <div><mat-icon title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
       </div>
     </mat-cell>
   </ng-container>
@@ -39,7 +44,6 @@
            (dblclick)="goToDocument(row)"
            (click)="onSelect(row)"
            [ngClass]="{'selected' : row == selected}"
-           class="cursor-pointer"
            matRipple
   >
   </mat-row>
