@@ -1,3 +1,12 @@
-<p>
-  file-permissions works!
-</p>
+<div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+    <div fxLayout="row" fxLayoutAlign="start">
+        <span>
+            Permissions
+        </span>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+        <div [class.permission-cell-header]>Read</div>
+        <div [class.permission-cell-header]>Write</div>
+        <div [class.permission-cell-header]>Full</div>
+    </div>
+</div>
