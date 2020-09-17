@@ -32,8 +32,10 @@
         <div>
           <entity-list-lock-button [docId]="element.uid"></entity-list-lock-button>
         </div>
-        <div><mat-icon title="View document" [class.cursor-pointer]="true">visibility</mat-icon></div>
-        <div><mat-icon title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
+        <div><mat-icon title="View document" [class.cursor-pointer]="true"
+                       (click)="goToDocument(element)">visibility</mat-icon></div>
+        <div><mat-icon [matMenuTriggerFor]="docMenu"
+                       title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
       </div>
     </mat-cell>
   </ng-container>
@@ -51,7 +53,7 @@
 
 </mat-table>
 
-<mat-menu #menu="matMenu">
+<mat-menu #docMenu="matMenu">
   <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
   <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
   <button mat-menu-item><mat-icon>warning</mat-icon> Permissions</button>
