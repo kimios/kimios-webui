@@ -97,12 +97,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     }
   }
 
-    openPermissionsDialog(): void {
-      const dialogRef = this.dialog.open(FilePermissionsDialogComponent/*, {
+    openPermissionsDialog(entityId: number): void {
+      const dialogRef = this.dialog.open(FilePermissionsDialogComponent, {
         data: {
-          'uid': this.document.uid,
-          'name': this.document.name
+          'uid': entityId
         }
-      }*/);
+      });
     }
 }

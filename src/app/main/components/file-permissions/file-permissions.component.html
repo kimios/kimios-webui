@@ -1,12 +1,17 @@
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
     <div fxLayout="row" fxLayoutAlign="start">
         <span>
-            Permissions
+            Permissions ({{documentId}})
         </span>
     </div>
     <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
         <div [class.permission-cell-header]>Read</div>
         <div [class.permission-cell-header]>Write</div>
         <div [class.permission-cell-header]>Full</div>
+    </div>
+    <div *ngFor="let permission of permissions" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+        <div [class.permission-cell-header]>{{permission.read}}</div>
+        <div [class.permission-cell-header]>{{permission.write}}</div>
+        <div [class.permission-cell-header]>{{permission.fullAccess}}</div>
     </div>
 </div>

@@ -35,6 +35,7 @@
         <div><mat-icon title="View document" [class.cursor-pointer]="true"
                        (click)="goToDocument(element)">visibility</mat-icon></div>
         <div><mat-icon [matMenuTriggerFor]="docMenu"
+                       [matMenuTriggerData]="{uid: element.uid}"
                        title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
       </div>
     </mat-cell>
@@ -54,8 +55,10 @@
 </mat-table>
 
 <mat-menu #docMenu="matMenu">
-  <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
-  <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
-  <button mat-menu-item (click)="openPermissionsDialog()" ><mat-icon>warning</mat-icon> Permissions</button>
-  <button mat-menu-item><mat-icon>delete</mat-icon> Delete</button>
+  <ng-template matMenuContent let-uid="uid">
+    <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
+    <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
+    <button mat-menu-item (click)="openPermissionsDialog(uid)" ><mat-icon>warning</mat-icon> Permissions</button>
+    <button mat-menu-item><mat-icon>delete</mat-icon> Delete</button>
+  </ng-template>
 </mat-menu>
