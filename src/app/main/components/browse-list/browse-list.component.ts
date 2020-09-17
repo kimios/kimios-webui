@@ -8,10 +8,11 @@ import {DocumentUtils} from 'app/main/utils/document-utils';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {Sort} from '@angular/material';
+import {MatDialog, Sort} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {filter} from 'rxjs/operators';
+import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 
 const sortMapping = {
   'name': 'name',
@@ -40,7 +41,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       private bes: BrowseEntityService,
       private router: Router,
       private documentDetailService: DocumentDetailService,
-      private workspaceSessionService: WorkspaceSessionService
+      private workspaceSessionService: WorkspaceSessionService,
+      public dialog: MatDialog
   ) {
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
@@ -94,4 +96,13 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       this.workspaceSessionService.sort.next({name: sortMapping[$event.active], direction: direction});
     }
   }
+
+    openPermissionsDialog(): void {
+      const dialogRef = this.dialog.open(FilePermissionsDialogComponent/*, {
+        data: {
+          'uid': this.document.uid,
+          'name': this.document.name
+        }
+      }*/);
+    }
 }

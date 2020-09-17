@@ -81,6 +81,8 @@ import {SettingsComponent} from 'app/main/components/settings/settings.component
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
 import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.component';
 import {EntityListLockButtonComponent} from 'app/main/components/entity-list-lock-button/entity-list-lock-button.component';
+import {FilePermissionsComponent} from '../components/file-permissions/file-permissions.component';
+import {FilePermissionsDialogComponent} from '../components/file-permissions-dialog/file-permissions-dialog.component';
 
 
 @NgModule({
@@ -128,7 +130,9 @@ import {EntityListLockButtonComponent} from 'app/main/components/entity-list-loc
         SettingsComponent,
         OverviewComponent,
         BrowseListComponent,
-        EntityListLockButtonComponent
+        EntityListLockButtonComponent,
+        FilePermissionsComponent,
+        FilePermissionsDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -179,7 +183,8 @@ import {EntityListLockButtonComponent} from 'app/main/components/entity-list-loc
         UsersAndGroupsSelectionDialogComponent,
         EntityMoveDialogComponent,
         ContainerEntityCreationDialogComponent,
-        ContainerEntityDialogComponent
+        ContainerEntityDialogComponent,
+        FilePermissionsDialogComponent
     ],
     exports: [
         FileUploadListComponent,

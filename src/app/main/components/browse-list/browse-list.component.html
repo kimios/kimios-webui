@@ -56,6 +56,6 @@
 <mat-menu #docMenu="matMenu">
   <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
   <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
-  <button mat-menu-item><mat-icon>warning</mat-icon> Permissions</button>
+  <button mat-menu-item (click)="openPermissionsDialog()" ><mat-icon>warning</mat-icon> Permissions</button>
   <button mat-menu-item><mat-icon>delete</mat-icon> Delete</button>
 </mat-menu>
