@@ -1,8 +1,10 @@
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
-    <div fxLayout="row" fxLayoutAlign="start">
-        <span>
-            Permissions ({{documentId}})
-        </span>
+    <div fxLayout="row" fxLayoutAlign="start" >
+        <div fxFlex>
+            <span style="font-weight: bolder">
+                Permissions
+            </span>
+        </div>
     </div>
     <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
         <div [class.permission-cell-header]>Read</div>
@@ -13,7 +15,7 @@
         <div fxFlex>
             <div fxLayout="column" >
                 <div>
-                    <span>{{permission.fullName}}</span>
+                    <span style="font-weight: bolder">{{permission.fullName}}</span>
                 </div>
                 <div>
                     <span>{{permission.name + '@' + permission.source}}</span>
