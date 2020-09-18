@@ -68,6 +68,8 @@
         min-width: 120px;
         border-color: $kimios-green;
 
+        @extend .cursor-pointer;
+
         &.active {
             background-color: $kimios-green;
 
