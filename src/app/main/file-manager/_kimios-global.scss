@@ -3,4 +3,6 @@ $kimios-navbar-background-color: $kimios-app-default-background-color !global;
 $kimios-green: #48d12e;
 $kimios-app-background-color: #f7f9fd;
 $kimios-browse-tree-background-color: $kimios-app-background-color !global;
-$kimios-app-default-font-color: #838d99;
+$kimios-dark-grey: #838D99;
+$kimios-app-default-font-color: $kimios-dark-grey;
+

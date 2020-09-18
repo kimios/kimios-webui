@@ -101,7 +101,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       const dialogRef = this.dialog.open(FilePermissionsDialogComponent, {
         data: {
           'uid': entityId
-        }
+        },
+        panelClass: 'kimios-dialog'
       });
     }
 }

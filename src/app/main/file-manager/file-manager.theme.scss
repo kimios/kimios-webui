@@ -89,4 +89,13 @@
             font-weight: bold;
         }
     }
+
+    .kimios-dialog .mat-dialog-container {
+        padding: 15px;
+        border-radius: 10px;
+        border-color: $kimios-dark-grey;
+        border-width: 1px;
+        border-style: solid;
+        box-shadow: none;
+    }
 }
