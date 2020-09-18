@@ -59,4 +59,32 @@
         box-shadow: none;
         background-color: $kimios-app-default-background-color !important;
     }
+
+    .kimios-button {
+        border-radius: 5px;
+        border-width: 2px;
+        border-style: solid;
+        height: 40px !important;
+        min-width: 120px;
+        border-color: $kimios-green;
+
+        &.active {
+            background-color: $kimios-green;
+
+            span.kimios-button-text {
+                color: #F5F5F5;
+            }
+        }
+
+        &.inactive {
+            span.kimios-button-text {
+                color: $kimios-green;
+            }
+        }
+        span.kimios-button-text {
+            margin-left: 20px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+    }
 }
