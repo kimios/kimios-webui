@@ -604,6 +604,18 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 tap(doc => this.entities.set(docId, doc))
             );
     }
+
+    getEntity(entityId: number): Observable<DMEntity> {
+        return this.entities.get(entityId) != null ?
+            of(this.entities.get(entityId)) :
+            this.retrieveContainerEntity(entityId).pipe(
+                concatMap(
+                    res => (res === null || res === undefined || res === '') ?
+                        this.getDocument(entityId) :
+                        of(res)
+                )
+            );
+    }
 }
 
 
