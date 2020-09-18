@@ -9,7 +9,17 @@
         <div [class.permission-cell-header]>Write</div>
         <div [class.permission-cell-header]>Full</div>
     </div>
-    <div *ngFor="let permission of permissions" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+    <div *ngFor="let permission of permissions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
+        <div fxFlex>
+            <div fxLayout="column" >
+                <div>
+                    <span>{{permission.fullName}}</span>
+                </div>
+                <div>
+                    <span>{{permission.name + '@' + permission.source}}</span>
+                </div>
+            </div>
+        </div>
         <div [class.permission-cell-header]>{{permission.read}}</div>
         <div [class.permission-cell-header]>{{permission.write}}</div>
         <div [class.permission-cell-header]>{{permission.fullAccess}}</div>
