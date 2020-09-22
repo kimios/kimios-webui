@@ -10,10 +10,11 @@ export const DEFAULT_DMENTITY_SORT = <DMEntitySort>{name: 'name', direction: 'as
 })
 export class WorkspaceSessionService {
   private _gridOrList: ListingType = ListingType.LIST;
-
   public sort: BehaviorSubject<DMEntitySort> = new BehaviorSubject<DMEntitySort>(DEFAULT_DMENTITY_SORT);
+  public closePermissionsDialog: BehaviorSubject<boolean>;
 
   constructor() {
+    this.closePermissionsDialog = new BehaviorSubject<boolean>(null);
   }
 
   get gridOrList(): ListingType {

@@ -59,6 +59,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     ).subscribe(
         next => this.sort = next
     );
+    this.workspaceSessionService.closePermissionsDialog.pipe(
+        filter(next => next != null)
+    ).subscribe(
+        next => this.dialog.closeAll()
+    );
   }
 
   /**
