@@ -4,6 +4,7 @@ import {FileManagerComponent} from './file-manager.component';
 import {
     MatAutocompleteModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCheckboxModule,
     MatChipsModule,
     MatDatepickerModule,
@@ -15,6 +16,7 @@ import {
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatMenuModule,
     MatPaginatorModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
@@ -25,8 +27,7 @@ import {
     MatSortModule,
     MatTableModule,
     MatTabsModule,
-    MatTreeModule,
-    MatMenuModule, MatButtonToggleModule
+    MatTreeModule
 } from '@angular/material';
 
 import {FuseSharedModule} from '@fuse/shared.module';
@@ -81,8 +82,8 @@ import {SettingsComponent} from 'app/main/components/settings/settings.component
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
 import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.component';
 import {EntityListLockButtonComponent} from 'app/main/components/entity-list-lock-button/entity-list-lock-button.component';
-import {FilePermissionsComponent} from '../components/file-permissions/file-permissions.component';
-import {FilePermissionsDialogComponent} from '../components/file-permissions-dialog/file-permissions-dialog.component';
+import {FilePermissionsComponent} from 'app/main/components/file-permissions/file-permissions.component';
+import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 
 
 @NgModule({

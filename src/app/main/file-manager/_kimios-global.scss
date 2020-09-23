@@ -5,6 +5,9 @@ $kimios-app-background-color: #f7f9fd;
 $kimios-browse-tree-background-color: $kimios-app-background-color !global;
 $kimios-dark-grey: #838D99;
 $kimios-app-default-font-color: $kimios-dark-grey;
-$kimios-dialog-width-default: 300;
+$kimios-dialog-width-default: 400;
+$kimios-dialog-height-default: 400;
 $kimios-dialog-permissions-width: $kimios-dialog-width-default;
-
+$kimios-dialog-permissions-height: $kimios-dialog-height-default;
+$kimios-spinner-width: 100;
+$kimios-spinner-height: $kimios-spinner-width;

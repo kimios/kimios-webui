@@ -1,3 +1,14 @@
+<div class="wrapper" id="wrapper" #wrapper>
+    <div class="overlay" *ngIf="showSpinner" id="overlay" #overlay>
+        <div class="spinner-wrapper">
+            <mat-spinner
+                    color="primary"
+            ></mat-spinner>
+        </div>
+    </div>
+
+<form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
+
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
     <div fxLayout="row" fxLayoutAlign="start" >
         <div fxFlex>
@@ -7,11 +18,25 @@
         </div>
     </div>
     <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
-        <div [class.permission-cell-header]>Read</div>
-        <div [class.permission-cell-header]>Write</div>
-        <div [class.permission-cell-header]>Full</div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <span>Read</span>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <span>Write</span>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <span>Full</span>
+        </div>
     </div>
-    <div *ngFor="let permission of permissions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
+    <div
+            *ngFor="let permission of permissions; let i = index"
+            fxLayout="row"
+            fxLayoutAlign="start center"
+            fxLayoutGap="15px"
+            [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())">
         <div fxFlex>
             <div fxLayout="column" >
                 <div>
@@ -22,9 +47,18 @@
                 </div>
             </div>
         </div>
-        <div [class.permission-cell-header]>{{permission.read}}</div>
-        <div [class.permission-cell-header]>{{permission.write}}</div>
-        <div [class.permission-cell-header]>{{permission.fullAccess}}</div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <div><mat-checkbox [formControlName]="'read'"></mat-checkbox></div>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <div><mat-checkbox [formControlName]="'write'"></mat-checkbox></div>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+            <div><mat-checkbox [formControlName]="'fullAccess'"></mat-checkbox></div>
+        </div>
     </div>
     <div [class.div-button-add-user]="true">
         <div class="button-add-user kimios-button"
@@ -49,9 +83,14 @@
                  [class.kimios-green]="true"
                  [class.active]="true"
                  fxLayout="row"
-                 fxLayoutAlign="center center">
+                 fxLayoutAlign="center center"
+                 (click)="submit($event)">
                 <span class="kimios-button-text">SAVE CHANGES</span>
             </div>
         </div>
     </div>
+</div>
+
+</form>
+
 </div>
