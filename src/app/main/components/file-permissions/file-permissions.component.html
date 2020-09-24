@@ -93,7 +93,7 @@
 </div>
 
     <div *ngIf="!updateSecuritiesScreen" style="width: 100%;" >
-        <permissions-users-groups-add [documentId]="documentId"></permissions-users-groups-add>
+        <permissions-users-groups-add [documentId]="documentId" [existingSecurities]="permissions" ></permissions-users-groups-add>
     </div>
 
 </form>

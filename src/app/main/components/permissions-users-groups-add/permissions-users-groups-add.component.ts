@@ -1,12 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
-import {map, startWith} from 'rxjs/operators';
+import {concatMap, map, startWith} from 'rxjs/operators';
 import {DMEntitySecurity} from 'app/kimios-client-api';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMENTITYTYPE_DOCUMENT, SECURITY_ENTITY_TYPE} from 'app/main/utils/constants';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'permissions-users-groups-add',
@@ -17,6 +18,9 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
 
   @Input()
   documentId: number;
+  @Input()
+  existingSecurities: Array<DMEntitySecurity>;
+
   filteredUsersAndGroups$: Observable<Array<UserOrGroup>>;
   addUserForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
@@ -25,7 +29,8 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   constructor(
       private cacheSecurityService: CacheSecurityService,
       private fb: FormBuilder,
-      private workspaceSessionService: WorkspaceSessionService
+      private workspaceSessionService: WorkspaceSessionService,
+      private browseEntityService: BrowseEntityService
   ) {
     this.permissions = new Array<DMEntitySecurity>();
     this.addUserForm = this.fb.group({
@@ -38,7 +43,15 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
     this.addUserForm.get('userOrGroupInput').valueChanges
         .pipe(
             startWith(''),
-            map(searchTerm => this.filteredUsersAndGroups$ = this.cacheSecurityService.retrieveUsersAndGroups(searchTerm))
+            concatMap(searchTerm => this.cacheSecurityService.retrieveUsersAndGroups(searchTerm)),
+            map(usersAndGroups => this.filterExistingSecurities(usersAndGroups, this.existingSecurities)),
+            concatMap(usersAndGroups => combineLatest(of(usersAndGroups), this.browseEntityService.getEntity(this.documentId))),
+            map(([uAndG, entity]) => this.filteredUsersAndGroups$ = of(uAndG.filter( userOrGroup =>
+                ! (userOrGroup.type === 'user'
+                    && userOrGroup.element['uid'] === entity.owner
+                    && userOrGroup.element.source === entity.ownerSource
+                )
+            )))
         ).subscribe();
   }
 
@@ -85,6 +98,24 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   }
 
   submit($event: MouseEvent): void {
+    // this.workspaceSessionService.
+  }
 
+  private filterExistingSecurities(usersAndGroups: Array<UserOrGroup>, excludedUsersAndGroups: Array<DMEntitySecurity>): Array<UserOrGroup> {
+    return usersAndGroups.filter(
+        userOrGroup => !this.userOrGroupIsInArray(userOrGroup, excludedUsersAndGroups)
+    );
+  }
+
+  private userOrGroupIsInArray(userOrGroup: UserOrGroup, excludedUsersAndGroups: Array<DMEntitySecurity>): boolean {
+    return excludedUsersAndGroups.filter(sec =>
+        (
+            (userOrGroup.type === 'user' && sec.type === SECURITY_ENTITY_TYPE.USER
+                && userOrGroup.element['uid'] === sec.name)
+            || (userOrGroup.type === 'group' && sec.type === SECURITY_ENTITY_TYPE.GROUP
+                && userOrGroup.element['gid'] === sec.name)
+        )
+        && (userOrGroup.element.source === sec.source)
+    ).length > 0;
   }
 }
