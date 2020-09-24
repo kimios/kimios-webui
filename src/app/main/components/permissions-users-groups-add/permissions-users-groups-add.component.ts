@@ -3,11 +3,12 @@ import {combineLatest, Observable, of} from 'rxjs';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {concatMap, map, startWith} from 'rxjs/operators';
-import {DMEntitySecurity} from 'app/kimios-client-api';
+import {DMEntity, DMEntitySecurity} from 'app/kimios-client-api';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMENTITYTYPE_DOCUMENT, SECURITY_ENTITY_TYPE} from 'app/main/utils/constants';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {DMEntityType, DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Component({
   selector: 'permissions-users-groups-add',
@@ -25,6 +26,8 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   addUserForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
   permissions: Array<DMEntitySecurity>;
+
+  entity: DMEntity;
 
   constructor(
       private cacheSecurityService: CacheSecurityService,
@@ -56,6 +59,10 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
                 this.filterExistingSecurities(usersAndGroups, this.permissions)
             ))
         ).subscribe();
+
+    this.browseEntityService.getEntity(this.documentId).subscribe(
+        next => this.entity = next
+    );
   }
 
   searchUsersAndGroups(value: string): void {
@@ -63,14 +70,15 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   }
 
   private createSecurityFormGroup(security: DMEntitySecurity): FormGroup {
-    return this.fb.group({
-      'name': security.name,
-      'source': security.source,
-      'type': security.type,
-      'read': security.read,
-      'write': security.write,
-      'fullAccess': security.fullAccess
-    });
+      return this.fb.group({
+          'name': security.name,
+          'source': security.source,
+          'type': security.type,
+          'read': security.read,
+          'write': security.write,
+          'fullAccess': security.fullAccess,
+          'fullName': security.fullName
+      });
   }
 
   addToList(userOrGroup: UserOrGroup): void {
@@ -79,7 +87,9 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
       dmEntityType: DMENTITYTYPE_DOCUMENT,
       name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
       source: userOrGroup.element.source,
-      fullName: userOrGroup.element.name,
+      fullName: userOrGroup.element['uid'] ?
+          userOrGroup.element['firstName'] + ' ' + userOrGroup.element['lastName'] :
+          userOrGroup.element['name'],
       type: userOrGroup.type === 'user' ? SECURITY_ENTITY_TYPE.USER : SECURITY_ENTITY_TYPE.GROUP,
       read: false,
       write: false,
@@ -101,7 +111,25 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   }
 
   submit($event: MouseEvent): void {
-    // this.workspaceSessionService.
+      const dmSecurities = Object.keys((this.addUserForm.get('securities') as FormGroup).controls).map(control =>
+          <DMEntitySecurity> {
+              dmEntityUid: this.documentId,
+              dmEntityType: DMEntityUtils.dmEntityIsDocument(this.entity) ?
+                  DMEntityType.DOCUMENT :
+                  DMEntityUtils.dmEntityIsFolder(this.entity) ?
+                      DMEntityType.FOLDER :
+                      DMEntityType.WORKSPACE
+              ,
+              name: this.addUserForm.get('securities').get(control).get('name').value,
+              source: this.addUserForm.get('securities').get(control).get('source').value,
+              fullName: this.addUserForm.get('securities').get(control).get('fullName').value,
+              type: this.addUserForm.get('securities').get(control).get('type').value,
+              read: this.addUserForm.get('securities').get(control).get('read').value,
+              write: this.addUserForm.get('securities').get(control).get('write').value,
+              fullAccess: this.addUserForm.get('securities').get(control).get('fullAccess').value
+          });
+      this.workspaceSessionService.newPermissionsToBeAdded.next(dmSecurities);
+      this.workspaceSessionService.closeUserPermissionAdd.next(true);
   }
 
   private filterExistingSecurities(usersAndGroups: Array<UserOrGroup>, excludedUsersAndGroups: Array<DMEntitySecurity>): Array<UserOrGroup> {

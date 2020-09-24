@@ -67,6 +67,12 @@ export class FilePermissionsComponent implements OnInit, DoCheck {
     ).subscribe(
         next => this.updateSecuritiesScreen = true
     );
+
+    this.workspaceSessionService.newPermissionsToBeAdded.subscribe(securities => {
+      this.permissions = this.permissions.concat(securities);
+      this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(this.permissions));
+      console.dir(this.dmEntitySecuritiesForm.get('formGroupSecurities'));
+    });
   }
 
   private loadData(): Observable<Array<DMEntitySecurity>> {
