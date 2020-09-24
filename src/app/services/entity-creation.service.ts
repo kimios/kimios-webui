@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {FolderService, WorkspaceService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 @Injectable({
   providedIn: 'root'
