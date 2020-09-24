@@ -46,12 +46,15 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
             concatMap(searchTerm => this.cacheSecurityService.retrieveUsersAndGroups(searchTerm)),
             map(usersAndGroups => this.filterExistingSecurities(usersAndGroups, this.existingSecurities)),
             concatMap(usersAndGroups => combineLatest(of(usersAndGroups), this.browseEntityService.getEntity(this.documentId))),
-            map(([uAndG, entity]) => this.filteredUsersAndGroups$ = of(uAndG.filter( userOrGroup =>
+            map(([uAndG, entity]) => uAndG.filter( userOrGroup =>
                 ! (userOrGroup.type === 'user'
                     && userOrGroup.element['uid'] === entity.owner
                     && userOrGroup.element.source === entity.ownerSource
                 )
-            )))
+            )),
+            map(usersAndGroups => this.filteredUsersAndGroups$ = of(
+                this.filterExistingSecurities(usersAndGroups, this.permissions)
+            ))
         ).subscribe();
   }
 
