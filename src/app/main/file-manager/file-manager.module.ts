@@ -84,6 +84,7 @@ import {BrowseListComponent} from 'app/main/components/browse-list/browse-list.c
 import {EntityListLockButtonComponent} from 'app/main/components/entity-list-lock-button/entity-list-lock-button.component';
 import {FilePermissionsComponent} from 'app/main/components/file-permissions/file-permissions.component';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
+import {PermissionsUsersGroupsAddComponent} from 'app/main/components/permissions-users-groups-add/permissions-users-groups-add.component';
 
 
 @NgModule({
@@ -133,7 +134,8 @@ import {FilePermissionsDialogComponent} from 'app/main/components/file-permissio
         BrowseListComponent,
         EntityListLockButtonComponent,
         FilePermissionsComponent,
-        FilePermissionsDialogComponent
+        FilePermissionsDialogComponent,
+        PermissionsUsersGroupsAddComponent
     ],
     imports: [
         FileManagerRoutingModule,

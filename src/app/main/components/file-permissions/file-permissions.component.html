@@ -9,7 +9,7 @@
 
 <form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
 
-<div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+<div *ngIf="updateSecuritiesScreen" fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
     <div fxLayout="row" fxLayoutAlign="start" >
         <div fxFlex>
             <span style="font-weight: bolder">
@@ -62,7 +62,8 @@
     </div>
     <div [class.div-button-add-user]="true">
         <div class="button-add-user kimios-button"
-             fxFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px;">
+             fxFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px;"
+             (click)="showAddUserScreen()" >
             <span>Add user</span>
             <mat-icon>add</mat-icon>
         </div>
@@ -90,6 +91,10 @@
         </div>
     </div>
 </div>
+
+    <div *ngIf="!updateSecuritiesScreen" style="width: 100%;" >
+        <permissions-users-groups-add [documentId]="documentId"></permissions-users-groups-add>
+    </div>
 
 </form>
 

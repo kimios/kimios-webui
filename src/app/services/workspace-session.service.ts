@@ -12,9 +12,11 @@ export class WorkspaceSessionService {
   private _gridOrList: ListingType = ListingType.LIST;
   public sort: BehaviorSubject<DMEntitySort> = new BehaviorSubject<DMEntitySort>(DEFAULT_DMENTITY_SORT);
   public closePermissionsDialog: BehaviorSubject<boolean>;
+  public closeUserPermissionAdd: BehaviorSubject<boolean>;
 
   constructor() {
     this.closePermissionsDialog = new BehaviorSubject<boolean>(null);
+    this.closeUserPermissionAdd = new BehaviorSubject<boolean>(false);
   }
 
   get gridOrList(): ListingType {

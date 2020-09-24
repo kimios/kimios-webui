@@ -107,7 +107,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         data: {
           'uid': entityId
         },
-        panelClass: 'kimios-dialog'
+        panelClass: 'kimios-dialog',
+        width: '400px'
       });
     }
 }

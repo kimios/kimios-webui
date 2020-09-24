@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {combineLatest, Observable, of} from 'rxjs';
-import {SecurityService} from 'app/kimios-client-api';
-import {concatMap, tap} from 'rxjs/operators';
+import {AuthenticationSource, Group, SecurityService} from 'app/kimios-client-api';
+import {concatMap, map, tap} from 'rxjs/operators';
 import {LockPossibility} from 'app/main/model/lock-possibility';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {UserOrGroup} from 'app/main/model/user-or-group';
+import {User} from 'app/kimios-client-api/model/user';
 
 export interface SecurityEnt {
   read: boolean;
@@ -94,5 +96,53 @@ export class CacheSecurityService {
   invalidLockEntry(entityId: number): void {
     this._lockPossibilityMap.delete(entityId);
     this.browseEntityService.deleteCacheDocumentEntry(entityId);
+  }
+
+  public retrieveUsersAndGroups(searchTerm: string): Observable<Array<UserOrGroup>> {
+
+    return this.securityService.getAuthenticationSources().pipe(
+        concatMap(sources => sources),
+        concatMap(source => combineLatest(
+            this.securityService.getUsers(this.sessionService.sessionToken, source.name).pipe(
+                map(users => this.filterUsers(users, searchTerm)),
+                concatMap(users => of(this.toUserOrGroupArrayWithType('user', users)))
+            ),
+            this.securityService.getGroups(this.sessionService.sessionToken, source.name).pipe(
+                map(groups => this.filterGroups(groups, searchTerm)),
+                concatMap(groups => of(this.toUserOrGroupArrayWithType('group', groups)))
+            )
+        )),
+        map(([u, g]) => u.concat(g))
+    );
+  }
+  
+  private filterUsers(users: Array<User>, searchTerm: string): Array<User> {
+    return users.filter(user => user.uid.includes(searchTerm) 
+        || user.name.includes(searchTerm)
+        || user.firstName.includes(searchTerm)
+        || user.lastName.includes(searchTerm)
+    );
+  }
+
+  private filterGroups(groups: Array<Group>, searchTerm: string): Array<User> {
+    return groups.filter(group => group.gid.includes(searchTerm)
+        || group.name.includes(searchTerm)
+    );
+  }
+
+  retrieveUsers(source: AuthenticationSource): Observable<Array<User>> {
+    return this.securityService.getUsers(this.sessionService.sessionToken, source.name);
+  }
+
+
+  toUserOrGroupArrayWithType(type: 'user' | 'group', array: Array<User>): Array<UserOrGroup> {
+    return array.map(user => {
+      return this.toUserOrGroupWithType(type, user);
+    });
+  }
+
+  toUserOrGroupWithType(type: 'user' | 'group', elem: User | Group): UserOrGroup {
+    const userOrGroup: UserOrGroup = {type: type, element: elem};
+    return userOrGroup;
   }
 }

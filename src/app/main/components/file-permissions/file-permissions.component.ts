@@ -6,7 +6,7 @@ import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
-import {map} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {DMENTITYTYPE_DOCUMENT} from 'app/main/utils/constants';
 
 @Component({
@@ -25,6 +25,7 @@ export class FilePermissionsComponent implements OnInit, DoCheck {
   dmEntitySecuritiesForm: FormGroup;
   formArray$: Observable<AbstractControl[]>;
   showSpinner = true;
+  updateSecuritiesScreen = true;
 
   @ViewChild('wrapper') wrapperElement: ElementRef;
   @ViewChild('overlay') overlayElement: ElementRef;
@@ -59,6 +60,12 @@ export class FilePermissionsComponent implements OnInit, DoCheck {
 
     this.browseEntityService.getEntity(this.documentId).subscribe(
         entity => this.entityName = entity.name
+    );
+
+    this.workspaceSessionService.closeUserPermissionAdd.pipe(
+        filter(next => next),
+    ).subscribe(
+        next => this.updateSecuritiesScreen = true
     );
   }
 
@@ -177,6 +184,9 @@ export class FilePermissionsComponent implements OnInit, DoCheck {
 
     this.overlayElement.nativeElement.style.top = (wrapperWidth - overlayWidth) / 2 + 'px';
     this.overlayElement.nativeElement.style.left = (wrapperHeight - overlayHeight) / 2 + 'px';
+  }
 
+  showAddUserScreen(): void {
+    this.updateSecuritiesScreen = false;
   }
 }

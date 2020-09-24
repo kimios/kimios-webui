@@ -1,12 +1,12 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {BehaviorSubject, combineLatest, of} from 'rxjs';
-import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {concatMap, tap} from 'rxjs/operators';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';

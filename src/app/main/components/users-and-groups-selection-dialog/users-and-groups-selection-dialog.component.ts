@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {DialogData} from 'app/main/components/file-security/file-security.component';
-import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 @Component({
   selector: 'users-and-groups-selection-dialog',

@@ -7,8 +7,8 @@ import {ColumnDescriptionWithElement} from 'app/main/model/column-description-wi
 import {MatDialog, MatTableDataSource} from '@angular/material';
 import {concatMap, map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
-import {UserOrGroup} from 'app/main/components/users-and-groups-selection-panel/users-and-groups-selection-panel.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -99,7 +99,7 @@ export class FileSecurityComponent implements OnInit {
         <DMEntitySecurity> {
             dmEntityUid: this.documentId,
             dmEntityType: DMENTITYTYPE_DOCUMENT,
-            name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
+            name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
             source: userOrGroup.element.source,
             fullName: userOrGroup.element.name,
             type: userOrGroup.type === 'user' ? SECURITY_ENTITY_TYPE.USER : SECURITY_ENTITY_TYPE.GROUP,

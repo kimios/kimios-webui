@@ -1,12 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Group, User} from 'app/kimios-client-api';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {BehaviorSubject} from 'rxjs';
-
-export interface UserOrGroup {
-  type: string;
-  element: User | Group;
-}
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 @Component({
   selector: 'users-and-groups-selection-panel',
