@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {Observable, of, ReplaySubject, Subject} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
@@ -8,22 +8,7 @@ import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.service';
-
-export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
-    const content = control.get('content');
-    const filename = control.get('filename');
-    const tagList = control.get('tagList');
-
-    return (
-        content
-        && filename
-        && tagList
-        && content.value === ''
-        && filename.value === ''
-        && tagList.value instanceof Array
-        && tagList.value.length === 0
-    ) ? { 'searchParamsValid': false } : null;
-};
+import {searchParamsValidator} from 'app/main/utils/form-utils';
 
 @Component({
   selector: 'file-search-bar',
