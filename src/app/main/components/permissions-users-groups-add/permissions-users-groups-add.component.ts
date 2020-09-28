@@ -2,13 +2,14 @@ import {Component, Input, OnInit} from '@angular/core';
 import {combineLatest, Observable, of} from 'rxjs';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
-import {concatMap, map, startWith} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {DMEntity, DMEntitySecurity} from 'app/kimios-client-api';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMENTITYTYPE_DOCUMENT, SECURITY_ENTITY_TYPE} from 'app/main/utils/constants';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DMEntityType, DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {MatOptionSelectionChange} from '@angular/material';
 
 @Component({
   selector: 'permissions-users-groups-add',
@@ -24,6 +25,7 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
 
   filteredUsersAndGroups$: Observable<Array<UserOrGroup>>;
   addUserForm: FormGroup;
+  userInput: string;
   formArray$: Observable<AbstractControl[]>;
   permissions: Array<DMEntitySecurity>;
 
@@ -45,7 +47,9 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
   ngOnInit(): void {
     this.addUserForm.get('userOrGroupInput').valueChanges
         .pipe(
+            filter(searchTerm => searchTerm !== undefined),
             startWith(''),
+            tap(searchTerm => this.userInput = typeof searchTerm === 'string' ? searchTerm : ''),
             concatMap(searchTerm => this.cacheSecurityService.retrieveUsersAndGroups(searchTerm)),
             map(usersAndGroups => this.filterExistingSecurities(usersAndGroups, this.existingSecurities)),
             concatMap(usersAndGroups => combineLatest(of(usersAndGroups), this.browseEntityService.getEntity(this.documentId))),
@@ -104,6 +108,7 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
     }
     fg.addControl(idx.toString(), this.createSecurityFormGroup(newSec));
     this.permissions.push(newSec);
+    this.sendEventResetSearch();
   }
 
   cancel($event: MouseEvent): void {
@@ -149,4 +154,19 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
         && (userOrGroup.element.source === sec.source)
     ).length > 0;
   }
+
+    sendEventResetSearch(): void {
+      this.addUserForm.get('userOrGroupInput').setValue(this.userInput, {onlySelf: false, emitEvent: true});
+      // this.addUserForm.get('userOrGroupInput').updateValueAndValidity({ onlySelf: false, emitEvent: true });
+    }
+
+    onSelectionChange($event: MatOptionSelectionChange): void {
+        if ($event.source.selected) {
+            this.addToList($event.source.value);
+        }
+    }
+
+   displayWithFunc(): string {
+      return '';
+    }
 }

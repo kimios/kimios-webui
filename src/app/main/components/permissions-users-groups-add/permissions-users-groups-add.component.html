@@ -12,20 +12,17 @@
     <div fxFlex>
 
       <mat-form-field>
-        <input #inputSearch
+        <input
                type="text"
-               name="inputSearch"
                matInput
                [matAutocomplete]="autoSearchUsersAndGroups"
                placeholder="Search by name, groups…"
-               [formControlName]="'userOrGroupInput'">
-        <!--addUserForm.get('userOrGroupInput')-->
-        <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="searchUsersAndGroups(inputSearch.value)">
-          <mat-icon>search</mat-icon>
-        </button>
-        <mat-autocomplete #autoSearchUsersAndGroups="matAutocomplete" fxFlex="40">
+               [formControlName]="'userOrGroupInput'"
+               (focus)="sendEventResetSearch()">
+        <mat-autocomplete #autoSearchUsersAndGroups="matAutocomplete" fxFlex="40" [displayWith]="displayWithFunc">
           <mat-option *ngFor="let userOrGroup of filteredUsersAndGroups$ | async" placeholder="placeholder"
-                      (click)="addToList(userOrGroup)">
+                      (onSelectionChange)="onSelectionChange($event)"
+                      [value]="userOrGroup">
             <div *ngIf="userOrGroup.type === 'user' else templateGroup;" fxLayout="row" fxLayoutAlign="start center">
               <mat-icon>person</mat-icon>
               <span>
@@ -38,7 +35,7 @@
             </div>
             <ng-template #templateGroup>
               <div fxLayout="row" fxLayoutAlign="start center">
-                <mat-icon>person</mat-icon>
+                <mat-icon>group</mat-icon>
                 <span>
                   {{userOrGroup.element.name + ' (' + userOrGroup.element.gid + '@' + userOrGroup.element.source + ')'}}
                 </span>
