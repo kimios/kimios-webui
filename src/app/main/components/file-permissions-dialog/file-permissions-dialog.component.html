@@ -1,3 +1,151 @@
-<div>
-  <file-permissions [documentId]="data.uid"></file-permissions>
+<div #titleDiv mat-dialog-title fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+  <ng-container *ngIf="updateSecuritiesScreen else addUserScreenTitle">
+    <div fxLayout="row" fxLayoutAlign="start"  mat-dialog-title>
+      <div fxFlex>
+        <span style="font-weight: bolder">
+          Permissions
+        </span>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+      <div [class.permission-cell-header]="true"
+           fxLayout="row" fxLayoutAlign="center center">
+        <span>Read</span>
+      </div>
+      <div [class.permission-cell-header]="true"
+           fxLayout="row" fxLayoutAlign="center center">
+        <span>Write</span>
+      </div>
+      <div [class.permission-cell-header]="true"
+           fxLayout="row" fxLayoutAlign="center center">
+        <span>Full</span>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #addUserScreenTitle>
+    <div fxLayout="row" fxLayoutAlign="start" mat-dialog-title>
+      <div fxFlex>
+          <span style="font-weight: bolder">
+              Add users
+          </span>
+      </div>
+    </div>
+  </ng-template>
 </div>
+
+<div mat-dialog-content #contentDiv>
+  <div class="wrapper" id="wrapper" #wrapper>
+    <div class="overlay" *ngIf="showSpinner" id="overlay" #overlay>
+      <div class="spinner-wrapper">
+        <mat-spinner
+                color="primary"
+        ></mat-spinner>
+      </div>
+    </div>
+
+    <ng-container *ngIf="updateSecuritiesScreen else addUserScreenContent">
+      <div
+              *ngFor="let permission of permissions; let i = index"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              fxLayoutGap="15px"
+              [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())">
+        <div fxFlex>
+          <div fxLayout="column" >
+            <div>
+              <span style="font-weight: bolder">{{permission.fullName}}</span>
+            </div>
+            <div>
+              <span>{{permission.name + '@' + permission.source}}</span>
+            </div>
+          </div>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+          <div><mat-checkbox [formControlName]="'read'"></mat-checkbox></div>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+          <div><mat-checkbox [formControlName]="'write'"></mat-checkbox></div>
+        </div>
+        <div [class.permission-cell-header]="true"
+             fxLayout="row" fxLayoutAlign="center center">
+          <div><mat-checkbox [formControlName]="'fullAccess'"></mat-checkbox></div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #addUserScreenContent >
+      <permissions-users-groups-add
+              [documentId]="documentId"
+              [existingSecurities]="permissions"
+              [titleDivElement]="titleDivElement"
+              [actionsDivElement]="actionsDivElement"
+              [contentDivElement]="contentDivElement" >
+      </permissions-users-groups-add>
+    </ng-template>
+  </div>
+</div>
+
+<mat-dialog-actions style="width: 100%;" #actionsDiv>
+  <ng-container *ngIf="updateSecuritiesScreen else addUserScreenActions">
+    <div [class.div-button-add-user]="true" fxFill>
+      <div class="button-add-user kimios-button"
+           fxFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px;"
+           (click)="showAddUserScreen()" >
+        <span>Add user</span>
+        <mat-icon>add</mat-icon>
+      </div>
+    </div>
+    <div fxFill>
+      <div fxLayout="row"
+           fxLayoutAlign="center center"
+           fxLayoutGap="20px">
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="cancel($event)">
+          <span [class.kimios-button-text]="true">CANCEL</span>
+        </div>
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.active]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="submit($event)">
+          <span class="kimios-button-text">SAVE CHANGES</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #addUserScreenActions >
+    <div fxFill>
+      <div fxLayout="row"
+           fxLayoutAlign="center center"
+           fxLayoutGap="20px">
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="cancelAddUsers($event)">
+          <span [class.kimios-button-text]="true">CANCEL</span>
+        </div>
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.active]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="submitAddUsers($event)">
+          <span class="kimios-button-text">ADD USERS</span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-dialog-actions>
+
+<!--<file-permissions [documentId]="data.uid"></file-permissions>
+-->
+
+

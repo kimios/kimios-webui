@@ -15,11 +15,13 @@ export class WorkspaceSessionService {
   public closePermissionsDialog: BehaviorSubject<boolean>;
   public closeUserPermissionAdd: BehaviorSubject<boolean>;
   public newPermissionsToBeAdded: BehaviorSubject<Array<DMEntitySecurity>>;
+  public submitAddUsers: BehaviorSubject<boolean>;
 
   constructor() {
     this.closePermissionsDialog = new BehaviorSubject<boolean>(null);
     this.closeUserPermissionAdd = new BehaviorSubject<boolean>(false);
     this.newPermissionsToBeAdded = new BehaviorSubject<Array<DMEntitySecurity>>([]);
+    this.submitAddUsers = new BehaviorSubject<boolean>(false);
   }
 
   get gridOrList(): ListingType {

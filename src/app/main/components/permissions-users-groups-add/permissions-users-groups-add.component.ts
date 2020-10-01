@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {combineLatest, Observable, of} from 'rxjs';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
@@ -10,18 +10,25 @@ import {DMENTITYTYPE_DOCUMENT, SECURITY_ENTITY_TYPE} from 'app/main/utils/consta
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DMEntityType, DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {MatOptionSelectionChange} from '@angular/material';
+import {WindowRef} from '@agm/core/utils/browser-globals';
 
 @Component({
   selector: 'permissions-users-groups-add',
   templateUrl: './permissions-users-groups-add.component.html',
   styleUrls: ['./permissions-users-groups-add.component.scss']
 })
-export class PermissionsUsersGroupsAddComponent implements OnInit {
+export class PermissionsUsersGroupsAddComponent implements OnInit, AfterViewChecked {
 
   @Input()
   documentId: number;
   @Input()
   existingSecurities: Array<DMEntitySecurity>;
+  @Input()
+  contentDivElement: ElementRef;
+  @Input()
+  titleDivElement: ElementRef;
+  @Input()
+  actionsDivElement: ElementRef;
 
   filteredUsersAndGroups$: Observable<Array<UserOrGroup>>;
   addUserForm: FormGroup;
@@ -35,7 +42,9 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
       private cacheSecurityService: CacheSecurityService,
       private fb: FormBuilder,
       private workspaceSessionService: WorkspaceSessionService,
-      private browseEntityService: BrowseEntityService
+      private browseEntityService: BrowseEntityService,
+      private cdRef: ChangeDetectorRef,
+      private winRef: WindowRef
   ) {
     this.permissions = new Array<DMEntitySecurity>();
     this.addUserForm = this.fb.group({
@@ -67,9 +76,23 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
     this.browseEntityService.getEntity(this.documentId).subscribe(
         next => this.entity = next
     );
+
+    this.workspaceSessionService.submitAddUsers.pipe(
+        filter(next => next)
+    ).subscribe(next => {
+        if (next) {
+            this.submit();
+        }
+    });
   }
 
-  searchUsersAndGroups(value: string): void {
+  ngAfterViewChecked(): void {
+      this.cdRef.detectChanges();
+      this.initContentHeight();
+  }
+
+
+    searchUsersAndGroups(value: string): void {
 
   }
 
@@ -115,7 +138,7 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
     this.workspaceSessionService.closeUserPermissionAdd.next(true);
   }
 
-  submit($event: MouseEvent): void {
+  submit(): void {
       const dmSecurities = Object.keys((this.addUserForm.get('securities') as FormGroup).controls).map(control =>
           <DMEntitySecurity> {
               dmEntityUid: this.documentId,
@@ -168,5 +191,29 @@ export class PermissionsUsersGroupsAddComponent implements OnInit {
 
    displayWithFunc(): string {
       return '';
+   }
+
+   initContentHeight(): void {
+       const titleHeight = this.titleDivElement.nativeElement.offsetHeight;
+       const titleMargins =
+           Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.titleDivElement.nativeElement).marginTop.replace('px', ''))
+           + Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.titleDivElement.nativeElement).marginBottom.replace('px', ''));
+       const actionsHeight = this.actionsDivElement.nativeElement.offsetHeight;
+       const actionsMargins =
+           Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.actionsDivElement.nativeElement).marginTop.replace('px', ''))
+           + Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.actionsDivElement.nativeElement).marginBottom.replace('px', ''));
+       const parentParentHeight = this.contentDivElement.nativeElement.parentElement.parentElement.offsetHeight;
+       const parentParentPaddings =
+           Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.contentDivElement.nativeElement.parentElement.parentElement)
+               .paddingBottom.replace('px', ''))
+           + Math.abs(this.winRef.getNativeWindow().getComputedStyle(this.contentDivElement.nativeElement.parentElement.parentElement)
+               .paddingTop.replace('px', ''));
+
+       this.contentDivElement.nativeElement.parentElement.style.height = (parentParentHeight - parentParentPaddings) + 'px';
+       this.contentDivElement.nativeElement.style.height =
+           parentParentHeight
+           - (titleHeight + actionsHeight)
+           - (actionsMargins + titleMargins)
+           + 'px';
     }
 }

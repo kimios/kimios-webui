@@ -1,13 +1,6 @@
 <form [formGroup]="addUserForm">
 
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
-  <div fxLayout="row" fxLayoutAlign="start" >
-    <div fxFlex>
-            <span style="font-weight: bolder">
-                Add users
-            </span>
-    </div>
-  </div>
   <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="15px">
     <div fxFlex>
 
@@ -17,7 +10,7 @@
                matInput
                [matAutocomplete]="autoSearchUsersAndGroups"
                placeholder="Search by name, groups…"
-               [formControlName]="'userOrGroupInput'"
+               [formControl]="addUserForm.get('userOrGroupInput')"
                (focus)="sendEventResetSearch()">
         <mat-autocomplete #autoSearchUsersAndGroups="matAutocomplete" fxFlex="40" [displayWith]="displayWithFunc">
           <mat-option *ngFor="let userOrGroup of filteredUsersAndGroups$ | async" placeholder="placeholder"
@@ -78,29 +71,6 @@
     </div>
   </div>
   </ng-container>
-
-  <div >
-    <div fxLayout="row"
-         fxLayoutAlign="center center"
-         fxLayoutGap="20px">
-      <div [class.kimios-button]="true"
-           [class.kimios-green]="true"
-           [class.inactive]="true"
-           fxLayout="row"
-           fxLayoutAlign="center center"
-           (click)="cancel($event)">
-        <span [class.kimios-button-text]="true">CANCEL</span>
-      </div>
-      <div [class.kimios-button]="true"
-           [class.kimios-green]="true"
-           [class.active]="true"
-           fxLayout="row"
-           fxLayoutAlign="center center"
-           (click)="submit($event)">
-        <span class="kimios-button-text">ADD USERS</span>
-      </div>
-    </div>
-  </div>
 </div>
 
 </form>

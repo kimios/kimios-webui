@@ -85,6 +85,7 @@ import {EntityListLockButtonComponent} from 'app/main/components/entity-list-loc
 import {FilePermissionsComponent} from 'app/main/components/file-permissions/file-permissions.component';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {PermissionsUsersGroupsAddComponent} from 'app/main/components/permissions-users-groups-add/permissions-users-groups-add.component';
+import {WindowRef} from '@agm/core/utils/browser-globals';
 
 
 @NgModule({
@@ -177,7 +178,8 @@ import {PermissionsUsersGroupsAddComponent} from 'app/main/components/permission
     ],
     providers   : [
         EntityService,
-        SearchEntityService
+        SearchEntityService,
+        WindowRef
     ],
     entryComponents: [
         FilesUploadDialogComponent,
