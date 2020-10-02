@@ -1,1 +1,9 @@
-<share-form [documentId]="data.uid" [documentName]="data.name" ></share-form>
+<mat-tab-group>
+    <mat-tab label="Share with a user">
+        <share-form [documentId]="data.uid" [documentName]="data.name" ></share-form>
+    </mat-tab>
+
+    <mat-tab label="External share">
+
+    </mat-tab>
+</mat-tab-group>

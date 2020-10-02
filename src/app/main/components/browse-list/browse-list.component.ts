@@ -13,6 +13,7 @@ import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {filter} from 'rxjs/operators';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
+import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 
 const sortMapping = {
   'name': 'name',
@@ -112,4 +113,14 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         height: '400px'
       });
     }
+
+  openShareDialog(docId: number, docName: string): void {
+    const dialogRef = this.dialog.open(ShareDialogComponent, {
+      data: {
+        'uid': docId,
+        'name': docName
+      },
+      panelClass: 'kimios-dialog'
+    });
+  }
 }
