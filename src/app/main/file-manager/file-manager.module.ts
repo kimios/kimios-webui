@@ -86,6 +86,7 @@ import {FilePermissionsComponent} from 'app/main/components/file-permissions/fil
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {PermissionsUsersGroupsAddComponent} from 'app/main/components/permissions-users-groups-add/permissions-users-groups-add.component';
 import {WindowRef} from '@agm/core/utils/browser-globals';
+import {ShareExternalComponent} from 'app/main/components/share-external/share-external.component';
 
 
 @NgModule({
@@ -136,7 +137,8 @@ import {WindowRef} from '@agm/core/utils/browser-globals';
         EntityListLockButtonComponent,
         FilePermissionsComponent,
         FilePermissionsDialogComponent,
-        PermissionsUsersGroupsAddComponent
+        PermissionsUsersGroupsAddComponent,
+        ShareExternalComponent
     ],
     imports: [
         FileManagerRoutingModule,
