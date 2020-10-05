@@ -99,4 +99,15 @@
         box-shadow: none;
         overflow-x: hidden;
     }
+
+    .mat-ink-bar {
+        background-color: $kimios-green !important;
+    }
+
+    .mat-tab-label-active {
+        .mat-tab-label-content {
+            color: $kimios-green;
+            font-weight: bolder;
+        }
+    }
 }
