@@ -1,9 +1,18 @@
-<mat-tab-group>
-    <mat-tab label="Share with a user">
-        <share-form [documentId]="data.uid" [documentName]="data.name" ></share-form>
-    </mat-tab>
+<div fxLayout="column" fxLayoutAlign="space-between center">
+    <div>
+        <h4 style="margin-top: 5px">{{data.name}}</h4>
+    </div>
 
-    <mat-tab label="External share">
-        <share-external></share-external>
-    </mat-tab>
-</mat-tab-group>
+    <div fxFill>
+        <mat-tab-group>
+            <mat-tab label="Share with a user">
+                <share-form [documentId]="data.uid" [documentName]="data.name" ></share-form>
+            </mat-tab>
+
+            <mat-tab label="External share">
+                <share-external></share-external>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+</div>

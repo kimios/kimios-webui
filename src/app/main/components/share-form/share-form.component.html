@@ -1,69 +1,100 @@
-<form class="full-width"  #form [formGroup]="shareFormGroup" (ngSubmit)="onSubmit()" (keyup)="$event.key === 'Enter' ? onSubmit():1" >
-  <div fxFlex>
-    <h4>Share document: {{documentName}}</h4>
+<form class="full-width" #form
+      [formGroup]="shareFormGroup"
+      (ngSubmit)="onSubmit()"
+      (keyup)="$event.key === 'Enter' ? onSubmit():1"
+      style="margin-top: 20px">
 
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start">
+      <div>
+        <span>Share Until</span>
+      </div>
 
-    <div fxLayout="column" fxLayoutAlign="space-between">
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-      <mat-form-field fxFlex="45">
-        <input matInput [min]="minDate" [matDatepicker]="picker" placeholder="Share until" formControlName="dateUntil"
-               required>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-form-field fxFlex="45">
+          <input matInput [min]="minDate" [matDatepicker]="picker" placeholder="date" formControlName="dateUntil"
+                 required>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field fxFlex="45">
-        <select matNativeControl [formControl]="shareFormGroup.get('timeUntil')">
-          <option *ngFor="let hourAndTime of possibleTimeSelections" value="{{hourAndTime}}}" [selected]="hourAndTimeDefault === hourAndTime">
-            {{hourAndTime}}
-          </option>
-        </select>
-      </mat-form-field>
-    </div>
+        <mat-form-field fxFlex="45">
+          <select matNativeControl [formControl]="shareFormGroup.get('timeUntil')" placeholder="time">
+            <option *ngFor="let hourAndTime of possibleTimeSelections"
+                    value="{{hourAndTime}}}"
+                    [selected]="hourAndTimeDefault === hourAndTime">
+              {{hourAndTime}}
+            </option>
+          </select>
+        </mat-form-field>
+      </div>
 
-    <!-- share with -->
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-      <mat-form-field class="example-full-width" fxFlex="100">
-        <input type="text" placeholder="Share with user" aria-label="Number" matInput [formControl]="shareFormGroup.get('user')" [matAutocomplete]="auto" required>
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected()">
-          <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option">
-            {{option.name + ', ' + option.firstName + ' (' + option.name + '@' + option.source + ')'}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-    </div>
-
-    <!-- share level -->
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-
-      <mat-radio-group
-              label="Share level"
-              [formGroup]="shareFormGroup.get('shareLevel')" required fxFlex="100">
-        <div fxLayout="row" fxLayoutAlign="space-between center">
-          <mat-radio-button value="read" [checked]="true" fxFlex="30">
-            Read
-          </mat-radio-button>
-          <mat-radio-button value="write" fxFlex="30">
-            Write
-          </mat-radio-button>
-          <mat-radio-button value="fullAccess" fxFlex="30">
-            Full access
-        </mat-radio-button>
+      <!-- share with -->
+      <div fxFill fxLayout="column">
+        <mat-form-field class="example-full-width" fxFill>
+          <input type="text" placeholder="Share with user" aria-label="Number" matInput [formControl]="shareFormGroup.get('user')" [matAutocomplete]="auto" required>
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected()">
+            <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option">
+              {{option.name + ', ' + option.firstName + ' (' + option.name + '@' + option.source + ')'}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <div fxFill fxLayoutAlign="end">
+          <mat-checkbox [formControl]="shareFormGroup.get('notify')" >Send a notification? </mat-checkbox>
         </div>
-      </mat-radio-group>
+      </div>
+
+      <!-- notify -->
+
+
+      <div style="margin-bottom: 20px; margin-top: 20px">
+        <span>Permissions</span>
+      </div>
+
+      <!-- share level -->
+      <div fxFill
+           style="margin-bottom: 20px">
+        <mat-radio-group
+                label="Share level"
+                [formGroup]="shareFormGroup.get('shareLevel')" required fxFlex="100">
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <mat-checkbox value="read" [checked]="true" fxFlex="30">
+              Read
+            </mat-checkbox>
+            <mat-checkbox value="write" fxFlex="30">
+              Write
+            </mat-checkbox>
+            <mat-checkbox value="fullAccess" fxFlex="30">
+              Full access
+          </mat-checkbox>
+          </div>
+        </mat-radio-group>
+      </div>
+
+      <div style="margin-top: 20px; width: 100%;">
+        <div fxLayout="row"
+             fxLayoutAlign="center center"
+             fxLayoutGap="20px"
+             fxFill
+             style="margin-top: 20px !important;">
+          <div [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.inactive]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               matDialogClose>
+            <span [class.kimios-button-text]="true">CANCEL</span>
+          </div>
+          <div [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.active]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               (click)="onSubmit()">
+            <span class="kimios-button-text">SHARE DOCUMENT</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- notify -->
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-      <mat-checkbox [formControl]="shareFormGroup.get('notify')" >Send a notification? </mat-checkbox>
-    </div>
-
-    <div fxLayout="row" fxLayoutAlign="center">
-      <button mat-button matDialogClose>Cancel</button>
-      <button mat-button (click)="onSubmit()">Share document</button>
-    </div>
-
-    </div>
-
-</div>
 </form>
