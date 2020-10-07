@@ -93,11 +93,13 @@ export class SessionService implements OnDestroy {
     }
 
     logout(): void {
+        this.stopSessionCheck();
         this.securityService.endSession(this.sessionToken).subscribe(
             () => { this.cookieService.delete(KIMIOS_COOKIE); }
         );
-        this.router.navigate(['/login']);
-        this.stopSessionCheck();
+        this.router.navigate(['/login']).then(
+            () => window.location.reload()
+        );
     }
 
     disconnect(): Observable<string> {
