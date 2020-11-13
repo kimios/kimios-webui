@@ -17,9 +17,15 @@
          style="width: 100%; margin-left: 20px; margin-right: 20px; margin-bottom: 84px;"
          #contentColumn id="contentColumn" >
 
-      <div style="width: 100%; margin: 20px;"
-           #browsePathRow id="browsePathRow" >
-        <browse-path></browse-path>
+      <div fxLayout="row"
+           fxLayoutAlign="start">
+        <div style="margin: 20px;"
+             #browsePathRow id="browsePathRow" fxFlex>
+          <browse-path></browse-path>
+        </div>
+        <div>
+          <mat-icon style="margin: 20px;">cloud_upload</mat-icon>
+        </div>
       </div>
 
       <div fxLayout="row"
