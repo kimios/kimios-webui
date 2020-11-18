@@ -1,9 +1,14 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Location } from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {PageEvent} from '@angular/material';
+import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
-import {filter} from 'rxjs/operators';
+import {catchError, filter} from 'rxjs/operators';
+import {DMEntity} from 'app/kimios-client-api';
+import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
+import {Tag} from 'app/main/model/tag';
+import {of} from 'rxjs';
+import {FileUploadService} from 'app/services/file-upload.service';
 
 @Component({
   selector: 'app-workspaces',
@@ -25,7 +30,9 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   constructor(
       private browseEntityService: BrowseEntityService,
       private location: Location,
-      private workspaceSessionService: WorkspaceSessionService
+      private workspaceSessionService: WorkspaceSessionService,
+      public filesUploadDialog: MatDialog,
+      private fileUploadService: FileUploadService
   ) {
     console.log('in workspace constructor');
   }
@@ -66,5 +73,73 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
   paginatorHandler($event: PageEvent): void {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
+  }
+
+  openFilesUploadDialog(list: FileList, droppedInDir?: DMEntity): void {
+    const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
+      // width: '250px',
+      data: {
+        filesList: Array.from(list),
+        filesTags: new Map<string, Map<number, Tag>>()
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (! result) {
+        return;
+      }
+      console.log('The dialog was closed');
+      console.dir(dialogRef.componentInstance.data.filesList);
+
+      const currentPath = this.browseEntityService.currentPath.getValue();
+      let path: string;
+      let currentDir: DMEntity;
+      if (currentPath.length > 0) {
+        currentDir = currentPath[currentPath.length - 1];
+        path = currentDir.path;
+      } else {
+        return;
+      }
+
+      let parentDir: DMEntity;
+      if (droppedInDir !== null && droppedInDir !== undefined && droppedInDir !== '') {
+        path += '/' + droppedInDir.name;
+        parentDir = droppedInDir;
+      } else {
+        parentDir = currentDir;
+      }
+
+      this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
+        v,
+        path + '/' + v.name,
+        true,
+        '[]',
+        true,
+        -1,
+        '[]',
+        dialogRef.componentInstance.data.filesTags.get(v.name) ?
+            Array.from(dialogRef.componentInstance.data.filesTags.get(v.name).keys()) :
+            []
+      ]))
+          .pipe(
+              catchError(error => {
+                console.log('server error: ');
+                console.dir(error);
+                return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
+              })
+          )
+          .subscribe(
+              null,
+              null,
+              () => {
+                this.browseEntityService.deleteCacheEntry(parentDir.uid);
+                this.browseEntityService.selectedEntity$.next(currentDir);
+              }
+          );
+    });
+  }
+
+  handleFileInput(files: FileList): void {
+    this.openFilesUploadDialog(files, null);
   }
 }

@@ -24,7 +24,13 @@
           <browse-path></browse-path>
         </div>
         <div>
-          <mat-icon style="margin: 20px;">cloud_upload</mat-icon>
+          <div class="file-uploader" style="padding:20px">
+            <form>
+              <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
+              <mat-icon class="cursor-pointer"
+                      (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
+            </form>
+          </div>
         </div>
       </div>
 
