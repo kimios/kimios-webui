@@ -1,0 +1,5 @@
+workspaces section:
+- refresh button to see new files (background refresh via websocket is next step)
+
+document page:
+- if no change securities access, deactivate all checkboxes and buttons (maybe hide buttons)
