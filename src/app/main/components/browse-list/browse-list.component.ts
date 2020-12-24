@@ -122,5 +122,13 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       },
       panelClass: 'kimios-dialog'
     });
+
+    this.bes.shareDocumentReturn$.subscribe(
+        res => {
+          if (res) {
+            dialogRef.close();
+          }
+        }
+    );
   }
 }

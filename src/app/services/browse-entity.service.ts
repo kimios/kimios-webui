@@ -54,6 +54,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public nodeToRemoveFromTree: Subject<DMEntity>;
     public updateMoveTreeNode$: Subject<TreeNodeMoveUpdate>;
 
+    public shareDocumentReturn$: Subject<boolean>;
+
     pageSize: number;
     pageIndex: BehaviorSubject<number>;
     length: BehaviorSubject<number>;
@@ -107,6 +109,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.onAddedChildToEntity$ = new Subject<number>();
 
       this.openEntityFromFileUploadList$ = new Subject<number>();
+
+      this.shareDocumentReturn$ = new Subject<boolean>();
 
       this.ngOnInit();
   }

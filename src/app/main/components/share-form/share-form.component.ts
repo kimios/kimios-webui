@@ -4,6 +4,7 @@ import {SecurityService, ShareService, User} from 'app/kimios-client-api';
 import {from, Observable, Subject} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
 import {map, mergeMap, startWith} from 'rxjs/operators';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 
 @Component({
@@ -33,7 +34,8 @@ export class ShareFormComponent implements OnInit {
       private fb: FormBuilder,
       private securityService: SecurityService,
       private sessionService: SessionService,
-      private shareService: ShareService
+      private shareService: ShareService,
+      private browseEntityService: BrowseEntityService
   ) {
     this.possibleTimeSelections = new Array<String>();
     this.filteredUsers$ = new Observable<User[]>();
@@ -103,7 +105,11 @@ export class ShareFormComponent implements OnInit {
             this.shareFormGroup.get('shareLevel').value === 'fullAccess',
             this.formatDate(this.shareFormGroup.get('dateUntil').value, this.shareFormGroup.get('timeUntil').value),
             this.shareFormGroup.get('notify').value
-        ).subscribe();
+        ).subscribe(
+            null,
+            error => console.log('error when sharing document'),
+            () => this.browseEntityService.shareDocumentReturn$.next(true)
+        );
 
     }
   }
@@ -142,9 +148,9 @@ export class ShareFormComponent implements OnInit {
       dateStr += dateUntil['parsedDateParts'][0];
     } else {
       if (dateUntil['_i']
-          && dateUntil['_i']['date']
-          && dateUntil['_i']['month']
-          && dateUntil['_i']['year']) {
+          && dateUntil['_i']['date'] != null
+          && dateUntil['_i']['month'] != null
+          && dateUntil['_i']['year'] != null) {
         dateStr += this.format2digits('' + dateUntil['_i']['date']);
         dateStr += '-';
         dateStr += this.format2digits('' + (dateUntil['_i']['month'] + 1));
