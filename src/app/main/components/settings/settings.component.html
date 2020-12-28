@@ -1,16 +1,18 @@
 <mat-tab-group *ngIf="(isAdmin$ | async) || (hasStudioAccess$ | async); else personalSettingsOnly">
 
   <mat-tab label="Settings">
-    Personal Settings
+    <personal-settings></personal-settings>
   </mat-tab>
 
   <mat-tab *ngIf="(isAdmin$ | async)" label="Administration">
+    <administration></administration>
   </mat-tab>
 
   <mat-tab *ngIf="(hasStudioAccess$ | async)" label="Studio">
+    <studio></studio>
   </mat-tab>
 </mat-tab-group>
 
 <ng-template #personalSettingsOnly>
-  Personal Settings
+  <personal-settings></personal-settings>
 </ng-template>

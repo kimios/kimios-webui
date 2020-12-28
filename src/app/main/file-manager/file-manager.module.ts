@@ -87,6 +87,10 @@ import {FilePermissionsDialogComponent} from 'app/main/components/file-permissio
 import {PermissionsUsersGroupsAddComponent} from 'app/main/components/permissions-users-groups-add/permissions-users-groups-add.component';
 import {WindowRef} from '@agm/core/utils/browser-globals';
 import {ShareExternalComponent} from 'app/main/components/share-external/share-external.component';
+import {AppComponent} from '../../app.component';
+import {AdministrationComponent} from '../components/administration/administration.component';
+import {StudioComponent} from '../components/studio/studio.component';
+import {PersonalSettingsComponent} from '../components/personal-settings/personal-settings.component';
 
 
 @NgModule({
@@ -138,7 +142,10 @@ import {ShareExternalComponent} from 'app/main/components/share-external/share-e
         FilePermissionsComponent,
         FilePermissionsDialogComponent,
         PermissionsUsersGroupsAddComponent,
-        ShareExternalComponent
+        ShareExternalComponent,
+        AdministrationComponent,
+        StudioComponent,
+        PersonalSettingsComponent
     ],
     imports: [
         FileManagerRoutingModule,
