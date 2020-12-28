@@ -190,4 +190,12 @@ export class SessionService implements OnDestroy {
     isSessionCheckStarted(): boolean {
         return (this.intervalId != null);
     }
+
+    currentUserIsAdmin(): Observable<boolean> {
+        return this.securityService.isAdmin(this.sessionToken);
+    }
+
+    currentUserHasStudioAccess(): Observable<boolean> {
+        return this.securityService.hasStudioAccess(this.sessionToken);
+    }
 }
