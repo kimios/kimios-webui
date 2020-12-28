@@ -91,6 +91,9 @@ import {AppComponent} from '../../app.component';
 import {AdministrationComponent} from '../components/administration/administration.component';
 import {StudioComponent} from '../components/studio/studio.component';
 import {PersonalSettingsComponent} from '../components/personal-settings/personal-settings.component';
+import {AdminDomainsComponent} from 'app/main/components/admin-domains/admin-domains.component';
+import {AdminSpecialRolesComponent} from 'app/main/components/admin-special-roles/admin-special-roles.component';
+import {AdminSpecialTasksComponent} from 'app/main/components/admin-special-tasks/admin-special-tasks.component';
 
 
 @NgModule({
@@ -145,7 +148,10 @@ import {PersonalSettingsComponent} from '../components/personal-settings/persona
         ShareExternalComponent,
         AdministrationComponent,
         StudioComponent,
-        PersonalSettingsComponent
+        PersonalSettingsComponent,
+        AdminDomainsComponent,
+        AdminSpecialRolesComponent,
+        AdminSpecialTasksComponent
     ],
     imports: [
         FileManagerRoutingModule,
