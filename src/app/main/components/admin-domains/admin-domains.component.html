@@ -9,42 +9,44 @@
         </div>
     </div>
 
-    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+    <div fxLayout="column" fxLayoutGap="10px" fxFlex>
         <ng-container *ngIf="authenticationSource$ | async as authenticationSource">
-            <div fxLayout="column" [ngClass]="'domain-form-div'">
-                <div [ngClass]="'talign-right'">Domain name: </div>
-                <div [ngClass]="'talign-right'">Type: </div>
-                <div [ngClass]="'talign-right'">Enable Auth By Email: </div>
-                <div [ngClass]="'talign-right'">Enable SSO: </div>
-            </div>
-            <div fxLayout="column" fxFlex [ngClass]="'domain-form-div'">
-                <div>{{authenticationSource.name}}</div>
-                <div>
-                    <mat-select [(value)]="authenticationSource.className">
-                        <mat-option
-                            *ngFor="let type of availableTypes$ | async"
-                            value="{{type}}"
+            <div fxLayout="row" fxLayoutGap="5px">
+                <div fxLayout="column" [ngClass]="'domain-form-div'">
+                    <div [ngClass]="'talign-right'">Domain name: </div>
+                    <div [ngClass]="'talign-right'">Type: </div>
+                    <div [ngClass]="'talign-right'">Enable Auth By Email: </div>
+                    <div [ngClass]="'talign-right'">Enable SSO: </div>
+                </div>
+                <div fxLayout="column" fxFlex [ngClass]="'domain-form-div'">
+                    <div>{{authenticationSource.name}}</div>
+                    <div>
+                        <mat-select [(value)]="authenticationSource.className">
+                            <mat-option
+                                *ngFor="let type of availableTypes$ | async"
+                                value="{{type}}"
+                            >
+                                {{type}}
+                            </mat-option>
+                        </mat-select>
+                    </div>
+                    <div>
+                        <mat-checkbox
+                            value="{{authenticationSource.enableMailCheck}}"
+                            name="enableMailCheck"
                         >
-                            {{type}}
-                        </mat-option>
-                    </mat-select>
-                </div>
-                <div>
-                    <mat-checkbox
-                        value="{{authenticationSource.enableMailCheck}}"
-                        name="enableMailCheck"
-                    >
-                    </mat-checkbox>
-                </div>
-                <div>
-                    <mat-checkbox
-                        value="{{authenticationSource.enableSso}}"
-                        name="enableSso"
-                    >
-                    </mat-checkbox>
+                        </mat-checkbox>
+                    </div>
+                    <div>
+                        <mat-checkbox
+                            value="{{authenticationSource.enableSso}}"
+                            name="enableSso"
+                        >
+                        </mat-checkbox>
+                    </div>
                 </div>
             </div>
+            <div>buttons here</div>
         </ng-container>
     </div>
-
 </div>
