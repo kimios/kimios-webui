@@ -1,58 +1,50 @@
-<div fxLayout="row" fxLayoutAlign="start start">
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px">
 
-  <div fxFlex="30" fxLayout="column">
-    <table>
-      <tr *ngFor="let domain of domains$ | async"
-          (click)="loadDomain(domain.name)"
-          class="cursor-pointer"
-      >
-        <td>{{domain.name}}</td>
-      </tr>
-    </table>
-  </div>
+    <div fxFlex="30" fxLayout="column">
+        <div *ngFor="let domain of domains$ | async"
+             (click)="loadDomain(domain.name)"
+             class="cursor-pointer"
+        >
+            <span>{{domain.name}}</span>
+        </div>
+    </div>
 
-  <div fxFlexFill fxLayout="column">
-    <ng-container *ngIf="authenticationSource$ | async as authenticationSource">
-      <table>
-        <tr>
-          <td>Domain name</td>
-          <td>{{authenticationSource.name}}</td>
-        </tr>
-        <tr>
-          <td>Type</td>
-          <td>
-            <mat-select name="type" [value]="authenticationSource.className">
-              <mat-option
-                      *ngFor="let type of availableTypes$ | async"
-                      [value]="type"
-              >
-                {{type}}
-              </mat-option>
-            </mat-select>
-          </td>
-        </tr>
-        <tr>
-          <td>enableMailCheck</td>
-          <td>
-            <mat-checkbox
-                    value="{{authenticationSource.enableMailCheck}}"
-                    name="enableMailCheck"
-            >
-            </mat-checkbox>
-          </td>
-        </tr>
-        <tr>
-          <td>enableSso</td>
-          <td>
-            <mat-checkbox
-                    value="{{authenticationSource.enableSso}}"
-                    name="enableSso"
-            >
-            </mat-checkbox>
-          </td>
-        </tr>
-      </table>
-    </ng-container>
-  </div>
+    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+        <ng-container *ngIf="authenticationSource$ | async as authenticationSource">
+            <div fxLayout="column" [ngClass]="'domain-form-div'">
+                <div [ngClass]="'talign-right'">Domain name: </div>
+                <div [ngClass]="'talign-right'">Type: </div>
+                <div [ngClass]="'talign-right'">Enable Auth By Email: </div>
+                <div [ngClass]="'talign-right'">Enable SSO: </div>
+            </div>
+            <div fxLayout="column" fxFlex [ngClass]="'domain-form-div'">
+                <div>{{authenticationSource.name}}</div>
+                <div>
+                    <mat-select [(value)]="authenticationSource.className">
+                        <mat-option
+                            *ngFor="let type of availableTypes$ | async"
+                            value="{{type}}"
+                        >
+                            {{type}}
+                        </mat-option>
+                    </mat-select>
+                </div>
+                <div>
+                    <mat-checkbox
+                        value="{{authenticationSource.enableMailCheck}}"
+                        name="enableMailCheck"
+                    >
+                    </mat-checkbox>
+                </div>
+                <div>
+                    <mat-checkbox
+                        value="{{authenticationSource.enableSso}}"
+                        name="enableSso"
+                    >
+                    </mat-checkbox>
+                </div>
+            </div>
+        </ng-container>
+    </div>
 
 </div>
