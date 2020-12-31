@@ -1,4 +1,5 @@
 export * from './authenticationSource';
+export * from './authenticationSourceParam';
 export * from './body';
 export * from './bookmark';
 export * from './cell';

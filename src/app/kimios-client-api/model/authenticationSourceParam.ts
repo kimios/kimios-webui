@@ -11,12 +11,11 @@
  */
 
 
-export interface DataTransaction { 
-    uid?: number;
-    size?: number;
-    hashMD5?: string;
-    hashSHA?: string;
-    downloadToken?: string;
-    password?: string;
-    compressed?: boolean;
+export interface AuthenticationSourceParam { 
+    name?: string;
+    className?: string;
+    enableSso?: boolean;
+    enableMailCheck?: boolean;
+    sessionId?: string;
+    parameters?: { [key: string]: string; };
 }
