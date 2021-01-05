@@ -31,14 +31,10 @@ import {APP_CONFIG} from 'app/app-config/config';
 import {SessionService} from 'app/services/session.service';
 import {CookieService} from 'ngx-cookie-service';
 import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
-import { AdminDomainsUsersComponent } from './main/components/admin-domains-users/admin-domains-users.component';
-import { AdminDomainsParametersComponent } from './main/components/admin-domains-parameters/admin-domains-parameters.component';
 
 @NgModule({
     declarations: [
-        AppComponent,
-        AdminDomainsUsersComponent,
-        AdminDomainsParametersComponent
+        AppComponent
     ],
     imports     : [
         BrowserModule,
