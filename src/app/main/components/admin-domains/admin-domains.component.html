@@ -10,6 +10,10 @@
     </div>
 
     <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+
+        <mat-tab-group>
+            <mat-tab label="Parameters">
+
         <ng-container *ngIf="authenticationSourceLoaded$ | async as loaded">
             <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
 
@@ -107,5 +111,18 @@
 
             </form>
         </ng-container>
+
+            </mat-tab>
+
+            <mat-tab label="Users">
+
+            </mat-tab>
+
+            <mat-tab label="Groups">
+
+            </mat-tab>
+
+        </mat-tab-group>
+
     </div>
 </div>
