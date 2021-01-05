@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {AdministrationService, AuthenticationSource, AuthenticationSourceParam} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
-import {concatMap, tap} from 'rxjs/operators';
+import {concatMap, filter, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 
@@ -34,6 +34,7 @@ export class AdminDomainsParametersComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminService.selectedDomain$.pipe(
+        filter(domainName => domainName !== ''),
         concatMap(
         domainName => this.administrationService.getAuthenticationSource(this.sessionService.sessionToken, domainName)
         ),

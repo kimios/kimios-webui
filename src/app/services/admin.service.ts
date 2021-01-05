@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {AdministrationService, AuthenticationSource, SecurityService} from 'app/kimios-client-api';
-import {SessionService} from './session.service';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {AuthenticationSource, SecurityService} from 'app/kimios-client-api';
 
 @Injectable({
   providedIn: 'root'
@@ -9,14 +8,12 @@ import {SessionService} from './session.service';
 export class AdminService {
 
   domains$: Observable<Array<AuthenticationSource>>;
-  selectedDomain$: Subject<string>;
+  selectedDomain$: BehaviorSubject<string>;
 
   constructor(
-      private sessionService: SessionService,
-      private administrationService: AdministrationService,
       private securityService: SecurityService
   ) {
     this.domains$ = this.securityService.getAuthenticationSources();
-    this.selectedDomain$ = new Subject<string>();
+    this.selectedDomain$ = new BehaviorSubject<string>('');
   }
 }
