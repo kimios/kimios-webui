@@ -10,7 +10,7 @@
     </div>
 
     <div fxLayout="column" fxLayoutGap="10px" fxFlex>
-        <ng-container *ngIf="authenticationSource$ | async as authenticationSource">
+        <ng-container *ngIf="authenticationSourceLoaded$ | async as loaded">
             <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
 
             <div fxLayout="row" fxLayoutGap="5px">
@@ -21,10 +21,10 @@
                     <div [ngClass]="'talign-right'">Enable SSO: </div>
                 </div>
                 <div fxLayout="column" fxFlex [ngClass]="'domain-form-div'">
-                    <div>{{authenticationSource.name}}</div>
+                    <div>{{authenticationSource$.getValue().name}}</div>
                     <div>
                         <mat-select
-                                [(value)]="authenticationSource.className"
+                                [(value)]="authenticationSource$.getValue().className"
                                 [formControlName]="'className'"
                         >
                             <mat-option
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <mat-checkbox
-                            value="{{authenticationSource.enableMailCheck}}"
+                            value="{{authenticationSource$.getValue().enableMailCheck}}"
                             name="enableMailCheck"
                             [formControlName]="'enableMailCheck'"
                         >
@@ -45,7 +45,7 @@
                     </div>
                     <div>
                         <mat-checkbox
-                            value="{{authenticationSource.enableSso}}"
+                            value="{{authenticationSource$.getValue().enableSso}}"
                             name="enableSso"
                             [formControlName]="'enableSso'"
                         >
@@ -53,6 +53,33 @@
                     </div>
                 </div>
             </div>
+                <!-- domain specific parameters -->
+                <!--<ng-container *ngIf="authenticationSourceParams$ | async as params">-->
+                <ng-container *ngIf="getParamsControlAsMap().size > 0">
+                    <!--<ng-container *ngIf="params.size > 0">-->
+                        <div fxLayout="column" [formGroup]="formGroup.get('params')" >
+                            <div [ngClass]="'domain-form-div'">
+                                <div>Specific parameters</div>
+                            </div>
+                            <div>
+                                <table>
+                                    <tr *ngFor="let key of getParamsControlAsMap().keys()">
+                                        <td>{{key}}</td>
+                                        <td>
+                                            <mat-form-field>
+                                            <input
+                                                    matInput
+                                                    [formControl]="formGroup.get('params').get(key)"
+                                                    type="text">
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    <!--</ng-container>-->
+                </ng-container>
+
             <div style="width: 100%;">
                 <div fxLayout="row"
                      fxLayoutAlign="center center"
