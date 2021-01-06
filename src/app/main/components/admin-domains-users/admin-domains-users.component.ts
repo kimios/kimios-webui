@@ -33,14 +33,13 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new UsersDataSource(this.users$);
+    this.dataSource = new UsersDataSource(this.sessionService, this.securityService);
 
     this.adminService.selectedDomain$.pipe(
         filter(domainName => domainName !== '')
-    ).pipe(
-        concatMap(domainName => this.loadUsers(domainName)),
-        tap(users => this.users$.next(users))
-    ).subscribe();
+    ).subscribe(
+        domainName => this.dataSource.loadUsers(domainName)
+    );
 
     this.users$.subscribe(users => console.dir(users));
   }
