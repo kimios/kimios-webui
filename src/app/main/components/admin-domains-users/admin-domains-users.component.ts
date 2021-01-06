@@ -1,10 +1,13 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
 import {SecurityService} from 'app/kimios-client-api';
-import {catchError, concatMap, filter, share, switchMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
+import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
+import {DMEntitySort} from 'app/main/model/dmentity-sort';
+import {Sort} from '@angular/material';
 
 @Component({
   selector: 'admin-domains-users',
@@ -15,25 +18,43 @@ import {SessionService} from 'app/services/session.service';
 export class AdminDomainsUsersComponent implements OnInit {
 
   users$: BehaviorSubject<Array<KimiosUser>>;
+  dataSource: UsersDataSource;
+  columnsDescription = USERS_DEFAULT_DISPLAYED_COLUMNS;
+  displayedColumns = [ 'uid', 'lastName', 'firstName' ];
+
+  sort: DMEntitySort = { name: 'name', direction: 'asc' };
 
   constructor(
       private adminService: AdminService,
       private securityService: SecurityService,
-      private sessionService: SessionService
+      private sessionService: SessionService,
   ) {
     this.users$ = new BehaviorSubject<Array<KimiosUser>>(new Array<KimiosUser>());
   }
 
   ngOnInit(): void {
+    this.dataSource = new UsersDataSource(this.users$);
+
     this.adminService.selectedDomain$.pipe(
-        tap(() => console.log('AdminDomainsUsersComponent')),
-        filter(domainName => domainName !== ''),
-        concatMap(domainName => this.securityService.getUsers(this.sessionService.sessionToken, domainName).pipe(
-            catchError(err => of(new Array<KimiosUser>())),
-            share()
-        )),
+        filter(domainName => domainName !== '')
+    ).pipe(
+        concatMap(domainName => this.loadUsers(domainName)),
         tap(users => this.users$.next(users))
     ).subscribe();
+
+    this.users$.subscribe(users => console.dir(users));
   }
 
+  loadUsers(source: string, usersFilter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 20):
+      Observable<Array<KimiosUser>> {
+    return this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
+        catchError(() => of(new Array<KimiosUser>())),
+        tap(users => console.log('returned ' + users.length + ' users')),
+        map(users => users),
+    );
+  }
+
+  sortData($event: Sort): void {
+
+  }
 }
