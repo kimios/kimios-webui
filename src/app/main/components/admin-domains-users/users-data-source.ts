@@ -3,7 +3,7 @@ import {BehaviorSubject, of} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {SessionService} from 'app/services/session.service';
 import {SecurityService} from 'app/kimios-client-api';
-import {catchError, finalize, share} from 'rxjs/operators';
+import {catchError, finalize, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 
 export const USERS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
@@ -64,9 +64,30 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
 
     loadUsers(source: string, filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 20): void {
         this.loadingSubject.next(true);
-        this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false))
-        ).subscribe(users => this.usersSubject.next(users));
+        if ((this.usersCacheByDomain[source] == null || this.usersCacheByDomain[source] === undefined)
+            && filter === ''
+            && pageIndex === 0
+        ) {
+            this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
+                catchError(() => of([])),
+                tap(users => this.usersCacheByDomain[source] = users),
+                finalize(() => this.loadingSubject.next(false))
+            ).subscribe(users => this.usersSubject.next(users));
+        } else {
+            if (this.usersCacheByDomain[source].length === 0) {
+                this.usersSubject.next(this.usersCacheByDomain[source]);
+            } else {
+                let usersToReturn = this.usersCacheByDomain.get(source);
+                if (filter !== '') {
+                    usersToReturn = usersToReturn.filter(user =>
+                        user.uid.toLowerCase().includes(filter.toLowerCase())
+                        || user.firstName.toLowerCase().includes(filter.toLowerCase())
+                        || user.lastName.toLowerCase().includes(filter.toLowerCase())
+                    );
+                }
+                usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize)
+                this.usersSubject.next(usersToReturn);
+            }
+        }
     }
 }
