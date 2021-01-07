@@ -5,6 +5,7 @@ import {SessionService} from 'app/services/session.service';
 import {SecurityService} from 'app/kimios-client-api';
 import {catchError, finalize, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
+import {DMEntitySort} from 'app/main/model/dmentity-sort';
 
 export const USERS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -62,44 +63,55 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         this.loadingSubject.complete();
     }
 
-    loadUsers(source: string, filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 20): void {
+    loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
         this.loadingSubject.next(true);
-        if ((this.usersCacheByDomain.get(source) == null || this.usersCacheByDomain.get(source) === undefined)
-            && filter === ''
-            && pageIndex === 0
-        ) {
+        if (this.usersCacheByDomain.get(source) == null
+            || this.usersCacheByDomain.get(source) === undefined) {
             this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
                 tap(users => this.usersCacheByDomain.set(source, users)),
                 finalize(() => this.loadingSubject.next(false))
-            ).subscribe(users => this.usersSubject.next(users));
+            ).subscribe(users => this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize));
         } else {
-            if (this.usersCacheByDomain.get(source).length === 0) {
-                this.usersSubject.next(this.usersCacheByDomain.get(source));
-            } else {
-                let usersToReturn = this.usersCacheByDomain.get(source);
-                if (filter !== '') {
-                    usersToReturn = usersToReturn.filter(user =>
-                        user.uid.toLowerCase().includes(filter.toLowerCase())
-                        || user.firstName.toLowerCase().includes(filter.toLowerCase())
-                        || user.lastName.toLowerCase().includes(filter.toLowerCase())
-                    );
-                }
-                usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize);
-                this.usersSubject.next(usersToReturn);
-            }
+            this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize);
         }
     }
 
-    filterUsers(value: string): Array<KimiosUser> {
-        return this._filterUsers(value, this.usersSubject.getValue());
+    _loadUsersFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
+        let usersToReturn = new Array<KimiosUser>();
+        if (this.usersCacheByDomain.get(source).length !== 0) {
+            usersToReturn = this.usersCacheByDomain.get(source);
+            if (filter !== '') {
+                usersToReturn = this._filterUsers(filter, usersToReturn);
+            }
+            usersToReturn = this._sortUsers(usersToReturn, sort)
+                .slice(pageIndex * pageSize, pageSize);
+        }
+        this.usersSubject.next(usersToReturn);
     }
 
-    _filterUsers(value: string, userList: Array<KimiosUser>): Array<KimiosUser> {
+    filterUsers(value: string, source): Array<KimiosUser> {
+        return this._filterUsers(value, this.usersCacheByDomain.get(source));
+    }
+
+    private _filterUsers(value: string, userList: Array<KimiosUser>): Array<KimiosUser> {
         return  userList.filter(user =>
             user.uid.toLowerCase().includes(value.toLowerCase())
             || user.firstName.toLowerCase().includes(value.toLowerCase())
             || user.lastName.toLowerCase().includes(value.toLowerCase())
         );
+    }
+
+    private _sortUsers(users: Array<KimiosUser>, sort: DMEntitySort): Array<KimiosUser> {
+        return users.sort((user1, user2) => this._compareUsersOnField(user1, user2, sort));
+    }
+
+    private _compareUsersOnField(user1: KimiosUser, user2: KimiosUser, sort: DMEntitySort): number {
+        const sortDir = sort.direction === 'asc' ?
+            1 :
+            -1;
+        const sortRes = sortDir * user1[sort.name].localeCompare(user2[sort.name]);
+
+        return sortRes;
     }
 }
