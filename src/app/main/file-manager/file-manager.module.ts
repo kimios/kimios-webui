@@ -95,6 +95,7 @@ import {AdminSpecialRolesComponent} from 'app/main/components/admin-special-role
 import {AdminSpecialTasksComponent} from 'app/main/components/admin-special-tasks/admin-special-tasks.component';
 import {AdminDomainsParametersComponent} from 'app/main/components/admin-domains-parameters/admin-domains-parameters.component';
 import {AdminDomainsUsersComponent} from 'app/main/components/admin-domains-users/admin-domains-users.component';
+import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-groups/admin-domains-groups.component';
 
 
 @NgModule({
@@ -154,7 +155,8 @@ import {AdminDomainsUsersComponent} from 'app/main/components/admin-domains-user
         AdminSpecialRolesComponent,
         AdminSpecialTasksComponent,
         AdminDomainsParametersComponent,
-        AdminDomainsUsersComponent
+        AdminDomainsUsersComponent,
+        AdminDomainsGroupsComponent
     ],
     imports: [
         FileManagerRoutingModule,

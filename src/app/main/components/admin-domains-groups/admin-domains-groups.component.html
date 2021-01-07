@@ -1,0 +1,48 @@
+<div fxLayout="column" fxLayoutGap="5px">
+
+  <div>
+    <form (ngSubmit)="filterData()">
+      <mat-form-field style="width: 90%;">
+        <input #inputDataSearch type="text" name="inputFilename" matInput aria-label="Tags" [formControl]="dataSearch"
+               [matAutocomplete]="autoDataSearch" placeholder="login or name">
+        <button mat-button (click)="filterData()" >
+          <mat-icon>search</mat-icon>
+        </button>
+        <mat-autocomplete #autoDataSearch="matAutocomplete" fxFlex="40" [displayWith]="displayFn">
+          <mat-option *ngFor="let group of filteredData$ | async" placeholder="File name" [value]="group"
+                      (click)="showGroup(group)" >
+            <span>{{group.name}}, {{group.gid}})</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <mat-table [dataSource]="dataSource"
+             matSort
+             matSortActive="{{sort.name}}"
+             matSortDirection="{{sort.direction}}"
+             matSortDisableClear
+             (matSortChange)="sortData($event)">
+
+    <ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}">
+      <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="{{col.matColumnDef}}"
+      > {{col.displayName}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
+        <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns;">
+    </mat-row>
+
+  </mat-table>
+
+</div>
