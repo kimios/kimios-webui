@@ -1,7 +1,26 @@
 <!--<ng-container *ngIf="users$ | async as users">-->
   <!--<form [formGroup]="formGroup" (ngSubmit)="onSubmit()">-->
 
-    <div>
+    <div fxLayout="column" fxLayoutGap="5px">
+
+      <div>
+        <form (ngSubmit)="filterUsers()">
+          <mat-form-field style="width: 90%;">
+            <input #inputUserSearch type="text" name="inputFilename" matInput aria-label="Tags" [formControl]="userSearch"
+                   [matAutocomplete]="autoUserSearch" placeholder="login or name">
+            <button mat-button (click)="filterUsers()" >
+              <mat-icon>search</mat-icon>
+            </button>
+            <mat-autocomplete #autoUserSearch="matAutocomplete" fxFlex="40" [displayWith]="displayFn">
+              <mat-option *ngFor="let user of filteredUsers$ | async" placeholder="File name" [value]="user"
+                          (click)="showUser(user)" >
+                <span>{{user.lastName}}, {{user.firstName}} ({{user.uid}})</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </form>
+      </div>
+
       <mat-table [dataSource]="dataSource"
                  matSort
                  matSortActive="{{sort.name}}"
@@ -27,8 +46,8 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;">
         </mat-row>
 
-
       </mat-table>
+
     </div>
   <!--</form>-->
 

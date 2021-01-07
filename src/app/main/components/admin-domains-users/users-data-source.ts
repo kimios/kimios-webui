@@ -64,18 +64,18 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
 
     loadUsers(source: string, filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 20): void {
         this.loadingSubject.next(true);
-        if ((this.usersCacheByDomain[source] == null || this.usersCacheByDomain[source] === undefined)
+        if ((this.usersCacheByDomain.get(source) == null || this.usersCacheByDomain.get(source) === undefined)
             && filter === ''
             && pageIndex === 0
         ) {
             this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
-                tap(users => this.usersCacheByDomain[source] = users),
+                tap(users => this.usersCacheByDomain.set(source, users)),
                 finalize(() => this.loadingSubject.next(false))
             ).subscribe(users => this.usersSubject.next(users));
         } else {
-            if (this.usersCacheByDomain[source].length === 0) {
-                this.usersSubject.next(this.usersCacheByDomain[source]);
+            if (this.usersCacheByDomain.get(source).length === 0) {
+                this.usersSubject.next(this.usersCacheByDomain.get(source));
             } else {
                 let usersToReturn = this.usersCacheByDomain.get(source);
                 if (filter !== '') {
@@ -85,9 +85,21 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
                         || user.lastName.toLowerCase().includes(filter.toLowerCase())
                     );
                 }
-                usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize)
+                usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize);
                 this.usersSubject.next(usersToReturn);
             }
         }
+    }
+
+    filterUsers(value: string): Array<KimiosUser> {
+        return this._filterUsers(value, this.usersSubject.getValue());
+    }
+
+    _filterUsers(value: string, userList: Array<KimiosUser>): Array<KimiosUser> {
+        return  userList.filter(user =>
+            user.uid.toLowerCase().includes(value.toLowerCase())
+            || user.firstName.toLowerCase().includes(value.toLowerCase())
+            || user.lastName.toLowerCase().includes(value.toLowerCase())
+        );
     }
 }
