@@ -1,5 +1,5 @@
 import {BehaviorSubject, of} from 'rxjs';
-import {Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
+import {Group, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {catchError, finalize, tap} from 'rxjs/operators';
