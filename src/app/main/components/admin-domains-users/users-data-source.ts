@@ -43,6 +43,7 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
+    public totalNbElements$: BehaviorSubject<number>;
 
     usersCacheByDomain: Map<string, Array<KimiosUser>>;
 
@@ -52,6 +53,7 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
     ) {
         super();
         this.usersCacheByDomain = new Map<string, Array<KimiosUser>>();
+        this.totalNbElements$ = new BehaviorSubject<number>(0);
     }
 
     connect(): BehaviorSubject<KimiosUser[]> {
@@ -69,12 +71,16 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
             || this.usersCacheByDomain.get(source) === undefined) {
             this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
-                tap(users => this.usersCacheByDomain.set(source, users)),
+                tap(users => this._setCacheForDomain(source, users)),
                 finalize(() => this.loadingSubject.next(false))
             ).subscribe(users => this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize));
         } else {
             this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize);
         }
+    }
+
+    private _setCacheForDomain(domainName: string, data: Array<KimiosUser>): void {
+        this.usersCacheByDomain.set(domainName, data);
     }
 
     _loadUsersFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
@@ -84,8 +90,9 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
             if (filter !== '') {
                 usersToReturn = this._filterUsers(filter, usersToReturn);
             }
-            usersToReturn = this._sortUsers(usersToReturn, sort)
-                .slice(pageIndex * pageSize, pageSize);
+            this.totalNbElements$.next(usersToReturn.length);
+            usersToReturn = this._sortUsers(usersToReturn, sort);
+            usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize * (pageIndex + 1));
         }
         this.usersSubject.next(usersToReturn);
     }

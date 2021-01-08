@@ -7,7 +7,7 @@ import {catchError, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {MatAutocompleteTrigger, Sort} from '@angular/material';
+import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
 import {FormControl} from '@angular/forms';
 
 @Component({
@@ -28,9 +28,10 @@ export class AdminDomainsUsersComponent implements OnInit {
 
   page = 0;
   pageSize = 10;
-  pageOptions = [ 0, 10, 20 ];
+  pageOptions = [ 10, 20 ];
 
   @ViewChild('inputUserSearch', { read: MatAutocompleteTrigger }) inputUserSearch: MatAutocompleteTrigger;
+  totalNbElements: number;
 
   constructor(
       private adminService: AdminService,
@@ -51,6 +52,10 @@ export class AdminDomainsUsersComponent implements OnInit {
 
     this.filteredUsers$ = this.userSearch.valueChanges.pipe(
         map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
+    );
+
+    this.dataSource.totalNbElements$.subscribe(
+        total => this.totalNbElements = total
     );
   }
 
@@ -89,5 +94,16 @@ export class AdminDomainsUsersComponent implements OnInit {
 
   showUser(user: KimiosUser): void {
 
+  }
+
+  handlePageEvent($event: PageEvent): void {
+    this.page = $event.pageIndex;
+    this.pageSize = $event.pageSize;
+    this._updatePage();
+  }
+
+  _updatePage(): void {
+    this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort,
+        this.userSearch.value, this.page, this.pageSize);
   }
 }

@@ -48,6 +48,14 @@
 
       </mat-table>
 
+      <mat-paginator
+              [length]="totalNbElements"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageOptions"
+              (page)="handlePageEvent($event)">
+      </mat-paginator>
+
+
     </div>
   <!--</form>-->
 
