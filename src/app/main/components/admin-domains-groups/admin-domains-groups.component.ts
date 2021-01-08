@@ -2,12 +2,16 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormControl} from '@angular/forms';
 import {Observable, of} from 'rxjs';
-import {Group, SecurityService} from 'app/kimios-client-api';
+import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
 import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
 import {catchError, filter, map, tap} from 'rxjs/operators';
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
+
+const sortTypeMapping = {
+  'nbUsers' : 'number'
+};
 
 @Component({
   selector: 'admin-domains-groups',
@@ -36,12 +40,13 @@ export class AdminDomainsGroupsComponent implements OnInit {
       private adminService: AdminService,
       private securityService: SecurityService,
       private sessionService: SessionService,
+      private administrationService: AdministrationService
   ) {
     this.filteredData$ = new Observable<Array<GroupWithData>>();
   }
 
   ngOnInit(): void {
-    this.dataSource = new GroupsDataSource(this.sessionService, this.securityService);
+    this.dataSource = new GroupsDataSource(this.sessionService, this.securityService, this.administrationService);
 
     this.adminService.selectedDomain$.pipe(
         filter(domainName => domainName !== ''),
@@ -55,6 +60,13 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
     this.dataSource.totalNbElements$.subscribe(
         total => this.totalNbElements = total
+    );
+
+    this.dataSource.elementUpdated$.subscribe(
+        group => {
+          console.log('groupUpdated : ');
+          console.dir(group);
+        }
     );
   }
 
@@ -77,6 +89,9 @@ export class AdminDomainsGroupsComponent implements OnInit {
         $event.direction.toString() === 'desc' ?
             'desc' :
             'asc';
+    if (sortTypeMapping[this.sort.name] != null) {
+      this.sort.type = sortTypeMapping[this.sort.name];
+    }
     this.dataSource.loadData(
         this.adminService.selectedDomain$.getValue(),
         this.sort,

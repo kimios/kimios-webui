@@ -1,10 +1,12 @@
-import {BehaviorSubject, of} from 'rxjs';
-import {Group, SecurityService} from 'app/kimios-client-api';
+import {BehaviorSubject, combineLatest, from, of} from 'rxjs';
+import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {catchError, finalize, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, finalize, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {ColumnDescription} from 'app/main/model/column-description';
+import {User as KimiosUser} from 'app/kimios-client-api';
+import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 
 export interface GroupWithData extends Group {
     nbUsers: number;
@@ -45,18 +47,23 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
 
     public loading$ = this.loadingSubject.asObservable();
     public totalNbElements$: BehaviorSubject<number>;
+    public elementUpdated$: BehaviorSubject<GroupWithData>;
 
     dataCacheByDomain: Map<string, Array<GroupWithData>>;
+    dataCacheUsersByDomain: Map<string, Array<KimiosUser>>;
 
     dataFieldsForFiltering = [ 'name', 'gid'];
 
     constructor(
         private sessionService: SessionService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private administrationService: AdministrationService
     ) {
         super();
         this.dataCacheByDomain = new Map<string, Array<GroupWithData>>();
+        this.dataCacheUsersByDomain = new Map<string, Array<KimiosUser>>();
         this.totalNbElements$ = new BehaviorSubject<number>(0);
+        this.elementUpdated$ = new BehaviorSubject<GroupWithData>(null);
     }
 
     connect(): BehaviorSubject<GroupWithData[]> {
@@ -76,6 +83,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
                 catchError(() => of([])),
                 map(elements => this._convertAllToGroupWithData(elements)),
                 tap(data => this._setCacheForDomain(source, data)),
+                tap(() => this._loadNbUsers(source)),
                 finalize(() => this.loadingSubject.next(false))
             ).subscribe(data => this._loadDataFromCache(source, sort, filter, pageIndex, pageSize));
         } else {
@@ -133,9 +141,36 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         const sortDir = sort.direction === 'asc' ?
             1 :
             -1;
-        const sortRes = sortDir * element1[sort.name].localeCompare(element2[sort.name]);
+        const sortRes = sortDir * (
+            sort.type != null && sort.type === 'number' ?
+                compareNumbers([element1[sort.name]], [element2[sort.name]]) :
+                element1[sort.name].localeCompare(element2[sort.name])
+        );
 
         return sortRes;
+    }
+
+    private _loadNbUsers(source: string): void {
+        const groups = this.dataCacheByDomain.get(source);
+        if (groups.length === 0) {
+            return;
+        }
+        from(groups).pipe(
+            concatMap(group => combineLatest(of(group), this.administrationService.getManageableUsers(this.sessionService.sessionToken, group.gid, source))),
+            map(([ group, users ]) => {
+                this._updateElementInDataCache(source, group, 'nbUsers', users.length);
+                this.dataCacheUsersByDomain[source] = users;
+            })
+        ).subscribe();
+    }
+
+    private _updateElementInDataCache(source: string, group: GroupWithData, key: string, value: number): void {
+        const idx = this.dataCacheByDomain.get(source).findIndex(grp => grp.gid === group.gid);
+        if (idx === -1) {
+            return;
+        }
+        this.dataCacheByDomain.get(source)[idx][key] = value;
+        this.elementUpdated$.next(this.dataCacheByDomain.get(source)[idx]);
     }
 }
 
