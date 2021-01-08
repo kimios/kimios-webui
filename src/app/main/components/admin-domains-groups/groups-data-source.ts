@@ -32,6 +32,7 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
+    public totalNbElements$: BehaviorSubject<number>;
 
     dataCacheByDomain: Map<string, Array<Group>>;
 
@@ -43,6 +44,7 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
     ) {
         super();
         this.dataCacheByDomain = new Map<string, Array<Group>>();
+        this.totalNbElements$ = new BehaviorSubject<number>(0);
     }
 
     connect(): BehaviorSubject<Group[]> {
@@ -60,12 +62,16 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
             || this.dataCacheByDomain.get(source) === undefined) {
             this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
-                tap(data => this.dataCacheByDomain.set(source, data)),
+                tap(data => this._setCacheForDomain(source, data)),
                 finalize(() => this.loadingSubject.next(false))
             ).subscribe(data => this._loadDataFromCache(source, sort, filter, pageIndex, pageSize));
         } else {
             this._loadDataFromCache(source, sort, filter, pageIndex, pageSize);
         }
+    }
+
+    private _setCacheForDomain(domainName: string, data: Array<Group>): void {
+        this.dataCacheByDomain.set(domainName, data);
     }
 
     _loadDataFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
@@ -75,8 +81,9 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
             if (filter !== '') {
                 dataToReturn = this._filterDataList(filter, dataToReturn);
             }
+            this.totalNbElements$.next(dataToReturn.length);
             dataToReturn = this._sortData(dataToReturn, sort)
-                .slice(pageIndex * pageSize, pageSize);
+                .slice(pageIndex * pageSize, pageSize * (pageIndex + 1));
         }
         this.dataSubject.next(dataToReturn);
     }

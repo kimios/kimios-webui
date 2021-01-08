@@ -3,7 +3,7 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormControl} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {Group, SecurityService} from 'app/kimios-client-api';
-import {MatAutocompleteTrigger, Sort} from '@angular/material';
+import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
 import {catchError, filter, map, tap} from 'rxjs/operators';
@@ -26,7 +26,9 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   page = 0;
   pageSize = 10;
-  pageOptions = [ 0, 10, 20 ];
+  pageOptions = [ 10, 20 ];
+
+  totalNbElements: number;
 
   @ViewChild('inputDataSearch', { read: MatAutocompleteTrigger }) inputDataSearch: MatAutocompleteTrigger;
 
@@ -49,6 +51,10 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
     this.filteredData$ = this.dataSearch.valueChanges.pipe(
         map(value => this.dataSource.filterData(value, this.adminService.selectedDomain$.getValue()))
+    );
+
+    this.dataSource.totalNbElements$.subscribe(
+        total => this.totalNbElements = total
     );
   }
 
@@ -87,5 +93,16 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   showGroup(group: Group): void {
 
+  }
+
+  handlePageEvent($event: PageEvent): void {
+    this.page = $event.pageIndex;
+    this.pageSize = $event.pageSize;
+    this._updatePage();
+  }
+
+  _updatePage(): void {
+    this.dataSource.loadData(this.adminService.selectedDomain$.getValue(), this.sort,
+        this.dataSearch.value, this.page, this.pageSize);
   }
 }
