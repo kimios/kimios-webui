@@ -1,0 +1,56 @@
+<form  [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+    <div fxLayout="column" >
+
+        <mat-form-field>
+            <mat-label>firstname</mat-label>
+            <input matInput [formControlName]="'firstName'">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>lastname</mat-label>
+            <input matInput [formControlName]="'lastName'">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>phone number</mat-label>
+            <input matInput [formControlName]="'phoneNumber'">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>mail</mat-label>
+            <input matInput [formControlName]="'mail'">
+        </mat-form-field>
+
+        <mat-checkbox [formControlName]="'enabled'">
+            enabled
+        </mat-checkbox>
+
+    <div fxLayout="row">
+        <div fxLayout="row"
+             fxLayoutAlign="center center"
+             fxLayoutGap="20px"
+             fxFill
+             style="margin-top: 20px !important;">
+            <div [class.kimios-button]="true"
+                 [class.kimios-green]="true"
+                 [class.inactive]="true"
+                 fxLayout="row"
+                 fxLayoutAlign="center center"
+                 matDialogClose>
+                <span [class.kimios-button-text]="true">CANCEL</span>
+            </div>
+            <div [class.kimios-button]="true"
+                 [class.kimios-green]="true"
+                 [class.active]="true"
+                 fxLayout="row"
+                 fxLayoutAlign="center center"
+                 (click)="onSubmit()">
+                <span class="kimios-button-text">SAVE USER</span>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+</form>

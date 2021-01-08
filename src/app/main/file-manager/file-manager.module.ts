@@ -96,7 +96,8 @@ import {AdminSpecialTasksComponent} from 'app/main/components/admin-special-task
 import {AdminDomainsParametersComponent} from 'app/main/components/admin-domains-parameters/admin-domains-parameters.component';
 import {AdminDomainsUsersComponent} from 'app/main/components/admin-domains-users/admin-domains-users.component';
 import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-groups/admin-domains-groups.component';
-import {UserDialogComponent} from '../components/user-dialog/user-dialog.component';
+import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
+import {UserFormComponent} from 'app/main/components/user-form/user-form.component';
 
 
 @NgModule({
@@ -158,7 +159,8 @@ import {UserDialogComponent} from '../components/user-dialog/user-dialog.compone
         AdminDomainsParametersComponent,
         AdminDomainsUsersComponent,
         AdminDomainsGroupsComponent,
-        UserDialogComponent
+        UserDialogComponent,
+        UserFormComponent
     ],
     imports: [
         FileManagerRoutingModule,

@@ -97,7 +97,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   showUser(user: KimiosUser): void {
     const dialogRef = this.dialog.open(UserDialogComponent, {
       data: {
-        'uid': user.uid
+        'user': user
       },
     });
   }

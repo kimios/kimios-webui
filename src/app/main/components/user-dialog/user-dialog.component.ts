@@ -1,9 +1,10 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {User as KimiosUser} from 'app/kimios-client-api';
 
 export interface UserDialogData {
-  uid: number;
-};
+  user: KimiosUser;
+}
 
 @Component({
   selector: 'user-dialog',
