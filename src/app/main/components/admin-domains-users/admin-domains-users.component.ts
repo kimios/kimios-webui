@@ -7,8 +7,9 @@ import {catchError, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
+import {MatAutocompleteTrigger, MatDialog, PageEvent, Sort} from '@angular/material';
 import {FormControl} from '@angular/forms';
+import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
 
 @Component({
   selector: 'admin-domains-users',
@@ -37,6 +38,7 @@ export class AdminDomainsUsersComponent implements OnInit {
       private adminService: AdminService,
       private securityService: SecurityService,
       private sessionService: SessionService,
+      public dialog: MatDialog
   ) {
     this.filteredUsers$ = new Observable<Array<KimiosUser>>();
   }
@@ -93,7 +95,11 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   showUser(user: KimiosUser): void {
-
+    const dialogRef = this.dialog.open(UserDialogComponent, {
+      data: {
+        'uid': user.uid
+      },
+    });
   }
 
   handlePageEvent($event: PageEvent): void {

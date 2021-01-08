@@ -96,6 +96,7 @@ import {AdminSpecialTasksComponent} from 'app/main/components/admin-special-task
 import {AdminDomainsParametersComponent} from 'app/main/components/admin-domains-parameters/admin-domains-parameters.component';
 import {AdminDomainsUsersComponent} from 'app/main/components/admin-domains-users/admin-domains-users.component';
 import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-groups/admin-domains-groups.component';
+import {UserDialogComponent} from '../components/user-dialog/user-dialog.component';
 
 
 @NgModule({
@@ -156,7 +157,8 @@ import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-gro
         AdminSpecialTasksComponent,
         AdminDomainsParametersComponent,
         AdminDomainsUsersComponent,
-        AdminDomainsGroupsComponent
+        AdminDomainsGroupsComponent,
+        UserDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -209,7 +211,8 @@ import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-gro
         EntityMoveDialogComponent,
         ContainerEntityCreationDialogComponent,
         ContainerEntityDialogComponent,
-        FilePermissionsDialogComponent
+        FilePermissionsDialogComponent,
+        UserDialogComponent
     ],
     exports: [
         FileUploadListComponent,
