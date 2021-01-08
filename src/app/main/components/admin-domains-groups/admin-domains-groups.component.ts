@@ -7,7 +7,7 @@ import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
 import {catchError, filter, map, tap} from 'rxjs/operators';
-import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource} from './groups-data-source';
+import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
 
 @Component({
   selector: 'admin-domains-groups',
@@ -18,11 +18,11 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   dataSource: GroupsDataSource;
   columnsDescription = GROUPS_DEFAULT_DISPLAYED_COLUMNS;
-  displayedColumns = [ 'gid', 'name' ];
+  displayedColumns = [ 'gid', 'name', 'nbUsers' ];
 
   sort: DMEntitySort = { name: 'name', direction: 'asc' };
   dataSearch = new FormControl('');
-  filteredData$: Observable<Array<Group>>;
+  filteredData$: Observable<Array<GroupWithData>>;
 
   page = 0;
   pageSize = 10;
@@ -37,7 +37,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
       private securityService: SecurityService,
       private sessionService: SessionService,
   ) {
-    this.filteredData$ = new Observable<Array<Group>>();
+    this.filteredData$ = new Observable<Array<GroupWithData>>();
   }
 
   ngOnInit(): void {
@@ -58,7 +58,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
     );
   }
 
-  displayFn(group?: Group): string {
+  displayFn(group?: GroupWithData): string {
     return this.dataSearch ? this.dataSearch.value : '';
   }
 
@@ -91,7 +91,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
     this.inputDataSearch.closePanel();
   }
 
-  showGroup(group: Group): void {
+  showGroup(group: GroupWithData): void {
 
   }
 

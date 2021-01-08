@@ -2,9 +2,13 @@ import {BehaviorSubject, of} from 'rxjs';
 import {Group, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {catchError, finalize, tap} from 'rxjs/operators';
+import {catchError, finalize, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {ColumnDescription} from 'app/main/model/column-description';
+
+export interface GroupWithData extends Group {
+    nbUsers: number;
+}
 
 export const GROUPS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -24,17 +28,25 @@ export const GROUPS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'name',
         cell: null
+    }, {
+        id: 'nbUsers',
+        matColumnDef: 'nbUsers',
+        position: 3,
+        matHeaderCellDef: 'nbUsers',
+        sticky: false,
+        displayName: 'total users',
+        cell: null
     }
 ];
 
-export class GroupsDataSource extends MatTableDataSource<Group> {
-    private dataSubject = new BehaviorSubject<Group[]>([]);
+export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
+    private dataSubject = new BehaviorSubject<GroupWithData[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
     public totalNbElements$: BehaviorSubject<number>;
 
-    dataCacheByDomain: Map<string, Array<Group>>;
+    dataCacheByDomain: Map<string, Array<GroupWithData>>;
 
     dataFieldsForFiltering = [ 'name', 'gid'];
 
@@ -43,11 +55,11 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
         private securityService: SecurityService
     ) {
         super();
-        this.dataCacheByDomain = new Map<string, Array<Group>>();
+        this.dataCacheByDomain = new Map<string, Array<GroupWithData>>();
         this.totalNbElements$ = new BehaviorSubject<number>(0);
     }
 
-    connect(): BehaviorSubject<Group[]> {
+    connect(): BehaviorSubject<GroupWithData[]> {
         return this.dataSubject;
     }
 
@@ -62,6 +74,7 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
             || this.dataCacheByDomain.get(source) === undefined) {
             this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
+                map(elements => this._convertAllToGroupWithData(elements)),
                 tap(data => this._setCacheForDomain(source, data)),
                 finalize(() => this.loadingSubject.next(false))
             ).subscribe(data => this._loadDataFromCache(source, sort, filter, pageIndex, pageSize));
@@ -70,12 +83,24 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
         }
     }
 
-    private _setCacheForDomain(domainName: string, data: Array<Group>): void {
+    private _createGroupWithDataFromGroup(group: Group): GroupWithData {
+        return <GroupWithData> {
+            gid: group.gid,
+            name: group.name,
+            nbUsers: -1
+        };
+    }
+
+    private _convertAllToGroupWithData(elements: Array<Group>): Array<GroupWithData> {
+        return elements.map(elem => this._createGroupWithDataFromGroup(elem));
+    }
+
+    private _setCacheForDomain(domainName: string, data: Array<GroupWithData>): void {
         this.dataCacheByDomain.set(domainName, data);
     }
 
     _loadDataFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
-        let dataToReturn = new Array<Group>();
+        let dataToReturn = new Array<GroupWithData>();
         if (this.dataCacheByDomain.get(source).length !== 0) {
             dataToReturn = this.dataCacheByDomain.get(source);
             if (filter !== '') {
@@ -88,11 +113,11 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
         this.dataSubject.next(dataToReturn);
     }
 
-    filterData(value: string, source): Array<Group> {
+    filterData(value: string, source): Array<GroupWithData> {
         return this._filterDataList(value, this.dataCacheByDomain.get(source));
     }
 
-    private _filterDataList(value: string, list: Array<Group>): Array<Group> {
+    private _filterDataList(value: string, list: Array<GroupWithData>): Array<GroupWithData> {
         return  list.filter(
             element => this.dataFieldsForFiltering
                     .find(field => element[field] != null && element[field].toLowerCase().includes(value.toLowerCase()))
@@ -100,11 +125,11 @@ export class GroupsDataSource extends MatTableDataSource<Group> {
         );
     }
 
-    private _sortData(data: Array<Group>, sort: DMEntitySort): Array<Group> {
+    private _sortData(data: Array<GroupWithData>, sort: DMEntitySort): Array<GroupWithData> {
         return data.sort((group1, group2) => this._compareDataOnField(group1, group2, sort));
     }
 
-    private _compareDataOnField(element1: Group, element2: Group, sort: DMEntitySort): number {
+    private _compareDataOnField(element1: GroupWithData, element2: GroupWithData, sort: DMEntitySort): number {
         const sortDir = sort.direction === 'asc' ?
             1 :
             -1;
