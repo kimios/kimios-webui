@@ -3,11 +3,12 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormControl} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
-import {MatAutocompleteTrigger, PageEvent, Sort} from '@angular/material';
+import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
 import {catchError, filter, map, tap} from 'rxjs/operators';
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
+import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 
 const sortTypeMapping = {
   'nbUsers' : 'number'
@@ -34,13 +35,16 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   totalNbElements: number;
 
+  dialogRef: MatDialogRef<GroupDialogComponent, any>;
+
   @ViewChild('inputDataSearch', { read: MatAutocompleteTrigger }) inputDataSearch: MatAutocompleteTrigger;
 
   constructor(
       private adminService: AdminService,
       private securityService: SecurityService,
       private sessionService: SessionService,
-      private administrationService: AdministrationService
+      private administrationService: AdministrationService,
+      private dialog: MatDialog
   ) {
     this.filteredData$ = new Observable<Array<GroupWithData>>();
   }
@@ -107,7 +111,13 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   showGroup(group: GroupWithData): void {
-
+    this.dialogRef = this.dialog.open(GroupDialogComponent, {
+      data: group ? {
+        'group': group
+      } : {
+        'source': this.adminService.selectedDomain$.getValue()
+      }
+    });
   }
 
   handlePageEvent($event: PageEvent): void {

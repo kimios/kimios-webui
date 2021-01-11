@@ -98,6 +98,8 @@ import {AdminDomainsUsersComponent} from 'app/main/components/admin-domains-user
 import {AdminDomainsGroupsComponent} from 'app/main/components/admin-domains-groups/admin-domains-groups.component';
 import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
 import {UserFormComponent} from 'app/main/components/user-form/user-form.component';
+import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
+import {GroupFormComponent} from 'app/main/components/group-form/group-form.component';
 
 
 @NgModule({
@@ -160,7 +162,9 @@ import {UserFormComponent} from 'app/main/components/user-form/user-form.compone
         AdminDomainsUsersComponent,
         AdminDomainsGroupsComponent,
         UserDialogComponent,
-        UserFormComponent
+        UserFormComponent,
+        GroupDialogComponent,
+        GroupFormComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -214,7 +218,8 @@ import {UserFormComponent} from 'app/main/components/user-form/user-form.compone
         ContainerEntityCreationDialogComponent,
         ContainerEntityDialogComponent,
         FilePermissionsDialogComponent,
-        UserDialogComponent
+        UserDialogComponent,
+        GroupDialogComponent
     ],
     exports: [
         FileUploadListComponent,
