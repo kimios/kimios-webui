@@ -88,10 +88,10 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-      this.showSpinnerFormSubmit = true;
     if (this.userForm.invalid) {
       return;
     }
+    this.showSpinnerFormSubmit = true;
     if (this.user) {
         this.administrationService.updateUser(
             this.sessionService.sessionToken,
