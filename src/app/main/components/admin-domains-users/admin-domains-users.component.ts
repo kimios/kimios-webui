@@ -7,7 +7,7 @@ import {catchError, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {MatAutocompleteTrigger, MatDialog, PageEvent, Sort} from '@angular/material';
+import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
 import {FormControl} from '@angular/forms';
 import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
 
@@ -34,6 +34,8 @@ export class AdminDomainsUsersComponent implements OnInit {
   @ViewChild('inputUserSearch', { read: MatAutocompleteTrigger }) inputUserSearch: MatAutocompleteTrigger;
   totalNbElements: number;
 
+  dialogRef: MatDialogRef<UserDialogComponent, any>;
+
   constructor(
       private adminService: AdminService,
       private securityService: SecurityService,
@@ -59,6 +61,12 @@ export class AdminDomainsUsersComponent implements OnInit {
     this.dataSource.totalNbElements$.subscribe(
         total => this.totalNbElements = total
     );
+
+    this.adminService.closeUserDialog$.subscribe(boolean => {
+      if (boolean) {
+        this.dialogRef.close();
+      }
+    });
   }
 
   displayFn(user?: KimiosUser): string {
@@ -95,7 +103,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   showUser(user: KimiosUser): void {
-    const dialogRef = this.dialog.open(UserDialogComponent, {
+    this.dialogRef = this.dialog.open(UserDialogComponent, {
       data: {
         'user': user
       },

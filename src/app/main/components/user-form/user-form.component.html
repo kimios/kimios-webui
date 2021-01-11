@@ -37,7 +37,8 @@
                  [class.inactive]="true"
                  fxLayout="row"
                  fxLayoutAlign="center center"
-                 matDialogClose>
+                 matDialogClose
+                 (click)="close()" >
                 <span [class.kimios-button-text]="true">CANCEL</span>
             </div>
             <div [class.kimios-button]="true"

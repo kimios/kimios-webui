@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {AdministrationService, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {ValidationErrors} from '@angular/forms/src/directives/validators';
+import {AdminService} from 'app/services/admin.service';
 
 const userFormPasswordConfirmValidator = function(control: FormGroup): ValidationErrors | null {
   return (control.get('password').value === control.get('passwordConfirm').value) ?
@@ -28,6 +29,7 @@ export class UserFormComponent implements OnInit {
       private administrationService: AdministrationService,
       private securityService: SecurityService,
       private sessionService: SessionService,
+      private adminService: AdminService,
       private fb: FormBuilder
   ) {
 
@@ -71,4 +73,8 @@ export class UserFormComponent implements OnInit {
         () => console.log('user updated')
     );
   }
+
+    close(): void {
+        this.adminService.closeUserDialog$.next(true);
+    }
 }
