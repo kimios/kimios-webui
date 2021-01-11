@@ -120,4 +120,12 @@ export class AdminDomainsUsersComponent implements OnInit {
     this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort,
         this.userSearch.value, this.page, this.pageSize);
   }
+
+  openNewUserDialog(): void {
+    this.dialogRef = this.dialog.open(UserDialogComponent, {
+      data: {
+        'source': this.adminService.selectedDomain$.getValue()
+      },
+    });
+  }
 }

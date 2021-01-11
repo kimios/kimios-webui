@@ -1,6 +1,16 @@
 <form  [formGroup]="userForm" (ngSubmit)="onSubmit()">
 
     <div fxLayout="column" >
+        <div>
+            <span *ngIf="user; else uidInput">{{user.uid}}@{{user.source}}</span>
+            <ng-template #uidInput>
+                <mat-form-field>
+                    <mat-label>uid</mat-label>
+                    <input matInput [formControlName]="'uid'">
+                    <span matSuffix>@{{source}}</span>
+                </mat-form-field>
+            </ng-template>
+        </div>
 
         <mat-form-field>
             <mat-label>firstname</mat-label>
@@ -20,6 +30,19 @@
         <mat-form-field>
             <mat-label>mail</mat-label>
             <input matInput [formControlName]="'mail'">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>password</mat-label>
+            <input matInput [formControlName]="'password'">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>confirm password</mat-label>
+            <input matInput [formControlName]="'passwordConfirm'">
+            <mat-error>
+                does not match with password
+            </mat-error>
         </mat-form-field>
 
         <mat-slide-toggle
