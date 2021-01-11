@@ -67,7 +67,8 @@
                  (click)="close()" >
                 <span [class.kimios-button-text]="true">CANCEL</span>
             </div>
-            <div [class.kimios-button]="true"
+            <div *ngIf="!showSpinnerFormSubmit; else spinner"
+                 [class.kimios-button]="true"
                  [class.kimios-green]="true"
                  [class.active]="true"
                  fxLayout="row"
@@ -75,6 +76,11 @@
                  (click)="onSubmit()">
                 <span class="kimios-button-text">SAVE USER</span>
             </div>
+            <ng-template #spinner>
+                <div style="width: 120px" fxLayout="row" fxLayoutAlign="center center">
+                    <mat-spinner diameter="30"></mat-spinner>
+                </div>
+            </ng-template>
         </div>
     </div>
 

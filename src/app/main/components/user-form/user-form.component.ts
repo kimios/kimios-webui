@@ -33,6 +33,7 @@ export class UserFormComponent implements OnInit {
 
   userForm: FormGroup;
   enabledSlideToggleMessage: string;
+    showSpinnerFormSubmit = false;
 
   constructor(
       private administrationService: AdministrationService,
@@ -87,6 +88,7 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+      this.showSpinnerFormSubmit = true;
       this.userForm.updateValueAndValidity();
     if (this.userForm.invalid) {
       return;
@@ -103,7 +105,10 @@ export class UserFormComponent implements OnInit {
             this.user.source,
             this.userForm.get('enabled').value
         ).subscribe(
-            () => console.log('user updated')
+            () => {
+                this.showSpinnerFormSubmit = false;
+                // this.adminService.closeUserDialog$.next(true);
+            },
         );
     } else {
         this.administrationService.createUser(
@@ -117,7 +122,10 @@ export class UserFormComponent implements OnInit {
             this.source,
             this.userForm.get('enabled').value
         ).subscribe(
-            () => console.log('user updated')
+            () => {
+                this.showSpinnerFormSubmit = false;
+                // this.adminService.closeUserDialog$.next(true);
+            }
         );
     }
   }
