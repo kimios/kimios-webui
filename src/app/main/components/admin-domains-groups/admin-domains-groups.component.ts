@@ -111,12 +111,13 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   showGroup(group: GroupWithData): void {
+    const data = group != null && group !== undefined ? {
+      'group': group
+    } : {
+      'source': this.adminService.selectedDomain$.getValue()
+    };
     this.dialogRef = this.dialog.open(GroupDialogComponent, {
-      data: group ? {
-        'group': group
-      } : {
-        'source': this.adminService.selectedDomain$.getValue()
-      }
+      data: data
     });
   }
 

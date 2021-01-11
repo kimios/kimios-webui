@@ -95,6 +95,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         return <GroupWithData> {
             gid: group.gid,
             name: group.name,
+            source: group.source,
             nbUsers: -1
         };
     }

@@ -63,7 +63,7 @@ export class AdminDomainsUsersComponent implements OnInit {
     );
 
     this.adminService.closeUserDialog$.subscribe(boolean => {
-      if (boolean) {
+      if (boolean && this.dialogRef != null) {
         this.dialogRef.close();
       }
     });
