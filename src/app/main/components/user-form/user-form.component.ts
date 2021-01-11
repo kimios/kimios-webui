@@ -24,6 +24,7 @@ export class UserFormComponent implements OnInit {
   user: KimiosUser;
 
   userForm: FormGroup;
+  enabledSlideToggleMessage: string;
 
   constructor(
       private administrationService: AdministrationService,
@@ -37,6 +38,16 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.userForm = this._createFormGroupFromUser(this.user);
+    this._updateEnabledSlideToggleMessage(this.userForm.get('enabled').value);
+    this.userForm.get('enabled').valueChanges.subscribe(
+        value => this._updateEnabledSlideToggleMessage(value)
+    );
+  }
+
+  _updateEnabledSlideToggleMessage(enabled: any): void {
+      this.enabledSlideToggleMessage = enabled ?
+          'Enabled' :
+          'Disabled';
   }
   
   _createFormGroupFromUser(user: KimiosUser): FormGroup {

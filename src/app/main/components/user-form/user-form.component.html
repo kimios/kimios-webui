@@ -22,9 +22,12 @@
             <input matInput [formControlName]="'mail'">
         </mat-form-field>
 
-        <mat-checkbox [formControlName]="'enabled'">
-            enabled
-        </mat-checkbox>
+        <mat-slide-toggle
+                [formControlName]="'enabled'"
+                class="example-margin"
+                labelPosition="before">
+            {{enabledSlideToggleMessage}}
+        </mat-slide-toggle>
 
     <div fxLayout="row">
         <div fxLayout="row"
