@@ -89,7 +89,6 @@ export class UserFormComponent implements OnInit {
 
   onSubmit(): void {
       this.showSpinnerFormSubmit = true;
-      this.userForm.updateValueAndValidity();
     if (this.userForm.invalid) {
       return;
     }
