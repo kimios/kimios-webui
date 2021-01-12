@@ -1,12 +1,12 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormControl} from '@angular/forms';
-import {Observable, of} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
 import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
-import {catchError, filter, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 
@@ -37,6 +37,11 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   dialogRef: MatDialogRef<GroupDialogComponent, any>;
 
+  @Input()
+  mode: 'domain' | 'user';
+  @Input()
+  userId: string;
+
   @ViewChild('inputDataSearch', { read: MatAutocompleteTrigger }) inputDataSearch: MatAutocompleteTrigger;
 
   constructor(
@@ -50,16 +55,31 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.mode == null
+        || this.mode === undefined) {
+      this.mode = 'domain';
+    }
+    if (! this.modeIsDomain()) {
+      this.displayedColumns = [ 'gid', 'name' ];
+      this.columnsDescription = this.columnsDescription.filter(colDesc => this.displayedColumns.findIndex(
+          elem => elem === colDesc.matColumnDef) !== -1);
+    }
+
     this.dataSource = new GroupsDataSource(this.sessionService, this.securityService, this.administrationService);
 
     this.adminService.selectedDomain$.pipe(
         filter(domainName => domainName !== ''),
     ).subscribe(
-        domainName => this.dataSource.loadData(domainName, this.sort, this.dataSearch.value, this.page, this.pageSize)
+        domainName => this.modeIsDomain() ?
+            this.dataSource.loadData(domainName, this.sort, this.dataSearch.value, this.page, this.pageSize) :
+            this.dataSource.loadDataForUserId(domainName, this.sort, this.userId)
     );
 
     this.filteredData$ = this.dataSearch.valueChanges.pipe(
-        map(value => this.dataSource.filterData(value, this.adminService.selectedDomain$.getValue()))
+        startWith(''),
+        concatMap(filterValue => combineLatest(of(filterValue),
+            this.dataSource._initCacheForDomain(this.adminService.selectedDomain$.getValue()))),
+        map(([filterValue, booleanValue]) => this.dataSource.filterData(filterValue, this.adminService.selectedDomain$.getValue()))
     );
 
     this.dataSource.totalNbElements$.subscribe(
@@ -72,6 +92,10 @@ export class AdminDomainsGroupsComponent implements OnInit {
           console.dir(group);
         }
     );
+  }
+
+  modeIsDomain(): boolean {
+    return this.mode === 'domain';
   }
 
   displayFn(group?: GroupWithData): string {
@@ -96,13 +120,17 @@ export class AdminDomainsGroupsComponent implements OnInit {
     if (sortTypeMapping[this.sort.name] != null) {
       this.sort.type = sortTypeMapping[this.sort.name];
     }
-    this.dataSource.loadData(
-        this.adminService.selectedDomain$.getValue(),
-        this.sort,
-        this.dataSearch.value,
-        this.page,
-        this.pageSize
-    );
+    if (this.mode === 'domain') {
+      this.dataSource.loadData(
+          this.adminService.selectedDomain$.getValue(),
+          this.sort,
+          this.dataSearch.value,
+          this.page,
+          this.pageSize
+      );
+    } else {
+      this.dataSource.loadDataForUserId(this.adminService.selectedDomain$.getValue(), this.sort, this.userId);
+    }
   }
 
   filterData(): void {

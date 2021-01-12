@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ValidatorFn} from '@angular/forms';
-import {AdministrationService, AuthenticationSource, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
+import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {ValidationErrors} from '@angular/forms/src/directives/validators';
 import {AdminService} from 'app/services/admin.service';
@@ -34,6 +34,7 @@ export class UserFormComponent implements OnInit {
   userForm: FormGroup;
   enabledSlideToggleMessage: string;
     showSpinnerFormSubmit = false;
+    userGroups: Array<Group>;
 
   constructor(
       private administrationService: AdministrationService,
@@ -42,7 +43,7 @@ export class UserFormComponent implements OnInit {
       private adminService: AdminService,
       private fb: FormBuilder
   ) {
-
+      this.userGroups = new Array<Group>();
   }
 
   ngOnInit(): void {

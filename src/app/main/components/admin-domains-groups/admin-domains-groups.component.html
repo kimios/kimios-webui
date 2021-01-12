@@ -20,7 +20,7 @@
     </div>
 
     <div>
-      <button (click)="showGroup(null)"><mat-icon>add</mat-icon></button>
+      <button *ngIf="modeIsDomain()" (click)="showGroup(null)"><mat-icon>add</mat-icon></button>
     </div>
 
   </div>
@@ -52,7 +52,7 @@
 
   </mat-table>
 
-  <mat-paginator
+  <mat-paginator *ngIf="modeIsDomain()"
           [length]="totalNbElements"
           [pageSize]="pageSize"
           [pageSizeOptions]="pageOptions"
