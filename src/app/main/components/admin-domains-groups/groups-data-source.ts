@@ -224,5 +224,11 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         this.dataCacheByDomain.get(source)[idx][key] = value;
         this.elementUpdated$.next(this.dataCacheByDomain.get(source)[idx]);
     }
+
+    addToData(group: GroupWithData): void {
+        const data = this.dataSubject.getValue();
+        data.push(group);
+        this.dataSubject.next(data);
+    }
 }
 

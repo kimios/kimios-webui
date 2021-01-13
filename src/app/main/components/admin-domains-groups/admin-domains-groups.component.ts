@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {FormControl} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {combineLatest, Observable, of} from 'rxjs';
 import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
 import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
@@ -44,14 +44,19 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   @ViewChild('inputDataSearch', { read: MatAutocompleteTrigger }) inputDataSearch: MatAutocompleteTrigger;
 
+  userGroups: FormGroup;
+  showSpinnerFormSubmit: false;
+
   constructor(
       private adminService: AdminService,
       private securityService: SecurityService,
       private sessionService: SessionService,
       private administrationService: AdministrationService,
-      private dialog: MatDialog
+      private dialog: MatDialog,
+      private fb: FormBuilder
   ) {
     this.filteredData$ = new Observable<Array<GroupWithData>>();
+    this.userGroups = this.fb.group({});
   }
 
   ngOnInit(): void {
@@ -92,6 +97,19 @@ export class AdminDomainsGroupsComponent implements OnInit {
           console.dir(group);
         }
     );
+
+    this.dataSource.connect().subscribe(
+        data => this.userGroups = this._initFormGroup(data)
+    );
+  }
+
+  private _initFormGroup(groups: Array<GroupWithData>): FormGroup {
+    const formGroup = this.fb.group({});
+    groups.forEach(group => {
+      formGroup.addControl(group.gid, this.fb.control(true));
+    });
+
+    return formGroup;
   }
 
   modeIsDomain(): boolean {
@@ -134,11 +152,17 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   filterData(): void {
-    this.dataSource.loadData(this.adminService.selectedDomain$.getValue(), this.sort, this.dataSearch.value, this.page, this.pageSize);
-    this.inputDataSearch.closePanel();
+    if (this.modeIsDomain()) {
+      this.dataSource.loadData(this.adminService.selectedDomain$.getValue(), this.sort, this.dataSearch.value, this.page, this.pageSize);
+      this.inputDataSearch.closePanel();
+    }
   }
 
   showGroup(group: GroupWithData): void {
+    if (! this.modeIsDomain()) {
+      this.dataSource.addToData(group);
+      return;
+    }
     const data = group != null && group !== undefined ? {
       'group': group
     } : {
@@ -158,5 +182,17 @@ export class AdminDomainsGroupsComponent implements OnInit {
   _updatePage(): void {
     this.dataSource.loadData(this.adminService.selectedDomain$.getValue(), this.sort,
         this.dataSearch.value, this.page, this.pageSize);
+  }
+
+  close(): void {
+
+  }
+
+  onSubmit(): void {
+    const mapGroups = new Map<string, boolean>();
+    Object.keys(this.userGroups.controls).forEach(key => mapGroups.set(key, this.userGroups.get(key).value));
+    this.adminService.saveUserGroups(this.userId, mapGroups).subscribe(
+        next => console.log('saveUserGroups() is ' + next)
+    );
   }
 }

@@ -1,8 +1,10 @@
-<form  [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
 
     <mat-tab-group>
 
         <mat-tab label="user data">
+
+            <form  [formGroup]="userForm" (ngSubmit)="onSubmit()">
 
     <div fxLayout="column" >
         <div>
@@ -90,12 +92,14 @@
 
     </div>
 
+            </form>
+
         </mat-tab>
 
-        <mat-tab label="user groups">
+        <mat-tab label="user groups" *ngIf="user">
             <admin-domains-groups [mode]="'user'" [userId]="user.uid"></admin-domains-groups>
         </mat-tab>
 
     </mat-tab-group>
 
-</form>
+
