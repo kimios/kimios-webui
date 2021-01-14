@@ -26,15 +26,17 @@ export class AdminService {
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {
 
-      return zip(from(mapGroups.keys()).pipe(
-          switchMap(gid => iif(
-              () => mapGroups.get(gid),
-              this.administrationService.addUserToGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue()),
-              this.administrationService.removeUserFromGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue())
-          )),
-          catchError(() => of(false)),
-          concatMap(ahaha => iif(() => typeof ahaha === 'boolean', of(false), of(true))),
-          )
+        return zip(from(mapGroups.keys()).pipe(
+            switchMap(gid => {
+                if (mapGroups.get(gid) === true) {
+                    return this.administrationService.addUserToGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue());
+                } else {
+                    return this.administrationService.removeUserFromGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue());
+                }
+            }),
+            catchError(() => of(false)),
+            concatMap(res => iif(() => typeof res === 'boolean', of(false), of(true))),
+        )
       ).pipe(
           map(array => {
             if (array.filter(val => val === false).length > 0) {

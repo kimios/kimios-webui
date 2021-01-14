@@ -93,12 +93,18 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     }
 
     _initCacheForDomain(source: string): Observable<boolean> {
-        return this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
-            catchError(() => of([])),
-            map(elements => this._convertAllToGroupWithData(elements)),
-            tap(data => this._setCacheForDomain(source, data)),
-            concatMap(date => of(true))
-        );
+        return this.isCacheSetForDomain(source) ?
+            of(this.isCacheSetForDomain(source)) :
+            this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+                catchError(() => of([])),
+                map(elements => this._convertAllToGroupWithData(elements)),
+                tap(data => this._setCacheForDomain(source, data)),
+                concatMap(date => of(true))
+            );
+    }
+
+    isCacheSetForDomain(source: string): boolean {
+        return (this.dataCacheByDomain.get(source) != null);
     }
 
     loadDataForUserId(source: string, sort: DMEntitySort, userId: string): void {
@@ -228,6 +234,11 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     addToData(group: GroupWithData): void {
         const data = this.dataSubject.getValue();
         data.push(group);
+        this.dataSubject.next(data);
+    }
+
+    removeFromData(gid: string): void {
+        const data = this.dataSubject.getValue().filter(grp => grp.gid !== gid);
         this.dataSubject.next(data);
     }
 }

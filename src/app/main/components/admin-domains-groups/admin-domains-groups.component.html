@@ -34,6 +34,17 @@
              matSortDisableClear
              (matSortChange)="sortData($event)">
 
+
+    <!-- remove Column -->
+    <ng-container *ngIf="!modeIsDomain()" matColumnDef="remove">
+      <mat-header-cell *matHeaderCellDef>
+
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeFromData(row)" >remove</mat-icon>
+      </mat-cell>
+    </ng-container>
+
     <ng-container
             *ngFor="let col of columnsDescription"
             matColumnDef="{{col.matColumnDef}}"
@@ -55,7 +66,8 @@
 
   </mat-table>
 
-    <div fxLayout="row"
+    <div *ngIf="!modeIsDomain()"
+         fxLayout="row"
          fxLayoutAlign="center center"
          fxLayoutGap="20px"
          fxFill

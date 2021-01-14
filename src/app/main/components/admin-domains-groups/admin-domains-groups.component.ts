@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {combineLatest, Observable, of} from 'rxjs';
+import {combineLatest, iif, Observable, of} from 'rxjs';
 import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
 import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
@@ -65,7 +65,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
       this.mode = 'domain';
     }
     if (! this.modeIsDomain()) {
-      this.displayedColumns = [ 'gid', 'name' ];
+      this.displayedColumns = [ 'remove', 'gid', 'name' ];
       this.columnsDescription = this.columnsDescription.filter(colDesc => this.displayedColumns.findIndex(
           elem => elem === colDesc.matColumnDef) !== -1);
     }
@@ -73,18 +73,22 @@ export class AdminDomainsGroupsComponent implements OnInit {
     this.dataSource = new GroupsDataSource(this.sessionService, this.securityService, this.administrationService);
 
     this.adminService.selectedDomain$.pipe(
-        filter(domainName => domainName !== ''),
+        filter(domainName => domainName !== '')
     ).subscribe(
-        domainName => this.modeIsDomain() ?
-            this.dataSource.loadData(domainName, this.sort, this.dataSearch.value, this.page, this.pageSize) :
-            this.dataSource.loadDataForUserId(domainName, this.sort, this.userId)
+        domainName => {
+          if (this.modeIsDomain()) {
+            this.userId = null;
+            this.dataSource.loadData(domainName, this.sort, this.dataSearch.value, this.page, this.pageSize);
+          }
+        }
     );
 
     this.filteredData$ = this.dataSearch.valueChanges.pipe(
         startWith(''),
         concatMap(filterValue => combineLatest(of(filterValue),
             this.dataSource._initCacheForDomain(this.adminService.selectedDomain$.getValue()))),
-        map(([filterValue, booleanValue]) => this.dataSource.filterData(filterValue, this.adminService.selectedDomain$.getValue()))
+        map(([filterValue, booleanValue]) => this.dataSource.filterData(filterValue, this.adminService.selectedDomain$.getValue())),
+        concatMap(groups => iif(() => this.modeIsDomain(), of(groups), of(this._removeUserGroups(groups))))
     );
 
     this.dataSource.totalNbElements$.subscribe(
@@ -99,12 +103,24 @@ export class AdminDomainsGroupsComponent implements OnInit {
     );
 
     this.dataSource.connect().subscribe(
-        data => this.userGroups = this._initFormGroup(data)
+        data => this.userGroups = this._mergeFormGroup(this.userGroups, data)
     );
+
+    if (! this.modeIsDomain()) {
+      this.dataSource.loadDataForUserId(this.adminService.selectedDomain$.getValue(), this.sort, this.userId);
+    }
   }
 
-  private _initFormGroup(groups: Array<GroupWithData>): FormGroup {
-    const formGroup = this.fb.group({});
+  private _mergeFormGroup(formGroup: FormGroup, groups: Array<GroupWithData>): FormGroup {
+    const formGroupNew = this.fb.group({});
+    if (formGroup != null
+        && formGroup !== undefined) {
+      Object.keys(formGroup.controls).forEach(control => {
+        if (formGroup.get(control).value === false) {
+          formGroupNew.addControl(control, this.fb.control(formGroup.get(control).value));
+        }
+      });
+    }
     groups.forEach(group => {
       formGroup.addControl(group.gid, this.fb.control(true));
     });
@@ -160,7 +176,13 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   showGroup(group: GroupWithData): void {
     if (! this.modeIsDomain()) {
+      if (this.userGroups.get(group.gid) != null
+          && this.userGroups.get(group.gid).value === false) {
+        this.userGroups.removeControl(group.gid);
+      }
+      const val = this.dataSearch.value;
       this.dataSource.addToData(group);
+      this.dataSearch.patchValue(val, {onlySelf: true, emitEvent: true, emitViewToModelChange: true});
       return;
     }
     const data = group != null && group !== undefined ? {
@@ -191,8 +213,45 @@ export class AdminDomainsGroupsComponent implements OnInit {
   onSubmit(): void {
     const mapGroups = new Map<string, boolean>();
     Object.keys(this.userGroups.controls).forEach(key => mapGroups.set(key, this.userGroups.get(key).value));
-    this.adminService.saveUserGroups(this.userId, mapGroups).subscribe(
+    this.administrationService.getManageableGroups(
+        this.sessionService.sessionToken, this.userId, this.adminService.selectedDomain$.getValue()).pipe(
+        map(groups => {
+          const newMap = new Map<string, boolean>();
+          const groupsGid = groups.map(grp => grp.gid);
+          mapGroups.forEach((value, key) => {
+            if (!groupsGid.includes(key)
+                || value === false) {
+              newMap.set(key, value);
+            }
+          });
+          return newMap;
+        }),
+        concatMap(mapGroupsNew => this.adminService.saveUserGroups(this.userId, mapGroupsNew))
+    ).subscribe(
         next => console.log('saveUserGroups() is ' + next)
     );
+  }
+
+  removeFromData(row: GroupWithData): void {
+    if (this.userGroups.get(row.gid) != null) {
+      this.userGroups.controls[row.gid].setValue(false, {onlySelf: true});
+    }
+    const val = this.dataSearch.value;
+    this.dataSource.removeFromData(row.gid);
+    this.dataSearch.patchValue(val, {onlySelf: true, emitEvent: true, emitViewToModelChange: true});
+  }
+
+  private _removeUserGroups(groups: Array<GroupWithData>): Array<GroupWithData> {
+    if (this.userId != null
+        && this.userId !== undefined
+        && this.userGroups != null
+        && this.userGroups !== undefined) {
+
+      groups = groups.filter(group =>
+          this.userGroups.get(group.gid) == null
+          || this.userGroups.get(group.gid).value === false
+      );
+    }
+    return groups;
   }
 }

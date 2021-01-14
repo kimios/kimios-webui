@@ -49,7 +49,7 @@ export class AdminDomainsUsersComponent implements OnInit {
     this.dataSource = new UsersDataSource(this.sessionService, this.securityService);
 
     this.adminService.selectedDomain$.pipe(
-        filter(domainName => domainName !== ''),
+        filter(domainName => domainName !== '')
     ).subscribe(
         domainName => this.dataSource.loadUsers(domainName, this.sort, this.userSearch.value, this.page, this.pageSize)
     );
