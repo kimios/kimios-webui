@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
 import {Observable, of} from 'rxjs';
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
@@ -18,6 +18,9 @@ import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.c
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminDomainsUsersComponent implements OnInit {
+
+  @Input()
+  _mode: 'admin' | 'roles' = 'admin';
 
   dataSource: UsersDataSource;
   columnsDescription = USERS_DEFAULT_DISPLAYED_COLUMNS;
@@ -46,27 +49,42 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new UsersDataSource(this.sessionService, this.securityService);
+    this.dataSource = new UsersDataSource(this.sessionService, this.securityService, this.adminService);
 
-    this.adminService.selectedDomain$.pipe(
-        filter(domainName => domainName !== '')
-    ).subscribe(
-        domainName => this.dataSource.loadUsers(domainName, this.sort, this.userSearch.value, this.page, this.pageSize)
-    );
+    if (this.modeIsAdmin()) {
+      this.adminService.selectedDomain$.pipe(
+          filter(domainName => domainName !== '')
+      ).subscribe(
+          domainName => this.dataSource.loadUsers(domainName, this.sort, this.userSearch.value, this.page, this.pageSize)
+      );
 
-    this.filteredUsers$ = this.userSearch.valueChanges.pipe(
-        map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
-    );
+      this.filteredUsers$ = this.userSearch.valueChanges.pipe(
+          map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
+      );
+
+      this.adminService.closeUserDialog$.subscribe(boolean => {
+        if (boolean && this.dialogRef != null) {
+          this.dialogRef.close();
+        }
+      });
+    }
 
     this.dataSource.totalNbElements$.subscribe(
         total => this.totalNbElements = total
     );
 
-    this.adminService.closeUserDialog$.subscribe(boolean => {
-      if (boolean && this.dialogRef != null) {
-        this.dialogRef.close();
-      }
-    });
+    if (this._mode === 'roles') {
+      this.displayedColumns = [ 'uid', 'lastName', 'firstName' ];
+      this.adminService.selectedRole$.pipe(
+          filter(roleId => roleId !== 0),
+      ).subscribe(
+          roleId => this.dataSource.loadUsersForRoleId(roleId, this.sort)
+      );
+    }
+  }
+
+  private modeIsAdmin(): boolean {
+    return this._mode === 'admin';
   }
 
   displayFn(user?: KimiosUser): string {
@@ -88,13 +106,17 @@ export class AdminDomainsUsersComponent implements OnInit {
         $event.direction.toString() === 'desc' ?
             'desc' :
             'asc';
-    this.dataSource.loadUsers(
-        this.adminService.selectedDomain$.getValue(),
-        this.sort,
-        this.userSearch.value,
-        this.page,
-        this.pageSize
-    );
+    if (this.modeIsAdmin()) {
+      this.dataSource.loadUsers(
+          this.adminService.selectedDomain$.getValue(),
+          this.sort,
+          this.userSearch.value,
+          this.page,
+          this.pageSize
+      );
+    } else {
+      this.dataSource.sortLoadedData(this.sort);
+    }
   }
 
   filterUsers(): void {
@@ -105,7 +127,8 @@ export class AdminDomainsUsersComponent implements OnInit {
   showUser(user: KimiosUser): void {
     this.dialogRef = this.dialog.open(UserDialogComponent, {
       data: {
-        'user': user
+        'user': user,
+        'edit': this.modeIsAdmin()
       },
     });
   }

@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, from, iif, Observable, of, Subject, zip} from 'rxjs';
-import {AdministrationService, AuthenticationSource, SecurityService} from 'app/kimios-client-api';
+import {AdministrationService, AuthenticationSource, Role, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
-import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, tap, toArray} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +11,7 @@ export class AdminService {
 
   domains$: Observable<Array<AuthenticationSource>>;
   selectedDomain$: BehaviorSubject<string>;
+  selectedRole$: BehaviorSubject<number>;
 
   closeUserDialog$: Subject<boolean>;
 
@@ -21,6 +22,7 @@ export class AdminService {
   ) {
     this.domains$ = this.securityService.getAuthenticationSources();
     this.selectedDomain$ = new BehaviorSubject<string>('');
+    this.selectedRole$ = new BehaviorSubject<number>(0);
     this.closeUserDialog$ = new Subject<boolean>();
   }
 
@@ -46,5 +48,20 @@ export class AdminService {
             }
           })
       );
+    }
+
+    findUsersWithRole(roleId: number): Observable<Array<Role>> {
+        return this.administrationService.getRoles(this.sessionService.sessionToken, roleId);
+    }
+
+    loadUsersFromUsersRole(roles: Array<Role>): Observable<Array<KimiosUser>> {
+        return from(roles).pipe(
+            concatMap(role => this.administrationService.getManageableUser(
+                this.sessionService.sessionToken,
+                role.userName,
+                role.userSource
+            )),
+            toArray(),
+        );
     }
 }

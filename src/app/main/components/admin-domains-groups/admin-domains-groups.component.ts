@@ -2,7 +2,7 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {combineLatest, iif, Observable, of} from 'rxjs';
-import {AdministrationService, Group, SecurityService} from 'app/kimios-client-api';
+import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {SessionService} from 'app/services/session.service';
@@ -40,7 +40,9 @@ export class AdminDomainsGroupsComponent implements OnInit {
   @Input()
   mode: 'domain' | 'user';
   @Input()
-  userId: string;
+  user: KimiosUser;
+  @Input()
+  edit = false;
 
   @ViewChild('inputDataSearch', { read: MatAutocompleteTrigger }) inputDataSearch: MatAutocompleteTrigger;
 
@@ -65,7 +67,10 @@ export class AdminDomainsGroupsComponent implements OnInit {
       this.mode = 'domain';
     }
     if (! this.modeIsDomain()) {
-      this.displayedColumns = [ 'remove', 'gid', 'name' ];
+      this.displayedColumns = [ 'gid', 'name' ];
+      if (this.edit) {
+        this.displayedColumns.unshift('remove');
+      }
       this.columnsDescription = this.columnsDescription.filter(colDesc => this.displayedColumns.findIndex(
           elem => elem === colDesc.matColumnDef) !== -1);
     }
@@ -77,7 +82,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
     ).subscribe(
         domainName => {
           if (this.modeIsDomain()) {
-            this.userId = null;
+            this.user = null;
             this.dataSource.loadData(domainName, this.sort, this.dataSearch.value, this.page, this.pageSize);
           }
         }
@@ -107,7 +112,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
     );
 
     if (! this.modeIsDomain()) {
-      this.dataSource.loadDataForUserId(this.adminService.selectedDomain$.getValue(), this.sort, this.userId);
+      this.dataSource.loadDataForUserId(this.user.source, this.sort, this.user.uid);
     }
   }
 
@@ -163,7 +168,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
           this.pageSize
       );
     } else {
-      this.dataSource.loadDataForUserId(this.adminService.selectedDomain$.getValue(), this.sort, this.userId);
+      this.dataSource.loadDataForUserId(this.adminService.selectedDomain$.getValue(), this.sort, this.user.uid);
     }
   }
 
@@ -214,7 +219,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
     const mapGroups = new Map<string, boolean>();
     Object.keys(this.userGroups.controls).forEach(key => mapGroups.set(key, this.userGroups.get(key).value));
     this.administrationService.getManageableGroups(
-        this.sessionService.sessionToken, this.userId, this.adminService.selectedDomain$.getValue()).pipe(
+        this.sessionService.sessionToken, this.user.uid, this.adminService.selectedDomain$.getValue()).pipe(
         map(groups => {
           const newMap = new Map<string, boolean>();
           const groupsGid = groups.map(grp => grp.gid);
@@ -226,7 +231,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
           });
           return newMap;
         }),
-        concatMap(mapGroupsNew => this.adminService.saveUserGroups(this.userId, mapGroupsNew))
+        concatMap(mapGroupsNew => this.adminService.saveUserGroups(this.user.uid, mapGroupsNew))
     ).subscribe(
         next => console.log('saveUserGroups() is ' + next)
     );
@@ -242,8 +247,8 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   private _removeUserGroups(groups: Array<GroupWithData>): Array<GroupWithData> {
-    if (this.userId != null
-        && this.userId !== undefined
+    if (this.user != null
+        && this.user !== undefined
         && this.userGroups != null
         && this.userGroups !== undefined) {
 

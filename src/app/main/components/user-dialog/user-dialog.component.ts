@@ -5,6 +5,7 @@ import {User as KimiosUser} from 'app/kimios-client-api';
 export interface UserDialogData {
   user: KimiosUser;
   source: string;
+  edit?: boolean;
 }
 
 @Component({

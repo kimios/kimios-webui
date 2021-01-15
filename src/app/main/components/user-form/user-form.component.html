@@ -58,7 +58,7 @@
             {{enabledSlideToggleMessage}}
         </mat-slide-toggle>
 
-    <div fxLayout="row">
+    <div *ngIf="edit" fxLayout="row">
         <div fxLayout="row"
              fxLayoutAlign="center center"
              fxLayoutGap="20px"
@@ -97,7 +97,7 @@
         </mat-tab>
 
         <mat-tab label="user groups" *ngIf="user">
-            <admin-domains-groups [mode]="'user'" [userId]="user.uid"></admin-domains-groups>
+            <admin-domains-groups [mode]="'user'" [user]="user" [edit]="edit" ></admin-domains-groups>
         </mat-tab>
 
     </mat-tab-group>

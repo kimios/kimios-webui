@@ -3,7 +3,7 @@
 
     <div fxLayout="column" fxLayoutGap="5px">
 
-      <div fxLayout="row">
+      <div *ngIf="modeIsAdmin()" fxLayout="row">
         <div fxFlex="70">
         <form (ngSubmit)="filterUsers()">
           <mat-form-field style="width: 90%;">
@@ -55,7 +55,7 @@
 
       </mat-table>
 
-      <mat-paginator
+      <mat-paginator *ngIf="modeIsAdmin()"
               [length]="totalNbElements"
               [pageSize]="pageSize"
               [pageSizeOptions]="pageOptions"

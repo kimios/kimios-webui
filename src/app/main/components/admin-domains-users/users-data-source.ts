@@ -3,9 +3,10 @@ import {BehaviorSubject, of} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {SessionService} from 'app/services/session.service';
 import {SecurityService} from 'app/kimios-client-api';
-import {catchError, finalize, tap} from 'rxjs/operators';
+import {catchError, concatMap, finalize, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
+import {AdminService} from 'app/services/admin.service';
 
 export const USERS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -49,7 +50,8 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
 
     constructor(
         private sessionService: SessionService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private adminService: AdminService
     ) {
         super();
         this.usersCacheByDomain = new Map<string, Array<KimiosUser>>();
@@ -120,5 +122,19 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         const sortRes = sortDir * user1[sort.name].localeCompare(user2[sort.name]);
 
         return sortRes;
+    }
+
+    sortLoadedData(sort: DMEntitySort): void {
+        const sortedData = this._sortUsers(this.usersSubject.getValue(), sort);
+        this.usersSubject.next(sortedData);
+    }
+
+    loadUsersForRoleId(roleId: number, sort: DMEntitySort): void {
+        this.adminService.findUsersWithRole(roleId).pipe(
+            concatMap(roles => this.adminService.loadUsersFromUsersRole(roles)),
+            map(users => this._sortUsers(users, sort))
+        ).subscribe(
+            usersSorted => this.usersSubject.next(usersSorted)
+        );
     }
 }

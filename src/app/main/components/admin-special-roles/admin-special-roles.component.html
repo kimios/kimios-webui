@@ -1,3 +1,17 @@
-<p>
-  admin-special-roles works!
-</p>
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+
+  <div fxFlex="30" fxLayout="column">
+    <div *ngFor="let possibleRoleId of possibleRolesId"
+         (click)="selectRole(possibleRoleId)"
+         class="cursor-pointer"
+    >
+      <span>{{_possibleRoles.get(possibleRoleId)}}</span>
+    </div>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+
+    <admin-domains-users [_mode]="'roles'"></admin-domains-users>
+
+  </div>
+</div>

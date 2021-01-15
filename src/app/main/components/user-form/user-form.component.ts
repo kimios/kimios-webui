@@ -30,6 +30,8 @@ export class UserFormComponent implements OnInit {
   user: KimiosUser;
   @Input()
   source: string;
+  @Input()
+  edit: boolean;
 
   userForm: FormGroup;
   enabledSlideToggleMessage: string;

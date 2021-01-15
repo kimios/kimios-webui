@@ -1,6 +1,6 @@
 <div fxLayout="column" fxLayoutGap="5px">
 
-  <div>
+  <div *ngIf="modeIsDomain() || edit">
     <div fxFlex="70">
     <form (ngSubmit)="filterData()">
       <mat-form-field style="width: 90%;">
@@ -66,7 +66,7 @@
 
   </mat-table>
 
-    <div *ngIf="!modeIsDomain()"
+    <div *ngIf="mode === 'user' && edit"
          fxLayout="row"
          fxLayoutAlign="center center"
          fxLayoutGap="20px"
