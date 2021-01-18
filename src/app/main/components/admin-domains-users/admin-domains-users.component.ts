@@ -2,14 +2,15 @@ import {ChangeDetectionStrategy, Component, Input, OnInit, ViewChild} from '@ang
 import {AdminService} from 'app/services/admin.service';
 import {Observable, of} from 'rxjs';
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
-import {SecurityService} from 'app/kimios-client-api';
+import {AdministrationService, AuthenticationSource, SecurityService} from 'app/kimios-client-api';
 import {catchError, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '@angular/material';
-import {FormControl} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
+import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/admin-special-roles-add-to-role-dialog/admin-special-roles-add-to-role-dialog.component';
 
 @Component({
   selector: 'admin-domains-users',
@@ -20,7 +21,7 @@ import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.c
 export class AdminDomainsUsersComponent implements OnInit {
 
   @Input()
-  _mode: 'admin' | 'roles' = 'admin';
+  _mode: 'admin' | 'roles' | 'addToRole' = 'admin';
 
   dataSource: UsersDataSource;
   columnsDescription = USERS_DEFAULT_DISPLAYED_COLUMNS;
@@ -37,21 +38,30 @@ export class AdminDomainsUsersComponent implements OnInit {
   @ViewChild('inputUserSearch', { read: MatAutocompleteTrigger }) inputUserSearch: MatAutocompleteTrigger;
   totalNbElements: number;
 
-  dialogRef: MatDialogRef<UserDialogComponent, any>;
+  dialogRef: MatDialogRef<UserDialogComponent, any> | MatDialogRef<AdminSpecialRolesAddToRoleDialogComponent>;
+
+  selectDomain: FormControl;
+  domains$: Observable<Array<AuthenticationSource>>;
+  usersToAddToRole: FormGroup;
 
   constructor(
       private adminService: AdminService,
       private securityService: SecurityService,
       private sessionService: SessionService,
-      public dialog: MatDialog
+      private administrationService: AdministrationService,
+      public dialog: MatDialog,
+      private fb: FormBuilder
   ) {
     this.filteredUsers$ = new Observable<Array<KimiosUser>>();
+    this.usersToAddToRole = this.fb.group({});
+    this.selectDomain = this.fb.control('');
   }
 
   ngOnInit(): void {
     this.dataSource = new UsersDataSource(this.sessionService, this.securityService, this.adminService);
 
-    if (this.modeIsAdmin()) {
+    if (this.modeIsAdmin()
+        || this._mode === 'addToRole') {
       this.adminService.selectedDomain$.pipe(
           filter(domainName => domainName !== '')
       ).subscribe(
@@ -74,12 +84,37 @@ export class AdminDomainsUsersComponent implements OnInit {
     );
 
     if (this._mode === 'roles') {
-      this.displayedColumns = [ 'uid', 'lastName', 'firstName' ];
+      this.displayedColumns = [ 'remove', 'uid', 'lastName', 'firstName' ];
       this.adminService.selectedRole$.pipe(
           filter(roleId => roleId !== 0),
       ).subscribe(
           roleId => this.dataSource.loadUsersForRoleId(roleId, this.sort)
       );
+    }
+
+    if (this._mode === 'addToRole') {
+      this.displayedColumns = [ 'checkbox', 'uid', 'lastName', 'firstName' ];
+      this.domains$ = this.securityService.getAuthenticationSources();
+
+      this.selectDomain.valueChanges.pipe(
+          map(domain => { if (typeof domain === 'string') {
+            this.dataSource.loadUsers(domain, this.sort, this.userSearch.value, this.page, this.pageSize);
+          }})
+      ).subscribe();
+      this.dataSource.connect().pipe(
+          map(users => users.forEach(user => this.usersToAddToRole.addControl(user.uid, this.fb.control(false))))
+      ).subscribe();
+
+      this.domains$.pipe(
+          filter(() => this.selectDomain.value === ''),
+          filter(domains => domains.length > 0)
+      ).subscribe(
+          domains => {
+            this.adminService.selectedDomain$.next(domains[0].name);
+            this.selectDomain.setValue(domains[0].name);
+          }
+      );
+
     }
   }
 
@@ -120,8 +155,11 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   filterUsers(): void {
-    this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize);
-    this.inputUserSearch.closePanel();
+    if (this._mode === 'admin'
+        || this._mode === 'addToRole') {
+      this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize);
+      this.inputUserSearch.closePanel();
+    }
   }
 
   showUser(user: KimiosUser): void {
@@ -150,5 +188,28 @@ export class AdminDomainsUsersComponent implements OnInit {
         'source': this.adminService.selectedDomain$.getValue()
       },
     });
+  }
+
+  openAddToRoleDialog(): void {
+    this.dialogRef = this.dialog.open(AdminSpecialRolesAddToRoleDialogComponent);
+  }
+
+  openDialog(): void {
+    if (this._mode === 'roles') {
+      this.openAddToRoleDialog();
+    } else {
+      this.openNewUserDialog();
+    }
+  }
+
+  removeUserFromRole(row: KimiosUser): void {
+    this.administrationService.deleteRole(
+        this.sessionService.sessionToken,
+        this.adminService.selectedRole$.getValue(),
+        row.uid,
+        row.source
+    ).subscribe(
+        () => this.dataSource.loadUsersForRoleId(this.adminService.selectedRole$.getValue(), this.sort)
+    );
   }
 }

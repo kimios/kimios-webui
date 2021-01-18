@@ -100,6 +100,7 @@ import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.c
 import {UserFormComponent} from 'app/main/components/user-form/user-form.component';
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 import {GroupFormComponent} from 'app/main/components/group-form/group-form.component';
+import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/admin-special-roles-add-to-role-dialog/admin-special-roles-add-to-role-dialog.component';
 
 
 @NgModule({
@@ -164,7 +165,8 @@ import {GroupFormComponent} from 'app/main/components/group-form/group-form.comp
         UserDialogComponent,
         UserFormComponent,
         GroupDialogComponent,
-        GroupFormComponent
+        GroupFormComponent,
+        AdminSpecialRolesAddToRoleDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -219,7 +221,8 @@ import {GroupFormComponent} from 'app/main/components/group-form/group-form.comp
         ContainerEntityDialogComponent,
         FilePermissionsDialogComponent,
         UserDialogComponent,
-        GroupDialogComponent
+        GroupDialogComponent,
+        AdminSpecialRolesAddToRoleDialogComponent
     ],
     exports: [
         FileUploadListComponent,

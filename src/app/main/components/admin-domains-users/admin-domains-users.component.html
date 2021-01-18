@@ -3,8 +3,8 @@
 
     <div fxLayout="column" fxLayoutGap="5px">
 
-      <div *ngIf="modeIsAdmin()" fxLayout="row">
-        <div fxFlex="70">
+      <div fxLayout="row">
+        <div *ngIf="modeIsAdmin()" fxFlex="70">
         <form (ngSubmit)="filterUsers()">
           <mat-form-field style="width: 90%;">
             <input #inputUserSearch type="text" name="inputFilename" matInput aria-label="Tags" [formControl]="userSearch"
@@ -15,25 +15,62 @@
             <mat-autocomplete #autoUserSearch="matAutocomplete" fxFlex="40" [displayWith]="displayFn">
               <mat-option *ngFor="let user of filteredUsers$ | async" placeholder="File name" [value]="user"
                           (click)="showUser(user)" >
-                <span>{{user.lastName}}, {{user.firstName}} ({{user.uid}})</span>
+                <span>{{user.lastName}}, {{user.firstName}} ({{user.uid}}@{{user.source}})</span>
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
         </form>
         </div>
 
-        <div>
-          <button (click)="openNewUserDialog()"><mat-icon>add</mat-icon></button>
+        <div *ngIf="_mode === 'addToRole'" fxFlex>
+          <!--<ng-container *ngIf="selectedDomain$ | async as selectedDom">-->
+            <mat-select
+                    [formControl]="selectDomain"
+            >
+              <mat-option
+                      *ngFor="let domain of domains$ | async"
+                      [value]="domain.name"
+              >
+                {{domain.name}}
+              </mat-option>
+            </mat-select>
+          <!--</ng-container>-->
         </div>
+
+        <ng-container *ngIf="modeIsAdmin() || _mode === 'roles'">
+        <div>
+          <button (click)="openDialog()"><mat-icon>add</mat-icon></button>
+        </div>
+        </ng-container>
 
       </div>
 
+      <form [formGroup]="usersToAddToRole" >
       <mat-table [dataSource]="dataSource"
                  matSort
                  matSortActive="{{sort.name}}"
                  matSortDirection="{{sort.direction}}"
                  matSortDisableClear
                  (matSortChange)="sortData($event)">
+
+        <!-- remove Column -->
+        <ng-container *ngIf="_mode === 'roles'" matColumnDef="remove">
+          <mat-header-cell *matHeaderCellDef>
+
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-icon [ngClass]="'cursor-pointer'" (click)="removeUserFromRole(row)" >remove</mat-icon>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container *ngIf="_mode === 'addToRole'" matColumnDef="checkbox">
+          <mat-header-cell *matHeaderCellDef>
+
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-checkbox [formControlName]="row.uid"></mat-checkbox>
+          </mat-cell>
+        </ng-container>
 
         <ng-container
                 *ngFor="let col of columnsDescription"
@@ -62,6 +99,7 @@
               (page)="handlePageEvent($event)">
       </mat-paginator>
 
+      </form>
 
     </div>
   <!--</form>-->
