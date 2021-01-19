@@ -99,6 +99,37 @@
               (page)="handlePageEvent($event)">
       </mat-paginator>
 
+        <div *ngIf="_mode === 'addToRole'"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             fxLayoutGap="20px"
+             fxFill
+             style="margin-top: 20px !important;">
+          <div [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.inactive]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               matDialogClose
+               (click)="close()" >
+            <span [class.kimios-button-text]="true">CANCEL</span>
+          </div>
+          <div *ngIf="!showSpinnerFormSubmit; else spinner"
+               [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.active]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               (click)="onSubmitAddUsers()">
+            <span class="kimios-button-text">ADD {{nbUsersToAdd}} USER{{nbUsersToAdd > 1 ? 'S' : ''}}</span>
+          </div>
+          <ng-template #spinner>
+            <div style="width: 120px" fxLayout="row" fxLayoutAlign="center center">
+              <mat-spinner diameter="30"></mat-spinner>
+            </div>
+          </ng-template>
+        </div>
+
       </form>
 
     </div>

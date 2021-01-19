@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
-import {Observable, of} from 'rxjs';
+import {from, Observable, of} from 'rxjs';
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
 import {AdministrationService, AuthenticationSource, SecurityService} from 'app/kimios-client-api';
-import {catchError, filter, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {USERS_DEFAULT_DISPLAYED_COLUMNS, UsersDataSource} from './users-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
@@ -43,6 +43,8 @@ export class AdminDomainsUsersComponent implements OnInit {
   selectDomain: FormControl;
   domains$: Observable<Array<AuthenticationSource>>;
   usersToAddToRole: FormGroup;
+  showSpinnerFormSubmit = false;
+  nbUsersToAdd = 0;
 
   constructor(
       private adminService: AdminService,
@@ -113,6 +115,12 @@ export class AdminDomainsUsersComponent implements OnInit {
             this.adminService.selectedDomain$.next(domains[0].name);
             this.selectDomain.setValue(domains[0].name);
           }
+      );
+
+      this.usersToAddToRole.valueChanges.subscribe(
+          () => this.nbUsersToAdd = Object.keys(this.usersToAddToRole.controls).filter(controlKey =>
+              this.usersToAddToRole.get(controlKey).value === true
+          ).length
       );
 
     }
@@ -211,5 +219,21 @@ export class AdminDomainsUsersComponent implements OnInit {
     ).subscribe(
         () => this.dataSource.loadUsersForRoleId(this.adminService.selectedRole$.getValue(), this.sort)
     );
+  }
+
+  close(): void {
+    this.dialogRef.close();
+  }
+
+  onSubmitAddUsers(): void {
+    from(Object.keys(this.usersToAddToRole.controls)).pipe(
+        filter(key => key !== '' && this.usersToAddToRole.get(key).value === true),
+        concatMap(key => this.administrationService.createRole(
+            this.sessionService.sessionToken,
+            this.adminService.selectedRole$.getValue(),
+            key,
+            this.adminService.selectedDomain$.getValue()
+        ))
+    ).subscribe();
   }
 }
