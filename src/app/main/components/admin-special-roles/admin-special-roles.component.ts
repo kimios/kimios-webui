@@ -9,11 +9,11 @@ import {AdminService} from 'app/services/admin.service';
 export class AdminSpecialRolesComponent implements OnInit {
 
   private _possibleRoles: Map<number, string> = new Map<number, string>([
-    [1, 'Administrator'],
-    [2, 'Special roles'],
-    [3, 'Studio user'],
-    [4, 'Reporting user'],
-    [5, 'Meta feed access denied']
+    [3, 'Administrator'],
+    [2, 'Studio user'],
+    [5, 'Reporting user'],
+    [1, 'Workspace creator'],
+    [4, 'Meta feed access denied']
   ]);
   public possibleRolesId: Array<number>;
 
