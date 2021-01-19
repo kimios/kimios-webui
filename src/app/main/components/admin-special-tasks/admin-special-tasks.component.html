@@ -1,3 +1,17 @@
-<p>
-  admin-special-tasks works!
-</p>
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+
+  <div fxFlex="30" fxLayout="column">
+    <div *ngFor="let possibleTaskId of possibleTasksId"
+         (click)="selectTask(possibleTaskId)"
+         class="cursor-pointer"
+    >
+      <span>{{_possibleTasks.get(possibleTaskId)}}</span>
+    </div>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+
+
+
+  </div>
+</div>

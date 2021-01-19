@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {AdminService} from '../../../services/admin.service';
 
 @Component({
   selector: 'admin-special-tasks',
@@ -7,9 +8,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminSpecialTasksComponent implements OnInit {
 
-  constructor() { }
+  private _possibleTasks: Map<number, string> = new Map<number, string>([
+    [1, 'Sessions management'],
+    [2, 'Reindex']
+  ]);
+  public possibleTasksId: Array<number>;
+
+  constructor(
+      private adminService: AdminService,
+  ) {
+    this.possibleTasksId = Array.from(this._possibleTasks.keys());
+  }
 
   ngOnInit(): void {
   }
 
+  selectTask(possibleTaskId: number): void {
+
+  }
 }
