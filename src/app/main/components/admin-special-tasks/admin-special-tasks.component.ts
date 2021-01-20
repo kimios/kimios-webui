@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {AdminService} from '../../../services/admin.service';
+import {AdminService} from 'app/services/admin.service';
 
 @Component({
   selector: 'admin-special-tasks',
@@ -21,9 +21,12 @@ export class AdminSpecialTasksComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.adminService.selectedTask$.subscribe(
+
+    );
   }
 
   selectTask(possibleTaskId: number): void {
-
+    this.adminService.selectedTask$.next(possibleTaskId);
   }
 }

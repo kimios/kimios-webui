@@ -12,6 +12,8 @@ export class AdminService {
   domains$: Observable<Array<AuthenticationSource>>;
   selectedDomain$: BehaviorSubject<string>;
   selectedRole$: BehaviorSubject<number>;
+  selectedTask$: BehaviorSubject<number>;
+  selectedUser$: BehaviorSubject<KimiosUser>;
 
   closeUserDialog$: Subject<boolean>;
 
@@ -23,6 +25,8 @@ export class AdminService {
     this.domains$ = this.securityService.getAuthenticationSources();
     this.selectedDomain$ = new BehaviorSubject<string>('');
     this.selectedRole$ = new BehaviorSubject<number>(0);
+    this.selectedTask$ = new BehaviorSubject<number>(0);
+    this.selectedUser$ = new BehaviorSubject<KimiosUser>(null);
     this.closeUserDialog$ = new Subject<boolean>();
   }
 

@@ -101,6 +101,10 @@ import {UserFormComponent} from 'app/main/components/user-form/user-form.compone
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 import {GroupFormComponent} from 'app/main/components/group-form/group-form.component';
 import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/admin-special-roles-add-to-role-dialog/admin-special-roles-add-to-role-dialog.component';
+import {AdminSpecialTasksSessionsComponent} from '../components/admin-special-tasks-sessions/admin-special-tasks-sessions.component';
+import {AdminSpecialTasksReindexComponent} from '../components/admin-special-tasks-reindex/admin-special-tasks-reindex.component';
+import {AdTaskComponent} from '../components/ad-task/ad-task.component';
+import {AdDirective} from './ad-directive';
 
 
 @NgModule({
@@ -166,7 +170,11 @@ import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/adm
         UserFormComponent,
         GroupDialogComponent,
         GroupFormComponent,
-        AdminSpecialRolesAddToRoleDialogComponent
+        AdminSpecialRolesAddToRoleDialogComponent,
+        AdminSpecialTasksSessionsComponent,
+        AdminSpecialTasksReindexComponent,
+        AdTaskComponent,
+        AdDirective
     ],
     imports: [
         FileManagerRoutingModule,
@@ -222,7 +230,9 @@ import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/adm
         FilePermissionsDialogComponent,
         UserDialogComponent,
         GroupDialogComponent,
-        AdminSpecialRolesAddToRoleDialogComponent
+        AdminSpecialRolesAddToRoleDialogComponent,
+        AdminSpecialTasksReindexComponent,
+        AdminSpecialTasksSessionsComponent
     ],
     exports: [
         FileUploadListComponent,
