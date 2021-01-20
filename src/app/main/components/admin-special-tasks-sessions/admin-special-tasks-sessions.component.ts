@@ -9,6 +9,10 @@ import {Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
 
+const sortTypeMapping = {
+  'lastUse' : 'number'
+};
+
 @Component({
   selector: 'admin-special-tasks-sessions',
   templateUrl: './admin-special-tasks-sessions.component.html',
@@ -43,10 +47,12 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     this.domainsUsers = new Map<string, Array<string>>();
     this.users = new Map<string, KimiosUser>();
     this.sort = <DMEntitySort> {
-      name: 'lastName',
-      direction: 'asc'
+      name: 'lastUse',
+      direction: 'asc',
+      type: 'number'
     };
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
+    this.displayedColumns.unshift('remove');
   }
 
   ngOnInit(): void {
@@ -114,7 +120,9 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
         $event.direction.toString() === 'desc' ?
             'desc' :
             'asc';
-
+    if (sortTypeMapping[this.sort.name] != null) {
+      this.sort.type = sortTypeMapping[this.sort.name];
+    }
     this.dataSource.loadData(
         this.adminService.selectedUser$.getValue(),
         this.sort,
@@ -123,11 +131,15 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   }
 
   endAllSessions(row: KimiosUser): void {
-
+    this.administrationService.removeEnabledSessions(this.sessionService.sessionToken, row.uid, row.source).subscribe(
+        () => this.dataSource.loadData(this.adminService.selectedUser$.getValue(), this.sort, null)
+    );
   }
 
   endSession(row: Session): void {
-
+    this.administrationService.removeEnabledSession(this.sessionService.sessionToken, row.sessionUid).subscribe(
+        () => this.dataSource.loadData(this.adminService.selectedUser$.getValue(), this.sort, null)
+    );
   }
 
 

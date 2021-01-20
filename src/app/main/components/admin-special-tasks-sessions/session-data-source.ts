@@ -17,7 +17,7 @@ export const SESSIONS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         displayName: 'sessionUid',
         cell: (row: Session) => row.sessionUid
     },
-    {
+    /*{
         id: 'userName',
         matColumnDef: 'userName',
         position: 2,
@@ -34,7 +34,7 @@ export const SESSIONS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'userSource',
         cell: (row: Session) => row.userSource
-    },
+    },*/
     {
         id: 'lastUse',
         matColumnDef: 'lastUse',

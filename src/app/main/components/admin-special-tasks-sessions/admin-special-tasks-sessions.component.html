@@ -39,7 +39,12 @@
                         mat-sort-header="{{col.matColumnDef}}"
                 > {{col.displayName}} </mat-header-cell>
                 <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
-                    <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+                    <span *ngIf="col.id === 'sessionUid' && element.sessionUid === sessionService.sessionToken else notCurrentSession;">
+                        Current session
+                    </span>
+                    <ng-template #notCurrentSession>
+                        <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+                    </ng-template>
                 </mat-cell>
             </ng-container>
 
