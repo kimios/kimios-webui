@@ -1,5 +1,9 @@
 <mat-table #table [dataSource]="dataSource" matSort
-           matSort matSortActive="{{sort.name}}" matSortDirection="{{sort.direction}}" matSortDisableClear (matSortChange)="sortData($event)">
+           matSort
+           matSortActive="{{sort.name}}"
+           matSortDirection="{{sort.direction}}"
+           matSortDisableClear (matSortChange)="sortData($event)"
+            >
 
   <ng-container
           *ngFor="let col of columnsDescription"
@@ -46,9 +50,16 @@
   <mat-row *matRowDef="let row; columns: displayedColumns;"
            (dblclick)="goToDocument(row)"
            (click)="onSelect(row)"
-           [ngClass]="{'selected' : row == selected}"
+           [ngClass]="{'selected' : row == selected, 'dragover': isDragOver(row.uid)}"
            matRipple
-  >
+           (drop)="handleDrop($event, row)"
+           (dragover)="handleDragOver($event, row)"
+           (dragenter)="handleDragEnter($event)"
+           (dragstart)="dragStart($event, row)"
+           (dragend)="handleDragEnd($event, row)"
+           (dragexit)="handleDragExit($event, row)"
+           draggable="true"
+           [attr.data-entityuid]="row.uid">
   </mat-row>
 
 

@@ -12,4 +12,10 @@ mat-row {
   &.selected {
     background-color: $kimios-app-background-color;
   }
+
+  &.dragover {
+    border-width: 2px;
+    border-color: $kimios-green;
+  }
+
 }
