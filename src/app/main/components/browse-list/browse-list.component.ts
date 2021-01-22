@@ -30,8 +30,6 @@ const sortMapping = {
 })
 export class BrowseListComponent implements OnInit, OnDestroy {
 
-  @Input()
-  entities$: BehaviorSubject<Array<DMEntity>>;
   dataSource: EntityDataSource;
   displayedColumns = [];
   columnsDescription: ColumnDescription[] = DEFAULT_DISPLAYED_COLUMNS;
@@ -60,7 +58,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataSource = new EntityDataSource(this.entities$);
+    this.dataSource = new EntityDataSource();
     this.workspaceSessionService.sort.pipe(
         filter(next => next !== undefined && next != null)
     ).subscribe(
@@ -70,6 +68,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         filter(next => next != null)
     ).subscribe(
         next => this.dialog.closeAll()
+    );
+    this.bes.entitiesToDisplay$.subscribe(
+        entities => this.dataSource.setData(entities)
     );
   }
 

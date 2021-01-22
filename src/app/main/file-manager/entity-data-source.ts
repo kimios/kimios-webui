@@ -1,17 +1,19 @@
 import {DMEntity, Document} from 'app/kimios-client-api';
 import {DataSource} from '@angular/cdk/table';
 import {CollectionViewer} from '@angular/cdk/collections';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import * as moment from 'moment';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 export class EntityDataSource extends DataSource<DMEntity> {
 
+    private _entities$: BehaviorSubject<Array<DMEntity>>;
+
     constructor(
-        private entities$: Observable<Array<DMEntity>>
     ) {
         super();
+        this._entities$ = new BehaviorSubject<Array<DMEntity>>([]);
     }
 
     static humanFileSize(bytes, si): string {
@@ -31,10 +33,14 @@ export class EntityDataSource extends DataSource<DMEntity> {
     }
 
     connect(collectionViewer: CollectionViewer): Observable<DMEntity[] | ReadonlyArray<DMEntity>> {
-        return this.entities$;
+        return this._entities$;
     }
 
     disconnect(collectionViewer: CollectionViewer): void {
+    }
+
+    setData(data: Array<DMEntity>): void {
+        this._entities$.next(data);
     }
 }
 

@@ -35,7 +35,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public entitiesPathIds: Map<number, number[]>;
 
     public entities: Map<number, DMEntity>;
-    public entitiesSorted: Array<DMEntity>;
 
     public currentPath: BehaviorSubject<Array<DMEntity>>;
 
@@ -208,7 +207,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             res => {
                 this.totalEntitiesToDisplay$.next(res);
                 // reset this variable to null to inform it has to be filled
-                this.entitiesSorted = null;
                 this.makePage(this.pageIndex.getValue(), this.pageSize, this.workspaceSessionService.sort.getValue());
             }
         );
@@ -431,14 +429,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         const indexBeginning = (this.pageIndex.getValue()) * this.pageSize;
         const indexEnd = indexBeginning + this.pageSize;
         if (this.explorerMode.getValue() === EXPLORER_MODE.BROWSE) {
-            if (sortRequired || this.entitiesSorted == null || this.entitiesSorted === undefined) {
-                if (this.sort != null && this.sort !== undefined) {
-                    this.entitiesSorted = this.sortEntities(this.totalEntitiesToDisplay$.getValue().slice(), this.sort);
-                } else {
-                    this.entitiesSorted = this.totalEntitiesToDisplay$.getValue().slice();
-                }
-            }
-            this.entitiesToDisplay$.next(this.entitiesSorted.slice(indexBeginning, indexEnd));
+            const entitiesSorted = (sortRequired || (this.sort != null && this.sort !== undefined)) ?
+                this.sortEntities(this.totalEntitiesToDisplay$.getValue().slice(), this.sort) :
+                this.totalEntitiesToDisplay$.getValue().slice();
+            this.entitiesToDisplay$.next(entitiesSorted.slice(indexBeginning, indexEnd));
         } else {
             this.searchEntityService.changePage(this.pageIndex.getValue(), this.pageSize).subscribe(
                 next => this.entitiesToDisplay$.next(next)
