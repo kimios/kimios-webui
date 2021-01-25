@@ -26,7 +26,8 @@
         <div>
           <div class="file-uploader" style="padding:20px">
             <form>
-              <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)" />
+              <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
+                     multiple="multiple" />
               <mat-icon class="cursor-pointer"
                       (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
             </form>
