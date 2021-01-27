@@ -9,6 +9,9 @@ import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialo
 import {Tag} from 'app/main/model/tag';
 import {of} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
+import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 
 @Component({
   selector: 'app-workspaces',
@@ -32,7 +35,8 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       private location: Location,
       private workspaceSessionService: WorkspaceSessionService,
       public filesUploadDialog: MatDialog,
-      private fileUploadService: FileUploadService
+      private fileUploadService: FileUploadService,
+      public entityMoveDialog: MatDialog,
   ) {
     console.log('in workspace constructor');
   }
@@ -141,5 +145,128 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
   handleFileInput(files: FileList): void {
     this.openFilesUploadDialog(files, null);
+  }
+
+  handleDrop(event: Event): void {
+    event.preventDefault();
+
+    if (event['dataTransfer']
+        && event['dataTransfer'].getData('text/plain') !== null
+        && event['dataTransfer'].getData('text/plain') !== undefined
+        && event['dataTransfer'].getData('text/plain').startsWith('kimiosEntityMove')
+        && event['droppedInDir'] !== null
+        && event['droppedInDir'] !== undefined) {
+
+      const data = event['dataTransfer'].getData('text/plain');
+      const dataSplitted = data.split(':');
+      if (dataSplitted.length !== 2
+          || Number(dataSplitted[1]) === NaN) {
+        return;
+      }
+      console.log(dataSplitted.join(' : '));
+      this.openEntityMoveConfirmDialog(
+          this.browseEntityService.entities.get(Number(dataSplitted[1])),
+          event['droppedInDir']
+      );
+      return;
+    }
+
+    console.dir(event['dataTransfer']);
+
+    if (event['dataTransfer'] != null
+        && event['dataTransfer']['files'] != null) {
+      Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
+
+      /*const items = event['dataTransfer'].items;
+      const loading = new BehaviorSubject(null);
+      let nbLoading = 0;
+      loading.pipe(
+          filter(value => value != null),
+          map(value => nbLoading = nbLoading + (value === true ? 1 : -1)),
+          tap(value => console.log('nbLoading: ' + nbLoading)),
+          takeWhile(() => nbLoading !== 0),
+      ).subscribe();*/
+
+      /*const item = items[i];
+      if (item.kind === 'file') {
+        const entry = item.webkitGetAsEntry();
+        if (entry.isFile) {
+
+        } else if (entry.isDirectory) {
+          const directoryReader = entry.createReader();
+          new Promise((resolve, reject) => {
+            directoryReader.readEntries(
+                entries => {
+                  resolve(entries);
+                },
+                err => {
+                  reject(err);
+                }
+            );
+          }).then(
+              entries => console.dir(entries)
+          );
+        }
+      }
+      }*/
+      /*loading.pipe(
+          tap(val => console.log('loading ' + val)),
+          filter(val => val === false),
+          delay(500),
+          filter(val => nbLoading === 0)
+      ).subscribe(
+          open =>*/
+      this.openFilesUploadDialog(
+          event['dataTransfer']['files'],
+          event['droppedInDir'] ? event['droppedInDir'] : '',
+//          event['dataTransfer'].items
+      );
+      /*);
+
+      for (let i = 0; i < items.length; i++) {
+        loading.next(true);
+        const entry = items[i].webkitGetAsEntry(); // only for Webkit
+        // though apparently
+        // FF has it too
+        if (entry) {
+          recurseItem(entry, '/', loading);
+        }
+        loading.next(false);
+      }*/
+    }
+  }
+
+  private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
+    const dialogRef = this.entityMoveDialog.open(EntityMoveDialogComponent, {
+      // width: '250px',
+      data: {
+        entityMoved: entityMoved,
+        entityTarget: entityTarget,
+        fromPath: this.browseEntityService.currentPath.getValue().reverse()[0].path
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(next => {
+      if (next !== true) {
+        return;
+      }
+      this.browseEntityService.moveEntity(entityMoved, entityTarget).subscribe(
+          null,
+          // TODO : enhance dialog and message
+          error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
+          () => {
+            console.log(
+                'moved entity '
+                + entityMoved.name
+                + ' to '
+                + entityTarget.name
+            );
+            if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
+              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
+            }
+            this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
+          }
+      );
+    });
   }
 }

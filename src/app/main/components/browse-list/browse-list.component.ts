@@ -1,5 +1,5 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {BehaviorSubject, Subject} from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
@@ -14,8 +14,6 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {filter} from 'rxjs/operators';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
-import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
-import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 
 const sortMapping = {
   'name': 'name',
@@ -141,15 +139,18 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   handleDrop($event: DragEvent, row: DMEntity): void {
     this.resetDragOverDir();
-    if (DMEntityUtils.dmEntityIsFolder(row)) {
-      console.log('moving in dir now');
-      console.dir($event.dataTransfer);
-      const movedUid = $event.dataTransfer.getData('text');
-      this.openEntityMoveConfirmDialog(this.bes.entities.get(Number(movedUid)), row);
-    } else {
-      console.log('moving in doc, just impossible…');
-    }
     $event.preventDefault();
+    if (! DMEntityUtils.dmEntityIsFolder(row)) {
+        if ($event['kimiosEntityMove'] === true) {
+          console.log('moving in doc, just impossible…');
+          $event.stopPropagation();
+        }
+        // it's a document import on current directory
+    } else {
+      if (DMEntityUtils.dmEntityIsFolder(row)) {
+        $event['droppedInDir'] = row;
+      }
+    }
   }
 
   handleDragOver($event: DragEvent, row: DMEntity): void {
@@ -167,6 +168,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     console.log('dragging ' + row.name);
     $event.dataTransfer.setData('text', row.uid.toString());
     $event.dataTransfer.effectAllowed = 'move';
+    $event['kimiosEntityMove'] = true;
+    $event.dataTransfer.setData('text/plain', 'kimiosEntityMove:' + row.uid);
   }
 
   isDragOver(uid: number): boolean {
@@ -187,39 +190,5 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   resetDragOverDir(): void {
     this.dragOverDir = 0;
-  }
-
-  private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
-    const dialogRef = this.entityMoveDialog.open(EntityMoveDialogComponent, {
-      // width: '250px',
-      data: {
-        entityMoved: entityMoved,
-        entityTarget: entityTarget,
-        fromPath: this.bes.currentPath.getValue().reverse()[0].path
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(next => {
-      if (next !== true) {
-        return;
-      }
-      this.bes.moveEntity(entityMoved, entityTarget).subscribe(
-          null,
-          // TODO : enhance dialog and message
-          error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
-          () => {
-            console.log(
-                'moved entity '
-                + entityMoved.name
-                + ' to '
-                + entityTarget.name
-            );
-            if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
-              this.bes.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
-            }
-            this.bes.updateListAfterMove(entityMoved, entityTarget);
-          }
-      );
-    });
   }
 }
