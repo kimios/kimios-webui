@@ -257,21 +257,20 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
         return;
       }
       this.browseEntityService.moveEntity(entityMoved, entityTarget).subscribe(
-          null,
-          // TODO : enhance dialog and message
-          error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
-          () => {
+          any => {
+            if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
+              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
+            }
+            this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
             console.log(
                 'moved entity '
                 + entityMoved.name
                 + ' to '
                 + entityTarget.name
             );
-            if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
-              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
-            }
-            this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
-          }
+          },
+          // TODO : enhance dialog and message
+          error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
       );
     });
   }
