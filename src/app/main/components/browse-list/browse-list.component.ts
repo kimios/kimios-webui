@@ -141,7 +141,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     this.resetDragOverDir();
     $event.preventDefault();
     if (! DMEntityUtils.dmEntityIsFolder(row)) {
-        if ($event['kimiosEntityMove'] === true) {
+        if ($event.dataTransfer
+            && $event.dataTransfer.getData('text/plain').includes('kimiosEntityMove:')) {
           console.log('moving in doc, just impossible…');
           $event.stopPropagation();
         }
