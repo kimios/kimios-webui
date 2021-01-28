@@ -105,6 +105,7 @@ import {AdminSpecialTasksSessionsComponent} from '../components/admin-special-ta
 import {AdminSpecialTasksReindexComponent} from '../components/admin-special-tasks-reindex/admin-special-tasks-reindex.component';
 import {AdTaskComponent} from '../components/ad-task/ad-task.component';
 import {AdDirective} from './ad-directive';
+import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 
 
 @NgModule({
@@ -174,7 +175,8 @@ import {AdDirective} from './ad-directive';
         AdminSpecialTasksSessionsComponent,
         AdminSpecialTasksReindexComponent,
         AdTaskComponent,
-        AdDirective
+        AdDirective,
+        ErrorDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -232,7 +234,8 @@ import {AdDirective} from './ad-directive';
         GroupDialogComponent,
         AdminSpecialRolesAddToRoleDialogComponent,
         AdminSpecialTasksReindexComponent,
-        AdminSpecialTasksSessionsComponent
+        AdminSpecialTasksSessionsComponent,
+        ErrorDialogComponent
     ],
     exports: [
         FileUploadListComponent,

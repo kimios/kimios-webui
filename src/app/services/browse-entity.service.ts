@@ -619,6 +619,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       return this.appendEntityParentNameRec(entityId, '');
     }
 
+    computeFolderPathEntities(entity: DMEntity): Array<DMEntity> {
+      return this.appendEntityParentRec(entity, new Array<DMEntity>());
+    }
+
     appendEntityParentNameRec(entityId: number, path: string): string {
       const entity = this.entities.get(entityId);
       if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
@@ -634,6 +638,30 @@ export class BrowseEntityService implements OnInit, OnDestroy {
           );
       }
     }
+
+    private appendEntityParentRec(entity: DMEntity, array: DMEntity[]): Array<DMEntity> {
+        if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
+            array.unshift(entity);
+            return array;
+        } else {
+            return this.appendEntityParentRec(
+                DMEntityUtils.dmEntityIsDocument(entity) ?
+                    this.entities.get(entity['folderUid']) :
+                    this.entities.get(entity['parentUid']),
+                array.concat(entity)
+            );
+        }
+    }
+
+    checkMoveIsPossible(entityMoved: DMEntity, entityTarget: DMEntity): boolean {
+        return entityMoved.uid !== entityTarget.uid
+            && this.entityNotParentOf(entityMoved, entityTarget);
+    }
+
+    private entityNotParentOf(entityMoved: DMEntity, entityTarget: DMEntity): boolean {
+        return this.computeFolderPathEntities(entityTarget).filter(entity => entity.uid === Number(entityMoved.uid)).length === 0;
+    }
+
 }
 
 

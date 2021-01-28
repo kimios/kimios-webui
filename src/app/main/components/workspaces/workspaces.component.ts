@@ -12,6 +12,7 @@ import {FileUploadService} from 'app/services/file-upload.service';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
+import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-workspaces',
@@ -37,6 +38,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       public filesUploadDialog: MatDialog,
       private fileUploadService: FileUploadService,
       public entityMoveDialog: MatDialog,
+      private errorDialog: MatDialog
   ) {
     console.log('in workspace constructor');
   }
@@ -169,10 +171,17 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
         return;
       }
       console.log(dataSplitted.join(' : '));
-      this.openEntityMoveConfirmDialog(
-          this.browseEntityService.entities.get(Number(dataSplitted[1])),
-          event['droppedInDir']
-      );
+      const entityMoved = this.browseEntityService.entities.get(Number(dataSplitted[1]));
+      const entityTarget = event['droppedInDir'];
+      if (DMEntityUtils.dmEntityIsDocument(entityMoved)
+        || this.browseEntityService.checkMoveIsPossible(entityMoved, entityTarget)) {
+        this.openEntityMoveConfirmDialog(
+            entityMoved,
+            entityTarget
+        );
+      } else {
+        this.openErrorDialog('This move is not allowed');
+      }
       return;
     }
 
@@ -272,6 +281,14 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
           // TODO : enhance dialog and message
           error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
       );
+    });
+  }
+
+  private openErrorDialog(msg: string): void {
+    const dialogRef = this.errorDialog.open(ErrorDialogComponent, {
+      data: {
+        message: msg
+      }
     });
   }
 }
