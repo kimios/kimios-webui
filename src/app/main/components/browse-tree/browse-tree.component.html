@@ -1,8 +1,10 @@
 <tree-root [nodes]="nodes" #tree class="kimios-browse-tree"
            (toggleExpanded)="onToggleExpanded($event)"
            [focused]="true"
-           (focus)="onFocus($event)" >
-  <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+           (focus)="onFocus($event)"
+           [options]="treeOptions"
+           (drop)="handleDrop($event)">
+  <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
     <div class="node-wrapper"
          [style.padding-left]="node.getNodePadding()"
          [attr.data-nodeuid]="node.uid"
@@ -50,6 +52,8 @@
         </div>
       </div>
     </div>
+    <tree-node-children [node]="node" [templates]="templates">
+    </tree-node-children>
   </ng-template>
 
   <!--<ng-template #treeNodeFullTemplate

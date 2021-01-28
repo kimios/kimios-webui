@@ -614,6 +614,26 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 )
             );
     }
+
+    computeEntityPath(entityId: number): string {
+      return this.appendEntityParentNameRec(entityId, '');
+    }
+
+    appendEntityParentNameRec(entityId: number, path: string): string {
+      const entity = this.entities.get(entityId);
+      if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
+          return entity.name + '/' + path;
+      } else {
+          return this.appendEntityParentNameRec(
+              DMEntityUtils.dmEntityIsDocument(entity) ?
+                  this.entities.get(entity['folderUid']).uid :
+                  this.entities.get(entity['parentUid']).uid,
+              path === '' ?
+                  entity.name :
+                  entity.name + '/' + path
+          );
+      }
+    }
 }
 
 

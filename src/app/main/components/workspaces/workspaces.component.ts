@@ -79,7 +79,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
   }
 
-  openFilesUploadDialog(list: FileList, droppedInDir?: DMEntity): void {
+  openFilesUploadDialog(list: FileList, droppedInDir?: DMEntity, droppedInTree?: boolean): void {
     const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
       // width: '250px',
       data: {
@@ -107,7 +107,11 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
       let parentDir: DMEntity;
       if (droppedInDir !== null && droppedInDir !== undefined && droppedInDir !== '') {
-        path += '/' + droppedInDir.name;
+        if (droppedInTree !== null && droppedInTree === true) {
+          path = this.browseEntityService.computeEntityPath(droppedInDir.uid);
+        } else {
+          path += '/' + droppedInDir.name;
+        }
         parentDir = droppedInDir;
       } else {
         parentDir = currentDir;
@@ -149,6 +153,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
   handleDrop(event: Event): void {
     event.preventDefault();
+    event.stopPropagation();
 
     if (event['dataTransfer']
         && event['dataTransfer'].getData('text/plain') !== null
@@ -219,6 +224,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       this.openFilesUploadDialog(
           event['dataTransfer']['files'],
           event['droppedInDir'] ? event['droppedInDir'] : '',
+          event['droppedInTreeNode'] ? event['droppedInTreeNode'] : null
 //          event['dataTransfer'].items
       );
       /*);

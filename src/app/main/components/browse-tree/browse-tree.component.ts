@@ -28,6 +28,19 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   @ViewChild('tree') tree;
 
   nodes = [];
+  treeOptions = {
+    actionMapping: {
+        mouse: {
+            drop: (tree, node, $event) => {
+                // console.log('drop'); // from === {name: 'first'}
+                // Add a node to `to.parent` at `to.index` based on the data in `from`
+                // Then call tree.update()
+                $event['droppedInDir'] = node && node.id ? node.id : null;
+                $event['droppedInTreeNode'] = true;
+            }
+        }
+    }
+  };
 
   constructor(
       private treeNodesService: TreeNodesService,
@@ -442,5 +455,11 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 uid: uid
             }
         });
+    }
+
+    handleDrop($event: DragEvent): void {
+        if ($event['droppedInDir']) {
+            $event['droppedInDir'] = this.browseEntityService.entities.get(Number($event['droppedInDir']));
+        }
     }
 }
