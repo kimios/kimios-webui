@@ -41,7 +41,7 @@
            (treeDrop)="node.onDrop($event)"
            [treeAllowDrop]="node.allowDrop"
            [treeDrag]="node"
-           [treeDragEnabled]="node.allowDrag()">
+           [treeDragEnabled]="true">
         <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
           <div>
             <tree-node-content [node]="node" [index]="index"></tree-node-content>

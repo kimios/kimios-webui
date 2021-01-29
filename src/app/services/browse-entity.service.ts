@@ -582,6 +582,24 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.entities.set(entity.uid, entity);
     }
 
+    updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
+      if (DMEntityUtils.dmEntityIsDocument(entity)) {
+          return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
+              tap(doc => this.entities.set(entity.uid, doc))
+          );
+      } else {
+          if (DMEntityUtils.dmEntityIsFolder(entity)) {
+              return this.folderService.getFolder(this.sessionService.sessionToken, entity.uid).pipe(
+                  tap(doc => this.entities.set(entity.uid, doc))
+              );
+          } else {
+              return this.workspaceService.getWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
+                  tap(doc => this.entities.set(entity.uid, doc))
+              );
+          }
+      }
+    }
+
     checkEntityInCache(entityId: number): boolean {
       return this.entities.get(entityId) !== null && this.entities.get(entityId) !== undefined;
     }
@@ -662,6 +680,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         return this.computeFolderPathEntities(entityTarget).filter(entity => entity.uid === Number(entityMoved.uid)).length === 0;
     }
 
+    reloadEntity(uid: number): Observable<DMEntity> {
+        return this.getEntity(uid).pipe(
+            concatMap(entity => this.updateEntityInCache(entity))
+        );
+    }
 }
 
 

@@ -37,9 +37,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 // Then call tree.update()
                 $event['droppedInDir'] = node && node.id ? node.id : null;
                 $event['droppedInTreeNode'] = true;
+            },
+            dragStart: (tree, node, $event) => {
+                if (node
+                    && node.data
+                    && node.data.id) {
+                    $event.dataTransfer.setData('text/plain', 'kimiosEntityMove:' + node.data.id);
+                }
             }
         }
-    }
+    },
+    allowDrag: true,
+    allowDrop: true
   };
 
   constructor(
@@ -62,7 +71,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     }
 
       this.browseEntityService.updateMoveTreeNode$.subscribe(
-          next => this.updateMoveTreeNode(next.entityMoved, next.entityTarget)
+          next => this.updateMoveTreeNode(next.entityMoved, next.entityTarget, next.initialParentUid)
       );
 
     /*this.entityCreationService.onFormSubmitted$.pipe(
@@ -92,7 +101,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                                 name: entity.name,
                                 id: entity.uid.toString(),
                                 children: null,
-                                isLoading: true
+                                isLoading: true,
+                                allowDrop: true
                             };
                             this.nodes.push(newNode);
                             this.tree.treeModel.update();
@@ -421,25 +431,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     );
   }
 
-  private updateMoveTreeNode(entityMoved: DMEntity, entityTarget: DMEntity): void {
+  private updateMoveTreeNode(entityMoved: DMEntity, entityTarget: DMEntity, initialParentUid: number): void {
       const nodeToMove = this.tree.treeModel.getNodeById(entityMoved.uid);
       const nodeTarget = this.tree.treeModel.getNodeById(entityTarget.uid);
-      if (nodeTarget) {
-          if (nodeTarget.data.children !== null) {
-              this.tree.treeModel.getNodeById(entityTarget.uid).data.children.push(nodeToMove.data);
-          }
-      }
-      const nodeMovedParent = this.tree.treeModel.getNodeById(entityMoved['parentUid']);
-      if (nodeMovedParent) {
-          const childIndexToRemove = nodeMovedParent.data.children.findIndex(child => child.id === entityMoved.uid.toString());
-          if (childIndexToRemove !== -1) {
-              this.tree.treeModel.getNodeById(entityMoved['parentUid']).data.children.splice(childIndexToRemove, 1);
-              if (this.tree.treeModel.getNodeById(entityMoved['parentUid']).data.children.length === 0) {
-                  this.tree.treeModel.getNodeById(entityMoved['parentUid']).hasChildren = false;
-                  this.tree.treeModel.getNodeById(entityMoved['parentUid']).data.children = null;
-              }
-          }
-      }
+      const nodeFrom = this.tree.treeModel.getNodeById(initialParentUid);
+      this.tree.treeModel.moveNode(
+          nodeToMove, {
+              dropOnNode: false,
+              index: nodeToMove.data.children.length,
+              parent: nodeTarget
+          }, {
+              parent: nodeFrom
+          });
       this.tree.treeModel.update();
   }
 

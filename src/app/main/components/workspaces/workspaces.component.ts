@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import { Location } from '@angular/common';
+import {Location} from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
-import {catchError, filter} from 'rxjs/operators';
-import {DMEntity} from 'app/kimios-client-api';
+import {catchError, concatMap, filter} from 'rxjs/operators';
+import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {of} from 'rxjs';
@@ -259,7 +259,11 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       data: {
         entityMoved: entityMoved,
         entityTarget: entityTarget,
-        fromPath: this.browseEntityService.currentPath.getValue().reverse()[0].path
+        fromPath: this.browseEntityService.computeEntityPath(
+            DMEntityUtils.dmEntityIsDocument(entityMoved) ?
+                (<KimiosDocument>entityMoved).folderUid :
+                (<Folder>entityMoved).parentUid
+        )
       }
     });
 
@@ -267,15 +271,18 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       if (next !== true) {
         return;
       }
-      this.browseEntityService.moveEntity(entityMoved, entityTarget).subscribe(
-          any => {
-            if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
-              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
+      const movedEntityInitialParentUid = entityMoved.uid;
+      this.browseEntityService.moveEntity(entityMoved, entityTarget).pipe(
+          concatMap(() => this.browseEntityService.reloadEntity(entityMoved.uid))
+      ).subscribe(
+          reloadedEntity => {
+            if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
+              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialParentUid));
             }
-            this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
+            this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget);
             console.log(
                 'moved entity '
-                + entityMoved.name
+                + reloadedEntity.name
                 + ' to '
                 + entityTarget.name
             );

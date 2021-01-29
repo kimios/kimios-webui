@@ -243,7 +243,7 @@ export class BrowseComponent implements OnInit {
                         + entityTarget.name
                     );
                     if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
-                        this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget));
+                        this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget, null));
                     }
                     this.browseEntityService.updateListAfterMove(entityMoved, entityTarget);
                 }
