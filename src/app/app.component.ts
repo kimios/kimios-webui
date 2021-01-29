@@ -154,6 +154,13 @@ export class AppComponent implements OnInit, OnDestroy
 
                 this.document.body.classList.add(this.fuseConfig.colorTheme);
             });
+
+        window.addEventListener('dragover', e => {
+            e.preventDefault();
+        }, false);
+        window.addEventListener('drop', e => {
+            e.preventDefault();
+        }, false);
     }
 
     /**
