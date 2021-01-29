@@ -153,9 +153,10 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     this.openFilesUploadDialog(files, null);
   }
 
-  handleDrop(event: Event): void {
+  handleDrop(event: Event): boolean {
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
 
     if (event['dataTransfer']
         && event['dataTransfer'].getData('text/plain') !== null
@@ -168,7 +169,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       const dataSplitted = data.split(':');
       if (dataSplitted.length !== 2
           || Number(dataSplitted[1]) === NaN) {
-        return;
+        return false;
       }
       console.log(dataSplitted.join(' : '));
       const entityMoved = this.browseEntityService.entities.get(Number(dataSplitted[1]));
@@ -182,7 +183,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       } else {
         this.openErrorDialog('This move is not allowed');
       }
-      return;
+      return false;
     }
 
     console.dir(event['dataTransfer']);
@@ -249,6 +250,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
         loading.next(false);
       }*/
     }
+    return false;
   }
 
   private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
