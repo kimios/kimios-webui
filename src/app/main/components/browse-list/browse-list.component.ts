@@ -155,7 +155,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   handleDragOver($event: DragEvent, row: DMEntity): void {
-    if (DMEntityUtils.dmEntityIsFolder(row)) {
+    if (row != null
+        && row !== undefined
+        && DMEntityUtils.dmEntityIsFolder(row)) {
       this.dragOverDir = row.uid;
     }
     $event.preventDefault();
@@ -178,13 +180,17 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   handleDragEnd($event: DragEvent, row: DMEntity): void {
-    if (this.dragOverDir === row.uid) {
+    if (row != null
+        && row !== undefined
+        && this.dragOverDir === row.uid) {
       this.resetDragOverDir();
     }
   }
 
   handleDragExit($event: Event, row: DMEntity): void {
-    if (this.dragOverDir === row.uid) {
+    if (row != null
+      && row !== undefined
+      && this.dragOverDir === row.uid) {
       this.resetDragOverDir();
     }
   }
