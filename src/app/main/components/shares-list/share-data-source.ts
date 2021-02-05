@@ -1,5 +1,5 @@
 import {MatTableDataSource} from '@angular/material';
-import {Session, Share, ShareService} from 'app/kimios-client-api';
+import {Share, ShareService} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {tap} from 'rxjs/operators';
