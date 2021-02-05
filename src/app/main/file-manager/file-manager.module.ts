@@ -106,6 +106,7 @@ import {AdminSpecialTasksReindexComponent} from '../components/admin-special-tas
 import {AdTaskComponent} from '../components/ad-task/ad-task.component';
 import {AdDirective} from './ad-directive';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
+import {SharesListComponent} from 'app/main/components/shares-list/shares-list.component';
 
 
 @NgModule({
@@ -176,7 +177,8 @@ import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialo
         AdminSpecialTasksReindexComponent,
         AdTaskComponent,
         AdDirective,
-        ErrorDialogComponent
+        ErrorDialogComponent,
+        SharesListComponent
     ],
     imports: [
         FileManagerRoutingModule,

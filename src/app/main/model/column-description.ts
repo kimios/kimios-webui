@@ -7,4 +7,5 @@ export interface ColumnDescription {
     sticky: boolean;
     cell: any;
     noSortHeader?: boolean;
+    title?: (any) => string;
 }
