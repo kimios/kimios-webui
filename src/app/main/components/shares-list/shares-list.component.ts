@@ -10,6 +10,12 @@ export enum SharesListMode {
   BY_ME = 'byMe'
 }
 
+const sortTypeMapping = {
+  'creationDate' : 'number',
+  'expirationDate' : 'number',
+  'entity' : 'DMEntity'
+};
+
 @Component({
   selector: 'shares-list',
   templateUrl: './shares-list.component.html',
@@ -45,7 +51,18 @@ export class SharesListComponent implements OnInit {
   }
 
   sortData($event: Sort): void {
-
+    this.sort.name = $event.active;
+    this.sort.direction =
+        $event.direction.toString() === 'desc' ?
+            'desc' :
+            'asc';
+    if ((sortTypeMapping)[this.sort.name] != null) {
+      this.sort.type = sortTypeMapping[this.sort.name];
+    }
+    this.dataSource.loadData(
+        this.sort,
+        null
+    );
   }
 
   endShare(id: number): void {

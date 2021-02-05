@@ -86,8 +86,12 @@ export class ShareDataSource extends MatTableDataSource<Share> {
             1 :
             -1;
         const sortRes = sortDir * (
-            sort.type != null && sort.type === 'number' ?
-                compareNumbers([element1[sort.name]], [element2[sort.name]]) :
+            sort.type != null ?
+                sort.type === 'number' ?
+                    compareNumbers([element1[sort.name]], [element2[sort.name]]) :
+                    sort.type === 'DMEntity' ?
+                        element1[sort.name].name.localeCompare(element2[sort.name].name) :
+                        element1[sort.name].localeCompare(element2[sort.name]) :
                 element1[sort.name].localeCompare(element2[sort.name])
         );
 
