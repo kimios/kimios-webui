@@ -104,4 +104,12 @@ export class DocumentDetailService {
             })
         );
     }
+
+    addBookmark(documentId: number): Observable<any> {
+      return this.documentService.addBookmark(this.sessionService.sessionToken, documentId);
+    }
+
+    removeBookmark(documentId: number): Observable<any> {
+      return this.documentService.removeBookmark(this.sessionService.sessionToken, documentId);
+    }
 }

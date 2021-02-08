@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Subject} from 'rxjs';
+import {iif, of, Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
@@ -11,7 +11,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {MatDialog, Sort} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {filter} from 'rxjs/operators';
+import {concatMap, filter, map} from 'rxjs/operators';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 
@@ -197,5 +197,32 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   resetDragOverDir(): void {
     this.dragOverDir = 0;
+  }
+
+  handleBookmarkDocument(entity: DMEntity): void {
+    if (entity.bookmarked === true) {
+      this.documentDetailService.removeBookmark(entity.uid);
+    } else {
+      this.documentDetailService.addBookmark(entity.uid);
+    }
+
+    of(entity.bookmarked === true).pipe(
+        concatMap(res => {
+          if (res) {
+            return this.documentDetailService.removeBookmark(entity.uid);
+          } else {
+            return this.documentDetailService.addBookmark(entity.uid);
+          }
+        })
+    ).subscribe(
+        next => entity.bookmarked = !entity.bookmarked
+    );
+  }
+
+  entityStarIcon(entity: DMEntity): string {
+    return (entity.bookmarked != null
+        && entity.bookmarked === true) ?
+        'star' :
+        'star_border';
   }
 }

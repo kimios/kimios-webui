@@ -26,21 +26,31 @@
     <mat-header-cell *matHeaderCellDef> <mat-icon style="margin: auto;">apps</mat-icon> </mat-header-cell>
     <mat-cell *matCellDef="let element">
       <!-- only for documents -->
-      <div *ngIf="element.type === 3" fxLayout="row" fxLayoutAlign="space-between center" style="margin: auto;" fxLayoutGap="10px">
-        <div><mat-icon
-                title="Download document"
-                (click)="handleFileDownload(element.lastVersionId)"
-                [class.cursor-pointer]="true">
-          get_app
-        </mat-icon></div>
+      <div *ngIf="element.type === 3 || element.type === 2" fxLayout="row" fxLayoutAlign="space-between start" fxLayoutGap="10px">
         <div>
-          <entity-list-lock-button [docId]="element.uid"></entity-list-lock-button>
+          <mat-icon
+                    title="Bookmark document"
+                    (click)="handleBookmarkDocument(element)"
+                    [class.cursor-pointer]="true">
+            {{entityStarIcon(element)}}
+          </mat-icon>
         </div>
-        <div><mat-icon title="View document" [class.cursor-pointer]="true"
-                       (click)="goToDocument(element)">visibility</mat-icon></div>
-        <div><mat-icon [matMenuTriggerFor]="docMenu"
-                       [matMenuTriggerData]="{uid: element.uid, name: element.name}"
-                       title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
+        <ng-container *ngIf="element.type === 3">
+          <div><mat-icon
+                  title="Download document"
+                  (click)="handleFileDownload(element.lastVersionId)"
+                  [class.cursor-pointer]="true">
+            get_app
+          </mat-icon></div>
+          <div>
+            <entity-list-lock-button [docId]="element.uid"></entity-list-lock-button>
+          </div>
+          <div><mat-icon title="View document" [class.cursor-pointer]="true"
+                         (click)="goToDocument(element)">visibility</mat-icon></div>
+          <div><mat-icon [matMenuTriggerFor]="docMenu"
+                         [matMenuTriggerData]="{uid: element.uid, name: element.name}"
+                         title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
+        </ng-container>
       </div>
     </mat-cell>
   </ng-container>
