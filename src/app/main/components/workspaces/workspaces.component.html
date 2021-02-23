@@ -15,17 +15,20 @@
 
     <div fxLayout="column"
          fxLayoutAlign="start"
+         fxLayoutGap="20px"
          style="width: 100%; margin-left: 20px; margin-right: 20px; margin-bottom: 84px;"
          #contentColumn id="contentColumn" >
 
       <div fxLayout="row"
-           fxLayoutAlign="start">
-        <div style="margin: 20px;"
+           fxLayoutAlign="center"
+           fxLayoutGap="20px"
+      >
+        <div
              #browsePathRow id="browsePathRow" fxFlex>
           <browse-path></browse-path>
         </div>
         <div>
-          <div class="file-uploader" style="padding:20px">
+          <div class="file-uploader">
             <form>
               <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
                      multiple="multiple"
@@ -36,6 +39,9 @@
                       (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
             </form>
           </div>
+        </div>
+        <div>
+          <mat-icon class="cursor-pointer">more_horiz</mat-icon>
         </div>
       </div>
 
