@@ -107,6 +107,7 @@ import {AdTaskComponent} from '../components/ad-task/ad-task.component';
 import {AdDirective} from './ad-directive';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {SharesListComponent} from 'app/main/components/shares-list/shares-list.component';
+import {WorkspaceMenuComponent} from 'app/main/components/workspace-menu/workspace-menu.component';
 
 
 @NgModule({
@@ -178,7 +179,8 @@ import {SharesListComponent} from 'app/main/components/shares-list/shares-list.c
         AdTaskComponent,
         AdDirective,
         ErrorDialogComponent,
-        SharesListComponent
+        SharesListComponent,
+        WorkspaceMenuComponent
     ],
     imports: [
         FileManagerRoutingModule,

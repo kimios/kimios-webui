@@ -7,12 +7,13 @@ import {catchError, concatMap, filter} from 'rxjs/operators';
 import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
-import {of} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
+import {AdminService} from 'app/services/admin.service';
 
 @Component({
   selector: 'app-workspaces',
@@ -31,6 +32,8 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   pageSizeOptions: number[] = [10, 20, 50];
   pageIndex: number;
 
+  isWorkspaceCreator: Observable<boolean>;
+
   constructor(
       private browseEntityService: BrowseEntityService,
       private location: Location,
@@ -38,9 +41,12 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       public filesUploadDialog: MatDialog,
       private fileUploadService: FileUploadService,
       public entityMoveDialog: MatDialog,
-      private errorDialog: MatDialog
+      private errorDialog: MatDialog,
+      private adminService: AdminService
   ) {
     console.log('in workspace constructor');
+
+    this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
   }
 
   ngOnInit(): void {

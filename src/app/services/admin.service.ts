@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, from, iif, Observable, of, Subject, zip} from 'rxjs';
 import {AdministrationService, AuthenticationSource, Role, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
-import {catchError, concatMap, map, switchMap, tap, toArray} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, toArray} from 'rxjs/operators';
+import {SPECIAL_ROLES} from 'app/main/model/special-roles.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -67,5 +68,13 @@ export class AdminService {
             )),
             toArray(),
         );
+    }
+
+    isWorkspaceCreator(): Observable<boolean> {
+        return this.findUsersWithRole(SPECIAL_ROLES.WORKSPACE_CREATOR).pipe(
+            map(roles => roles.filter(role =>
+                role.userName === this.sessionService.currentUser.uid
+            && role.userSource === this.sessionService.currentUser.source).length > 0
+        ));
     }
 }
