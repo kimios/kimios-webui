@@ -1,9 +1,9 @@
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
-import {Observable, of, throwError} from 'rxjs';
+import {combineLatest, Observable, of, throwError} from 'rxjs';
 import {Router} from '@angular/router';
-import {catchError, concatMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, map, tap} from 'rxjs/operators';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -138,6 +138,9 @@ export class SessionService implements OnDestroy {
                         }
                     }
                 }),
+                concatMap(res => combineLatest(of(res), this.securityService.getUser(token))),
+                tap(([res, user]) => this._currentUser = user),
+                map(([res, user]) => res),
                 tap(
                     res => {
                         if (res) {
