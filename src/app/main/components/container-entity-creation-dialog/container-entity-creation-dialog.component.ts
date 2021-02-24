@@ -7,9 +7,11 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {concatMap, tap} from 'rxjs/operators';
 import {UserOrGroup} from 'app/main/model/user-or-group';
+import {Folder, Workspace} from 'app/kimios-client-api';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
+  parentId: number;
 }
 
 @Component({
@@ -29,6 +31,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   // @ViewChild('fileSecurityForm') fileSecurityForm: ElementRef;
   entityCreationForm: FormGroup;
   documentId: number;
+  parentEntity: Workspace | Folder;
 
   constructor(
       public dialogRef: MatDialogRef<ContainerEntityCreationDialogComponent>,
@@ -39,20 +42,28 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
     this.selectedUsersAndGroups = new Array<UserOrGroup>();
-    const entityParent = this.browseEntityService.currentPath.getValue().slice().reverse().shift();
-    this.entityCreationForm = this.fb.group({
-      'name': this.fb.control(''),
-      'parent': this.fb.control(entityParent !== undefined ? entityParent : null),
-      'path': this.fb.control(entityParent !== undefined ? entityParent.path : null)
-    });
-    if (this.data.entityType !== 'folder') {
-      this.entityCreationForm.removeControl('parent');
-      this.entityCreationForm.removeControl('path');
-    }
+
     this.documentId = undefined;
   }
 
   ngOnInit(): void {
+    this.entityCreationForm = this.fb.group({
+      'name': this.fb.control('')
+    });
+
+    if (this.data.entityType === 'folder') {
+      of(this.data.parentId != null
+          && this.data.parentId !== undefined).pipe(
+          concatMap(res => res ?
+              this.browseEntityService.getEntity(this.data.parentId) :
+              of(this.browseEntityService.currentPath.getValue().slice().reverse()[0])
+          ),
+          tap(entity => {
+            this.parentEntity = entity;
+          })
+      ).subscribe(
+      );
+    }
   }
 
   drop($event: CdkDragDrop<UserOrGroup>): void {
@@ -78,8 +89,8 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       combineLatest(of(this.data.entityType), this.entityCreationService.createContainerEntity(
           this.entityCreationForm.get('name').value,
           this.data.entityType,
-          this.entityCreationForm.get('parent') !== null ?
-              this.entityCreationForm.get('parent').value['uid'] :
+          this.parentEntity !== null && this.parentEntity !== undefined ?
+              this.parentEntity.uid :
               null
       )).pipe(
           // make securities form submit securities
@@ -90,10 +101,12 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           }),
           tap(([entityType, res, uidCreated]) => {
             if (entityType === 'folder') {
-              const currentPathEntity = this.browseEntityService.currentPath.getValue().slice().reverse()[0];
-              this.browseEntityService.deleteCacheEntry(this.entityCreationForm.get('parent').value['uid']);
-              this.browseEntityService.selectedEntity$.next(currentPathEntity);
-              this.browseEntityService.onAddedChildToEntity$.next(currentPathEntity.uid);
+              //
+              this.browseEntityService.deleteCacheEntry(this.parentEntity.uid);
+              if (this.parentEntityIsCurrentPath()) {
+                this.browseEntityService.selectedEntity$.next(this.parentEntity);
+              }
+              this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
             } else {
               this.browseEntityService.onNewWorkspace.next(uidCreated);
             }
@@ -107,5 +120,10 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
 
   cancel(): void {
 
+  }
+
+  private parentEntityIsCurrentPath(): boolean {
+    const currentPathEntity = this.browseEntityService.currentPath.getValue().slice().reverse()[0];
+    return currentPathEntity.uid === this.parentEntity.uid;
   }
 }

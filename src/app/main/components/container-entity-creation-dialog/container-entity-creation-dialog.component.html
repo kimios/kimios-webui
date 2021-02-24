@@ -1,14 +1,11 @@
 <div fxLayout="column" fxLayoutAlign="start space-between">
+    <div fxLayout="column" fxLayoutAlign="center center">
+        <div>Create {{data.entityType}}</div>
+        <div *ngIf="data.entityType === 'folder'">at path: {{parentEntity.path}}</div>
+    </div>
     <div>
         <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
             <div fxLayout="column" fxLayoutAlign="start space-between">
-                <ng-container  *ngIf="data.entityType === 'folder'">
-                    <input type="hidden" name="parent" [formControl]="entityCreationForm.get('parent')">
-                    <mat-form-field ngDefaultControl [formControl]="entityCreationForm.get('path')" appearance="fill">
-                        <mat-label>Path</mat-label>
-                        <input matInput value="{{entityCreationForm.get('path').value}}">
-                    </mat-form-field>
-                </ng-container>
                 <mat-form-field ngDefaultControl [formControl]="entityCreationForm.get('name')" appearance="fill">
                     <mat-label>Name</mat-label>
                     <input matInput>

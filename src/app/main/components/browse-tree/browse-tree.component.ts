@@ -9,6 +9,7 @@ import {ActivatedRoute} from '@angular/router';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
 import {MatDialog} from '@angular/material';
+import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 
 @Component({
   selector: 'browse-tree',
@@ -57,6 +58,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
       private route: ActivatedRoute,
       private entityCreationService: EntityCreationService,
       public containerEntityDialog: MatDialog,
+      public createContainerEntityDialog: MatDialog
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -464,5 +466,24 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         if ($event['droppedInDir']) {
             $event['droppedInDir'] = this.browseEntityService.entities.get(Number($event['droppedInDir']));
         }
+    }
+
+    showProperties(entityId: number): void {
+        console.log('entityId is ' + entityId);
+    }
+
+    createFolderDialog(entityId: number): void {
+        this.openDialog('folder', entityId);
+    }
+
+    private openDialog(entityType: 'workspace' | 'folder', entityId: number): void {
+        const dialogRef = this.createContainerEntityDialog.open(ContainerEntityCreationDialogComponent, {
+            width: '60%',
+            height: '75%',
+            data: {
+                entityType: entityType,
+                parentId: entityId
+            }
+        });
     }
 }

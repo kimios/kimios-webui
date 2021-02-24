@@ -46,8 +46,10 @@
           <div>
             <tree-node-content [node]="node" [index]="index"></tree-node-content>
           </div>
-          <div class="treenode-icon-more">
-            <mat-icon (click)="openEntityData(node.id)">more_horiz</mat-icon>
+          <div class="treenode-icon-more" (click) = "$event.stopPropagation()">
+            <button mat-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{entityId: node.id}">
+              <mat-icon class="cursor-pointer">more_horiz</mat-icon>
+            </button>
           </div>
         </div>
       </div>
@@ -86,3 +88,10 @@
   </ng-template>-->
 
 </tree-root>
+
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-entityid="entityId">
+    <button mat-menu-item (click)="openEntityData(entityid)"><mat-icon>info</mat-icon> Properties</button>
+    <button mat-menu-item (click)="createFolderDialog(entityid)"><mat-icon>create_new_folder</mat-icon> New folder</button>
+  </ng-template>
+</mat-menu>
