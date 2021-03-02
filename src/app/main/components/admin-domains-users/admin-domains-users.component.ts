@@ -126,7 +126,7 @@ export class AdminDomainsUsersComponent implements OnInit {
     }
   }
 
-  private modeIsAdmin(): boolean {
+  public modeIsAdmin(): boolean {
     return this._mode === 'admin';
   }
 
