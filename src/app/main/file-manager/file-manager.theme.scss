@@ -114,4 +114,11 @@
     .talign-right {
         text-align: right;
     }
+
+    .selected-item {
+        color: $kimios-green;
+        div {
+            color: $kimios-green;
+        }
+    }
 }
