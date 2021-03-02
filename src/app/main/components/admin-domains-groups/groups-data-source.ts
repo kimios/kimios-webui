@@ -76,10 +76,11 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         this.loadingSubject.complete();
     }
 
-    loadData(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
+    loadData(source: string, sort: DMEntitySort, filter, pageIndex, pageSize, reload?: boolean): void {
         this.loadingSubject.next(true);
         if (this.dataCacheByDomain.get(source) == null
-            || this.dataCacheByDomain.get(source) === undefined) {
+            || this.dataCacheByDomain.get(source) === undefined
+            || reload === true) {
             this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
                 map(elements => this._convertAllToGroupWithData(elements)),

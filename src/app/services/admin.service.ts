@@ -15,6 +15,7 @@ export class AdminService {
   selectedRole$: BehaviorSubject<number>;
   selectedTask$: BehaviorSubject<number>;
   selectedUser$: BehaviorSubject<KimiosUser>;
+  groupCreated$: BehaviorSubject<boolean>;
 
   closeUserDialog$: Subject<boolean>;
 
@@ -29,6 +30,7 @@ export class AdminService {
     this.selectedTask$ = new BehaviorSubject<number>(0);
     this.selectedUser$ = new BehaviorSubject<KimiosUser>(null);
     this.closeUserDialog$ = new Subject<boolean>();
+    this.groupCreated$ = new BehaviorSubject<boolean>(false);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {

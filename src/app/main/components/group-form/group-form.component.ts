@@ -76,6 +76,7 @@ export class GroupFormComponent implements OnInit {
       ).subscribe(
           () => {
             this.showSpinnerFormSubmit = false;
+            this.adminService.groupCreated$.next(true);
             // this.adminService.closeUserDialog$.next(true);
           }
       );

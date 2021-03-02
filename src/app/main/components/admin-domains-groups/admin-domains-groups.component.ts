@@ -114,6 +114,23 @@ export class AdminDomainsGroupsComponent implements OnInit {
     if (! this.modeIsDomain()) {
       this.dataSource.loadDataForUserId(this.user.source, this.sort, this.user.uid);
     }
+
+    if (this.modeIsDomain()) {
+      this.adminService.groupCreated$.pipe(
+          filter(res => res === true),
+          tap(res =>
+              this.dataSource.loadData(
+                  this.adminService.selectedDomain$.getValue(),
+                  this.sort,
+                  this.dataSearch.value,
+                  this.page,
+                  this.pageSize,
+                  true
+              )
+          )
+      ).subscribe();
+    }
+
   }
 
   private _mergeFormGroup(formGroup: FormGroup, groups: Array<GroupWithData>): FormGroup {
