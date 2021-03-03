@@ -28,12 +28,12 @@
             span.nav-link-title, mat-icon.nav-link-icon {
                 color: $kimios-green;
             }
-            background-color: $kimios-navbar-background-color !important;
+//            background-color: $kimios-navbar-background-color !important;
         }
     }
 
     app {
-        background-color: $kimios-app-background-color;
+//        background-color: $kimios-app-background-color;
     }
 
     #kimios_site_link {
@@ -41,7 +41,7 @@
     }
 
     .external_link {
-        color: $kimios-app-default-font-color;
+//        color: $kimios-app-default-font-color;
     }
 
     navbar {
@@ -51,13 +51,13 @@
     }
 
     fuse-sidebar {
-        background-color: $kimios-navbar-background-color;
+//        background-color: $kimios-navbar-background-color;
         box-shadow: none;
     }
 
     .mat-toolbar {
         box-shadow: none;
-        background-color: $kimios-app-default-background-color !important;
+//        background-color: $kimios-app-default-background-color !important;
     }
 
     .kimios-button {
@@ -93,7 +93,7 @@
     .kimios-dialog .mat-dialog-container {
         padding: 15px;
         border-radius: 10px;
-        border-color: $kimios-dark-grey;
+        // border-color: $kimios-dark-grey;
         border-width: 1px;
         border-style: solid;
         box-shadow: none;
