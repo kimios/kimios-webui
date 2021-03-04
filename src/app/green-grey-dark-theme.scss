@@ -1,0 +1,64 @@
+$mat-green-grey: (
+        50: #ecf1ec,
+        100: #d8e3d8,
+        200: #baceba,
+        300: #a1bba1,
+        400: #7d9e7d,
+        500: #638b63,
+        600: #577d57,
+        700: #486848,
+        800: #375037,
+        900: #293d29,
+        A100: #d8e3d8,
+        A200: #baceba,
+        A400: #7d9e7d,
+        A700: #486848,
+        contrast: (
+                50: $dark-primary-text,
+                100: $dark-primary-text,
+                200: $dark-primary-text,
+                300: $dark-primary-text,
+                400: $light-primary-text,
+                500: $light-primary-text,
+                600: $light-primary-text,
+                700: $light-primary-text,
+                800: $light-primary-text,
+                900: $light-primary-text,
+                A100: $dark-primary-text,
+                A200: $dark-primary-text,
+                A400: $light-primary-text,
+                A700: $light-primary-text,
+        )
+);
+
+// Define the primary, accent and warn palettes
+$green-grey-dark-theme-primary-palette: mat-palette($mat-green);
+$green-grey-dark-theme-accent-palette: mat-palette($mat-green-grey);
+$green-grey-dark-theme-warn-palette: mat-palette($mat-red);
+
+// Create the Material theme object
+$green-grey-dark-theme: mat-dark-theme($green-grey-dark-theme-primary-palette, $green-grey-dark-theme-accent-palette, $green-grey-dark-theme-warn-palette);
+
+// Add ".theme-blue-gray-dark" class to the body to activate this theme.
+// Class name must start with "theme-" !!!
+body.theme-green-grey-dark {
+
+        // Generate the Angular Material theme
+        @include angular-material-theme($green-grey-dark-theme);
+
+        // Apply the theme to the Fuse Core
+        @include fuse-core-theme($green-grey-dark-theme);
+
+        // Apply the theme to the user components
+        @include components-theme($green-grey-dark-theme);
+
+        // Generate Fuse color classes for primary, accent and warn colors
+        $palettes: (
+                primary: $green-grey-dark-theme-primary-palette,
+                accent: $green-grey-dark-theme-accent-palette,
+                warn: $green-grey-dark-theme-warn-palette
+        );
+
+        @include fuse-color-classes($palettes);
+}
+
