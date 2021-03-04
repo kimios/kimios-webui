@@ -138,14 +138,12 @@ export class SessionService implements OnDestroy {
                         }
                     }
                 }),
-                concatMap(res => combineLatest(of(res), this.securityService.getUser(token))),
-                tap(([res, user]) => this._currentUser = user),
-                map(([res, user]) => res),
                 tap(
                     res => {
                         if (res) {
                             this._zone.run(() => {
                                 this.sessionToken = token;
+                                this.initCurrentUser(token);
                                 this.sessionAlive = true;
                                 this.router.navigate(['']);
                                 if (! this.isSessionCheckStarted()) {
@@ -156,6 +154,12 @@ export class SessionService implements OnDestroy {
                     }
                 )
             );
+    }
+
+    private initCurrentUser(token): void {
+        this.securityService.getUser(token).subscribe(
+            user => this._currentUser = user
+        );
     }
 
     connect(login: string, authenticationSource: string, password: string): Observable<string> {
