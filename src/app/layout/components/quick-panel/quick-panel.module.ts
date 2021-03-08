@@ -4,17 +4,19 @@ import { MatDividerModule, MatListModule, MatSlideToggleModule } from '@angular/
 import { FuseSharedModule } from '@fuse/shared.module';
 
 import { QuickPanelComponent } from 'app/layout/components/quick-panel/quick-panel.component';
+import {FileManagerModule} from '../../../main/file-manager/file-manager.module';
 
 @NgModule({
     declarations: [
         QuickPanelComponent
     ],
-    imports     : [
+    imports: [
         MatDividerModule,
         MatListModule,
         MatSlideToggleModule,
 
         FuseSharedModule,
+        FileManagerModule,
     ],
     exports: [
         QuickPanelComponent

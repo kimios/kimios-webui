@@ -57,4 +57,24 @@ export class DocumentUpload {
     get id(): string {
         return this._id;
     }
+
+    get status(): DocumentUploadStatus {
+        return this._status;
+    }
+
+    set status(value: DocumentUploadStatus) {
+        this._status = value;
+    }
+
+    isOnGoing(): boolean {
+        return this.status === DocumentUploadStatus.ONGOING;
+    }
+
+    isError(): boolean {
+        return this.status === DocumentUploadStatus.ERROR;
+    }
+
+    isSuccessful(): boolean {
+        return this.status === DocumentUploadStatus.SUCCESSFUL;
+    }
 }

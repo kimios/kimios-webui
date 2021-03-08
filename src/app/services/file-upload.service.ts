@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 
-import {DocumentService} from 'app/kimios-client-api';
+import {Document as KimiosDocument, DocumentService} from 'app/kimios-client-api';
 import {BehaviorSubject, combineLatest, forkJoin, from, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {HttpEventType} from '@angular/common/http';
@@ -9,9 +9,9 @@ import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
 import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
-import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from './browse-entity.service';
 import {NotificationService} from './notification.service';
+import {DocumentUploadStatus} from '../main/model/document-upload';
 
 interface TagJob {
     docId: number;
@@ -134,7 +134,8 @@ export class FileUploadService {
         this.filesUploaded.set(uploadId, new BehaviorSubject([]));
         this.filesUploadedDocuments.set(uploadId, new BehaviorSubject(undefined));
 
-        this.notificationService.uploadCreated.next(docPath);
+        this.notificationService.createUpload(docPath);
+        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ONGOING);
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
@@ -172,6 +173,7 @@ export class FileUploadService {
                                     case HttpEventType.UploadProgress:
                                         const progress = Math.round(100 * event.loaded / event.total);
                                         res = {name: document.name, status: 'progress', message: progress};
+                                        this.notificationService.updateUploadPercentage(docPath, progress);
                                         break;
 
                                     case HttpEventType.Response:
@@ -180,6 +182,7 @@ export class FileUploadService {
                                             status: event.body ? 'done' : 'status',
                                             message: event.body ? event.body : event.status
                                         };
+                                        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.SUCCESSFUL);
                                         this.lastUploadedDocumentId = res;
                                         break;
 
@@ -195,6 +198,7 @@ export class FileUploadService {
                             if (reportProgress) {
                                 this.filesProgress.get(uploadId).next(res);
                             }
+                            // this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR);
                             return res;
                         })
                         .catch(error => of(error))
@@ -212,6 +216,7 @@ export class FileUploadService {
 
                 };
                 this.filesProgress.get(uploadId).next(res);
+                this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR);
                 console.log('second catchError: ');
                 console.log(res);
                 return of(res);
