@@ -11,6 +11,7 @@ import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from './browse-entity.service';
+import {NotificationService} from './notification.service';
 
 interface TagJob {
     docId: number;
@@ -45,7 +46,8 @@ export class FileUploadService {
         private tagService: TagService,
         private documentRefreshService: DocumentRefreshService,
         private documentDetailService: DocumentDetailService,
-        private browseEntityService: BrowseEntityService
+        private browseEntityService: BrowseEntityService,
+        private notificationService: NotificationService
     ) {
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>();
         this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
@@ -131,6 +133,8 @@ export class FileUploadService {
         this.uploadingFile.next(uploadId);
         this.filesUploaded.set(uploadId, new BehaviorSubject([]));
         this.filesUploadedDocuments.set(uploadId, new BehaviorSubject(undefined));
+
+        this.notificationService.uploadCreated.next(docPath);
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document

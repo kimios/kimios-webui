@@ -108,6 +108,9 @@ import {AdDirective} from './ad-directive';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {SharesListComponent} from 'app/main/components/shares-list/shares-list.component';
 import {WorkspaceMenuComponent} from 'app/main/components/workspace-menu/workspace-menu.component';
+import {NotificationCenterComponent} from 'app/main/components/notification-center/notification-center.component';
+import {NotificationCenterListComponent} from 'app/main/components/notification-center-list/notification-center-list.component';
+import {DocumentUploadProgressComponent} from '../components/document-upload-progress/document-upload-progress.component';
 
 
 @NgModule({
@@ -180,7 +183,10 @@ import {WorkspaceMenuComponent} from 'app/main/components/workspace-menu/workspa
         AdDirective,
         ErrorDialogComponent,
         SharesListComponent,
-        WorkspaceMenuComponent
+        WorkspaceMenuComponent,
+        NotificationCenterComponent,
+        NotificationCenterListComponent,
+        DocumentUploadProgressComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -239,14 +245,16 @@ import {WorkspaceMenuComponent} from 'app/main/components/workspace-menu/workspa
         AdminSpecialRolesAddToRoleDialogComponent,
         AdminSpecialTasksReindexComponent,
         AdminSpecialTasksSessionsComponent,
-        ErrorDialogComponent
+        ErrorDialogComponent,
+        DocumentUploadProgressComponent
     ],
     exports: [
         FileUploadListComponent,
         FileUploadProgressComponent,
         ShareFormComponent,
         BrowseGridComponent,
-        ContainerEntityComponent
+        ContainerEntityComponent,
+        NotificationCenterComponent
     ]
 })
 export class FileManagerModule { }
