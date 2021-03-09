@@ -43,6 +43,8 @@
            [treeDrag]="node"
            [treeDragEnabled]="true">
         <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
+          <mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>
+          <mat-icon *ngIf="node.data.svgIcon === 'folder'">folder</mat-icon>
           <div>
             <tree-node-content [node]="node" [index]="index"></tree-node-content>
           </div>

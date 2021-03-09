@@ -104,7 +104,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                                 id: entity.uid.toString(),
                                 children: null,
                                 isLoading: true,
-                                allowDrop: true
+                                allowDrop: true,
+                                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
                             };
                             this.nodes.push(newNode);
                             this.tree.treeModel.update();
@@ -240,7 +241,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 name: entity.name,
                 id: entity.uid.toString(),
                 children: null,
-                isLoading: false
+                isLoading: false,
+                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
             };
             this.nodes.push(newNode);
             this.tree.treeModel.update();
@@ -268,7 +270,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                         name: entity.name,
                         id: entity.uid.toString(),
                         children: null,
-                        isLoading: false
+                        isLoading: false,
+                        svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
                     }));
                 this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
                 this.tree.treeModel.update();
@@ -308,7 +311,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 name: entityRet.name,
                 id: entityRet.uid.toString(),
                 children: null,
-                isLoading: true
+                isLoading: true,
+                  svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
               };
               this.nodes.push(newNode);
               this.tree.treeModel.update();
@@ -325,7 +329,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 name: entityChild.name,
                 id: entityChild.uid.toString(),
                 children: null,
-                isLoading: false
+                isLoading: false,
+                  svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
               };
             })
         ),
@@ -353,7 +358,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 name: entityChild.name,
                 id: entityChild.uid.toString(),
                 children: null,
-                isLoading: false
+                isLoading: false,
+                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entityChild) ? 'workspace' : 'folder'
               };
             })
         ),
@@ -416,7 +422,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                     name: entityChild.name,
                     id: entityChild.uid.toString(),
                     children: null,
-                    isLoading: false
+                    isLoading: false,
+                    svgIcon: DMEntityUtils.dmEntityIsWorkspace(entityChild) ? 'workspace' : 'folder'
                   };
                 })
         ),
