@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {iif, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, of, Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
@@ -11,9 +11,10 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {MatDialog, Sort} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {concatMap, filter, map} from 'rxjs/operators';
+import {concatMap, filter, tap} from 'rxjs/operators';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 
 const sortMapping = {
   'name': 'name',
@@ -37,6 +38,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   sort: DMEntitySort = { name: 'name', direction: 'asc' };
 
   dragOverDir: number;
+  deleteDocument$: BehaviorSubject<number>;
 
   constructor(
       private bes: BrowseEntityService,
@@ -53,6 +55,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     // Set the private defaults
     this._unsubscribeAll = new Subject();
     this.dragOverDir = 0;
+    this.deleteDocument$ = new BehaviorSubject<number>(null);
   }
 
   ngOnInit(): void {
@@ -70,6 +73,19 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     this.bes.entitiesToDisplay$.subscribe(
         entities => this.dataSource.setData(entities)
     );
+
+    this.deleteDocument$.pipe(
+        filter(res => res != null),
+        concatMap(uid => combineLatest(of(uid), this.bes.deleteDocument(uid))),
+        concatMap(([uid, res]) => this.bes.getDocument(uid)),
+        tap(doc => this.bes.deleteCacheEntry(doc.folderUid)),
+        concatMap(doc => this.bes.getEntity(doc.folderUid)),
+        tap(parentFolder => {
+          const currentPath = this.bes.currentPath.getValue();
+          const currentDir = currentPath[currentPath.length - 1];
+          this.bes.selectedEntity$.next(currentDir);
+        })
+    ).subscribe();
   }
 
   /**
@@ -224,5 +240,19 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         && entity.bookmarked === true) ?
         'star' :
         'star_border';
+  }
+
+  delete(uid: number, name: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        'message': 'Delete document ' + name + ' ?'
+      },
+      width: '400px',
+      height: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result =>
+      this.deleteDocument$.next(uid)
+    );
   }
 }

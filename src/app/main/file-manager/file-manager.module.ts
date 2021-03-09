@@ -101,16 +101,17 @@ import {UserFormComponent} from 'app/main/components/user-form/user-form.compone
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 import {GroupFormComponent} from 'app/main/components/group-form/group-form.component';
 import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/admin-special-roles-add-to-role-dialog/admin-special-roles-add-to-role-dialog.component';
-import {AdminSpecialTasksSessionsComponent} from '../components/admin-special-tasks-sessions/admin-special-tasks-sessions.component';
-import {AdminSpecialTasksReindexComponent} from '../components/admin-special-tasks-reindex/admin-special-tasks-reindex.component';
-import {AdTaskComponent} from '../components/ad-task/ad-task.component';
+import {AdminSpecialTasksSessionsComponent} from 'app/main/components/admin-special-tasks-sessions/admin-special-tasks-sessions.component';
+import {AdminSpecialTasksReindexComponent} from 'app/main/components/admin-special-tasks-reindex/admin-special-tasks-reindex.component';
+import {AdTaskComponent} from 'app/main/components/ad-task/ad-task.component';
 import {AdDirective} from './ad-directive';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {SharesListComponent} from 'app/main/components/shares-list/shares-list.component';
 import {WorkspaceMenuComponent} from 'app/main/components/workspace-menu/workspace-menu.component';
 import {NotificationCenterComponent} from 'app/main/components/notification-center/notification-center.component';
 import {NotificationCenterListComponent} from 'app/main/components/notification-center-list/notification-center-list.component';
-import {DocumentUploadProgressComponent} from '../components/document-upload-progress/document-upload-progress.component';
+import {DocumentUploadProgressComponent} from 'app/main/components/document-upload-progress/document-upload-progress.component';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 
 
 @NgModule({
@@ -186,7 +187,8 @@ import {DocumentUploadProgressComponent} from '../components/document-upload-pro
         WorkspaceMenuComponent,
         NotificationCenterComponent,
         NotificationCenterListComponent,
-        DocumentUploadProgressComponent
+        DocumentUploadProgressComponent,
+        ConfirmDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -246,7 +248,8 @@ import {DocumentUploadProgressComponent} from '../components/document-upload-pro
         AdminSpecialTasksReindexComponent,
         AdminSpecialTasksSessionsComponent,
         ErrorDialogComponent,
-        DocumentUploadProgressComponent
+        DocumentUploadProgressComponent,
+        ConfirmDialogComponent
     ],
     exports: [
         FileUploadListComponent,

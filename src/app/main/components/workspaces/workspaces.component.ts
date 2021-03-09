@@ -125,6 +125,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
         parentDir = currentDir;
       }
 
+      this.fileUploadService.uploading$.next(true);
       this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
         v,
         path + '/' + v.name,
@@ -150,6 +151,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
               () => {
                 this.browseEntityService.deleteCacheEntry(parentDir.uid);
                 this.browseEntityService.selectedEntity$.next(currentDir);
+                this.fileUploadService.uploading$.next(false);
               }
           );
     });

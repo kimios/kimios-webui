@@ -40,6 +40,8 @@ export class FileUploadService {
     private uploadingFiles: any[];
     allUploads: Map<string, Array<any>>;
 
+    uploading$: BehaviorSubject<boolean>;
+
     constructor(
         private documentService: DocumentService,
         private sessionService: SessionService,
@@ -61,6 +63,8 @@ export class FileUploadService {
         this.uploadingFiles = new Array<any>();
         this.allUploads = new Map<string, Array<any>>();
         this.uploadFinished$ = new BehaviorSubject<string>(undefined);
+
+        this.uploading$ = new BehaviorSubject<boolean>(false);
 
         this.init();
     }

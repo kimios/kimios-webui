@@ -85,7 +85,8 @@
                     class="quick-panel-toggle-button"
                     (click)="toggleSidebarOpen('quickPanel')"
                     aria-label="Toggle quick panel">
-                <mat-icon class="secondary-text">format_list_bulleted</mat-icon>
+                <mat-icon class="secondary-text" *ngIf="! showSpinner">{{sideBarIcon}}</mat-icon>
+                <mat-spinner *ngIf="showSpinner" mode="indeterminate" diameter="24"></mat-spinner>
             </button>
 
             <div class="toolbar-separator" *ngIf="!hiddenNavbar && rightNavbar" fxHide fxShow.gt-xs></div>

@@ -144,7 +144,7 @@ export class BrowseComponent implements OnInit {
         if (event['dataTransfer'] != null
             && event['dataTransfer']['files'] != null) {
             Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
-            this.openFilesUploadDialog(event['dataTransfer']['files'], event['droppedInDir'] ? event['droppedInDir'] : '');
+            this.openFilesUploadDialog(event['dataTransfer']['files'], event['droppedInDir'] ? event['droppedInDir'] : '');
         }
     }
 
@@ -203,7 +203,7 @@ export class BrowseComponent implements OnInit {
                     catchError(error => {
                         console.log('server error: ');
                         console.dir(error);
-                        return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
+                        return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
                     })
                 )
                 .subscribe(
@@ -212,6 +212,7 @@ export class BrowseComponent implements OnInit {
                     () => {
                         this.browseEntityService.deleteCacheEntry(parentDir.uid);
                         this.browseEntityService.selectedEntity$.next(currentDir);
+                        this.fileUploadService.uploading$.next(false);
                     }
                 );
         });

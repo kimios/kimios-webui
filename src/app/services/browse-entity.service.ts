@@ -511,6 +511,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         }
     }
 
+    deleteDocument(uid: number): Observable<any> {
+      return this.documentService.deleteDocument(this.sessionService.sessionToken, uid);
+    }
+
     updateListAfterDelete(entity: DMEntity): void {
         let parentUid: number;
         if (entity['parentUid']) {

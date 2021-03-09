@@ -12,6 +12,7 @@ import {User} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Router} from '@angular/router';
 import {SearchEntityService} from 'app/services/searchentity.service';
+import {FileUploadService} from '../../../services/file-upload.service';
 
 @Component({
     selector     : 'toolbar',
@@ -36,6 +37,9 @@ export class ToolbarComponent implements OnInit, OnDestroy
     private _unsubscribeAll: Subject<any>;
     private searchTerms = new Subject<string>();
 
+    sideBarIcon = 'format_list_bulleted';
+    showSpinner = false;
+
     /**
      * Constructor
      *
@@ -49,6 +53,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
         private _translateService: TranslateService,
         private sessionService: SessionService,
         private searchEntityService: SearchEntityService,
+        private fileUploadService: FileUploadService,
         private router: Router
     )
     {
@@ -140,6 +145,12 @@ export class ToolbarComponent implements OnInit, OnDestroy
                 return ([]);
             })
         ).subscribe();
+
+        this.fileUploadService.uploading$.pipe(
+            takeUntil(this._unsubscribeAll)
+        ).subscribe(
+            res =>  this.showSpinner = res
+        );
     }
 
     /**
