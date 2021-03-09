@@ -39,6 +39,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   dragOverDir: number;
   deleteDocument$: BehaviorSubject<number>;
+  showSpinner = false;
 
   constructor(
       private bes: BrowseEntityService,
@@ -86,6 +87,10 @@ export class BrowseListComponent implements OnInit, OnDestroy {
           this.bes.selectedEntity$.next(currentDir);
         })
     ).subscribe();
+
+    this.bes.loading$.subscribe(
+        res => this.showSpinner = res
+    );
   }
 
   /**
@@ -251,8 +256,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       height: '400px'
     });
 
-    dialogRef.afterClosed().subscribe(result =>
-      this.deleteDocument$.next(uid)
-    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.bes.loading$.next(true);
+        this.deleteDocument$.next(uid);
+      }
+    });
   }
 }

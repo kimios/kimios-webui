@@ -1,3 +1,13 @@
+<div class="wrapper" id="wrapper" #wrapper>
+  <div class="overlay" *ngIf="showSpinner" id="overlay" #overlay>
+    <div class="spinner-wrapper">
+      <mat-spinner
+              [ngClass]="'spinnerMarginAuto'"
+              color="primary"
+      ></mat-spinner>
+    </div>
+  </div>
+
 <mat-table #table [dataSource]="dataSource" matSort
            matSort
            matSortActive="{{sort.name}}"
@@ -84,3 +94,5 @@
     <button mat-menu-item (click)="delete(uid, name)" ><mat-icon>delete</mat-icon> Delete</button>
   </ng-template>
 </mat-menu>
+
+</div>

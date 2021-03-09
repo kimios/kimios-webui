@@ -62,6 +62,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     onNewWorkspace: Subject<number>;
     openEntityFromFileUploadList$: Subject<number>;
 
+    loading$: BehaviorSubject<boolean>;
+
   constructor(
       // Set the defaults
 
@@ -110,6 +112,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.openEntityFromFileUploadList$ = new Subject<number>();
 
       this.shareDocumentReturn$ = new Subject<boolean>();
+
+      this.loading$ = new BehaviorSubject<boolean>(false);
 
       this.ngOnInit();
   }
@@ -438,6 +442,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 next => this.entitiesToDisplay$.next(next)
             );
         }
+        this.loading$.next(false);
     }
 
     private sortEntities(entities: Array<DMEntity>, sort: DMEntitySort): Array<DMEntity> {
