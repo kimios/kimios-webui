@@ -1,12 +1,14 @@
 <div fxLayout="column" fxLayoutAlign="start start" >
-  <div><p title="{{upload.documentPath}}">{{upload.documentName}}</p></div>
+
 <!--  <div class="cut-text" title="{{upload.documentPath}}">
     {{messageDisplayed | async}}
     <span *ngIf="uploadStatus == 'done'"><mat-icon>done</mat-icon></span>
   </div>-->
   <ng-container *ngIf="upload$ | async as uploadUpdated">
     <ng-container *ngIf="uploadUpdated !== null">
-      <ng-container *ngIf="uploadUpdated.isOnGoing() || uploadUpdated.isSuccessful()">
+
+      <ng-container *ngIf="uploadUpdated.isOnGoing() else successfulOrError">
+        <div><p title="{{upload.documentPath}}">{{upload.documentName}}</p></div>
         <mat-progress-bar
                 [color]="color"
                 [mode]="mode"
@@ -14,6 +16,20 @@
                 [bufferValue]="bufferValue">
         </mat-progress-bar>
       </ng-container>
+      <ng-template #successfulOrError>
+        <ng-container *ngIf="uploadUpdated.isSuccessful() else error">
+          <div (click)="goToDoc(uploadUpdated.documentId)" title="Go to document" [ngClass]="'cursor-pointer'"><p title="{{upload.documentPath}}">{{upload.documentName}}</p></div>
+          <div fxLayout="row" fxFlexOffset="5px">
+            <mat-icon>done</mat-icon>
+          </div>
+        </ng-container>
+      </ng-template>
+      <ng-template #error>
+        <div><p title="{{upload.documentPath}}">{{upload.documentName}}</p></div>
+        <div fxLayout="row" fxFlexOffset="5px">
+          <mat-icon>error</mat-icon>
+        </div>
+      </ng-template>
     </ng-container>
   </ng-container>
 </div>

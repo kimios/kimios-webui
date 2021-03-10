@@ -183,8 +183,8 @@ export class FileUploadService {
                                             status: event.body ? 'done' : 'status',
                                             message: event.body ? event.body : event.status
                                         };
-                                        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.SUCCESSFUL);
                                         this.lastUploadedDocumentId = res;
+                                        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.SUCCESSFUL, res.message);
                                         break;
 
                                     default:

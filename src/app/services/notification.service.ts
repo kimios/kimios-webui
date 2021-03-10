@@ -37,7 +37,8 @@ export class NotificationService {
     this.publishUploadUpdate(this.uploadList.get(id));
   }
 
-  updateUploadStatus(id: string, status: DocumentUploadStatus): void {
+  updateUploadStatus(id: string, status: DocumentUploadStatus, docId?: number): void {
+    this.uploadList.get(id).documentId = docId;
     this.uploadList.get(id).status = status;
     this.publishUploadUpdate(this.uploadList.get(id));
   }

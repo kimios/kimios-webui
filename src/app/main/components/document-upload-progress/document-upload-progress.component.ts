@@ -2,6 +2,9 @@ import {Component, Input, OnInit} from '@angular/core';
 import {NotificationService} from 'app/services/notification.service';
 import {DocumentUpload} from '../../model/document-upload';
 import {BehaviorSubject} from 'rxjs';
+import {Router} from '@angular/router';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
 
 @Component({
   selector: 'document-upload-progress',
@@ -22,7 +25,11 @@ export class DocumentUploadProgressComponent implements OnInit {
   showProgressBar = false;
   upload$: BehaviorSubject<DocumentUpload>;
 
-  constructor(private notificationService: NotificationService) {
+  constructor(
+      private notificationService: NotificationService,
+      private router: Router,
+      private _fuseSidebarService: FuseSidebarService
+  ) {
   }
 
   ngOnInit(): void {
@@ -30,4 +37,8 @@ export class DocumentUploadProgressComponent implements OnInit {
     this.upload$ = this.notificationService.uploadUpdates.get(this.uploadId);
   }
 
+  goToDoc(id: number): void {
+    DocumentUtils.navigateToFile(this.router, id);
+    this._fuseSidebarService.getSidebar('quickPanel').close();
+  }
 }

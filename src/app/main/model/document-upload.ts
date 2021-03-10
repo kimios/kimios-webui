@@ -13,6 +13,7 @@ export class DocumentUpload {
     private _documentName: string;
     private _documentPath: string;
     private _status: DocumentUploadStatus;
+    private _documentId: number;
 
     constructor(documentName: string, documentPath: string) {
         this._documentName = documentName;
@@ -76,5 +77,13 @@ export class DocumentUpload {
 
     isSuccessful(): boolean {
         return this.status === DocumentUploadStatus.SUCCESSFUL;
+    }
+
+    get documentId(): number {
+        return this._documentId;
+    }
+
+    set documentId(value: number) {
+        this._documentId = value;
     }
 }
