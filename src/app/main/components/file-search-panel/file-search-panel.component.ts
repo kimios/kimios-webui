@@ -55,7 +55,7 @@ export class FileSearchPanelComponent implements OnInit {
   handleFileInput(files: FileList): void {
     this.fileToUpload = files.item(0);
 
-    this.fileUploadService.uploading$.next(true);
+    /*this.fileUploadService.uploading$.next(true);
     this.fileUploadService.uploadFile(
         null,
         this.fileToUpload,
@@ -73,7 +73,7 @@ export class FileSearchPanelComponent implements OnInit {
           this.fileUploadService.uploading$.next(false);
         }
 
-    );
+    );*/
   }
 
   handleDrop(event: Event): void {

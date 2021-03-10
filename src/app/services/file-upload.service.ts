@@ -117,7 +117,7 @@ export class FileUploadService {
         );
     }
 
-    uploadFile(
+    private uploadFile(
         uploadId: string,
         document: File,
 //        sessionId?: string,
@@ -137,9 +137,6 @@ export class FileUploadService {
         this.uploadingFile.next(uploadId);
         this.filesUploaded.set(uploadId, new BehaviorSubject([]));
         this.filesUploadedDocuments.set(uploadId, new BehaviorSubject(undefined));
-
-        this.notificationService.createUpload(docPath);
-        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ONGOING);
 
         return this.documentService.createDocumentFromFullPathWithPropertiesNoHash(
             document
@@ -289,6 +286,8 @@ export class FileUploadService {
                 );
                 this.uploadQueue.set(uploadId, elem);
                 this.allUploads.set(uploadId, elem);
+                this.notificationService.createUpload(elem[1]);
+                this.notificationService.updateUploadStatus(elem[1], DocumentUploadStatus.ONGOING);
             }
         );
         this.uploadQueue$.next(Array.from(this.uploadQueue.keys()));
