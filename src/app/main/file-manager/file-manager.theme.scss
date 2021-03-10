@@ -52,12 +52,12 @@
 
     fuse-sidebar {
 //        background-color: $kimios-navbar-background-color;
-        box-shadow: none;
+//        box-shadow: none;
     }
 
     .mat-toolbar {
-        box-shadow: none;
-        background-color: map-get($background, background);
+//        box-shadow: none;
+//        background-color: map-get($background, background);
     }
 
     .kimios-button {
@@ -133,7 +133,7 @@
     .node-content-wrapper-focused, .node-content-wrapper:hover {
         background-color: map-get($accent, 500);
         box-shadow: inset 0 0 0px #999;
-        border-radius: 0 20px 20px 0;
+        border-radius: 20px 20px 20px 20px;
     }
 
     .wrapper {
