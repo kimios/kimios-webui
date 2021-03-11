@@ -1,3 +1,13 @@
+<div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+
+  <div fxLayout="row"
+       fxLayoutAlign="start"
+       style="width: 100%;">
+    <div fxFlexOffset="20px">
+      <h1 class="no-margin-bottom">Settings</h1>
+    </div>
+  </div>
+
 <mat-tab-group *ngIf="(isAdmin$ | async) || (hasStudioAccess$ | async); else personalSettingsOnly">
 
   <mat-tab label="Settings">
@@ -16,3 +26,5 @@
 <ng-template #personalSettingsOnly>
   <personal-settings></personal-settings>
 </ng-template>
+
+</div>
