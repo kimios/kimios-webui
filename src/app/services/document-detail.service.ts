@@ -37,18 +37,6 @@ export class DocumentDetailService {
         );
   }
 
-  retrieveDocumentTags(docId: number): Observable<Tag[]> {
-    return this.documentVersionService.getLastDocumentVersion(this.sessionService.sessionToken, docId)
-        .pipe(
-            concatMap(next => this.documentVersionService.getMetaValues(this.sessionService.sessionToken, next.uid)),
-            map(res =>
-                res.filter(mv => mv.meta.name.startsWith(TagService.TAG_NAME_PREFIX)
-                    && mv.value == mv.meta.uid)
-                    .map(mv => new Tag(mv.meta.name.replace(new RegExp('^' + TagService.TAG_NAME_PREFIX), ''), mv.metaId))
-            )
-        );
-  }
-
   startDownloadTransaction(documentVersionId: number): Observable<DataTransaction> {
       return this.filetransferService.startDownloadTransaction(this.sessionService.sessionToken, documentVersionId)
           .pipe(

@@ -55,9 +55,9 @@
                                             [removable]="true"
                                             (removed)="removeTag($event)"
                                             attr.data-filename="{{this.data.filesList[i]?.name}}"
-                                            attr.data-tagid="{{tag.uid}}"
+                                            attr.data-tagvalue="{{tag}}"
                                     >
-                                        {{tag.name}}
+                                        {{tag}}
                                         <mat-icon matChipRemove >cancel</mat-icon>
                                     </mat-chip>
                                 </mat-chip-list>

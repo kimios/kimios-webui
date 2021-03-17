@@ -1,13 +1,14 @@
 import {Component, ElementRef, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {TagService} from 'app/services/tag.service';
-import {concatMap, map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
 import {MatChipInputEvent} from '@angular/material';
 import {CdkDragEnd, CdkDragStart} from '@angular/cdk/drag-drop';
 import {DOCUMENT} from '@angular/common';
+import {SearchEntityService} from '../../../services/searchentity.service';
 
 @Component({
   selector: 'file-tags',
@@ -16,9 +17,9 @@ import {DOCUMENT} from '@angular/common';
 })
 export class FileTagsComponent implements OnInit {
 
-  allTags$: Observable<Tag[]>;
-  allTags: Tag[];
-  filteredTags$: Observable<Tag[]>;
+  allTags$: Observable<string[]>;
+  allTags: string[];
+  filteredTags$: Observable<string[]>;
   selectable = true;
   removable = true;
   addOnBlur = true;
@@ -31,16 +32,12 @@ export class FileTagsComponent implements OnInit {
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
   constructor(
-      private tagService: TagService,
+      private searchEntityService: SearchEntityService,
       @Inject(DOCUMENT) document
   ) {
-    this.allTags$ = this.tagService.loadTags()
-        .pipe(
-            map(res => res.map(v => new Tag(v.name, v.uid))),
-            tap(res => this.allTags = res.sort(
-                (t1, t2) => t1.name.localeCompare(t2.name)
-            ))
-        );
+    this.allTags$ = this.searchEntityService.retrieveAllTags().pipe(
+        map(res => Array.from(res.keys()))
+    );
   }
 
   ngOnInit(): void {
@@ -50,80 +47,26 @@ export class FileTagsComponent implements OnInit {
 
   }
 
-  private initFilteredTags(): Observable<Tag[]> {
+  private initFilteredTags(): Observable<string[]> {
     return this.tagCtrl.valueChanges.pipe(
         startWith(null),
-        map((tag: (string|Tag) | null) =>
+        map((tag: (string) | null) =>
             tag ?
-                this._filterTags(tag instanceof Tag ? tag.name : tag) :
+                this._filterTags(tag) :
                 this.allTags
                     .slice()
         )
     );
   }
 
-  private _filterTags(value: string): Tag[] {
+  private _filterTags(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allTags.filter(tag => tag.name.toLowerCase().includes(filterValue));
+    return this.allTags.filter(tag => tag.toLowerCase().includes(filterValue));
   }
-
-  createAndAddTag($event: MatChipInputEvent): void {
-    const input = $event.input;
-    const value = $event.value;
-
-    // Add our tag
-    if ((value || '').trim()) {
-// ask to tagService to create the tag (the meta on the right document type)
-      this.tagService.createTag(value)
-          .pipe(
-              // concatMap(next => this.tagService.loadTags()),
-              // map(res => res.map(v => new Tag(v.name, v.uid)))
-              concatMap(next => this.allTags$)
-          )
-          .subscribe(
-              next => {
-                const newTag = next.filter(tag => tag.name === value)[0];
-                if (newTag) {
-                  this.filteredTags$ = this.initFilteredTags();
-
-                }
-              });
-
-    }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
-
-    this.tagCtrl.setValue(null);
-  }
-
 
   dragEnd($event: CdkDragEnd<any>): void {
     $event.source._dragRef.reset();
-  }
-
-  createTag(): void {
-    const tagName = this.tagInput.nativeElement.value;
-
-    if ((tagName || '').trim()) {
-      this.tagService.createTag(tagName)
-          .pipe(
-              // concatMap(next => this.tagService.loadTags()),
-              // map(res => res.map(v => new Tag(v.name, v.uid)))
-              concatMap(next => this.allTags$)
-          )
-          .subscribe(
-              next => {
-                const newTag = next.filter(tag => tag.name === tagName)[0];
-                if (newTag) {
-                  this.filteredTags$ = of([newTag]);
-                }
-              });
-
-    }
   }
 
     dragStart($event: CdkDragStart<any>): void {

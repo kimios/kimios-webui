@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {SearchEntityService} from 'app/services/searchentity.service';
 
 @Component({
   selector: 'app-search-queries',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SearchQueriesComponent implements OnInit {
 
-  constructor() { }
+  allTags: Map<string, number>;
 
-  ngOnInit() {
+  constructor(
+      private searchEntityService: SearchEntityService
+  ) {
+
+  }
+
+  ngOnInit(): void {
+    this.searchEntityService.retrieveAllTags().subscribe(
+        res => this.allTags = res
+    );
   }
 
 }

@@ -13,11 +13,6 @@
       >
     </mat-form-field>
 
-    <div fxFlex="47">
-      <a *ngIf="(filteredTags$ | async) && (filteredTags$ | async).length != 1 && tagInput.value.length > 2"
-              (click)="createTag()" style="text-decoration: underline; cursor: pointer">Make new tag</a>
-    </div>
-
   </div>
 
     <mat-chip-list
@@ -34,7 +29,7 @@
               (cdkDragStarted)="dragStart($event)"
               [cdkDragData]="tag"
       >
-        {{tag.name}}
+        {{tag}}
       </mat-chip>
     </mat-chip-list>
 

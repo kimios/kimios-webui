@@ -12,7 +12,7 @@ import {Document as KimiosDocument} from 'app/kimios-client-api';
 export class FileUploadListComponent implements OnInit {
 
   progress: Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>;
-  filesUploaded: Map<string, Observable<Tag[]>>;
+  filesUploaded: Map<string, Observable<string[]>>;
   private filesUploadedDocuments: Map<string, BehaviorSubject<KimiosDocument>>;
 
   constructor(private fileUploadService: FileUploadService) {

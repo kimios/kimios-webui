@@ -1,10 +1,9 @@
 import {Component, ElementRef, Inject, Input, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
-import {Tag} from 'app/main/model/tag';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
@@ -12,7 +11,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
-import { Location, formatDate } from '@angular/common';
+import {formatDate, Location} from '@angular/common';
 
 export enum Direction {
     NEXT = 1,
@@ -33,14 +32,14 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     documentVersions$: Observable<Array<DocumentVersion>>;
     documentVersions: Array<DocumentVersion>;
     documentVersionIds: Array<number>;
-    allTags$: Observable<Tag[]>;
-    allTags: Tag[];
-    documentTags$: BehaviorSubject<Tag[]>;
-    filteredTags$: Observable<Tag[]>;
-    selectedTag$: Subject<Tag>;
-    removedTag$: Subject<Tag>;
-    selectedTag: Tag;
-    removedTag: Tag;
+    allTagsKey$: Observable<Array<string>>;
+    allTags: Map<string, number>;
+    documentTags$: BehaviorSubject<Array<string>>;
+    filteredTags$: Observable<Array<string>>;
+    selectedTag$: Subject<string>;
+    removedTag$: Subject<string>;
+    selectedTag: string;
+    removedTag: string;
     createdTagName: string;
     canWrite$: Observable<boolean>;
     hasFullAccess$: Observable<boolean>;
@@ -74,14 +73,14 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private location: Location,
         @Inject(LOCALE_ID) private locale: string
     ) {
-        this.allTags$ = this.tagService.loadTags()
+        this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
             .pipe(
-                map(res => res.map(v => new Tag(v.name, v.uid))),
-                tap(res => this.allTags = res)
+                tap(res => this.allTags = res),
+                map(res => Array.from(res.keys()))
             );
-        this.documentTags$ = new BehaviorSubject<Tag[]>(new Array<Tag>());
-        this.selectedTag$ = new Subject<Tag>();
-        this.removedTag$ = new Subject<Tag>();
+        this.documentTags$ = new BehaviorSubject<Array<string>>([]);
+        this.selectedTag$ = new Subject<string>();
+        this.removedTag$ = new Subject<string>();
         this.canWrite$ = new Observable<boolean>();
         this.hasFullAccess$ = new Observable<boolean>();
         this.loading$ = of(true);
@@ -96,19 +95,15 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
         this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 
-        this.documentData$ = this.allTags$
+        this.documentData$ = this.allTagsKey$
             .pipe(
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
                 tap(res => this.currentVersionId = res.lastVersionId),
                 tap(res => this.document = res),
-                tap(res => this.loading$ = of(false))
-            );
-
-        this.documentDetailService.retrieveDocumentTags(this.documentId)
-            .subscribe(
-                next => this.documentTags$.next(next)
+                tap(res => this.loading$ = of(false)),
+                tap(res => this.documentTags$.next(res.tags)),
             );
 
         this.documentVersions$ = this.initDocumentVersions();
@@ -121,7 +116,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 concatMap(next => this.documentService.updateDocumentTag(
                     this.sessionService.sessionToken,
                     this.documentId,
-                    next.uid,
+                    next,
                     true
                     )
                 )
@@ -132,34 +127,28 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
         this.removedTag$
             .pipe(
-                tap(next => this.removedTag = next),
-                concatMap(next => this.documentService.updateDocumentTag(
+                concatMap(next => combineLatest(of(next), this.documentService.updateDocumentTag(
                     this.sessionService.sessionToken,
                     this.documentId,
-                    next.uid,
+                    next,
                     false
                     )
-                )
+                ))
             )
             .subscribe(
-                next => {
+                ([removedTag, res]) => {
                     const tags = this.documentTags$.getValue();
-                    let tagIndex;
-                    tags.forEach((value, index) => {
-                        if (value.uid === this.removedTag.uid) {
-                            tagIndex = index;
-                        }
-                    });
-                    if (tagIndex !== null && tagIndex !== undefined) {
+                    const tagIndex = tags.indexOf(removedTag);
+                    if (tagIndex !== -1) {
                         tags.splice(tagIndex, 1);
                         this.documentTags$.next(tags);
                     }
                 }
             );
 
-        this.documentTags$.pipe(
+       /* this.documentTags$.pipe(
             tap(res => this.searchEntityService.reloadTags())
-        ).subscribe();
+        ).subscribe();*/
 
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
@@ -229,32 +218,30 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         // this.documentRefreshService.needRefresh.unsubscribe();
     }
 
-    private initFilteredTags(): Observable<Tag[]> {
+    private initFilteredTags(): Observable<Array<string>> {
         return this.tagCtrl.valueChanges.pipe(
             startWith(null),
-            map((tag: (string|Tag) | null) =>
+            map((tag: string | null) =>
                 tag ?
-                    this._filterTags(tag instanceof Tag ? tag.name : tag) :
-                    this.allTags
+                    this._filterTags(tag) :
+                    Array.from(this.allTags.keys())
                         .filter(t => !this.isTagSetOnDocument(t))
                         .slice()
             )
         );
     }
 
-    private isTagSetOnDocument(tag: Tag): boolean {
-        return this.documentTags$.getValue().filter(
-            value => value.uid === tag.uid
-        ).length > 0;
+    private isTagSetOnDocument(tag: string): boolean {
+        return this.documentTags$.getValue().includes(tag);
     }
 
-    private _filterTags(value: string): Tag[] {
+    private _filterTags(value: string): Array<string> {
         const filterValue = value.toLowerCase();
 
-        return this.allTags.filter(tag => !this.isTagSetOnDocument(tag) && tag.name.toLowerCase().includes(filterValue));
+        return Array.from(this.allTags.keys()).filter(tag => !this.isTagSetOnDocument(tag) && tag.toLowerCase().includes(filterValue));
     }
 
-    private extractTagsFromAddonDatas(addonDataJsonString: string): Tag[] {
+    /*private extractTagsFromAddonDatas(addonDataJsonString: string): Tag[] {
         const addonData = JSON.parse(addonDataJsonString);
         const tags = new Array<Tag>();
         const allTagsMap = new Map<number, Tag>();
@@ -279,7 +266,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
             );
         }
         return tags;
-    }
+    }*/
 
     selected(event: MatAutocompleteSelectedEvent): void {
         const tag: any = event.option.value;
@@ -288,40 +275,19 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         this.tagCtrl.setValue(null);
     }
 
-    remove(tag: Tag): void {
+    remove(tag: string): void {
         this.removedTag$.next(tag);
     }
 
     createAndAddTag($event: MatChipInputEvent): void {
         if (!this.matAutocomplete.isOpen) {
             const input = $event.input;
-            const value = $event.value;
+            const value = $event.value.trim();
 
             // Add our tag
-            if ((value || '').trim()) {
-// ask to tagService to create the tag (the meta on the right document type)
-                this.createdTagName = value;
-                this.tagService.createTag(value)
-                    .pipe(
-                        // concatMap(next => this.tagService.loadTags()),
-                        // map(res => res.map(v => new Tag(v.name, v.uid)))
-                        concatMap(next => this.allTags$)
-                    )
-                    .subscribe(
-                        next => {
-                            const newTag = next.filter(tag => tag.name === this.createdTagName)[0];
-                            if (newTag) {
-                                this.selectedTag$.next(newTag);
-                                this.filteredTags$ = this.initFilteredTags();
-
-                            }
-                        });
-
-            }
-
-            // Reset the input value
-            if (input) {
-                input.value = '';
+            if (value.length > 0) {
+                this.selectedTag$.next(value);
+                // this.filteredTags$ = this.initFilteredTags();
             }
 
             this.tagCtrl.setValue(null);
@@ -333,16 +299,12 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     }
 
     private reloadDocument(): void {
-        this.documentData$ = this.allTags$
+        this.documentData$ = this.allTagsKey$
             .pipe(
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
-                tap(res => this.document = res)
-            );
-
-        this.documentDetailService.retrieveDocumentTags(this.documentId)
-            .subscribe(
-                next => this.documentTags$.next(next)
+                tap(res => this.document = res),
+                tap(res => this.documentTags$.next(res.tags))
             );
 
         this.documentVersions$ = this.initDocumentVersions();

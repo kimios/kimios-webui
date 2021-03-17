@@ -7,7 +7,7 @@ import {BehaviorSubject} from 'rxjs';
 
 export interface DialogData {
     filesList: File[];
-    filesTags: Map<string, Map<number, Tag>>;
+    filesTags: Map<string, Array<string>>;
 }
 
 @Component({
@@ -18,7 +18,7 @@ export interface DialogData {
 export class FilesUploadDialogComponent {
     form: FormGroup;
     private _fileIds: string[];
-    filesTags$: Map<string, BehaviorSubject<Array<Tag>>>;
+    filesTags$: Map<string, BehaviorSubject<Array<string>>>;
 
     constructor(
         public dialogRef: MatDialogRef<FilesUploadDialogComponent>,
@@ -28,7 +28,7 @@ export class FilesUploadDialogComponent {
         this.form = this.formBuilder.group({
             filesList: new FormArray([])
         });
-        this.filesTags$ = new Map<string, BehaviorSubject<Array<Tag>>>();
+        this.filesTags$ = new Map<string, BehaviorSubject<Array<string>>>();
         this.addCheckboxes();
     }
 
@@ -36,8 +36,8 @@ export class FilesUploadDialogComponent {
         this.data.filesList.map((o, i) => {
             const control = new FormControl(1);
             (this.form.controls.filesList as FormArray).push(control);
-            this.data.filesTags.set(o.name, new Map<number, Tag>());
-            this.filesTags$.set(o.name, new BehaviorSubject<Array<Tag>>([]));
+            this.data.filesTags.set(o.name, new Array<string>());
+            this.filesTags$.set(o.name, new BehaviorSubject<Array<string>>([]));
         });
     }
 
@@ -59,8 +59,9 @@ export class FilesUploadDialogComponent {
         console.log($event);
         $event.container.element.nativeElement.classList.remove('dragover');
         const targetFileName = $event.container.id;
-        if ($event.item.data instanceof Tag) {
-            this.data.filesTags.get(targetFileName).set($event.item.data.uid, $event.item.data);
+        if (typeof $event.item.data === 'string') {
+            this.data.filesTags.get(targetFileName).push($event.item.data);
+
             this.filesTags$.get(targetFileName).next(Array.from(this.data.filesTags.get(targetFileName).values()));
         }
     }
@@ -80,17 +81,18 @@ export class FilesUploadDialogComponent {
 
     removeTag($event: MatChipEvent): void {
         if ($event.chip._elementRef.nativeElement.dataset
-            && $event.chip._elementRef.nativeElement.dataset.tagid
+            && $event.chip._elementRef.nativeElement.dataset.tagvalue
             && $event.chip._elementRef.nativeElement.dataset.filename) {
             const fileName = $event.chip._elementRef.nativeElement.dataset.filename;
-            this.data.filesTags
+            const index = this.data.filesTags
                 .get(fileName)
-                .delete(Number($event.chip._elementRef.nativeElement.dataset.tagid));
+                .indexOf($event.chip._elementRef.nativeElement.dataset.tagvalue);
+            if (index !== -1) {
+                this.data.filesTags.get(fileName).splice(index, 1);
+            }
             this.filesTags$
                 .get(fileName)
-                .next(Array.from(this.data.filesTags
-                    .get(fileName).values())
-                );
+                .next(this.data.filesTags.get(fileName));
             console.log(this.filesTags$);
         }
     }

@@ -31,7 +31,7 @@ export class FileUploadService {
 
     uploadingFile: BehaviorSubject<string>;
     filesProgress: Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>;
-    filesUploaded: Map<string, BehaviorSubject<Tag[]>>;
+    filesUploaded: Map<string, BehaviorSubject<Array<string>>>;
     filesUploadedDocuments: Map<string, BehaviorSubject<KimiosDocument>>;
     uploadQueue$: BehaviorSubject<Array<string>>;
     uploadQueue: Map<string, Array<any>>;
@@ -52,7 +52,7 @@ export class FileUploadService {
         private notificationService: NotificationService
     ) {
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>();
-        this.filesUploaded = new Map<string, BehaviorSubject<Tag[]>>();
+        this.filesUploaded = new Map<string, BehaviorSubject<string[]>>();
         this.filesUploadedDocuments = new Map<string, BehaviorSubject<KimiosDocument>>();
         this.uploadingFile = new BehaviorSubject<string>(undefined);
         this.lastUploadedDocumentId = undefined;
@@ -127,7 +127,7 @@ export class FileUploadService {
         isRecursive?: boolean,
         documentTypeId?: number,
         metaItems?: string,
-        tags?: number[]
+        tags?: string[]
     ): Observable<{ name: string, status: string, message: number } | number | string > {
 
         if (uploadId === null
@@ -257,7 +257,7 @@ export class FileUploadService {
         );
     }
 
-    tagFile(docId: number, tags: number[]): Observable<Tag[]> {
+    tagFile(docId: number, tags: string[]): Observable<Array<string>> {
         return forkJoin(
             from(tags).pipe(
                 concatMap(
@@ -271,8 +271,9 @@ export class FileUploadService {
             )
         ).pipe(
             concatMap(
-                () => this.documentDetailService.retrieveDocumentTags(docId)
-            )
+                () => this.documentService.getDocument(this.sessionService.sessionToken, docId)
+            ),
+            map(doc => doc.tags)
         );
     }
 

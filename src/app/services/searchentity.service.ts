@@ -366,4 +366,42 @@ export class SearchEntityService implements Resolve<any> {
         });
         return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, criterias);
     }
+
+    public retrieveAllTags(): Observable<Map<string, number>> {
+        const criterias = new Array<Criteria>();
+        criterias.push({
+            fieldName: 'DocumentTags',
+            faceted: true
+        });
+        return this.searchService.advancedSearchDocuments(
+            this.sessionService.sessionToken,
+            0,
+            0,
+            null,
+            null,
+            null,
+            -1,
+            false,
+            criterias,
+            null,
+            false
+        ).pipe(
+            map(response => {
+                const mapTags = new Map<string, number>();
+                const facetValues = response.allfacetsData['DocumentTags'];
+                if (facetValues != null
+                    && facetValues !== undefined) {
+                    for (const index of Object.keys(facetValues)) {
+                        const facetValue = facetValues[index];
+                        if (facetValue[0] !== ''
+                            && facetValue[1] > 0) {
+                            mapTags.set(facetValue[0], facetValue[1]);
+                        }
+                    }
+                }
+                return mapTags;
+            })
+        );
+    }
+
 }
