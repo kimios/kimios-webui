@@ -43,7 +43,8 @@
                                                 [matChipInputFor]="chipList"
                                                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                                 [matChipInputAddOnBlur]="addOnBlur"
-                                                (matChipInputTokenEnd)="createAndAddTag($event)">
+                                                (submit)="uh()"
+                                                >
                                     </mat-chip-list>
                                     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                                         <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
@@ -58,7 +59,7 @@
                                                 [selectable]="false"
                                                 [removable]="false"
                                                 (removed)="remove(tag)">
-                                            {{tag.name}}
+                                            {{tag}}
                                         </mat-chip>
                                     </mat-chip-list>
                                 </ng-template>

@@ -363,4 +363,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     currentVersionIsFirst(): boolean {
         return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
     }
+
+    uh(): void {
+        this.selectedTag$.next(this.tagCtrl.value);
+    }
 }
