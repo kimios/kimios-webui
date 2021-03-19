@@ -145,9 +145,7 @@ export class FileUploadService {
             , isSecurityInherited
             , securityItems
             , isRecursive
-            , (documentTypeId === null || documentTypeId === undefined || documentTypeId === -1) ?
-                this.tagService.documentType.uid :
-                documentTypeId
+            , -1
             , metaItems
             , ''
             , ''
