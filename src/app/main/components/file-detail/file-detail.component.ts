@@ -5,8 +5,8 @@ import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {FormControl} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+import {FormBuilder, FormControl} from '@angular/forms';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatChipInputEvent} from '@angular/material';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
@@ -59,6 +59,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
+    @ViewChild('trigger') matAutocompleteTrigger: MatAutocompleteTrigger;
 
     constructor(
         private route: ActivatedRoute,
@@ -71,6 +72,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
         private documentRefreshService: DocumentRefreshService,
         private securityService: SecurityService,
         private location: Location,
+        private fb: FormBuilder,
         @Inject(LOCALE_ID) private locale: string
     ) {
         this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
@@ -280,18 +282,22 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     }
 
     createAndAddTag($event: MatChipInputEvent): void {
-        if (!this.matAutocomplete.isOpen) {
+        // if (!this.matAutocomplete.isOpen) {
             const input = $event.input;
-            const value = $event.value.trim();
+            const value = $event.value;
 
             // Add our tag
-            if (value.length > 0) {
+            if ((value || '').trim()) {
                 this.selectedTag$.next(value);
                 // this.filteredTags$ = this.initFilteredTags();
             }
-
+            // Reset the input value
+            if (input) {
+                input.value = '';
+            }
             this.tagCtrl.setValue(null);
-        }
+        // }
+        this.matAutocompleteTrigger.closePanel();
     }
 
     handleVersionDownload(versionId: number): void {
@@ -362,9 +368,5 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     currentVersionIsFirst(): boolean {
         return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
-    }
-
-    uh(): void {
-        this.selectedTag$.next(this.tagCtrl.value);
     }
 }

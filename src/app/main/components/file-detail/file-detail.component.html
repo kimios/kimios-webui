@@ -38,13 +38,13 @@
                                         <input
                                                 placeholder="Tags"
                                                 #tagInput
+                                                #trigger="matAutocompleteTrigger"
                                                 [formControl]="tagCtrl"
                                                 [matAutocomplete]="auto"
                                                 [matChipInputFor]="chipList"
                                                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                                 [matChipInputAddOnBlur]="addOnBlur"
-                                                (submit)="uh()"
-                                                >
+                                                (matChipInputTokenEnd)="createAndAddTag($event)">
                                     </mat-chip-list>
                                     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                                         <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
