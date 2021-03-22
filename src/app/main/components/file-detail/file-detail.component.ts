@@ -59,7 +59,6 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
-    @ViewChild('trigger') matAutocompleteTrigger: MatAutocompleteTrigger;
 
     constructor(
         private route: ActivatedRoute,
@@ -282,7 +281,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     }
 
     createAndAddTag($event: MatChipInputEvent): void {
-        // if (!this.matAutocomplete.isOpen) {
+        if (!this.matAutocomplete.isOpen) {
             const input = $event.input;
             const value = $event.value;
 
@@ -296,8 +295,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
                 input.value = '';
             }
             this.tagCtrl.setValue(null);
-        // }
-        this.matAutocompleteTrigger.closePanel();
+        }
+        // this.tagInputTrigger.closePanel();
     }
 
     handleVersionDownload(versionId: number): void {
@@ -368,5 +367,30 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     currentVersionIsFirst(): boolean {
         return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
+    }
+
+    addTag(tag: string): void {
+        console.log('addTag() ' + tag);
+        this.selectedTag$.next(tag);
+        this.tagInput.nativeElement.value = '';
+        this.tagCtrl.setValue(null);
+    }
+
+    addTagOnInput(): void {
+        if (this.matAutocomplete.isOpen) {
+            const input = this.tagInput.nativeElement;
+            const value = this.tagCtrl.value;
+
+            // Add our tag
+            if ((value || '').trim()) {
+                this.selectedTag$.next(value);
+                // this.filteredTags$ = this.initFilteredTags();
+            }
+            // Reset the input value
+            if (input) {
+                input.value = '';
+            }
+            this.tagCtrl.setValue(null);
+        }
     }
 }

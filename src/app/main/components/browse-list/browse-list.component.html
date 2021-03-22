@@ -25,7 +25,9 @@
     > {{col.displayName}} </mat-header-cell>
     <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
       <!-- display folder icon for folders and workspaces -->
+      <!--<fa-icon [icon]="['fab', 'facebook']" style="font-size:30px; color: #38539a;"></fa-icon>-->
       <mat-icon *ngIf="col.id == 'name' && element.type != 3" class="type-icon" fxFlex="40px">folder</mat-icon>
+      <!--<mat-icon *ngIf="col.id == 'name' && element.type == 3"><i class="fa fa-file"></i></mat-icon>-->
       <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
       <mat-icon *ngIf="col.id == 'icon'" class="type-icon" [ngClass]="element.extension" fxFlex="64px"></mat-icon>
     </mat-cell>
@@ -35,7 +37,7 @@
           matColumnDef="actions">
     <mat-header-cell *matHeaderCellDef> <mat-icon style="margin: auto;">apps</mat-icon> </mat-header-cell>
     <mat-cell *matCellDef="let element">
-      <!-- only for documents -->
+      <!-- only for documents and folders-->
       <div *ngIf="element.type === 3 || element.type === 2" fxLayout="row" fxLayoutAlign="space-between start" fxLayoutGap="10px">
         <div>
           <mat-icon
@@ -45,6 +47,7 @@
             {{entityStarIcon(element)}}
           </mat-icon>
         </div>
+        <!-- only for documents -->
         <ng-container *ngIf="element.type === 3">
           <div><mat-icon
                   title="Download document"
