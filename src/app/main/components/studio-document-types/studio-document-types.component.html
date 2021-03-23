@@ -1,3 +1,9 @@
-<p>
-  studio-document-types works!
-</p>
+<mat-list>
+  <mat-list-item *ngFor="let docType of docTypes$ | async"
+                 (click)="selectDocType(docType)"
+                 [ngClass]="{'cursor-pointer' : true,
+                           'selected-item' : docType.uid === adminService.selectedDocumentType$.getValue()}"
+  >
+    {{docType.name}}
+  </mat-list-item>
+</mat-list>
