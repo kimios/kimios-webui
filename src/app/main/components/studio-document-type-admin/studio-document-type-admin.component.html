@@ -1,0 +1,44 @@
+<form [formGroup]="formGroup">
+  <mat-form-field>
+    <input matInput type="text" name="documentTypeName" [formControlName]="'documentTypeName'">
+  </mat-form-field>
+
+  <mat-table [dataSource]="metaDataSource"
+             matSort
+             matSortActive="{{sort.name}}"
+             matSortDirection="{{sort.direction}}"
+             matSortDisableClear
+             (matSortChange)="sortData($event)">
+
+    <!-- remove Column -->
+    <ng-container>
+      <mat-header-cell *matHeaderCellDef>
+
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeFromData(row)" >remove</mat-icon>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}">
+      <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="{{col.matColumnDef}}"
+              [disabled]="col.matColumnDef === 'mandatory'"
+      > {{col.displayName}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
+        <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns;">
+    </mat-row>
+
+  </mat-table>
+
+</form>

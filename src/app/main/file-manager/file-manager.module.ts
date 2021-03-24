@@ -112,7 +112,8 @@ import {NotificationCenterComponent} from 'app/main/components/notification-cent
 import {NotificationCenterListComponent} from 'app/main/components/notification-center-list/notification-center-list.component';
 import {DocumentUploadProgressComponent} from 'app/main/components/document-upload-progress/document-upload-progress.component';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
-import {StudioDocumentTypesComponent} from '../components/studio-document-types/studio-document-types.component';
+import {StudioDocumentTypesComponent} from 'app/main/components/studio-document-types/studio-document-types.component';
+import {StudioDocumentTypeAdminComponent} from 'app/main/components/studio-document-type-admin/studio-document-type-admin.component';
 
 
 @NgModule({
@@ -190,7 +191,8 @@ import {StudioDocumentTypesComponent} from '../components/studio-document-types/
         NotificationCenterListComponent,
         DocumentUploadProgressComponent,
         ConfirmDialogComponent,
-        StudioDocumentTypesComponent
+        StudioDocumentTypesComponent,
+        StudioDocumentTypeAdminComponent
     ],
     imports: [
         FileManagerRoutingModule,
