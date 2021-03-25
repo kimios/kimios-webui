@@ -64,6 +64,10 @@ export class MetaDataSource extends MatTableDataSource<Meta> {
         );
     }
 
+    setData(metas: Array<Meta>): void {
+        this.dataSubject.next(metas);
+    }
+
     sortData1(sort: DMEntitySort): void {
         this.dataSubject.next(this.dataSubject.getValue().sort((meta1, meta2) =>
             sort.direction === 'desc' ?
