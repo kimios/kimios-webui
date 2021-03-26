@@ -26,6 +26,10 @@
     <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
       <!-- display folder icon for folders and workspaces -->
       <!--<fa-icon [icon]="['fab', 'facebook']" style="font-size:30px; color: #38539a;"></fa-icon>-->
+      <fa-icon *ngIf="col.id == 'name' && element.type == 3 && element.extension && element.extension == 'pdf'"
+               [icon]="['far', 'file-pdf']"
+               size="lg"
+               [ngClass]="'file-icon-browse-list'"></fa-icon>
       <mat-icon *ngIf="col.id == 'name' && element.type != 3" class="type-icon" fxFlex="40px">folder</mat-icon>
       <!--<mat-icon *ngIf="col.id == 'name' && element.type == 3"><i class="fa fa-file"></i></mat-icon>-->
       <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>

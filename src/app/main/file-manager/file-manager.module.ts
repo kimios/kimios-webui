@@ -114,7 +114,13 @@ import {DocumentUploadProgressComponent} from 'app/main/components/document-uplo
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {StudioDocumentTypesComponent} from 'app/main/components/studio-document-types/studio-document-types.component';
 import {StudioDocumentTypeAdminComponent} from 'app/main/components/studio-document-type-admin/studio-document-type-admin.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
 
+// to add icons from fontawesome
+library.add(far, fas);
 
 @NgModule({
     declarations: [
@@ -230,7 +236,8 @@ import {StudioDocumentTypeAdminComponent} from 'app/main/components/studio-docum
         DragDropModule,
         MatGridListModule,
 
-        TreeModule.forRoot()
+        TreeModule.forRoot(),
+        FontAwesomeModule
     ],
     providers   : [
         EntityService,
