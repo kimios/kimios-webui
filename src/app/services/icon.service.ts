@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import {MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
+import {findIconDefinition} from '@fortawesome/fontawesome-svg-core';
+import {IconName, IconPrefix} from '@fortawesome/fontawesome-common-types';
 
 export enum IconsEnum {
   Workspace = 'workspace'
@@ -29,5 +31,14 @@ export class IconService {
     iconKeys.forEach(key => {
       this.matIconRegistry.addSvgIcon(key, this.domSanitizer.bypassSecurityTrustResourceUrl(`${iconUrl}/${key}.svg`));
     });
+  }
+
+  public iconIsAvailableWithPrefix(iconPrefix: string, iconName: string): boolean {
+    const icon = findIconDefinition({
+      'prefix': iconPrefix as IconPrefix,
+      'iconName': iconName as IconName
+    });
+
+    return icon != null && icon !== undefined;
   }
 }

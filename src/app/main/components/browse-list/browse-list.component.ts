@@ -15,6 +15,7 @@ import {concatMap, filter, tap} from 'rxjs/operators';
 import {FilePermissionsDialogComponent} from 'app/main/components/file-permissions-dialog/file-permissions-dialog.component';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
+import {IconService} from 'app/services/icon.service';
 
 const sortMapping = {
   'name': 'name',
@@ -48,6 +49,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       private workspaceSessionService: WorkspaceSessionService,
       public dialog: MatDialog,
       public entityMoveDialog: MatDialog,
+      private iconService: IconService
   ) {
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
@@ -262,5 +264,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         this.deleteDocument$.next(uid);
       }
     });
+  }
+
+  retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
   }
 }
