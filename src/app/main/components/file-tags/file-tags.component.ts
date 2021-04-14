@@ -1,11 +1,8 @@
 import {Component, ElementRef, Inject, Input, OnInit, ViewChild} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {TagService} from 'app/services/tag.service';
-import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
-import {Tag} from 'app/main/model/tag';
+import {Observable} from 'rxjs';
+import {map, startWith, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormControl} from '@angular/forms';
-import {MatChipInputEvent} from '@angular/material';
 import {CdkDragEnd, CdkDragStart} from '@angular/cdk/drag-drop';
 import {DOCUMENT} from '@angular/common';
 import {SearchEntityService} from '../../../services/searchentity.service';
@@ -35,8 +32,10 @@ export class FileTagsComponent implements OnInit {
       private searchEntityService: SearchEntityService,
       @Inject(DOCUMENT) document
   ) {
+    this.allTags = new Array();
     this.allTags$ = this.searchEntityService.retrieveAllTags().pipe(
-        map(res => Array.from(res.keys()))
+        map(res => Array.from(res.keys())),
+        tap(res => this.allTags = res)
     );
   }
 

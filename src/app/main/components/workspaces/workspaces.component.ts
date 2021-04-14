@@ -3,11 +3,11 @@ import {Location} from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
-import {catchError, concatMap, filter} from 'rxjs/operators';
+import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
 import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -87,11 +87,11 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
   }
 
-  openFilesUploadDialog(list: FileList, droppedInDir?: DMEntity, droppedInTree?: boolean): void {
+  openFilesUploadDialog(list: Array<File>, droppedInDir?: DMEntity, droppedInTree?: boolean): void {
     const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
       // width: '250px',
       data: {
-        filesList: Array.from(list),
+        filesList: list,
         filesTags: new Map<string, Map<number, Tag>>()
       }
     });
@@ -158,7 +158,12 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   }
 
   handleFileInput(files: FileList): void {
-    this.openFilesUploadDialog(files, null);
+    const array = new Array<File>();
+    for (let i = 0; i < files.length; i++) {
+      array.push(files.item(i));
+    }
+
+    this.openFilesUploadDialog(array, null);
   }
 
   handleDrop(event: Event): boolean {
@@ -196,69 +201,98 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
     console.dir(event['dataTransfer']);
 
-    if (event['dataTransfer'] != null
-        && event['dataTransfer']['files'] != null) {
-      Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
+    if (event['dataTransfer'] != null) {
 
-      /*const items = event['dataTransfer'].items;
-      const loading = new BehaviorSubject(null);
-      let nbLoading = 0;
-      loading.pipe(
-          filter(value => value != null),
-          map(value => nbLoading = nbLoading + (value === true ? 1 : -1)),
-          tap(value => console.log('nbLoading: ' + nbLoading)),
-          takeWhile(() => nbLoading !== 0),
-      ).subscribe();*/
+      if (event['dataTransfer']['items'] != null
+          && event['dataTransfer']['items'].length > 0) {
 
-      /*const item = items[i];
-      if (item.kind === 'file') {
-        const entry = item.webkitGetAsEntry();
-        if (entry.isFile) {
+        const items = event['dataTransfer']['items'];
 
-        } else if (entry.isDirectory) {
-          const directoryReader = entry.createReader();
-          new Promise((resolve, reject) => {
-            directoryReader.readEntries(
-                entries => {
-                  resolve(entries);
-                },
-                err => {
-                  reject(err);
-                }
-            );
-          }).then(
-              entries => console.dir(entries)
+        /*
+const loading = new BehaviorSubject(null);
+let nbLoading = 0;
+loading.pipe(
+    filter(value => value != null),
+    map(value => nbLoading = nbLoading + (value === true ? 1 : -1)),
+    tap(value => console.log('nbLoading: ' + nbLoading)),
+    takeWhile(() => nbLoading !== 0),
+).subscribe();
+*/
+        const files = new Array<File>();
+        const loading = new BehaviorSubject<boolean>(null);
+        let nbLoading = 0;
+        let nbItemsToScan = items.length;
+        loading.pipe(
+            filter(value => value != null),
+            map(value => nbLoading = nbLoading + (value === true ? 1 : -1)),
+            tap(value => console.log('nbLoading: ' + nbLoading)),
+            takeWhile(() => nbLoading !== 0 && nbItemsToScan > 0),
+        ).subscribe(
+            null,
+            null,
+            () => this.openFilesUploadDialog(files)
+        );
+
+        let i = 0;
+        while (i < items.length) {
+          const item = items[i];
+          const entry = item.webkitGetAsEntry();
+          /*if (item.kind === 'file') {
+            if (entry.isFile) {
+
+            } else if (entry.isDirectory) {
+              const directoryReader = entry.createReader();
+              new Promise((resolve, reject) => {
+                directoryReader.readEntries(
+                    entries => {
+                      resolve(entries);
+                    },
+                    err => {
+                      reject(err);
+                    }
+                );
+              }).then(
+                  entries => console.dir(entries)
+              );
+            }
+          }*/
+          this.scanFiles(entry, '', loading, files);
+          i++;
+          nbItemsToScan--;
+        }
+      } else {
+        if (event['dataTransfer']['files'] != null
+            && event['dataTransfer']['files'].length > 0) {
+          Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
+          this.openFilesUploadDialog(
+              event['dataTransfer']['files'],
+              event['droppedInDir'] ? event['droppedInDir'] : '',
+              event['droppedInTreeNode'] ? event['droppedInTreeNode'] : null
           );
         }
       }
-      }*/
-      /*loading.pipe(
-          tap(val => console.log('loading ' + val)),
-          filter(val => val === false),
-          delay(500),
-          filter(val => nbLoading === 0)
-      ).subscribe(
-          open =>*/
-      this.openFilesUploadDialog(
-          event['dataTransfer']['files'],
-          event['droppedInDir'] ? event['droppedInDir'] : '',
-          event['droppedInTreeNode'] ? event['droppedInTreeNode'] : null
-//          event['dataTransfer'].items
-      );
-      /*);
-
-      for (let i = 0; i < items.length; i++) {
-        loading.next(true);
-        const entry = items[i].webkitGetAsEntry(); // only for Webkit
-        // though apparently
-        // FF has it too
-        if (entry) {
-          recurseItem(entry, '/', loading);
-        }
-        loading.next(false);
-      }*/
     }
     return false;
+  }
+
+  private scanFiles(item, container, loading: BehaviorSubject<boolean>, files: Array<File>): void {
+    loading.next(true);
+    if (item.isDirectory) {
+      const directoryReader = item.createReader();
+      directoryReader.readEntries(entries => {
+        entries.forEach(entry => {
+          this.scanFiles(entry, item.name, loading, files);
+        });
+        loading.next(false);
+      });
+    } else {
+      const promise = new Promise(resolve => {
+        item.file(file => {
+          files.push(file);
+          loading.next(false);
+        });
+      });
+    }
   }
 
   private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
