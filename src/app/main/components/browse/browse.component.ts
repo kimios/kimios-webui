@@ -187,7 +187,7 @@ export class BrowseComponent implements OnInit {
                 parentDir = currentDir;
             }
 
-            this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
+            /*this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
                 v,
                 path + '/' + v.name,
                 true,
@@ -214,7 +214,7 @@ export class BrowseComponent implements OnInit {
                         this.browseEntityService.selectedEntity$.next(currentDir);
                         this.fileUploadService.uploading$.next(false);
                     }
-                );
+                );*/
         });
     }
 

@@ -100,7 +100,7 @@ export class FileSearchPanelComponent implements OnInit {
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    /*dialogRef.afterClosed().subscribe(result => {
       if (! result) {
         return;
       }
@@ -131,7 +131,7 @@ export class FileSearchPanelComponent implements OnInit {
               null,
               () => this.searchEntityService.reloadFiles().subscribe()
           );
-    });
+    });*/
   }
 
   paginatorHandler($event: PageEvent): void {
