@@ -87,11 +87,12 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
   }
 
-  openFilesUploadDialog(list: Array<File>, droppedInDir?: DMEntity, droppedInTree?: boolean): void {
+  openFilesUploadDialog(filesMap: Map<string, Array<File>>, droppedInDir?: DMEntity, droppedInTree?: boolean, dirsToCreate?: Array<string>): void {
+    // filesMap = this.clearEmptyValues(filesMap);
     const dialogRef = this.filesUploadDialog.open(FilesUploadDialogComponent, {
       // width: '250px',
       data: {
-        filesList: list,
+        filesList: filesMap,
         filesTags: new Map<string, Map<number, Tag>>()
       }
     });
@@ -126,17 +127,22 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       }
 
       this.fileUploadService.uploading$.next(true);
-      this.fileUploadService.uploadFiles(dialogRef.componentInstance.data.filesList.map(v => [
-        v,
-        path + '/' + v.name,
+      let filesToUpload = new Array<FileToUpload>();
+      dialogRef.componentInstance.data.filesList.forEach((filesArray, filesPath) =>
+          filesToUpload = filesToUpload.concat(filesArray.map(file => new FileToUpload(file, filesPath)))
+      );
+      this.fileUploadService.uploadFiles(filesToUpload.map(v => [
+        v.file,
+        path + '/' + v.relativePath + v.file.name,
         true,
         '[]',
         true,
         -1,
         '[]',
-        dialogRef.componentInstance.data.filesTags.get(v.name) ?
-            Array.from(dialogRef.componentInstance.data.filesTags.get(v.name).keys()) :
-            []
+        dialogRef.componentInstance.data.filesTags.get(v.file.name) ?
+            Array.from(dialogRef.componentInstance.data.filesTags.get(v.file.name).keys()) :
+            [],
+
       ]))
           .pipe(
               catchError(error => {
@@ -158,12 +164,13 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   }
 
   handleFileInput(files: FileList): void {
-    const array = new Array<File>();
+    const filesMap = new Map<string, Array<File>>();
+    filesMap.set('', new Array<File>());
     for (let i = 0; i < files.length; i++) {
-      array.push(files.item(i));
+      filesMap.get('').push(files.item(i));
     }
 
-    this.openFilesUploadDialog(array, null);
+    this.openFilesUploadDialog(filesMap, null);
   }
 
   handleDrop(event: Event): boolean {
@@ -218,7 +225,11 @@ loading.pipe(
     takeWhile(() => nbLoading !== 0),
 ).subscribe();
 */
-        const files = new Array<File>();
+        const files = new Map<string, Array<File>>();
+        const dirsToCreate = new Array<string>();
+        // let currentPathStr = '';
+        // this.browseEntityService.currentPath.getValue().forEach(dmEntity => currentPathStr += dmEntity.name + '/');
+        files.set('', new Array<File>());
         const loading = new BehaviorSubject<boolean>(null);
         let nbLoading = 0;
         let nbItemsToScan = items.length;
@@ -230,7 +241,12 @@ loading.pipe(
         ).subscribe(
             null,
             null,
-            () => this.openFilesUploadDialog(files)
+            () => this.openFilesUploadDialog(
+                files,
+                event['droppedInDir'] ? event['droppedInDir'] : '',
+                event['droppedInTreeNode'] ? event['droppedInTreeNode'] : null,
+                dirsToCreate
+            )
         );
 
         let i = 0;
@@ -256,7 +272,7 @@ loading.pipe(
               );
             }
           }*/
-          this.scanFiles(entry, '', loading, files);
+          this.scanFiles(entry, '', loading, files, '', dirsToCreate);
           i++;
           nbItemsToScan--;
         }
@@ -275,20 +291,23 @@ loading.pipe(
     return false;
   }
 
-  private scanFiles(item, container, loading: BehaviorSubject<boolean>, files: Array<File>): void {
+  private scanFiles(item, container, loading: BehaviorSubject<boolean>, files: Map<string, Array<File>>, path: string, dirsToCreate: Array<string>): void {
     loading.next(true);
     if (item.isDirectory) {
+      const dirPath = path + item.name + '/';
+      dirsToCreate.push(dirPath);
+      files.set(dirPath, new Array<File>());
       const directoryReader = item.createReader();
       directoryReader.readEntries(entries => {
         entries.forEach(entry => {
-          this.scanFiles(entry, item.name, loading, files);
+          this.scanFiles(entry, item.name, loading, files, dirPath, dirsToCreate);
         });
         loading.next(false);
       });
     } else {
       const promise = new Promise(resolve => {
         item.file(file => {
-          files.push(file);
+          files.get(path).push(file);
           loading.next(false);
         });
       });
@@ -341,5 +360,30 @@ loading.pipe(
         message: msg
       }
     });
+  }
+
+  private clearEmptyValues(files: Map<string, Array<File>>): Map<string, Array<File>> {
+    Array.from(files.keys())
+        .filter(key => files.get(key).length === 0)
+        .forEach(keyWithEmptyValue => files.delete(keyWithEmptyValue));
+    return files;
+  }
+}
+
+export class FileToUpload {
+  private _relativePath: string;
+  private _file: File;
+
+  constructor(file: File, relativePath: string) {
+    this._file = file;
+    this._relativePath = relativePath;
+  }
+
+  get relativePath(): string {
+    return this._relativePath;
+  }
+
+  get file(): File {
+    return this._file;
   }
 }
