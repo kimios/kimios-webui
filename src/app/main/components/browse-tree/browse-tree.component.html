@@ -16,7 +16,7 @@
                   diameter="20"></mat-progress-spinner>
         </ng-container>
         <ng-template #notLoading>
-          <div [ngClass]="{'kimios-invisible' : (node.data.children === null
+          <div [ngClass]="{'disabled-tree-expander' : (node.data.children === null
                 || node.data.children === undefined
                 || node.data.children.length === 0)}" >
             <button mat-icon-button

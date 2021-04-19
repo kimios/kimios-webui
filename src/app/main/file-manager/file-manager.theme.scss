@@ -190,4 +190,8 @@
     .mw100 {
         max-width: 100px;
     }
+
+    .disabled-tree-expander {
+        color: mat-color($background, 'unselected-chip');
+    }
 }
