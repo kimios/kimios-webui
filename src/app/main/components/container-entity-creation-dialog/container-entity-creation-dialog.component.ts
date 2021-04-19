@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {BehaviorSubject, combineLatest, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
@@ -32,6 +32,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   entityCreationForm: FormGroup;
   documentId: number;
   parentEntity: Workspace | Folder;
+  parentEntity$: Observable<Workspace | Folder>;
 
   constructor(
       public dialogRef: MatDialogRef<ContainerEntityCreationDialogComponent>,
@@ -52,7 +53,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
     });
 
     if (this.data.entityType === 'folder') {
-      of(this.data.parentId != null
+      this.parentEntity$ = of(this.data.parentId != null
           && this.data.parentId !== undefined).pipe(
           concatMap(res => res ?
               this.browseEntityService.getEntity(this.data.parentId) :
@@ -61,8 +62,8 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           tap(entity => {
             this.parentEntity = entity;
           })
-      ).subscribe(
       );
+      this.parentEntity$.subscribe();
     }
   }
 

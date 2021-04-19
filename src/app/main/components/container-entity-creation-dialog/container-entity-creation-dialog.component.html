@@ -1,7 +1,11 @@
 <div fxLayout="column" fxLayoutAlign="start space-between">
     <div fxLayout="column" fxLayoutAlign="center center">
         <div>Create {{data.entityType}}</div>
-        <div *ngIf="data.entityType === 'folder'">at path: {{parentEntity.path}}</div>
+        <ng-container *ngIf="data.entityType === 'folder'">
+            <div *ngIf="parentEntity$ | async">
+                at path: {{parentEntity.path}}
+            </div>
+        </ng-container>
     </div>
     <div>
         <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">

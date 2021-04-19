@@ -158,6 +158,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
                 this.browseEntityService.deleteCacheEntry(parentDir.uid);
                 this.browseEntityService.selectedEntity$.next(currentDir);
                 this.fileUploadService.uploading$.next(false);
+                this.browseEntityService.onAddedChildToEntity$.next(parentDir.uid);
               }
           );
     });

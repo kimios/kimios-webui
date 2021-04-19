@@ -266,15 +266,20 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
                 childrenEntities
                     .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
-                    .forEach(entity => currentChildren.push({
-                        name: entity.name,
-                        id: entity.uid.toString(),
-                        children: null,
-                        isLoading: false,
-                        svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
-                    }));
+                    .forEach(entity => {
+                        currentChildren.push({
+                            name: entity.name,
+                            id: entity.uid.toString(),
+                            children: null,
+                            isLoading: false,
+                            svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                        });
+                    });
                 this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
                 this.tree.treeModel.update();
+                childrenEntities
+                    .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
+                    .forEach(entity => this.loadChildren(entity.uid).subscribe());
             })
         ).subscribe();
   }
