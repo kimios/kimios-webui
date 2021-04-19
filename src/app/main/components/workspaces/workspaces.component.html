@@ -51,13 +51,13 @@
            style="padding-top: 20px; height: 100%; border-radius: 10px;"
            #treeAndGridRow id="treeAndGridRow" >
 
-        <div fxFlex="18" id="workspacestreecontainer" style="overflow: auto;" >
+        <div fxFlex="21" id="workspacestreecontainer" style="overflow: auto;" >
 
           <browse-tree></browse-tree>
 
         </div>
-
-        <div fxFlex="82">
+        <mat-divider [vertical]="true"></mat-divider>
+        <div fxFlex="79">
           <!--<div>
             <mat-paginator
                     [length]="totalFilesFound$ | async"
