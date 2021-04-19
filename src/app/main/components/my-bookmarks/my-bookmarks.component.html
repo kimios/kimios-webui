@@ -8,6 +8,8 @@
     </div>
   </div>
 
+  <div [ngClass]="'kimios-content-area'">
+
 <mat-table
         *ngIf="dataSource != null"
         [dataSource]="dataSource"
@@ -19,10 +21,13 @@
 
   <!-- remove Column -->
   <ng-container matColumnDef="remove">
-    <mat-header-cell *matHeaderCellDef>
+    <mat-header-cell *matHeaderCellDef [ngClass]="'mw100'">
     </mat-header-cell>
-    <mat-cell *matCellDef="let row">
-      <mat-icon [ngClass]="'cursor-pointer'" (click)="removeBookmark(row)" >remove</mat-icon>
+    <mat-cell *matCellDef="let row" [ngClass]="'mw100'">
+      <mat-icon [ngClass]="'cursor-pointer'" (click)="removeBookmark(row)"
+                title="remove bookmark">
+        remove
+      </mat-icon>
     </mat-cell>
   </ng-container>
 
@@ -45,5 +50,7 @@
   </mat-row>
 
 </mat-table>
+
+  </div>
 
 </div>

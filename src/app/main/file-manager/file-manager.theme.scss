@@ -173,4 +173,21 @@
     #treeAndGridRow {
         background-color: map-get($background, card);
     }
+
+    .kimios-section-content {
+        background: mat-color($background, 'card');
+    }
+
+    .kimios-content-area {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .w50 {
+        width: 50px;
+    }
+
+    .mw100 {
+        max-width: 100px;
+    }
 }

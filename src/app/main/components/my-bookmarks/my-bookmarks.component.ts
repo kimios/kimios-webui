@@ -50,6 +50,10 @@ export class MyBookmarksComponent implements OnInit {
   }
 
   removeBookmark(bookmark: Bookmark): void {
-    this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid).subscribe();
+    this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid).subscribe(
+        null,
+        null,
+        () => this.dataSource.loadData(this.sort, this.filter)
+    );
   }
 }
