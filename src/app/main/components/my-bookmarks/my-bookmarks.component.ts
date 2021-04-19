@@ -2,8 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {Bookmark, DocumentService} from 'app/kimios-client-api';
 import {BOOKMARKS_DEFAULT_DISPLAYED_COLUMNS, BookmarksDataSource} from './bookmarks-data-source';
 import {SessionService} from 'app/services/session.service';
-import {Sort} from '@angular/material';
+import {MatDialog, Sort} from '@angular/material';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
+import {concatMap, filter} from 'rxjs/operators';
 
 @Component({
   selector: 'my-bookmarks',
@@ -21,7 +23,8 @@ export class MyBookmarksComponent implements OnInit {
 
   constructor(
       private documentService: DocumentService,
-      private sessionService: SessionService
+      private sessionService: SessionService,
+      public dialog: MatDialog
   ) {
     this.sort = <DMEntitySortSubElement> {
       name: 'name',
@@ -50,7 +53,16 @@ export class MyBookmarksComponent implements OnInit {
   }
 
   removeBookmark(bookmark: Bookmark): void {
-    this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid).subscribe(
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        'message': 'Delete bookmark : ' + bookmark.entity.name + ' ?'
+      }
+    });
+
+    dialogRef.afterClosed().pipe(
+        filter(res => res === true),
+        concatMap(res => this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid))
+    ).subscribe(
         null,
         null,
         () => this.dataSource.loadData(this.sort, this.filter)
