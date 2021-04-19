@@ -1,17 +1,17 @@
-<div fxLayout="column" fxLayoutAlign="start start">
+<div fxLayout="column" fxLayoutAlign="start start" fxFill>
     <div fxLayout="row" fxLayoutAlign="start center" class="goBackDiv" (click)="goBack($event)">
         <mat-icon id="goBackIcon" >arrow_back</mat-icon>
         <span>Go back to search results</span>
     </div>
 
-    <div class="content">
+    <div class="content" fxFill>
 
 <!-- File details -->
         <div *ngIf="documentData$ | async as data">
 
             <span id="docTitle">{{data.name + (data.extension ? '.' + data.extension : '')}}</span>
 
-            <div fxLayout="row" fxLayoutAlign="space-between start">
+            <div fxLayout="row" fxLayoutAlign="start start" fxFlexFill>
 
                 <div style="margin-right: 20px">
 
@@ -24,8 +24,8 @@
                             <file-detail-data [document]="data"></file-detail-data>
 
                             <!-- tags -->
-                            <div>
-                                <mat-form-field style="width: 100%;" *ngIf="canWrite$ | async; else elseBlockTags">
+                            <div fxFlexFill>
+                                <mat-form-field *ngIf="canWrite$ | async; else elseBlockTags" fxFlexFill>
                                     <mat-chip-list #chipList>
                                         <mat-chip
                                                 *ngFor="let tag of documentTags$ | async"
@@ -107,8 +107,8 @@
 
                 </div>
 
-                <div fxLayout="column" fxLayoutAlign="start start">
-                    <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%;">
+                <div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
+                    <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%">
                         <div>
                             <mat-icon
                                     [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
@@ -127,7 +127,7 @@
                             </mat-icon>
                         </div>
                     </div>
-                    <div>
+                    <div style="width: 96%">
                         <file-preview
                                 [documentId]="documentId"
                                 [documentExtension]="document.extension"
