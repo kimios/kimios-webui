@@ -92,7 +92,7 @@ export class FileDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.documentId = +this.route.snapshot.paramMap.get('documentId');
+        this.documentId = Number(this.route.snapshot.paramMap.get('documentId'));
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
         this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 
