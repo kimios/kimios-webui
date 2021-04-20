@@ -88,6 +88,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         // load initial nodes
         if (this.treeNodesService.treeNodes.length > 0) {
             // if (this.browseEntityService.selectedEntity$.)
+            this.initDataDone$.next(true);
         } else {
             this.retrieveEntitiesToExpand().pipe(
                 tap(res => this.entitiesToExpand$.next(res)),
@@ -153,8 +154,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             );
         }
 
-    this.browseEntityService.selectedEntity$
+    this.initDataDone$
         .pipe(
+            filter(res => res === true),
+            concatMap(res => this.browseEntityService.selectedEntity$),
             filter(entity => entity !== undefined),
             tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
             concatMap(
