@@ -28,6 +28,6 @@ export class DocumentUtils {
     }
 
     public static navigateToFolderOrWorkspace(router: Router, folderUid: number): void {
-        router.navigate(['/browse', folderUid]);
+        router.navigate(['/workspaces', folderUid]);
     }
 }
