@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
@@ -14,6 +14,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {AdminService} from 'app/services/admin.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-workspaces',
@@ -34,6 +35,9 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
 
   isWorkspaceCreator: Observable<boolean>;
 
+  @Input()
+  entityId: number;
+
   constructor(
       private browseEntityService: BrowseEntityService,
       private location: Location,
@@ -42,7 +46,8 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       private fileUploadService: FileUploadService,
       public entityMoveDialog: MatDialog,
       private errorDialog: MatDialog,
-      private adminService: AdminService
+      private adminService: AdminService,
+      private route: ActivatedRoute
   ) {
     console.log('in workspace constructor');
 
@@ -50,6 +55,12 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.entityId = Number(this.route.snapshot.paramMap.get('entityId'));
+    if (this.entityId != null
+        && this.entityId !== undefined) {
+      this.browseEntityService.getEntity(this.entityId)
+          .subscribe(entity => this.browseEntityService.selectedEntity$.next(entity));
+    }
     this.browseEntityService.selectedEntity$.subscribe(
         entity => {
           if (entity !== undefined) {
