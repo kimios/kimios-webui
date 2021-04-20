@@ -120,6 +120,7 @@
         div {
             color: $kimios-green;
         }
+        background: mat-color($background, 'card');
     }
 
     mat-row.selected {

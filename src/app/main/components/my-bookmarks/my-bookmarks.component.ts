@@ -1,11 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {Bookmark, DocumentService} from 'app/kimios-client-api';
+import {Bookmark, DMEntity, DocumentService} from 'app/kimios-client-api';
 import {BOOKMARKS_DEFAULT_DISPLAYED_COLUMNS, BookmarksDataSource} from './bookmarks-data-source';
 import {SessionService} from 'app/services/session.service';
 import {MatDialog, Sort} from '@angular/material';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {concatMap, filter} from 'rxjs/operators';
+import {Router} from '@angular/router';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'my-bookmarks',
@@ -24,7 +26,9 @@ export class MyBookmarksComponent implements OnInit {
   constructor(
       private documentService: DocumentService,
       private sessionService: SessionService,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private router: Router,
+      private bes: BrowseEntityService
   ) {
     this.sort = <DMEntitySortSubElement> {
       name: 'name',
@@ -68,4 +72,8 @@ export class MyBookmarksComponent implements OnInit {
         () => this.dataSource.loadData(this.sort, this.filter)
     );
   }
+
+    goToEntity(entity: DMEntity): void {
+      this.bes.goToEntity(entity, this.router);
+    }
 }

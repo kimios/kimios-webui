@@ -46,7 +46,7 @@
 
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
-  <mat-row *matRowDef="let row; columns: displayedColumns;" >
+  <mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="goToEntity(row.entity)">
   </mat-row>
 
 </mat-table>

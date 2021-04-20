@@ -8,6 +8,8 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {Router} from '@angular/router';
 
 const PAGE_SIZE_DEFAULT = 10;
 
@@ -594,16 +596,19 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
       if (DMEntityUtils.dmEntityIsDocument(entity)) {
           return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
-              tap(doc => this.entities.set(entity.uid, doc))
+              tap(doc => this.entities.set(entity.uid, doc)),
+              tap(doc => this.entitiesPathIds.set(entity.uid, null))
           );
       } else {
           if (DMEntityUtils.dmEntityIsFolder(entity)) {
               return this.folderService.getFolder(this.sessionService.sessionToken, entity.uid).pipe(
-                  tap(doc => this.entities.set(entity.uid, doc))
+                  tap(doc => this.entities.set(entity.uid, doc)),
+                  tap(doc => this.entitiesPathIds.set(entity.uid, null))
               );
           } else {
               return this.workspaceService.getWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
-                  tap(doc => this.entities.set(entity.uid, doc))
+                  tap(doc => this.entities.set(entity.uid, doc)),
+                  tap(doc => this.entitiesPathIds.set(entity.uid, null))
               );
           }
       }
@@ -693,6 +698,15 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         return this.getEntity(uid).pipe(
             concatMap(entity => this.updateEntityInCache(entity))
         );
+    }
+
+    goToEntity(entity: DMEntity, router: Router): void {
+        if (DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity)) {
+            DocumentUtils.navigateToFolderOrWorkspace(router, entity.uid);
+            // this.goInContainerEntity(entity);
+        } else {
+            DocumentUtils.navigateToFile(router, entity.uid);
+        }
     }
 }
 
