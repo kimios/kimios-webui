@@ -105,6 +105,8 @@
     }
 
     .mat-tab-label-active {
+        background-color: map-get($background, card);
+
         .mat-tab-label-content {
             color: $kimios-green;
             font-weight: bolder;
