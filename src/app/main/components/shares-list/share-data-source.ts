@@ -1,5 +1,5 @@
 import {MatTableDataSource} from '@angular/material';
-import {Share, ShareService} from 'app/kimios-client-api';
+import {Share, ShareService, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {tap} from 'rxjs/operators';
@@ -7,12 +7,28 @@ import {SharesListMode} from './shares-list.component';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {SessionService} from 'app/services/session.service';
 import {ColumnDescription} from 'app/main/model/column-description';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
+        id: 'entity',
+        matColumnDef: 'entity',
+        position: 1,
+        matHeaderCellDef: 'entity',
+        sticky: false,
+        displayName: 'Document',
+        cell: (row: Share) => row.entity.name + (DMEntityUtils.dmEntityIsDocument(row.entity) ?
+            (row.entity as KimiosDocument).extension != null
+            && (row.entity as KimiosDocument).extension !== undefined ?
+                '.' + (row.entity as KimiosDocument).extension :
+                '' :
+            ''),
+        title: (row: Share) => row.entity.path
+    },
+    {
         id: 'creationDate',
         matColumnDef: 'creationDate',
-        position: 1,
+        position: 2,
         matHeaderCellDef: 'creationDate',
         sticky: false,
         displayName: 'Created',
@@ -20,22 +36,11 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     }, {
         id: 'expirationDate',
         matColumnDef: 'expirationDate',
-        position: 2,
+        position: 3,
         matHeaderCellDef: 'expirationDate',
         sticky: false,
         displayName: 'Until',
         cell: (row: Share) => new Date(row.expirationDate)
-    }, {
-        id: 'entity',
-        matColumnDef: 'entity',
-        position: 3,
-        matHeaderCellDef: 'entity',
-        sticky: false,
-        displayName: 'Document',
-        cell: (row: Share) => row.entity.name,
-        title: (row: Share) => row.entity.path
-            + '/'
-            + row.entity.name
     }
 ];
 
