@@ -8,6 +8,7 @@ import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_v
 import {SessionService} from 'app/services/session.service';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {DateUtils} from 'app/main/utils/date-utils';
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -32,7 +33,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'creationDate',
         sticky: false,
         displayName: 'Created',
-        cell: (row: Share) => new Date(row.creationDate)
+        cell: (row: Share) => DateUtils.dateAndTimeShort_FR(new Date(row.creationDate))
     }, {
         id: 'expirationDate',
         matColumnDef: 'expirationDate',
@@ -40,7 +41,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'expirationDate',
         sticky: false,
         displayName: 'Until',
-        cell: (row: Share) => new Date(row.expirationDate)
+        cell: (row: Share) => DateUtils.dateAndTimeShort_FR(new Date(row.expirationDate))
     }
 ];
 
