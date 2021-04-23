@@ -93,4 +93,8 @@ export class MyBookmarksComponent implements OnInit {
   filterData(): void {
     this.dataSource.loadData(this.sort, this.dataSearch.value);
   }
+
+  retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
+  }
 }
