@@ -2,7 +2,7 @@ import {ColumnDescription} from 'app/main/model/column-description';
 import {Bookmark, DocumentService, Share} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
@@ -62,7 +62,11 @@ export class BookmarksDataSource extends MatTableDataSource<Bookmark> {
 
     loadData(sort: DMEntitySortSubElement, filter: string): void {
         this.documentService.getBookmarks(this.sessionService.sessionToken).pipe(
-            tap(bookmarks => this.bookmarksSubject.next(this._sortData(bookmarks, sort)))
+            map(bookmarks => filter != null && filter !== undefined && filter !== '' ?
+                this.filterData(bookmarks, filter) :
+                bookmarks
+            ),
+            tap(bookmarksFiltered => this.bookmarksSubject.next(this._sortData(bookmarksFiltered, sort)))
         ).subscribe();
     }
 
@@ -85,5 +89,9 @@ export class BookmarksDataSource extends MatTableDataSource<Bookmark> {
         );
 
         return sortRes;
+    }
+
+    private filterData(data: Bookmark[], filter: string): Bookmark[] {
+        return data.filter(bookmark => bookmark.entity.name.toLowerCase().includes(filter.toLowerCase()));
     }
 }

@@ -10,6 +10,17 @@
 
   <div [ngClass]="'kimios-content-area'">
 
+    <form (ngSubmit)="filterData()">
+      <mat-form-field>
+        <input #inputDataSearch type="text"
+               name="inputBookmark"
+               matInput aria-label="Bookmark filter" [formControl]="dataSearch" placeholder="filter bookmarks">
+        <!--<button mat-button (click)="filterData()" >
+          <mat-icon>search</mat-icon>
+        </button>-->
+      </mat-form-field>
+    </form>
+
 <mat-table
         *ngIf="dataSource != null"
         [dataSource]="dataSource"

@@ -5,11 +5,13 @@ import {SessionService} from 'app/services/session.service';
 import {MatDialog, Sort} from '@angular/material';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
-import {concatMap, filter} from 'rxjs/operators';
+import {concatMap, filter, map} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'my-bookmarks',
@@ -24,6 +26,9 @@ export class MyBookmarksComponent implements OnInit {
 
   columnsDescription = BOOKMARKS_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
+
+  dataSearch = new FormControl('');
+  filteredData$: Observable<Array<Bookmark>>;
 
   constructor(
       private documentService: DocumentService,
@@ -45,6 +50,9 @@ export class MyBookmarksComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource = new BookmarksDataSource(this.sessionService, this.documentService);
     this.dataSource.loadData(this.sort, this.filter);
+    this.dataSearch.valueChanges.pipe(
+        map(value => this.filterData())
+    ).subscribe();
   }
 
   sortData($event: Sort): void {
@@ -55,7 +63,7 @@ export class MyBookmarksComponent implements OnInit {
             'asc';
     this.dataSource.loadData(
         this.sort,
-        null
+        this.dataSearch.value
     );
   }
 
@@ -81,4 +89,8 @@ export class MyBookmarksComponent implements OnInit {
     goToEntity(entity: DMEntity): void {
       this.bes.goToEntity(entity, this.router);
     }
+
+  filterData(): void {
+    this.dataSource.loadData(this.sort, this.dataSearch.value);
+  }
 }
