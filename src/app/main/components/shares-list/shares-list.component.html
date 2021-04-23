@@ -32,6 +32,10 @@
             mat-sort-header="{{col.matColumnDef}}"
     > {{col.displayName}} </mat-header-cell>
     <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" title="{{col.title ? col.title(element) : ''}}">
+      <fa-icon *ngIf="col.id == 'entity'"
+               [icon]="['far', retrieveDocumentIcon(element.entity, 'far')]"
+               size="lg"
+               [ngClass]="'file-icon-list'"></fa-icon>
       <span *ngIf="col.id != 'icon'">{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
     </mat-cell>
   </ng-container>

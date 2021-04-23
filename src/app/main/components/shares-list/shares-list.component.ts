@@ -1,9 +1,11 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
-import {ShareService} from 'app/kimios-client-api';
+import {DMEntity, ShareService} from 'app/kimios-client-api';
 import {ShareDataSource, SHARES_DEFAULT_DISPLAYED_COLUMNS} from './share-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
+import {IconService} from 'app/services/icon.service';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -36,6 +38,7 @@ export class SharesListComponent implements OnInit {
   constructor(
       private sessionService: SessionService,
       private shareService: ShareService,
+      private iconService: IconService
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -67,5 +70,9 @@ export class SharesListComponent implements OnInit {
 
   endShare(id: number): void {
 
+  }
+
+  retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
   }
 }
