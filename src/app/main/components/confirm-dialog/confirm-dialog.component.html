@@ -1,5 +1,15 @@
-<div mat-dialog-content>
-  <p>{{data.message}}</p>
+<div mat-dialog-title>
+  {{data.dialogTitle}}
+</div>
+<div mat-dialog-content fxLayout="column" fxLayoutAlign="center">
+  <div fxLayout="row" style="align-items: center" fxLayoutGap="5px">
+      <fa-icon *ngIf="data.iconLine1 != null && data.iconLine1 !== undefined"
+               [icon]="['far', data.iconLine1]"
+               size="lg">
+      </fa-icon>
+      <p>{{data.messageLine1}}</p>
+  </div>
+  <div *ngIf="data.messageLine2"><p>{{data.messageLine2}}</p></div>
 </div>
 <div mat-dialog-actions align="center">
   <button mat-button (click)="onNoClick()">No Thanks</button>

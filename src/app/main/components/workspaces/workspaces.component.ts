@@ -4,17 +4,18 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
-import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
+import {DMEntity} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
-import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {AdminService} from 'app/services/admin.service';
 import {ActivatedRoute} from '@angular/router';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
+import {IconService} from 'app/services/icon.service';
 
 @Component({
   selector: 'app-workspaces',
@@ -47,7 +48,8 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       public entityMoveDialog: MatDialog,
       private errorDialog: MatDialog,
       private adminService: AdminService,
-      private route: ActivatedRoute
+      private route: ActivatedRoute,
+      private iconService: IconService
   ) {
     console.log('in workspace constructor');
 
@@ -327,16 +329,17 @@ loading.pipe(
   }
 
   private openEntityMoveConfirmDialog(entityMoved: DMEntity, entityTarget: DMEntity): void {
-    const dialogRef = this.entityMoveDialog.open(EntityMoveDialogComponent, {
+    const dialogRef = this.entityMoveDialog.open(ConfirmDialogComponent, {
       // width: '250px',
       data: {
-        entityMoved: entityMoved,
-        entityTarget: entityTarget,
-        fromPath: this.browseEntityService.computeEntityPath(
+        dialogTitle: 'Confirm move?',
+        iconLine1: DMEntityUtils.retrieveEntityIconName(this.iconService, entityMoved, 'far'),
+        messageLine1: entityMoved.name,
+        messageLine2: 'to ' + entityTarget.path
+            /* this.browseEntityService.computeEntityPath(
             DMEntityUtils.dmEntityIsDocument(entityMoved) ?
                 (<KimiosDocument>entityMoved).folderUid :
-                (<Folder>entityMoved).parentUid
-        )
+                (<Folder>entityMoved).parentUid)*/
       }
     });
 

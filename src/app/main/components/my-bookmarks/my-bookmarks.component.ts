@@ -8,6 +8,8 @@ import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm
 import {concatMap, filter} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {IconService} from 'app/services/icon.service';
 
 @Component({
   selector: 'my-bookmarks',
@@ -28,7 +30,8 @@ export class MyBookmarksComponent implements OnInit {
       private sessionService: SessionService,
       public dialog: MatDialog,
       private router: Router,
-      private bes: BrowseEntityService
+      private bes: BrowseEntityService,
+      private iconService: IconService
   ) {
     this.sort = <DMEntitySortSubElement> {
       name: 'name',
@@ -59,7 +62,9 @@ export class MyBookmarksComponent implements OnInit {
   removeBookmark(bookmark: Bookmark): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        'message': 'Delete bookmark : ' + bookmark.entity.name + ' ?'
+        dialogTitle: 'Delete bookmark?',
+        iconLine1: DMEntityUtils.retrieveEntityIconName(this.iconService, bookmark.entity, 'far'),
+        messageLine1: bookmark.entity.name
       }
     });
 
