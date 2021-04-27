@@ -30,7 +30,7 @@ export interface Share {
     downloadToken?: string;
     downloadCount?: number;
     expirationDate?: Date;
-    shareStatus?: Share.ShareStatusEnum;
+    shareStatus?: Share.ShareStatus;
     entity?: DMEntity;
 }
 export namespace Share {
@@ -39,10 +39,10 @@ export namespace Share {
         SYSTEM: 'SYSTEM' as TypeEnum,
         EXTERNAL: 'EXTERNAL' as TypeEnum
     };
-    export type ShareStatusEnum = 'ACTIVE' | 'EXPIRED' | 'DISABLED';
+    export type ShareStatus = 'ACTIVE' | 'EXPIRED' | 'DISABLED';
     export const ShareStatusEnum = {
-        ACTIVE: 'ACTIVE' as ShareStatusEnum,
-        EXPIRED: 'EXPIRED' as ShareStatusEnum,
-        DISABLED: 'DISABLED' as ShareStatusEnum
+        ACTIVE: 'ACTIVE' as ShareStatus,
+        EXPIRED: 'EXPIRED' as ShareStatus,
+        DISABLED: 'DISABLED' as ShareStatus
     };
 }
