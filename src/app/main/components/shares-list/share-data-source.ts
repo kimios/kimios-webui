@@ -43,7 +43,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'creationDate',
         sticky: false,
         displayName: 'Created',
-        cell: (row: Share) => DateUtils.dateAndTimeShort_FR(new Date(row.creationDate))
+        cell: (row: Share) => `${DateUtils.dateAndTimeShort_FR(new Date(row.creationDate))}`
     }, {
         id: 'expirationDate',
         matColumnDef: 'expirationDate',
@@ -52,6 +52,14 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'Until',
         cell: (row: Share) => DateUtils.dateAndTimeShort_FR(new Date(row.expirationDate))
+    }, {
+        id: 'shareStatus',
+        matColumnDef: 'shareStatus',
+        position: 4,
+        matHeaderCellDef: 'shareStatus',
+        sticky: false,
+        displayName: 'Status',
+        cell: null
     }
 ];
 
