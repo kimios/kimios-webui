@@ -1,3 +1,19 @@
+<form *ngIf="mode === 'byMe'" [formGroup]="form">
+  <div
+          fxLayout="row"
+          style="width: 100%; padding: 30px;"
+          fxLayoutGap="10px"
+          [ngClass]="'kimios-section-content'"
+          fxLayoutAlign="start center">
+    <span style="vertical-align: bottom">Filter by status: </span>
+    <mat-checkbox *ngFor="let statusType of shareStatusTypes"
+                  [formControlName]="statusType"
+                  labelPosition="after">
+      {{statusType}}
+    </mat-checkbox>
+  </div>
+</form>
+
 <mat-table
         *ngIf="dataSource != null"
         [dataSource]="dataSource"

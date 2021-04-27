@@ -2,13 +2,14 @@ import {MatTableDataSource} from '@angular/material';
 import {Share, ShareService, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {SharesListMode} from './shares-list.component';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {SessionService} from 'app/services/session.service';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DateUtils} from 'app/main/utils/date-utils';
+import ShareStatus = Share.ShareStatus;
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -89,13 +90,14 @@ export class ShareDataSource extends MatTableDataSource<Share> {
         this.loadingSubject.complete();
     }
 
-    loadData(sort: DMEntitySort, filter: string): void {
+    loadData(sort: DMEntitySort, filter: string, statusFilter: Array<ShareStatus>): void {
         if (this.mode === SharesListMode.WITH_ME) {
             this.shareService.listEntitiesSharedWithMe(this.sessionService.sessionToken).pipe(
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {
             this.shareService.listEntitiesSharedByMe(this.sessionService.sessionToken).pipe(
+                map(shares => this.filterSharesByStatus(shares, statusFilter)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         }
@@ -132,5 +134,9 @@ export class ShareDataSource extends MatTableDataSource<Share> {
         const shares = sortetIds.map(id => mapSharesKey.get(id));
 
         return shares;
+    }
+
+    private filterSharesByStatus(shares: Array<Share>, statusFilter: Array<Share.ShareStatus>): Array<Share> {
+        return shares.filter(share => statusFilter.includes(share.shareStatus));
     }
 }

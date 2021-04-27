@@ -8,6 +8,8 @@ import {IconService} from 'app/services/icon.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {combineLatest, Observable, of} from 'rxjs';
 import {concatMap, filter, flatMap, map, tap} from 'rxjs/operators';
+import {Share} from 'app/kimios-client-api/model/share';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -40,12 +42,15 @@ export class SharesListComponent implements OnInit {
 
   users: Map<string, KimiosUser>;
   shareUser: Map<number, User>;
+  shareStatusTypes: Array<Share.ShareStatus>;
+  form: FormGroup;
 
   constructor(
       private sessionService: SessionService,
       private shareService: ShareService,
       private iconService: IconService,
-      private administrationService: AdministrationService
+      private administrationService: AdministrationService,
+      private fb: FormBuilder
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -55,11 +60,14 @@ export class SharesListComponent implements OnInit {
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
     this.users = new Map<string, User>();
     this.shareUser = new Map<number, User>();
+    this.shareStatusTypes = Array.from(Object.keys(Share.ShareStatusEnum)).map(str => str as Share.ShareStatus);
+    this.form = this.fb.group({});
+    this.shareStatusTypes.forEach(status => this.form.addControl(status, this.fb.control(true)));
   }
 
   ngOnInit(): void {
     this.dataSource = new ShareDataSource(this.sessionService, this.shareService, this.mode);
-    this.dataSource.loadData(this.sort, this.filter);
+    this.loadData();
     this.dataSource.connect().pipe(
         flatMap(sha => sha),
         filter(share => ! Array.from(this.users.keys()).includes(share.targetUserId + '@' + share.targetUserSource)),
@@ -72,6 +80,18 @@ export class SharesListComponent implements OnInit {
         tap( ([share, user]) => this.users.set(user.uid + '@' + user.source, user)),
         tap( ([share, user]) => this.shareUser.set(share.id, user)),
     ).subscribe();
+
+    this.form.valueChanges.subscribe(
+        value => this.loadData()
+    );
+  }
+
+  loadData(): void {
+    this.dataSource.loadData(
+        this.sort,
+        this.filter,
+        Object.keys(this.form.controls).filter(statusControl => this.form.get(statusControl).value === true) as Share.ShareStatus[]
+    );
   }
 
   sortData($event: Sort): void {
@@ -90,10 +110,7 @@ export class SharesListComponent implements OnInit {
     } else {
       this.sort.externalSortData = null;
     }
-    this.dataSource.loadData(
-        this.sort,
-        null
-    );
+    this.loadData();
   }
 
   endShare(id: number): void {
