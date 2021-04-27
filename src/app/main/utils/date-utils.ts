@@ -1,7 +1,7 @@
 export class DateUtils {
     public static dateAndTimeShort_FR(date: Date): string {
-        return date.getDay()
-            + '/' + date.getMonth()
+        return date.getDate()
+            + '/' + (date.getMonth() + 1)
             + '/' + date.getFullYear()
             + ', ' + this.addLeadingZeros(date.getHours(), 2) + ':'
             + this.addLeadingZeros(date.getMinutes(), 2);
