@@ -39,11 +39,13 @@ export class SharesListComponent implements OnInit {
 
   columnsDescription = SHARES_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
+  displayedColumnsWithFilters: Array<string>;
 
   users: Map<string, KimiosUser>;
   shareUser: Map<number, User>;
   shareStatusTypes: Array<Share.ShareStatus>;
   form: FormGroup;
+  formGroupFilters: FormGroup;
 
   constructor(
       private sessionService: SessionService,
@@ -58,11 +60,19 @@ export class SharesListComponent implements OnInit {
       type: 'number'
     };
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
+    this.displayedColumnsWithFilters = this.displayedColumns.map(column => column + '_second-header');
     this.users = new Map<string, User>();
     this.shareUser = new Map<number, User>();
     this.shareStatusTypes = Array.from(Object.keys(Share.ShareStatusEnum)).map(str => str as Share.ShareStatus);
-    this.form = this.fb.group({});
-    this.shareStatusTypes.forEach(status => this.form.addControl(status, this.fb.control(true)));
+    this.form = this.fb.group({
+      'statusFilters': this.fb.group({}),
+      'strFilter': this.fb.control('')
+    });
+    this.shareStatusTypes.forEach(status =>
+        (this.form.get('statusFilters') as FormGroup).addControl(status, this.fb.control(true)));
+    this.formGroupFilters = this.fb.group({});
+    this.displayedColumnsWithFilters.forEach(column =>
+        (this.formGroupFilters as FormGroup).addControl(column, this.fb.control('')));
   }
 
   ngOnInit(): void {
@@ -89,8 +99,9 @@ export class SharesListComponent implements OnInit {
   loadData(): void {
     this.dataSource.loadData(
         this.sort,
-        this.filter,
-        Object.keys(this.form.controls).filter(statusControl => this.form.get(statusControl).value === true) as Share.ShareStatus[]
+        this.form.get('strFilter').value,
+        Object.keys((this.form.get('statusFilters') as FormGroup).controls)
+            .filter(statusControl => this.form.get('statusFilters').get(statusControl).value === true) as Share.ShareStatus[]
     );
   }
 

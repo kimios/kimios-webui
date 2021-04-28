@@ -3,6 +3,7 @@
 @mixin file-manager-theme($theme) {
 
     $background: map-get($theme, background);
+    $foreground: map-get($theme, foreground);
     $accent: map-get($theme, accent);
     $is-dark: map-get($theme, is-dark);
 
@@ -208,5 +209,18 @@
 
     .mat-cell {
         padding: 5px 5px 5px 10px;
+    }
+
+    .mat-header-row.kimios-first-of-several-headers {
+        border-top-color: mat-color($foreground, divider);
+        border-top-width: 1px;
+        border-top-style: solid;
+        border-bottom-width: unset;
+        border-bottom-style: unset;
+        min-height: 40px;
+
+        .mat-header-cell {
+            height: 40px;
+        }
     }
 }
