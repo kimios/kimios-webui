@@ -63,10 +63,10 @@
                size="lg"
                [ngClass]="'file-icon-list'"></fa-icon>
       <span *ngIf="col.id != 'with'">{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
-      <span *ngIf="col.id === 'with' && users.get(element.targetUserId + '@' + element.targetUserSource) != null">
-        {{users.get(element.targetUserId + '@' + element.targetUserSource).lastName
+      <span *ngIf="col.id === 'with' && element.targetUser != null">
+        {{element.targetUser.lastName
       + ', '
-      + users.get(element.targetUserId + '@' + element.targetUserSource).firstName }}
+      + element.targetUser.firstName }}
       </span>
     </mat-cell>
   </ng-container>
@@ -80,7 +80,7 @@
     >
       <mat-form-field>
         <input type="text"
-               matInput aria-label="Filter shares" [formControlName]="col" placeholder="search" name="{{col}}">
+               matInput aria-label="Filter shares" [formControlName]="col" placeholder="search">
         <button mat-button *ngIf="this.formGroupFilters.get(col).value.length > 0"
                 matSuffix mat-icon-button aria-label="Clear" (click)="this.formGroupFilters.get(col).setValue('')">
           <mat-icon>close</mat-icon>

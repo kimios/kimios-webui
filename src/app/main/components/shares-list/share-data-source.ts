@@ -1,5 +1,5 @@
 import {MatTableDataSource} from '@angular/material';
-import {Share, ShareService, Document as KimiosDocument} from 'app/kimios-client-api';
+import {Document as KimiosDocument, Share} from 'app/kimios-client-api';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {map, tap} from 'rxjs/operators';
@@ -9,6 +9,10 @@ import {SessionService} from 'app/services/session.service';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {DateUtils} from 'app/main/utils/date-utils';
+import {PropertyFilter} from 'app/main/model/property-filter';
+import {ObjectUtils} from 'app/main/utils/object-utils';
+import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
+import {ShareExtendedService} from 'app/services/share-extended.service';
 import ShareStatus = Share.ShareStatus;
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
@@ -19,13 +23,13 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'entity',
         sticky: false,
         displayName: 'Document',
-        cell: (row: Share) => row.entity.name + (DMEntityUtils.dmEntityIsDocument(row.entity) ?
+        cell: (row: ShareWithTargetUser) => row.entity.name + (DMEntityUtils.dmEntityIsDocument(row.entity) ?
             (row.entity as KimiosDocument).extension != null
             && (row.entity as KimiosDocument).extension !== undefined ?
                 '.' + (row.entity as KimiosDocument).extension :
                 '' :
             ''),
-        title: (row: Share) => row.entity.path
+        title: (row: ShareWithTargetUser) => row.entity.path
     },
     {
         id: 'with',
@@ -34,8 +38,8 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'with',
         sticky: false,
         displayName: 'With',
-        cell: (row: Share) => '',
-        title: (row: Share) => row.targetUserId + '@' + row.targetUserSource
+        cell: (row: ShareWithTargetUser) => '',
+        title: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource
     },
     {
         id: 'creationDate',
@@ -44,7 +48,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'creationDate',
         sticky: false,
         displayName: 'Created',
-        cell: (row: Share) => `${DateUtils.dateAndTimeShort_FR(new Date(row.creationDate))}`
+        cell: (row: ShareWithTargetUser) => `${DateUtils.dateAndTimeShort_FR(new Date(row.creationDate))}`
     }, {
         id: 'expirationDate',
         matColumnDef: 'expirationDate',
@@ -52,7 +56,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'expirationDate',
         sticky: false,
         displayName: 'Until',
-        cell: (row: Share) => DateUtils.dateAndTimeShort_FR(new Date(row.expirationDate))
+        cell: (row: ShareWithTargetUser) => DateUtils.dateAndTimeShort_FR(new Date(row.expirationDate))
     }, {
         id: 'shareStatus',
         matColumnDef: 'shareStatus',
@@ -64,8 +68,8 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     }
 ];
 
-export class ShareDataSource extends MatTableDataSource<Share> {
-    private sharesSubject = new BehaviorSubject<Share[]>([]);
+export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
+    private sharesSubject = new BehaviorSubject<ShareWithTargetUser[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
@@ -74,14 +78,14 @@ export class ShareDataSource extends MatTableDataSource<Share> {
 
     constructor(
         private sessionService: SessionService,
-        private shareService: ShareService,
+        private shareExtendedService: ShareExtendedService,
         mode: SharesListMode
     ) {
         super();
         this.mode = mode;
     }
 
-    connect(): BehaviorSubject<Share[]> {
+    connect(): BehaviorSubject<ShareWithTargetUser[]> {
         return this.sharesSubject;
     }
 
@@ -90,26 +94,41 @@ export class ShareDataSource extends MatTableDataSource<Share> {
         this.loadingSubject.complete();
     }
 
-    loadData(sort: DMEntitySort, filter: string, statusFilter: Array<ShareStatus>): void {
+    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>, statusFilter: Array<ShareStatus>): void {
         if (this.mode === SharesListMode.WITH_ME) {
-            this.shareService.listEntitiesSharedWithMe(this.sessionService.sessionToken).pipe(
+            this.shareExtendedService.retrieveSharesWithMeWithTargetUser().pipe(
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {
-            this.shareService.listEntitiesSharedByMe(this.sessionService.sessionToken).pipe(
+            this.shareExtendedService.retrieveSharesByMeWithTargetUser().pipe(
                 map(shares => this.filterSharesByStatus(shares, statusFilter)),
+                map(shares => this.filterData(shares, filters)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         }
     }
 
-    private _sortData(data: Array<Share>, sort: DMEntitySort): Array<Share> {
+    private filterData(shares: Array<ShareWithTargetUser>, filters: Array<PropertyFilter>): Array<ShareWithTargetUser> {
+        return shares.filter(share => {
+            let filterOk = true;
+            let i = 0;
+            const nbFilters = filters.length;
+            while (filterOk === true && i < nbFilters) {
+                const filter = filters[i];
+                filterOk = filter.applyFilter(ObjectUtils.extractValueRec(share, filter.propertyName.split('.')));
+                i++;
+            }
+            return filterOk;
+        });
+    }
+
+    private _sortData(data: Array<ShareWithTargetUser>, sort: DMEntitySort): Array<ShareWithTargetUser> {
         return sort.externalSortData == null || sort.externalSortData === undefined ?
             data.sort((share1, share2) => this._compareDataOnField(share1, share2, sort)) :
             this.applyExternalSortWithExternalData(data, sort.externalSortData, sort.direction === 'asc' ? 1 : -1);
     }
 
-    private _compareDataOnField(element1: Share, element2: Share, sort: DMEntitySort): number {
+    private _compareDataOnField(element1: ShareWithTargetUser, element2: ShareWithTargetUser, sort: DMEntitySort): number {
         const sortDir = sort.direction === 'asc' ?
             1 :
             -1;
@@ -126,17 +145,17 @@ export class ShareDataSource extends MatTableDataSource<Share> {
         return sortRes;
     }
 
-    private applyExternalSortWithExternalData(data: Array<Share>, externalSortData: Map<any, any>, sortDirection: number): Array<Share> {
+    private applyExternalSortWithExternalData(data: Array<ShareWithTargetUser>, externalSortData: Map<any, any>, sortDirection: number): Array<ShareWithTargetUser> {
         const sortetIds = Array.from(externalSortData.keys()).sort((key1, key2) =>
             sortDirection * (externalSortData.get(key1) as string).localeCompare(externalSortData.get(key2) as string));
-        const mapSharesKey = new Map<number, Share>();
+        const mapSharesKey = new Map<number, ShareWithTargetUser>();
         data.forEach(share => mapSharesKey.set(share.id, share));
         const shares = sortetIds.map(id => mapSharesKey.get(id));
 
         return shares;
     }
 
-    private filterSharesByStatus(shares: Array<Share>, statusFilter: Array<Share.ShareStatus>): Array<Share> {
+    private filterSharesByStatus(shares: Array<ShareWithTargetUser>, statusFilter: Array<Share.ShareStatus>): Array<ShareWithTargetUser> {
         return shares.filter(share => statusFilter.includes(share.shareStatus));
     }
 }
