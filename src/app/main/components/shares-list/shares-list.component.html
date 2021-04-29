@@ -1,24 +1,5 @@
 <div  [ngClass]="'kimios-section-content'">
 
-<form *ngIf="mode === 'byMe'" [formGroup]="form">
-  <div
-          fxLayout="column">
-    <div
-            [formGroupName]="'statusFilters'"
-            fxLayout="row"
-            style="padding: 5px; margin-left: 20px; margin-top: 25px"
-            fxLayoutGap="10px"
-            fxLayoutAlign="start center">
-      <span style="vertical-align: bottom">Filter by status: </span>
-      <mat-checkbox *ngFor="let statusType of shareStatusTypes"
-                    [formControlName]="statusType"
-                    labelPosition="after">
-        {{statusType}}
-      </mat-checkbox>
-    </div>
-  </div>
-</form>
-
 <mat-table
         *ngIf="dataSource != null"
         [dataSource]="dataSource"
@@ -27,7 +8,6 @@
         matSortDirection="{{sort.direction}}"
         matSortDisableClear
         (matSortChange)="sortData($event)"
-        [ngClass]="{'kimios-share-mat-table' : mode === 'byMe'}"
         [formGroup]="formGroupFilters"
 >
 
@@ -78,14 +58,28 @@
     <mat-header-cell
             *matHeaderCellDef
     >
-      <mat-form-field>
-        <input type="text"
-               matInput aria-label="Filter shares" [formControlName]="col" placeholder="search">
-        <button mat-button *ngIf="this.formGroupFilters.get(col).value.length > 0"
-                matSuffix mat-icon-button aria-label="Clear" (click)="this.formGroupFilters.get(col).setValue('')">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
+      <ng-container
+              *ngIf="col === 'entity_second-header' || col === 'with_second-header' || col === 'by_second-header'">
+        <mat-form-field>
+          <input type="text" name="{{col}}"
+                 matInput aria-label="Filter shares" [formControlName]="mappingSecondHeaderPropertyName.get(col)" placeholder="search">
+          <button mat-button *ngIf="this.formGroupFilters.get(mappingSecondHeaderPropertyName.get(col)).value.length > 0"
+                  matSuffix mat-icon-button aria-label="Clear"
+                  (click)="this.formGroupFilters.get(mappingSecondHeaderPropertyName.get(col)).setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </ng-container>
+      <ng-container
+              *ngIf="mode === 'byMe' && col === 'shareStatus_second-header'">
+        <mat-form-field style="min-width: 70%">
+          <!--<mat-label>status</mat-label>-->
+          <mat-select [formControlName]="mappingSecondHeaderPropertyName.get(col)" multiple>
+            <mat-option *ngFor="let shareStatus of shareStatusTypes" [value]="shareStatus">{{shareStatus}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+
     </mat-header-cell>
   </ng-container>
 

@@ -13,6 +13,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {PropertyFilter} from 'app/main/model/property-filter';
 import {PropertyFilterString} from 'app/main/model/property-filter-string';
 import {ShareExtendedService} from 'app/services/share-extended.service';
+import {PropertyFilterArray} from 'app/main/model/property-filter-array';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -28,7 +29,7 @@ const sortTypeMapping = {
 
 const filterPropertyPathMapping = {
   'entity': 'entity.name',
-  'with': 'targetUser.name'
+  'with': 'targetUser.name',
 };
 
 @Component({
@@ -51,8 +52,8 @@ export class SharesListComponent implements OnInit {
   mappingSecondHeaderPropertyName: Map<string, string>;
 
   shareStatusTypes: Array<Share.ShareStatus>;
-  form: FormGroup;
   formGroupFilters: FormGroup;
+  shareStatusValue: Array<string>;
 
   constructor(
       private sessionService: SessionService,
@@ -71,24 +72,19 @@ export class SharesListComponent implements OnInit {
     this.columnsDescription.forEach(column => this.mappingSecondHeaderPropertyName.set(column.id + '_second-header', column.id));
     this.displayedColumnsWithFilters = Array.from(this.mappingSecondHeaderPropertyName.keys());
     this.shareStatusTypes = Array.from(Object.keys(Share.ShareStatusEnum)).map(str => str as Share.ShareStatus);
-    this.form = this.fb.group({
-      'statusFilters': this.fb.group({}),
-      'strFilter': this.fb.control('')
+    this.formGroupFilters = this.fb.group({
+      'entity': this.fb.control(''),
+      'with': this.fb.control(''),
+      'shareStatus': this.fb.control([])
     });
-    this.shareStatusTypes.forEach(status =>
-        (this.form.get('statusFilters') as FormGroup).addControl(status, this.fb.control(true)));
-    this.formGroupFilters = this.fb.group({});
-    this.displayedColumnsWithFilters.forEach(column =>
-        (this.formGroupFilters as FormGroup).addControl(column, this.fb.control('')));
+    this.shareStatusValue = this.shareStatusTypes;
+    this.formGroupFilters.get('shareStatus').setValue(this.shareStatusValue);
   }
 
   ngOnInit(): void {
     this.dataSource = new ShareDataSource(this.sessionService, this.shareExtendedService, this.mode);
     this.loadData();
 
-    this.form.valueChanges.subscribe(
-        value => this.loadData()
-    );
     this.formGroupFilters.valueChanges.subscribe(
         value => this.loadData()
     );
@@ -97,9 +93,7 @@ export class SharesListComponent implements OnInit {
   loadData(): void {
     this.dataSource.loadData(
         this.sort,
-        this.makeFiltersFromFormGroup(this.formGroupFilters, this.mappingSecondHeaderPropertyName),
-        Object.keys((this.form.get('statusFilters') as FormGroup).controls)
-            .filter(statusControl => this.form.get('statusFilters').get(statusControl).value === true) as Share.ShareStatus[]
+        this.makeFiltersFromFormGroup(this.formGroupFilters, this.mappingSecondHeaderPropertyName)
     );
   }
 
@@ -140,16 +134,18 @@ export class SharesListComponent implements OnInit {
 
   private makeFiltersFromFormGroup(formGroup: FormGroup, mappingControlNamePropertyName?: Map<string, string>): Array<PropertyFilter> {
     const filters = new Array<PropertyFilter>();
+    const propertyFilterString = ['entity', 'with'];
     Object.keys(formGroup.controls)
+        .filter(key => propertyFilterString.includes(key))
         .filter(key => formGroup.get(key).value.length > 0)
-        .forEach(key => filters.push(new PropertyFilterString(
-          mappingControlNamePropertyName && mappingControlNamePropertyName.get(key) ?
-              filterPropertyPathMapping[mappingControlNamePropertyName.get(key)] != null ?
-                  filterPropertyPathMapping[mappingControlNamePropertyName.get(key)] :
-                  mappingControlNamePropertyName.get(key) :
-              key,
-            formGroup.get(key).value
-        )));
+        .forEach(key => {
+          const keyMapped = filterPropertyPathMapping[key] ? filterPropertyPathMapping[key] : key;
+          filters.push(new PropertyFilterString(keyMapped, formGroup.get(key).value));
+        });
+
+    filters.push(new PropertyFilterArray('shareStatus', formGroup.get('shareStatus').value));
+
+    console.dir(filters);
 
     return filters;
   }

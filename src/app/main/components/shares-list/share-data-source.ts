@@ -94,14 +94,13 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
         this.loadingSubject.complete();
     }
 
-    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>, statusFilter: Array<ShareStatus>): void {
+    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>): void {
         if (this.mode === SharesListMode.WITH_ME) {
             this.shareExtendedService.retrieveSharesWithMeWithTargetUser().pipe(
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {
             this.shareExtendedService.retrieveSharesByMeWithTargetUser().pipe(
-                map(shares => this.filterSharesByStatus(shares, statusFilter)),
                 map(shares => this.filterData(shares, filters)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
