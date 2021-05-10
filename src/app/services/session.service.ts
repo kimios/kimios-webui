@@ -4,6 +4,8 @@ import {CookieService} from 'ngx-cookie-service';
 import {combineLatest, Observable, of, throwError} from 'rxjs';
 import {Router} from '@angular/router';
 import {catchError, concatMap, map, tap} from 'rxjs/operators';
+import {CacheService} from './cache.service';
+import {environment} from '../../environments/environment';
 
 const KIMIOS_COOKIE = 'kimios';
 
@@ -19,6 +21,7 @@ export class SessionService implements OnDestroy {
     constructor(
         private securityService: SecurityService,
         private cookieService: CookieService,
+        private cacheService: CacheService,
         private router: Router,
         public _zone: NgZone
     ) {
@@ -149,6 +152,7 @@ export class SessionService implements OnDestroy {
                                 if (! this.isSessionCheckStarted()) {
                                     this.startSessionCheck();
                                 }
+                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/' + this.sessionToken);
                             });
                         }
                     }

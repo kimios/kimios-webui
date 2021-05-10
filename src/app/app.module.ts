@@ -31,6 +31,7 @@ import {APP_CONFIG} from 'app/app-config/config';
 import {SessionService} from 'app/services/session.service';
 import {CookieService} from 'ngx-cookie-service';
 import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
+import {CacheService} from './services/cache.service';
 
 @NgModule({
     declarations: [
@@ -79,6 +80,7 @@ import {FileManagerModule} from 'app/main/file-manager/file-manager.module';
     providers: [
         UserService,
         LoggedInGuard,
+        CacheService,
         SessionService,
         AppConfig,
         {
