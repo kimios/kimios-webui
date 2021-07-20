@@ -193,7 +193,8 @@ export class AdminDomainsUsersComponent implements OnInit {
   openNewUserDialog(): void {
     this.dialogRef = this.dialog.open(UserDialogComponent, {
       data: {
-        'source': this.adminService.selectedDomain$.getValue()
+        'source': this.adminService.selectedDomain$.getValue(),
+        'edit' : true
       },
     });
   }
