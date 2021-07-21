@@ -1,9 +1,14 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, from, iif, Observable, of, Subject, zip} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, iif, Observable, of, Subject, zip} from 'rxjs';
 import {AdministrationService, AuthenticationSource, Role, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
-import {catchError, concatMap, map, switchMap, toArray} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {SPECIAL_ROLES} from 'app/main/model/special-roles.enum';
+
+export interface GroupIdSource {
+    gid: string;
+    source: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +21,7 @@ export class AdminService {
   selectedTask$: BehaviorSubject<number>;
   selectedUser$: BehaviorSubject<KimiosUser>;
   groupCreated$: BehaviorSubject<boolean>;
+  groupModified$: BehaviorSubject<GroupIdSource>;
   selectedDocumentType$: BehaviorSubject<number>;
 
   closeUserDialog$: Subject<boolean>;
@@ -33,6 +39,7 @@ export class AdminService {
     this.closeUserDialog$ = new Subject<boolean>();
     this.groupCreated$ = new BehaviorSubject<boolean>(false);
     this.selectedDocumentType$ = new BehaviorSubject<number>(0);
+    this.groupModified$ = new BehaviorSubject<GroupIdSource>(null);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {
@@ -40,11 +47,17 @@ export class AdminService {
         return zip(from(mapGroups.keys()).pipe(
             switchMap(gid => {
                 if (mapGroups.get(gid) === true) {
-                    return this.administrationService.addUserToGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue());
+                    return combineLatest(of(gid), this.administrationService.addUserToGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue()));
                 } else {
-                    return this.administrationService.removeUserFromGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue());
+                    return combineLatest(of(gid), this.administrationService.removeUserFromGroup(this.sessionService.sessionToken, userId, gid, this.selectedDomain$.getValue()));
                 }
             }),
+            tap(([gid, res]) => this.groupModified$.next(
+                <GroupIdSource>{
+                    gid: gid,
+                    source: this.selectedDomain$.getValue()
+                })),
+            map(([gid, res]) => res),
             catchError(() => of(false)),
             concatMap(res => iif(() => typeof res === 'boolean', of(false), of(true))),
         )
@@ -55,7 +68,7 @@ export class AdminService {
             } else {
                 return true;
             }
-          })
+          }),
       );
     }
 

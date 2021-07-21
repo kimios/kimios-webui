@@ -100,8 +100,11 @@ export class AdminDomainsGroupsComponent implements OnInit {
         total => this.totalNbElements = total
     );
 
-    this.dataSource.elementUpdated$.subscribe(
+    this.adminService.groupModified$.pipe(
+        filter(groupWithData => groupWithData != null)
+    ).subscribe(
         group => {
+          this.dataSource.loadNbUser(group.gid, group.source);
           console.log('groupUpdated : ');
           console.dir(group);
         }

@@ -223,8 +223,32 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         ).subscribe();
     }
 
+    public loadNbUser(gid: string, source: string): void {
+        this.administrationService.getManageableUsers(this.sessionService.sessionToken, gid, source).pipe(
+            map(users => {
+                this._updateElementInDataCacheFromGid(source, gid, 'nbUsers', users.length);
+                this.dataCacheUsersByDomain[source] = users;
+            })
+        ).subscribe();
+    }
+
     private _updateElementInDataCache(source: string, group: GroupWithData, key: string, value: number): void {
         const idx = this.dataCacheByDomain.get(source).findIndex(grp => grp.gid === group.gid);
+        if (idx === -1) {
+            return;
+        }
+        this.dataCacheByDomain.get(source)[idx][key] = value;
+        this.elementUpdated$.next(this.dataCacheByDomain.get(source)[idx]);
+    }
+
+    private _updateElementInDataCacheFromGid(source: string, groupId: string, key: string, value: number): void {
+        if (this.dataCacheByDomain === null
+            || this.dataCacheByDomain === undefined
+            || this.dataCacheByDomain.size === 0
+        ) {
+            return;
+        }
+        const idx = this.dataCacheByDomain.get(source).findIndex(grp => grp.gid === groupId && grp.source === source);
         if (idx === -1) {
             return;
         }
