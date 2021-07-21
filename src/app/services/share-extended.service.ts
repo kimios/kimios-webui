@@ -27,13 +27,14 @@ export class ShareExtendedService {
         of(this.sharesByMe) :
         this.shareService.listEntitiesSharedByMe(this.sessionService.sessionToken).pipe(
             flatMap(shares => shares),
-            concatMap(share =>
+            /* concatMap(share =>
                 combineLatest(
                     of(share),
                     this.administrationService.getManageableUser(this.sessionService.sessionToken, share.targetUserId, share.targetUserSource)
                 )
             ),
-            map(([share, user]) => ShareUtils.makeShareWithTargetUser(share, user)),
+            map(([share, user]) => ShareUtils.makeShareWithTargetUser(share, user)), */
+            map(share => ShareUtils.makeShareWithTargetUser(share, null)),
             toArray(),
             tap(sharesWithTargetUser => this.sharesByMe = sharesWithTargetUser)
         );
@@ -44,13 +45,14 @@ export class ShareExtendedService {
           of(this.sharesWithMe) :
           this.shareService.listEntitiesSharedWithMe(this.sessionService.sessionToken).pipe(
               flatMap(shares => shares),
-              concatMap(share =>
+              /*concatMap(share =>
                   combineLatest(
                       of(share),
                       this.administrationService.getManageableUser(this.sessionService.sessionToken, share.targetUserId, share.targetUserSource)
                   )
               ),
-              map(([share, user]) => ShareUtils.makeShareWithTargetUser(share, user)),
+              map(([share, user]) => ShareUtils.makeShareWithTargetUser(share, user)),*/
+              map(share => ShareUtils.makeShareWithTargetUser(share, null)),
               toArray(),
               tap(sharesWithTargetUser => this.sharesWithMe = sharesWithTargetUser)
           );
