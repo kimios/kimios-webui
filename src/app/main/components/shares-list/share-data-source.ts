@@ -38,8 +38,8 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'with',
         sticky: false,
         displayName: 'With',
-        cell: (row: ShareWithTargetUser) => '',
-        title: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource
+        cell: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource,
+        // title: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource
     },
     {
         id: 'creationDate',

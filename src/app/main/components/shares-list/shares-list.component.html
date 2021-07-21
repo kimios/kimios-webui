@@ -42,12 +42,12 @@
                [icon]="['far', retrieveDocumentIcon(element.entity, 'far')]"
                size="lg"
                [ngClass]="'file-icon-list'"></fa-icon>
-      <span *ngIf="col.id != 'with'">{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
-      <span *ngIf="col.id === 'with' && element.targetUser != null">
+      <span>{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+      <!--<span *ngIf="col.id === 'with' && element.targetUser != null">
         {{element.targetUser.lastName
       + ', '
       + element.targetUser.firstName }}
-      </span>
+      </span>-->
     </mat-cell>
   </ng-container>
 
