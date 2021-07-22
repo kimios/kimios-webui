@@ -15,6 +15,9 @@ import {PropertyFilterString} from 'app/main/model/property-filter-string';
 import {ShareExtendedService} from 'app/services/share-extended.service';
 import {PropertyFilterArray} from 'app/main/model/property-filter-array';
 import {ColumnDescription} from 'app/main/model/column-description';
+import {BrowseEntityService} from '../../../services/browse-entity.service';
+import {Router} from '@angular/router';
+import {ShareWithTargetUser} from '../../model/share-with-target-user';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -64,7 +67,9 @@ export class SharesListComponent implements OnInit {
       private shareExtendedService: ShareExtendedService,
       private iconService: IconService,
       private administrationService: AdministrationService,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private bes: BrowseEntityService,
+      private router: Router
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -183,5 +188,15 @@ export class SharesListComponent implements OnInit {
       propertyFilterString.push('with');
     }
     return propertyFilterString;
+  }
+
+  goToDocument(entity: DMEntity): void {
+    this.bes.goToEntity(entity, this.router);
+  }
+
+  handleDblclick(row: ShareWithTargetUser): void {
+    if (this.mode === SharesListMode.WITH_ME) {
+      this.goToDocument(row.entity);
+    }
   }
 }
