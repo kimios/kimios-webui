@@ -42,6 +42,16 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         // title: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource
     },
     {
+        id: 'by',
+        matColumnDef: 'by',
+        position: 2,
+        matHeaderCellDef: 'by',
+        sticky: false,
+        displayName: 'By',
+        cell: (row: ShareWithTargetUser) => row.creatorId + '@' + row.creatorSource,
+        // title: (row: ShareWithTargetUser) => row.targetUserId + '@' + row.targetUserSource
+    },
+    {
         id: 'creationDate',
         matColumnDef: 'creationDate',
         position: 3,
@@ -97,6 +107,7 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
     loadData(sort: DMEntitySort, filters: Array<PropertyFilter>): void {
         if (this.mode === SharesListMode.WITH_ME) {
             this.shareExtendedService.retrieveSharesWithMeWithTargetUser().pipe(
+                map(shares => this.filterData(shares, filters)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {

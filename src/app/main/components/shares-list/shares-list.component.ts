@@ -14,6 +14,7 @@ import {PropertyFilter} from 'app/main/model/property-filter';
 import {PropertyFilterString} from 'app/main/model/property-filter-string';
 import {ShareExtendedService} from 'app/services/share-extended.service';
 import {PropertyFilterArray} from 'app/main/model/property-filter-array';
+import {ColumnDescription} from 'app/main/model/column-description';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -24,12 +25,14 @@ const sortTypeMapping = {
   'creationDate' : 'number',
   'expirationDate' : 'number',
   'entity' : 'DMEntity',
-  'with': 'external'
+  'with': 'external',
+  'by': 'external'
 };
 
 const filterPropertyPathMapping = {
   'entity': 'entity.name',
-  'with': 'targetUser.name',
+  'with': 'targetUserId',
+  'by': 'creatorId'
 };
 
 @Component({
@@ -50,6 +53,7 @@ export class SharesListComponent implements OnInit {
   displayedColumns: Array<string>;
   displayedColumnsWithFilters: Array<string>;
   mappingSecondHeaderPropertyName: Map<string, string>;
+  propertyFilterString: Array<string>;
 
   shareStatusTypes: Array<Share.ShareStatus>;
   formGroupFilters: FormGroup;
@@ -67,21 +71,20 @@ export class SharesListComponent implements OnInit {
       direction: 'desc',
       type: 'number'
     };
+  }
+
+  ngOnInit(): void {
+    this.columnsDescription = this.chooseColumnsToDisplayAccordingToMode(this.mode, this.columnsDescription);
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
     this.mappingSecondHeaderPropertyName = new Map<string, string>();
     this.columnsDescription.forEach(column => this.mappingSecondHeaderPropertyName.set(column.id + '_second-header', column.id));
     this.displayedColumnsWithFilters = Array.from(this.mappingSecondHeaderPropertyName.keys());
     this.shareStatusTypes = Array.from(Object.keys(Share.ShareStatusEnum)).map(str => str as Share.ShareStatus);
-    this.formGroupFilters = this.fb.group({
-      'entity': this.fb.control(''),
-      'with': this.fb.control(''),
-      'shareStatus': this.fb.control([])
-    });
+    this.formGroupFilters = this.initFormGroupFilters(this.mode);
+    this.propertyFilterString = this.initPropertyFilterString();
     this.shareStatusValue = this.shareStatusTypes;
     this.formGroupFilters.get('shareStatus').setValue(this.shareStatusValue);
-  }
 
-  ngOnInit(): void {
     this.dataSource = new ShareDataSource(this.sessionService, this.shareExtendedService, this.mode);
     this.loadData();
 
@@ -90,10 +93,33 @@ export class SharesListComponent implements OnInit {
     );
   }
 
+  private initFormGroupFilters(mode: SharesListMode): FormGroup {
+    const formGroup: FormGroup = this.fb.group({
+      'entity': this.fb.control(''),
+      'shareStatus': this.fb.control([])
+    });
+    if (mode === SharesListMode.WITH_ME) {
+      formGroup.addControl('by', this.fb.control(''));
+    } else {
+      formGroup.addControl('with', this.fb.control(''));
+    }
+    return formGroup;
+  }
+
+  private chooseColumnsToDisplayAccordingToMode(mode: SharesListMode, columnsDescription: Array<ColumnDescription>): Array<ColumnDescription> {
+    const excludedColumns = new Array<string>();
+    if (this.mode === SharesListMode.WITH_ME) {
+      excludedColumns.push('with');
+    } else {
+      excludedColumns.push('by');
+    }
+    return columnsDescription.filter(col => !excludedColumns.includes(col.id));
+  }
+
   loadData(): void {
     this.dataSource.loadData(
         this.sort,
-        this.makeFiltersFromFormGroup(this.formGroupFilters, this.mappingSecondHeaderPropertyName)
+        this.makeFiltersFromFormGroup(this.formGroupFilters, this.propertyFilterString)
     );
   }
 
@@ -132,9 +158,8 @@ export class SharesListComponent implements OnInit {
     );
   }
 
-  private makeFiltersFromFormGroup(formGroup: FormGroup, mappingControlNamePropertyName?: Map<string, string>): Array<PropertyFilter> {
+  private makeFiltersFromFormGroup(formGroup: FormGroup, propertyFilterString?: Array<string>): Array<PropertyFilter> {
     const filters = new Array<PropertyFilter>();
-    const propertyFilterString = ['entity', 'with'];
     Object.keys(formGroup.controls)
         .filter(key => propertyFilterString.includes(key))
         .filter(key => formGroup.get(key).value.length > 0)
@@ -148,5 +173,15 @@ export class SharesListComponent implements OnInit {
     console.dir(filters);
 
     return filters;
+  }
+
+  private initPropertyFilterString(): Array<string> {
+    const propertyFilterString = ['entity'];
+    if (this.mode === SharesListMode.WITH_ME) {
+      propertyFilterString.push('by');
+    } else {
+      propertyFilterString.push('with');
+    }
+    return propertyFilterString;
   }
 }
