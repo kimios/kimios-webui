@@ -70,7 +70,7 @@ export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     }, {
         id: 'shareStatus',
         matColumnDef: 'shareStatus',
-        position: 4,
+        position: 5,
         matHeaderCellDef: 'shareStatus',
         sticky: false,
         displayName: 'Status',

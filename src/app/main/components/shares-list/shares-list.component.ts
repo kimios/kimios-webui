@@ -83,6 +83,11 @@ export class SharesListComponent implements OnInit {
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
     this.mappingSecondHeaderPropertyName = new Map<string, string>();
     this.columnsDescription.forEach(column => this.mappingSecondHeaderPropertyName.set(column.id + '_second-header', column.id));
+    if (this.mode === SharesListMode.BY_ME) {
+      const columnId = 'actions';
+      this.displayedColumns.push(columnId);
+      this.mappingSecondHeaderPropertyName.set(columnId + '_second-header', columnId);
+    }
     this.displayedColumnsWithFilters = Array.from(this.mappingSecondHeaderPropertyName.keys());
     this.shareStatusTypes = Array.from(Object.keys(Share.ShareStatusEnum)).map(str => str as Share.ShareStatus);
     this.formGroupFilters = this.initFormGroupFilters(this.mode);
@@ -198,5 +203,9 @@ export class SharesListComponent implements OnInit {
     if (this.mode === SharesListMode.WITH_ME) {
       this.goToDocument(row.entity);
     }
+  }
+
+  handleEditShare(element: any): void {
+    
   }
 }

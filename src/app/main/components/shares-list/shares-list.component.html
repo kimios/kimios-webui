@@ -51,6 +51,20 @@
     </mat-cell>
   </ng-container>
 
+  <ng-container
+          matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+    <mat-cell *matCellDef="let element">
+      <div>
+        <mat-icon
+                title="Edit share"
+                (click)="handleEditShare(element)"
+                [class.cursor-pointer]="true">
+          mode_edit
+        </mat-icon>
+      </div>
+    </mat-cell>
+  </ng-container>
 
   <ng-container
           *ngFor="let col of displayedColumnsWithFilters"
@@ -82,7 +96,6 @@
 
     </mat-header-cell>
   </ng-container>
-
 
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"
                   [ngClass]="'kimios-first-of-several-headers'" >
