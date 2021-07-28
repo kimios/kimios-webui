@@ -11,7 +11,7 @@
 
       <div fxLayout="row" fxLayoutAlign="space-between center">
         <mat-form-field fxFlex="45">
-          <input matInput [min]="minDate" [matDatepicker]="picker" placeholder="date" [formControl]="shareFormGroup.get('dateUntil')"
+          <input matInput [min]="minDate" [matDatepicker]="picker" placeholder="date" [formControlName]="'dateUntil'"
                  required>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
@@ -20,7 +20,7 @@
         <mat-form-field fxFlex="45">
           <select matNativeControl [formControl]="shareFormGroup.get('timeUntil')" placeholder="time">
             <option *ngFor="let hourAndTime of possibleTimeSelections"
-                    value="{{hourAndTime}}}"
+                    value="{{hourAndTime}}"
                     [selected]="hourAndTimeDefault === hourAndTime">
               {{hourAndTime}}
             </option>

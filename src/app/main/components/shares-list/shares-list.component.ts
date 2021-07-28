@@ -3,7 +3,7 @@ import {SessionService} from 'app/services/session.service';
 import {AdministrationService, DMEntity} from 'app/kimios-client-api';
 import {ShareDataSource, SHARES_DEFAULT_DISPLAYED_COLUMNS} from './share-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {Sort} from '@angular/material';
+import {MatDialog, Sort} from '@angular/material';
 import {IconService} from 'app/services/icon.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {Observable} from 'rxjs';
@@ -15,9 +15,10 @@ import {PropertyFilterString} from 'app/main/model/property-filter-string';
 import {ShareExtendedService} from 'app/services/share-extended.service';
 import {PropertyFilterArray} from 'app/main/model/property-filter-array';
 import {ColumnDescription} from 'app/main/model/column-description';
-import {BrowseEntityService} from '../../../services/browse-entity.service';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
-import {ShareWithTargetUser} from '../../model/share-with-target-user';
+import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
+import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -69,7 +70,8 @@ export class SharesListComponent implements OnInit {
       private administrationService: AdministrationService,
       private fb: FormBuilder,
       private bes: BrowseEntityService,
-      private router: Router
+      private router: Router,
+      public dialog: MatDialog
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -101,6 +103,14 @@ export class SharesListComponent implements OnInit {
     this.formGroupFilters.valueChanges.subscribe(
         value => this.loadData()
     );
+
+    this.bes.shareDocumentReturn$.subscribe(
+        res => {
+          if (res === true) {
+            this.loadData(true);
+          }
+        }
+    );
   }
 
   private initFormGroupFilters(mode: SharesListMode): FormGroup {
@@ -126,10 +136,11 @@ export class SharesListComponent implements OnInit {
     return columnsDescription.filter(col => !excludedColumns.includes(col.id));
   }
 
-  loadData(): void {
+  loadData(refreshCache?: boolean): void {
     this.dataSource.loadData(
         this.sort,
-        this.makeFiltersFromFormGroup(this.formGroupFilters, this.propertyFilterString)
+        this.makeFiltersFromFormGroup(this.formGroupFilters, this.propertyFilterString),
+        refreshCache
     );
   }
 
@@ -205,7 +216,14 @@ export class SharesListComponent implements OnInit {
     }
   }
 
-  handleEditShare(element: any): void {
-    
+  handleEditShare(element: ShareWithTargetUser): void {
+    const dialogRef = this.dialog.open(ShareEditDialogComponent, {
+      data: {
+        'uid': -1,
+        'name': '',
+        'share': element
+      },
+      panelClass: 'kimios-dialog'
+    });
   }
 }

@@ -22,8 +22,8 @@ export class ShareExtendedService {
       this.sharesByMe = undefined;
   }
 
-  retrieveSharesByMeWithTargetUser(): Observable<Array<ShareWithTargetUser>> {
-    return this.sharesByMe !== undefined ?
+  retrieveSharesByMeWithTargetUser(refreshCache?: boolean): Observable<Array<ShareWithTargetUser>> {
+    return this.sharesByMe !== undefined && (refreshCache == null || refreshCache === undefined ||  refreshCache === false) ?
         of(this.sharesByMe) :
         this.shareService.listEntitiesSharedByMe(this.sessionService.sessionToken).pipe(
             flatMap(shares => shares),
@@ -40,8 +40,8 @@ export class ShareExtendedService {
         );
   }
 
-  retrieveSharesWithMeWithTargetUser(): Observable<Array<ShareWithTargetUser>> {
-      return this.sharesWithMe !== undefined ?
+  retrieveSharesWithMeWithTargetUser(refreshCache?: boolean): Observable<Array<ShareWithTargetUser>> {
+      return this.sharesWithMe !== undefined && (refreshCache == null || refreshCache === undefined ||  refreshCache === false) ?
           of(this.sharesWithMe) :
           this.shareService.listEntitiesSharedWithMe(this.sessionService.sessionToken).pipe(
               flatMap(shares => shares),

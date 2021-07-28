@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {FileManagerComponent} from './file-manager.component';
 import {
     MatAutocompleteModule,
@@ -118,6 +118,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
+import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
+import {ShareEditComponent} from 'app/main/components/share-edit/share-edit.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -198,7 +200,9 @@ library.add(far, fas);
         DocumentUploadProgressComponent,
         ConfirmDialogComponent,
         StudioDocumentTypesComponent,
-        StudioDocumentTypeAdminComponent
+        StudioDocumentTypeAdminComponent,
+        ShareEditDialogComponent,
+        ShareEditComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -242,7 +246,8 @@ library.add(far, fas);
     providers   : [
         EntityService,
         SearchEntityService,
-        WindowRef
+        WindowRef,
+        DatePipe
     ],
     entryComponents: [
         FilesUploadDialogComponent,
@@ -260,7 +265,8 @@ library.add(far, fas);
         AdminSpecialTasksSessionsComponent,
         ErrorDialogComponent,
         DocumentUploadProgressComponent,
-        ConfirmDialogComponent
+        ConfirmDialogComponent,
+        ShareEditDialogComponent
     ],
     exports: [
         FileUploadListComponent,

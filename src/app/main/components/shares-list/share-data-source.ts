@@ -1,6 +1,6 @@
 import {MatTableDataSource} from '@angular/material';
 import {Document as KimiosDocument, Share} from 'app/kimios-client-api';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {map, tap} from 'rxjs/operators';
 import {SharesListMode} from './shares-list.component';
@@ -13,7 +13,7 @@ import {PropertyFilter} from 'app/main/model/property-filter';
 import {ObjectUtils} from 'app/main/utils/object-utils';
 import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareExtendedService} from 'app/services/share-extended.service';
-import ShareStatus = Share.ShareStatus;
+
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -104,14 +104,14 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
         this.loadingSubject.complete();
     }
 
-    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>): void {
+    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>, refreshCache?: boolean): void {
         if (this.mode === SharesListMode.WITH_ME) {
-            this.shareExtendedService.retrieveSharesWithMeWithTargetUser().pipe(
+            this.shareExtendedService.retrieveSharesWithMeWithTargetUser(refreshCache).pipe(
                 map(shares => this.filterData(shares, filters)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {
-            this.shareExtendedService.retrieveSharesByMeWithTargetUser().pipe(
+            this.shareExtendedService.retrieveSharesByMeWithTargetUser(refreshCache).pipe(
                 map(shares => this.filterData(shares, filters)),
                 tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
