@@ -1,13 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
-import {AdministrationService, DMEntity} from 'app/kimios-client-api';
+import {AdministrationService, DMEntity, ShareService} from 'app/kimios-client-api';
 import {ShareDataSource, SHARES_DEFAULT_DISPLAYED_COLUMNS} from './share-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {MatDialog, Sort} from '@angular/material';
 import {IconService} from 'app/services/icon.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {Share} from 'app/kimios-client-api/model/share';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {PropertyFilter} from 'app/main/model/property-filter';
@@ -19,6 +19,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
 import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
+import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -71,7 +72,8 @@ export class SharesListComponent implements OnInit {
       private fb: FormBuilder,
       private bes: BrowseEntityService,
       private router: Router,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private shareService: ShareService
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -225,5 +227,31 @@ export class SharesListComponent implements OnInit {
       },
       panelClass: 'kimios-dialog'
     });
+  }
+
+  handleDeleteShare(element: ShareWithTargetUser): void {
+    const messageLine1 = 'Delete share of document '
+        + element.entity.name;
+    const messageLine2 = ' with user '
+        + element.targetUserId
+        + '@'
+        + element.targetUserSource
+        + '?';
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        'messageLine1': messageLine1,
+        'messageLine2': messageLine2,
+      },
+      width: '400px',
+      height: '400px'
+    });
+
+    dialogRef.afterClosed().pipe(
+        tap(uh => console.log('dialog closed')),
+        filter(result => result === true),
+        concatMap(result => this.shareService.removeShare(this.sessionService.sessionToken, element.id))
+    ).subscribe(
+        res => this.loadData(true)
+    );
   }
 }
