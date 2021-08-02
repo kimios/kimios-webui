@@ -37,7 +37,8 @@
     >
       {{col.displayName}}
     </mat-header-cell>
-    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" title="{{col.title ? col.title(element) : ''}}">
+    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" title="{{col.title ? col.title(element) : ''}}"
+              (dblclick)="col.id == 'entity' ? goToDocument(element.entity) : ''">
       <fa-icon *ngIf="col.id == 'entity'"
                [icon]="['far', retrieveDocumentIcon(element.entity, 'far')]"
                size="lg"
