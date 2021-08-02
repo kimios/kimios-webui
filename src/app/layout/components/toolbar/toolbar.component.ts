@@ -91,12 +91,12 @@ export class ToolbarComponent implements OnInit, OnDestroy
                 id   : 'en',
                 title: 'English',
                 flag : 'us'
-            },
+            }/*,
             {
                 id   : 'tr',
                 title: 'Turkish',
                 flag : 'tr'
-            }
+            }*/
         ];
 
         this.navigation = navigation;
