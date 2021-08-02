@@ -1,9 +1,9 @@
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
-import {combineLatest, Observable, of, throwError} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {Router} from '@angular/router';
-import {catchError, concatMap, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, tap} from 'rxjs/operators';
 import {CacheService} from './cache.service';
 import {environment} from '../../environments/environment';
 
@@ -125,15 +125,12 @@ export class SessionService implements OnDestroy {
     }
 
     login(login: string, authenticationSource: string, password: string): Observable<boolean> {
-        let token = null;
-        // const router = this.router;
 
         return this.callStartSession(login, authenticationSource, password)
             .pipe(
                 catchError(err => {
                     if (err.status === 200
                         && err.statusText === 'OK') {
-                        token = err.error.text;
                         return of(true);
                     } else {
                         if (err.status === 500) {
@@ -143,16 +140,18 @@ export class SessionService implements OnDestroy {
                 }),
                 tap(
                     res => {
-                        if (res) {
+                        if (res
+                            && res['sessionUid'] != null
+                            && res['sessionUid'] !== undefined) {
                             this._zone.run(() => {
-                                this.sessionToken = token;
-                                this.initCurrentUser(token);
+                                this.sessionToken = res['sessionUid'];
+                                this.initCurrentUser(this.sessionToken);
                                 this.sessionAlive = true;
                                 this.router.navigate(['']);
                                 if (! this.isSessionCheckStarted()) {
                                     this.startSessionCheck();
                                 }
-                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/' + this.sessionToken);
+                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/' + res['wsToken']);
                             });
                         }
                     }
