@@ -144,6 +144,11 @@ export class ShareFormComponent implements OnInit {
             error => console.log('error when sharing document')
         );
       } else {
+        const inputDateUntilValue = this.shareFormGroup.get('dateUntil').value;
+        const dateUntil = inputDateUntilValue['_d'] != null && inputDateUntilValue['_d'] !== undefined ?
+            inputDateUntilValue['_d'] :
+            inputDateUntilValue;
+
         this.shareService.updateShare(
             this.sessionService.sessionToken,
             this.share.id,
@@ -153,7 +158,10 @@ export class ShareFormComponent implements OnInit {
             this.shareFormGroup.get('shareLevel').value === 'write'
             || this.shareFormGroup.get('shareLevel').value === 'fullAccess',
             this.shareFormGroup.get('shareLevel').value === 'fullAccess',
-            this.formatDate(this.shareFormGroup.get('dateUntil').value.getTime(), this.shareFormGroup.get('timeUntil').value),
+            this.formatDate(
+                dateUntil.getTime(),
+                this.shareFormGroup.get('timeUntil').value
+            ),
             this.shareFormGroup.get('notify').value
         ).subscribe(
             res => this.browseEntityService.shareDocumentReturn$.next(true),
