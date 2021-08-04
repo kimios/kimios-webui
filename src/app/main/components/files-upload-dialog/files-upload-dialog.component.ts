@@ -1,9 +1,10 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatChipEvent, MatDialogRef} from '@angular/material';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatChipEvent, MatChipInputEvent, MatDialogRef} from '@angular/material';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {CdkDragDrop, CdkDragEnter, CdkDragExit} from '@angular/cdk/drag-drop';
 import {Tag} from 'app/main/model/tag';
 import {BehaviorSubject} from 'rxjs';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 export interface DialogData {
     filesList: Map<string, Array<File>>;
@@ -24,7 +25,12 @@ export class FilesUploadDialogComponent implements OnInit {
     form: FormGroup;
     private _fileIds: string[];
     filesTags$: Map<string, BehaviorSubject<Array<string>>>;
+    filesTags: Map<string, Array<string>>;
     dirsPath: Array<string>;
+    separatorKeysCodes: number[] = [ENTER, COMMA];
+    addOnBlur = true;
+
+    @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
     constructor(
         public dialogRef: MatDialogRef<FilesUploadDialogComponent>,
@@ -35,6 +41,7 @@ export class FilesUploadDialogComponent implements OnInit {
             'filesList': this.formBuilder.group({})
         });
         this.filesTags$ = new Map<string, BehaviorSubject<Array<string>>>();
+        this.filesTags = new Map<string, Array<string>>();
     }
 
     ngOnInit(): void {
@@ -56,6 +63,7 @@ export class FilesUploadDialogComponent implements OnInit {
                 console.log(formArray.controls.length);
                 this.data.filesTags.set(o.name, new Array<string>());
                 this.filesTags$.set(o.name, new BehaviorSubject<Array<string>>([]));
+                this.filesTags.set(o.name, new Array<string>());
             });
             console.dir(formArray);
             (this.form.get('filesList') as FormGroup).addControl(this.makeKeyFromPathForFormControl(path), formArray);
@@ -85,15 +93,14 @@ export class FilesUploadDialogComponent implements OnInit {
         this.dialogRef.close(false);
     }
 
-    addTag($event: CdkDragDrop<any>): void {
-        console.log('add tag');
-        console.log($event);
-        $event.container.element.nativeElement.classList.remove('dragover');
-        const targetFileName = $event.container.id;
-        if (typeof $event.item.data === 'string') {
-            this.data.filesTags.get(targetFileName).push($event.item.data);
-
-            this.filesTags$.get(targetFileName).next(Array.from(this.data.filesTags.get(targetFileName).values()));
+    addTag($event: MatChipInputEvent, name: string): void {
+        if (typeof $event.value === 'string' && $event.value.trim().length > 0) {
+            const tags = this.filesTags$.get(name).getValue();
+            if (! tags.includes($event.value)) {
+                tags.push($event.value);
+                this.filesTags$.get(name).next(tags);
+            }
+            this.tagInput.nativeElement.value = '';
         }
     }
 
@@ -113,21 +120,14 @@ export class FilesUploadDialogComponent implements OnInit {
         $event.container.element.nativeElement.classList.remove('dragover');
     }
 
-    removeTag($event: MatChipEvent): void {
-        if ($event.chip._elementRef.nativeElement.dataset
-            && $event.chip._elementRef.nativeElement.dataset.tagvalue
-            && $event.chip._elementRef.nativeElement.dataset.filename) {
-            const fileName = $event.chip._elementRef.nativeElement.dataset.filename;
-            const index = this.data.filesTags
-                .get(fileName)
-                .indexOf($event.chip._elementRef.nativeElement.dataset.tagvalue);
-            if (index !== -1) {
-                this.data.filesTags.get(fileName).splice(index, 1);
+    removeTag(tag: string, name: string): void {
+        if (typeof tag === 'string') {
+            const tags = this.filesTags$.get(name).getValue();
+            const tagIndex = tags.indexOf(tag);
+            if (tagIndex !== -1) {
+                tags.splice(tagIndex, 1);
+                this.filesTags$.get(name).next(tags.filter(v => v !== tag));
             }
-            this.filesTags$
-                .get(fileName)
-                .next(this.data.filesTags.get(fileName));
-            console.log(this.filesTags$);
         }
     }
 
