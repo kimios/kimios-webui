@@ -254,6 +254,38 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
     }
 
+    searchWithFilters(content: string, filename: string, tagList: Array<string>, documentParent = '', onlyTags = false): Observable<DMEntity[]> {
+        let criterias = new Array<Criteria>();
+        if (documentParent !== '') {
+            criterias.push({
+                fieldName: 'DocumentParent',
+                query: documentParent,
+                // filterQuery: true
+            });
+        }
+        if (content) {
+            criterias.push({
+                fieldName: 'DocumentBody',
+                query: content,
+//            filterQuery: true
+            });
+        }
+        if (filename) {
+            criterias = criterias.concat(this.filenameTermsToCriterias(filename));
+        }
+        if (tagList.length > 0) {
+            criterias.push({
+                fieldName: 'DocumentTags',
+                query: tagList.join('||')
+            });
+        }
+        criterias.push({
+            fieldName: 'DocumentTags',
+            faceted: true
+        });
+        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
+    }
+
     searchInContentWithFacets(content: string, facetFields: string[]): Observable<DMEntity[]> {
         const criterias = facetFields.map(
             (field) => ({

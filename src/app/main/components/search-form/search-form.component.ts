@@ -66,7 +66,15 @@ export class SearchFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    
+    this.searchEntityService.searchWithFilters(
+        this.searchFormGroup.get('content').value,
+        this.searchFormGroup.get('name').value,
+        this.selectedTags,
+        this.searchFormGroup.get('folder').value,
+        false
+    ).subscribe(
+
+    );
   }
 
   selectedDocumentName(): void {
