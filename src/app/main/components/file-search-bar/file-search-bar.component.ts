@@ -149,7 +149,7 @@ export class FileSearchBarComponent implements OnInit {
     }
 
     private _initTags(): void {
-        this.searchEntityService.searchWithFilters('', '', [], this.documentParent, true).subscribe();
+        this.searchEntityService.searchWithFiltersOld('', '', [], this.documentParent, true).subscribe();
     }
 
     private _filterTags(value: string): Tag[] {
@@ -165,7 +165,7 @@ export class FileSearchBarComponent implements OnInit {
 
         if (this.searchParams.errors === null
             || this.searchParams.errors['searchParamsValid'] === null) {
-            this.searchEntityService.searchWithFilters(
+            this.searchEntityService.searchWithFiltersOld(
                 this.searchParams.get('content').value,
                 this.searchParams.get('filename').value,
                 (this.searchParams.get('tagList') as FormArray).getRawValue().filter(e => e !== ''),

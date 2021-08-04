@@ -224,7 +224,7 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
     }
 
-    searchWithFilters(content: string, filename: string, tagList: Tag[], documentParent = '', onlyTags = false): Observable<DMEntity[]> {
+    searchWithFiltersOld(content: string, filename: string, tagList: Tag[], documentParent = '', onlyTags = false): Observable<DMEntity[]> {
         let criterias = new Array<Criteria>();
         if (documentParent !== '') {
             criterias.push({
