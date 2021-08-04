@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Inject, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MAT_DIALOG_DATA, MatChipEvent, MatChipInputEvent, MatDialogRef} from '@angular/material';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {CdkDragDrop, CdkDragEnter, CdkDragExit} from '@angular/cdk/drag-drop';
@@ -28,9 +28,10 @@ export class FilesUploadDialogComponent implements OnInit {
     filesTags: Map<string, Array<string>>;
     dirsPath: Array<string>;
     separatorKeysCodes: number[] = [ENTER, COMMA];
-    addOnBlur = true;
+    addOnBlur = false;
+    fileIdsMap = new Map<string, string>();
 
-    @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
+    @ViewChildren('tagInput') tagInputs: QueryList<ElementRef<HTMLInputElement>>;
 
     constructor(
         public dialogRef: MatDialogRef<FilesUploadDialogComponent>,
@@ -45,6 +46,16 @@ export class FilesUploadDialogComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.data.filesList.forEach((filesArray, path) => {
+            if (filesArray.length === 0) {
+                this.data.filesList.delete(path);
+                return;
+            }
+            filesArray.forEach(file => {
+                const completePath = path + '/' + file.name;
+                this.fileIdsMap.set(completePath, this.generateUniqueId(completePath));
+            });
+        });
         this.addCheckboxes();
         this.dirsPath = Array.from(this.data.filesList.keys());
     }
@@ -85,6 +96,8 @@ export class FilesUploadDialogComponent implements OnInit {
                 (formCopyFilesList.get(this.makeKeyFromPathForFormControl(path)) as FormArray).at(i).value === 1));
         });
         this.data.filesList = fileToUpload;
+        Array.from(this.filesTags$.keys()).forEach(fileName =>
+            this.data.filesTags.set(fileName, this.filesTags$.get(fileName).getValue()));
         this.dialogRef.close(true);
     }
 
@@ -93,14 +106,14 @@ export class FilesUploadDialogComponent implements OnInit {
         this.dialogRef.close(false);
     }
 
-    addTag($event: MatChipInputEvent, name: string): void {
+    addTag($event: MatChipInputEvent, name: string, inputId: string): void {
         if (typeof $event.value === 'string' && $event.value.trim().length > 0) {
             const tags = this.filesTags$.get(name).getValue();
             if (! tags.includes($event.value)) {
                 tags.push($event.value);
                 this.filesTags$.get(name).next(tags);
             }
-            this.tagInput.nativeElement.value = '';
+            this.tagInputs.filter(item => item.nativeElement.id === inputId)[0].nativeElement.value = '';
         }
     }
 
@@ -138,5 +151,9 @@ export class FilesUploadDialogComponent implements OnInit {
 
     makePathFromFormControlKey(key: string): string {
         return key.split(pathDirSeparator).join('/');
+    }
+
+    private generateUniqueId(str: string): string {
+        return btoa(str);
     }
 }

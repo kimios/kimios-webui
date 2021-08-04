@@ -57,12 +57,13 @@
                                         <input
                                                 placeholder="Enter a tag here"
                                                 #tagInput
-
+                                                [ngClass]="'tagInput'"
+                                                [id]="fileIdsMap.get(path + '/' + this.data.filesList.get(path)[i]?.name)"
                                                 [matChipInputFor]="chipList"
                                                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                                 [matChipInputAddOnBlur]="addOnBlur"
-                                                (matChipInputTokenEnd)="addTag($event, this.data.filesList.get(path)[i]?.name)"
-                                                (keyup.enter)="addTag($event, this.data.filesList.get(path)[i]?.name)" >
+                                                (matChipInputTokenEnd)="addTag($event, this.data.filesList.get(path)[i]?.name, fileIdsMap.get(path + '/' + this.data.filesList.get(path)[i]?.name))"
+                                                 >
                                     <mat-chip-list #chipList>
                                         <mat-chip
                                                 *ngFor="let tag of this.filesTags$.get(this.data.filesList.get(path)[i]?.name) | async"

@@ -153,7 +153,7 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
         -1,
         '[]',
         dialogRef.componentInstance.data.filesTags.get(v.file.name) ?
-            Array.from(dialogRef.componentInstance.data.filesTags.get(v.file.name).keys()) :
+            dialogRef.componentInstance.data.filesTags.get(v.file.name) :
             [],
 
       ]))
