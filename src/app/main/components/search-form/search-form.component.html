@@ -1,10 +1,15 @@
-<form class="full-width" #form
+<form [ngClass]="'full-width'" #form
       [formGroup]="searchFormGroup"
       (ngSubmit)="onSubmit()"
       (keyup)="$event.key === 'Enter' ? onSubmit():1"
       style="margin-top: 20px">
 
   <div fxFill fxLayout="column" fxLayoutAlign="space-between start">
+
+  <div fxFill fxLayout="row" fxLayoutAlign="space-between start">
+
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="45">
+
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Document name" aria-label="document's name" matInput [formControlName]="'name'"
              [matAutocomplete]="autoCompleteDocumentName">
@@ -16,42 +21,8 @@
     </mat-form-field>
 
     <mat-form-field class="example-full-width" fxFill>
-      <input type="text" placeholder="Document id" aria-label="document's id" matInput [formControlName]="'id'">
-    </mat-form-field>
-
-    <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Content" aria-label="document's content" matInput [formControlName]="'content'">
     </mat-form-field>
-
-        <ng-container *ngIf="allTags$ | async as allTagsData" >
-    <mat-form-field class="example-full-width" fxFill>
-      <input
-              matInput [formControlName]="'tagInput'"
-              placeholder="Tags"
-              #tagInput
-              [ngClass]="'tagInput'"
-              [matChipInputFor]="chipList"
-              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-              [matChipInputAddOnBlur]="addOnBlur"
-              [matAutocomplete]="auto"
-      >
-      <mat-chip-list #chipList>
-        <mat-chip
-                *ngFor="let tag of this.selectedTags"
-                [removable]="true"
-                (removed)="unselectTag(tag)"
-        >
-          {{tag}}
-          <mat-icon matChipRemove >cancel</mat-icon>
-        </mat-chip>
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedTag($event.option.value)">
-            <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
-              {{tag}}
-            </mat-option>
-          </mat-autocomplete>
-      </mat-chip-list>
-    </mat-form-field>
-        </ng-container>
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Owner" aria-label="document's owner" matInput [formControlName]="'owner'"
@@ -61,6 +32,44 @@
           {{option.name + ', ' + option.firstName + ' (' + option.name + '@' + option.source + ')'}}
         </mat-option>
       </mat-autocomplete>
+    </mat-form-field>
+
+      <ng-container *ngIf="allTags$ | async as allTagsData" >
+        <mat-form-field class="example-full-width" fxFill>
+          <input
+                  matInput [formControlName]="'tagInput'"
+                  placeholder="Tags"
+                  #tagInput
+                  [ngClass]="'tagInput'"
+                  [matChipInputFor]="chipList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  [matChipInputAddOnBlur]="addOnBlur"
+                  [matAutocomplete]="auto"
+          >
+        </mat-form-field>
+        <mat-chip-list #chipList>
+          <mat-chip
+                  *ngFor="let tag of this.selectedTags"
+                  [removable]="true"
+                  (removed)="unselectTag(tag)"
+          >
+            {{tag}}
+            <mat-icon matChipRemove >cancel</mat-icon>
+          </mat-chip>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedTag($event.option.value)">
+            <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+              {{tag}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-chip-list>
+      </ng-container>
+
+    </div>
+
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="45">
+
+    <mat-form-field class="example-full-width" fxFill>
+      <input type="text" placeholder="Document id" aria-label="document's id" matInput [formControlName]="'id'">
     </mat-form-field>
 
     <mat-form-field class="example-full-width" fxFill>
@@ -78,6 +87,10 @@
       <mat-datepicker-toggle matSuffix [for]="dateMaxPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMaxPicker></mat-datepicker>
     </mat-form-field>
+
+    </div>
+
+  </div>
 
     <div style="margin-top: 20px; width: 100%;">
       <div fxLayout="row"
