@@ -5,7 +5,8 @@ import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
 import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
-import {Tag} from '../main/model/tag';
+import {Tag} from 'app/main/model/tag';
+import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 
 export const PAGE_SIZE_DEFAULT = 20;
 const DEFAULT_SORT_FIELD = 'versionUpdateDate';
@@ -35,6 +36,7 @@ export class SearchEntityService implements Resolve<any> {
     private page: number;
     private query: string;
     private _criterias: Criteria[];
+    public currentSearchEntityQuery: SearchEntityQuery;
 
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
 
@@ -255,6 +257,17 @@ export class SearchEntityService implements Resolve<any> {
     }
 
     searchWithFilters(content: string, filename: string, tagList: Array<string>, documentParent = '', onlyTags = false): Observable<DMEntity[]> {
+
+        this.currentSearchEntityQuery = <SearchEntityQuery> {
+            name: filename,
+            content: content,
+            tags: tagList,
+            folder: null,
+            dateMin: null,
+            dateMax: null,
+            owner: null
+        };
+
         let criterias = new Array<Criteria>();
         if (documentParent !== '') {
             criterias.push({
@@ -436,4 +449,12 @@ export class SearchEntityService implements Resolve<any> {
         );
     }
 
+    loadQuery(query: SearchEntityQuery): void {
+        this.searchWithFilters(
+            query.content,
+            query.name,
+            query.tags,
+            ''
+        );
+    }
 }

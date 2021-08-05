@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 import {Document as KimiosDocument, User} from 'app/kimios-client-api';
@@ -6,6 +6,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {map, startWith, tap} from 'rxjs/operators';
 import {SearchEntityService} from 'app/services/searchentity.service';
+import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 
 @Component({
   selector: 'search-form',
@@ -60,7 +61,11 @@ export class SearchFormComponent implements OnInit {
                 this.filterTags(this.allTags, null, this.selectedTags))
     );
 
-    console.dir(this.allTags);
+    if (this.searchEntityService.currentSearchEntityQuery != null
+        && this.searchEntityService.currentSearchEntityQuery !== undefined) {
+      this.searchEntityService.loadQuery(this.searchEntityService.currentSearchEntityQuery);
+      this.initFormFromQuery(this.searchFormGroup, this.searchEntityService.currentSearchEntityQuery);
+    }
   }
 
   onSubmit(): void {
@@ -104,5 +109,18 @@ export class SearchFormComponent implements OnInit {
         && excludedTags != null
         && !excludedTags.includes(t)
     );
+  }
+
+  private initFormFromQuery(formGroup: FormGroup, searchEntityQuery: SearchEntityQuery): void {
+    formGroup.get('name').setValue(searchEntityQuery.name);
+    formGroup.get('id').setValue(searchEntityQuery.id);
+    formGroup.get('content').setValue(searchEntityQuery.content);
+    formGroup.get('owner').setValue(searchEntityQuery.owner);
+    formGroup.get('folder').setValue(searchEntityQuery.folder);
+    formGroup.get('dateMin').setValue(searchEntityQuery.dateMin);
+    formGroup.get('dateMax').setValue(searchEntityQuery.dateMax);
+
+    this.selectedTags = searchEntityQuery.tags;
+    formGroup.get('tagInput').setValue('');
   }
 }
