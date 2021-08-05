@@ -24,8 +24,6 @@ export class SearchFormComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
 
-  @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
-
   constructor(
       private fb: FormBuilder,
       private searchEntityService: SearchEntityService
@@ -89,13 +87,14 @@ export class SearchFormComponent implements OnInit {
     if (! this.selectedTags.includes(value)) {
       this.selectedTags.push(value);
     }
-    this.tagInput.nativeElement.value = '';
+    this.searchFormGroup.get('tagInput').setValue('');
   }
 
   unselectTag(tag: string): void {
     const tagIndex = this.selectedTags.findIndex(t => t === tag);
     if (tagIndex !== -1) {
       this.selectedTags.splice(tagIndex, 1);
+      this.searchFormGroup.get('tagInput').setValue('');
     }
   }
 
