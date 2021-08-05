@@ -14,6 +14,17 @@
       <search-form></search-form>
     </div>
     <div>
+      <mat-paginator
+              [length]="totalFilesFound$ | async"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="paginatorHandler($event)"
+              [pageIndex]="pageIndex"
+              showFirstLastButtons>
+      </mat-paginator>
+      <mat-divider></mat-divider>
+    </div>
+    <div>
       <file-list></file-list>
     </div>
   </div>
