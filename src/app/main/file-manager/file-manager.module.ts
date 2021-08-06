@@ -120,6 +120,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 import {ShareEditComponent} from 'app/main/components/share-edit/share-edit.component';
+import {SearchFormComponent} from '../components/search-form/search-form.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -202,7 +203,8 @@ library.add(far, fas);
         StudioDocumentTypesComponent,
         StudioDocumentTypeAdminComponent,
         ShareEditDialogComponent,
-        ShareEditComponent
+        ShareEditComponent,
+        SearchFormComponent
     ],
     imports: [
         FileManagerRoutingModule,
