@@ -73,6 +73,7 @@ export class SearchFormComponent implements OnInit {
         this.searchFormGroup.get('content').value,
         this.searchFormGroup.get('name').value,
         this.selectedTags,
+        this.searchFormGroup.get('id').value,
         this.searchFormGroup.get('folder').value,
         false
     ).subscribe(

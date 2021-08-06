@@ -256,7 +256,14 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
     }
 
-    searchWithFilters(content: string, filename: string, tagList: Array<string>, documentParent = '', onlyTags = false): Observable<DMEntity[]> {
+    searchWithFilters(
+        content: string,
+        filename: string,
+        tagList: Array<string>,
+        uid: number,
+        documentParent = '',
+        onlyTags = false
+    ): Observable<DMEntity[]> {
 
         this.currentSearchEntityQuery = <SearchEntityQuery> {
             name: filename,
@@ -265,7 +272,8 @@ export class SearchEntityService implements Resolve<any> {
             folder: null,
             dateMin: null,
             dateMax: null,
-            owner: null
+            owner: null,
+            id: uid
         };
 
         let criterias = new Array<Criteria>();
@@ -296,6 +304,13 @@ export class SearchEntityService implements Resolve<any> {
             fieldName: 'DocumentTags',
             faceted: true
         });
+        if (uid != null && uid !== undefined) {
+            criterias.push({
+                fieldName: 'DocumentUid',
+                query: uid.toString()
+            });
+        }
+
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
     }
 
@@ -454,6 +469,7 @@ export class SearchEntityService implements Resolve<any> {
             query.content,
             query.name,
             query.tags,
+            query.id,
             ''
         );
     }
