@@ -124,4 +124,12 @@ export class SearchFormComponent implements OnInit {
     this.selectedTags = searchEntityQuery.tags;
     formGroup.get('tagInput').setValue('');
   }
+
+  openUserList(): void {
+
+  }
+
+  openFolderTree(): void {
+
+  }
 }

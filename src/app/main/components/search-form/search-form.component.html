@@ -27,6 +27,7 @@
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Owner" aria-label="document's owner" matInput [formControlName]="'owner'"
              [matAutocomplete]="autoCompleteDocumentOwner" >
+      <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openUserList()">people</mat-icon>
       <mat-autocomplete #autoCompleteDocumentOwner="matAutocomplete" (optionSelected)="selectedUser()">
         <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option">
           {{option.name + ', ' + option.firstName + ' (' + option.name + '@' + option.source + ')'}}
@@ -74,6 +75,7 @@
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Folder" aria-label="document's folder" matInput [formControlName]="'folder'" >
+      <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openFolderTree()">folder_open</mat-icon>
     </mat-form-field>
 
     <mat-form-field fxFlex="45">
