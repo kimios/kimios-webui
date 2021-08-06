@@ -10,6 +10,7 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
 const PAGE_SIZE_DEFAULT = 10;
 
@@ -66,6 +67,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     loading$: BehaviorSubject<boolean>;
 
+    public browseMode$: BehaviorSubject<BROWSE_TREE_MODE>;
+    public chosenContainerEntityUid$: BehaviorSubject<number>;
+
   constructor(
       // Set the defaults
 
@@ -116,6 +120,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.shareDocumentReturn$ = new Subject<boolean>();
 
       this.loading$ = new BehaviorSubject<boolean>(false);
+
+      this.browseMode$ = new BehaviorSubject<BROWSE_TREE_MODE>(null);
+
+      this.chosenContainerEntityUid$ = new BehaviorSubject<number>(null);
 
       this.ngOnInit();
   }
@@ -183,7 +191,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         );
 
-        this.selectedEntityFromGridOrTree$.subscribe(
+        this.selectedEntityFromGridOrTree$.pipe(
+            filter(res => this.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE)
+        )
+            .subscribe(
             next => {
                 this.setHistoryNewEntry(next === undefined ? undefined : next.uid);
                 this.goHistoryForward();

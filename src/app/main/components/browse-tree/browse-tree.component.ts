@@ -10,6 +10,7 @@ import {EntityCreationService} from 'app/services/entity-creation.service';
 import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
 import {MatDialog} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
 @Component({
   selector: 'browse-tree',
@@ -20,6 +21,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
   @Input()
   entityId: number;
+  @Input()
+  mode: BROWSE_TREE_MODE = BROWSE_TREE_MODE.BROWSE;
 
   entitiesToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
@@ -67,6 +70,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+      this.browseEntityService.browseMode$.next(this.mode);
+
     if (this.treeNodesService.treeNodes.length > 0) {
       this.nodes = this.treeNodesService.treeNodes;
       this.tree.treeModel.update();
@@ -285,6 +290,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                     .forEach(entity => this.loadChildren(entity.uid).subscribe());
             })
         ).subscribe();
+
+        this.browseEntityService.chosenContainerEntityUid$.pipe(
+            filter(res => res != null && res !== undefined),
+            filter(res => this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG),
+            tap(res => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(res)))
+        ).subscribe();
   }
 
   retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {
@@ -403,9 +414,15 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   }
 
   selectNode(uid: number): void {
-    this.browseEntityService.selectedEntityFromGridOrTree$.next(
-        this.browseEntityService.entities.get(Number(uid))
-    );
+      if (this.mode === BROWSE_TREE_MODE.BROWSE) {
+          this.browseEntityService.selectedEntityFromGridOrTree$.next(
+              this.browseEntityService.entities.get(Number(uid))
+          );
+      } else {
+          if (this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG) {
+              this.browseEntityService.chosenContainerEntityUid$.next(uid);
+          }
+      }
   }
 
   onToggleExpanded(event): void {

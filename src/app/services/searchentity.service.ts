@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Criteria, DMEntity, DocumentService, FolderService, SearchResponse, SearchService, WorkspaceService} from 'app/kimios-client-api';
+import {Criteria, DMEntity, DocumentService, Folder, FolderService, SearchResponse, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
@@ -256,15 +256,14 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
     }
 
-    searchWithFilters(
+    searchWithFiltersAndSetCurrentQuery(
         content: string,
         filename: string,
         tagList: Array<string>,
         uid: number,
-        documentParent = '',
+        documentParent: Folder | Workspace,
         onlyTags = false
     ): Observable<DMEntity[]> {
-
         this.currentSearchEntityQuery = <SearchEntityQuery> {
             name: filename,
             content: content,
@@ -276,11 +275,30 @@ export class SearchEntityService implements Resolve<any> {
             id: uid
         };
 
+        return this.searchWithFilters(
+            content,
+            filename,
+            tagList,
+            uid,
+            documentParent.path,
+            onlyTags
+        );
+    }
+
+    searchWithFilters(
+        content: string,
+        filename: string,
+        tagList: Array<string>,
+        uid: number,
+        documentParent: string,
+        onlyTags = false
+    ): Observable<DMEntity[]> {
+
         let criterias = new Array<Criteria>();
-        if (documentParent !== '') {
+        if (documentParent != null && documentParent !== undefined) {
             criterias.push({
                 fieldName: 'DocumentParent',
-                query: documentParent,
+                query: documentParent.toString(),
                 // filterQuery: true
             });
         }
@@ -304,7 +322,7 @@ export class SearchEntityService implements Resolve<any> {
             fieldName: 'DocumentTags',
             faceted: true
         });
-        if (uid != null && uid !== undefined) {
+        if (uid != null && uid !== undefined && uid > 0) {
             criterias.push({
                 fieldName: 'DocumentUid',
                 query: uid.toString()
@@ -470,7 +488,7 @@ export class SearchEntityService implements Resolve<any> {
             query.name,
             query.tags,
             query.id,
-            ''
+            query.folder.path
         );
     }
 }

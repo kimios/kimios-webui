@@ -1,11 +1,11 @@
-import {Folder} from 'app/kimios-client-api';
+import {Folder, Workspace} from 'app/kimios-client-api';
 
 export interface SearchEntityQuery {
     name: string;
     id: number;
     content: string;
     owner: string;
-    folder: Folder;
+    folder: Folder | Workspace;
     tags: Array<string>;
     dateMin: Date;
     dateMax: Date;

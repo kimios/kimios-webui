@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 
-import {Document as KimiosDocument, User} from 'app/kimios-client-api';
+import {Document as KimiosDocument, Folder, User, Workspace} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
+import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
+import {MatDialog} from '@angular/material';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'search-form',
@@ -22,12 +25,16 @@ export class SearchFormComponent implements OnInit {
   allTags: Array<string>;
   allTags$: Observable<Array<string>>;
 
+  selectedContainerEntity: Folder | Workspace;
+
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
 
   constructor(
       private fb: FormBuilder,
-      private searchEntityService: SearchEntityService
+      private searchEntityService: SearchEntityService,
+      public dialog: MatDialog,
+      private bes: BrowseEntityService
   ) {
     this.filteredUsers$ = new BehaviorSubject<User>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
@@ -69,12 +76,12 @@ export class SearchFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.searchEntityService.searchWithFilters(
+    this.searchEntityService.searchWithFiltersAndSetCurrentQuery(
         this.searchFormGroup.get('content').value,
         this.searchFormGroup.get('name').value,
         this.selectedTags,
         this.searchFormGroup.get('id').value,
-        this.searchFormGroup.get('folder').value,
+        this.selectedContainerEntity,
         false
     ).subscribe(
 
@@ -130,6 +137,16 @@ export class SearchFormComponent implements OnInit {
   }
 
   openFolderTree(): void {
+    const dialog = this.dialog.open(BrowseTreeDialogComponent);
 
+    dialog.afterClosed().pipe(
+        filter(res => res === true),
+        concatMap(containerUid => this.bes.retrieveContainerEntity(this.bes.chosenContainerEntityUid$.getValue()))
+    ).subscribe(
+        container => {
+          this.selectedContainerEntity = container;
+          this.searchFormGroup.get('folder').setValue(container.path);
+        }
+    );
   }
 }

@@ -120,7 +120,8 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 import {ShareEditComponent} from 'app/main/components/share-edit/share-edit.component';
-import {SearchFormComponent} from '../components/search-form/search-form.component';
+import {SearchFormComponent} from 'app/main/components/search-form/search-form.component';
+import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -204,7 +205,8 @@ library.add(far, fas);
         StudioDocumentTypeAdminComponent,
         ShareEditDialogComponent,
         ShareEditComponent,
-        SearchFormComponent
+        SearchFormComponent,
+        BrowseTreeDialogComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -268,7 +270,8 @@ library.add(far, fas);
         ErrorDialogComponent,
         DocumentUploadProgressComponent,
         ConfirmDialogComponent,
-        ShareEditDialogComponent
+        ShareEditDialogComponent,
+        BrowseTreeDialogComponent
     ],
     exports: [
         FileUploadListComponent,
