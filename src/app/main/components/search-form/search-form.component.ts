@@ -82,6 +82,7 @@ export class SearchFormComponent implements OnInit {
         this.selectedTags,
         this.searchFormGroup.get('id').value,
         this.selectedContainerEntity,
+        this.searchFormGroup.get('owner').value,
         false
     ).subscribe(
 

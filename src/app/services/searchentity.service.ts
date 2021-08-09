@@ -262,6 +262,7 @@ export class SearchEntityService implements Resolve<any> {
         tagList: Array<string>,
         uid: number,
         documentParent: Folder | Workspace,
+        owner: string,
         onlyTags = false
     ): Observable<DMEntity[]> {
         this.currentSearchEntityQuery = <SearchEntityQuery> {
@@ -271,7 +272,7 @@ export class SearchEntityService implements Resolve<any> {
             folder: null,
             dateMin: null,
             dateMax: null,
-            owner: null,
+            owner: owner,
             id: uid
         };
 
@@ -280,7 +281,8 @@ export class SearchEntityService implements Resolve<any> {
             filename,
             tagList,
             uid,
-            documentParent.path,
+            documentParent != null ? documentParent.path : null,
+            owner,
             onlyTags
         );
     }
@@ -291,6 +293,7 @@ export class SearchEntityService implements Resolve<any> {
         tagList: Array<string>,
         uid: number,
         documentParent: string,
+        owner: string,
         onlyTags = false
     ): Observable<DMEntity[]> {
 
@@ -326,6 +329,12 @@ export class SearchEntityService implements Resolve<any> {
             criterias.push({
                 fieldName: 'DocumentUid',
                 query: uid.toString()
+            });
+        }
+        if (owner != null && owner !== undefined) {
+            criterias.push({
+                fieldName: 'DocumentOwner',
+                query: owner
             });
         }
 
@@ -488,7 +497,8 @@ export class SearchEntityService implements Resolve<any> {
             query.name,
             query.tags,
             query.id,
-            query.folder.path
+            query.folder.path,
+            query.owner
         );
     }
 }
