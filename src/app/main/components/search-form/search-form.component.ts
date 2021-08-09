@@ -1,15 +1,16 @@
 import {Component, OnInit} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, iif, Observable, of} from 'rxjs';
 
-import {Document as KimiosDocument, Folder, User, Workspace} from 'app/kimios-client-api';
+import {AdministrationService, Document as KimiosDocument, Folder, SecurityService, User, Workspace} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
 import {MatDialog} from '@angular/material';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {SessionService} from 'app/services/session.service';
 
 @Component({
   selector: 'search-form',
@@ -19,7 +20,9 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 export class SearchFormComponent implements OnInit {
   searchFormGroup: FormGroup;
   filteredDocuments$: BehaviorSubject<KimiosDocument>;
-  filteredUsers$: BehaviorSubject<User>;
+  filteredUsers$: Observable<Array<User>>;
+  selectedUser: User;
+  allUsers: Array<User>;
   filteredTags$: Observable<Array<string>>;
   selectedTags: Array<string>;
   allTags: Array<string>;
@@ -34,11 +37,15 @@ export class SearchFormComponent implements OnInit {
       private fb: FormBuilder,
       private searchEntityService: SearchEntityService,
       public dialog: MatDialog,
-      private bes: BrowseEntityService
+      private bes: BrowseEntityService,
+      private administrationService: AdministrationService,
+      private securityService: SecurityService,
+      private sessionService: SessionService
   ) {
-    this.filteredUsers$ = new BehaviorSubject<User>(null);
+    this.filteredUsers$ = new Observable<Array<User>>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
     this.selectedTags = new Array<string>();
+    this.allUsers = new Array<User>();
 
     this.searchFormGroup = this.fb.group({
       'name': this.fb.control(''),
@@ -73,6 +80,16 @@ export class SearchFormComponent implements OnInit {
       this.searchEntityService.loadQuery(this.searchEntityService.currentSearchEntityQuery);
       this.initFormFromQuery(this.searchFormGroup, this.searchEntityService.currentSearchEntityQuery);
     }
+
+    this.filteredUsers$ = this.searchFormGroup.get('owner').valueChanges.pipe(
+        filter(value =>  ! (value instanceof Object)),
+        startWith(null),
+        concatMap(inputVal => iif(
+            () => inputVal != null,
+            of(this.filterUsers(this.allUsers, inputVal, this.selectedUser)),
+            this.initAndReturnAllUsers()
+        ))
+    );
   }
 
   onSubmit(): void {
@@ -82,7 +99,12 @@ export class SearchFormComponent implements OnInit {
         this.selectedTags,
         this.searchFormGroup.get('id').value,
         this.selectedContainerEntity,
-        this.searchFormGroup.get('owner').value,
+        this.searchFormGroup.get('owner').value instanceof Object ?
+            this.searchFormGroup.get('owner').value.uid
+            + '@'
+            + this.searchFormGroup.get('owner').value.source :
+            this.searchFormGroup.get('owner').value
+        ,
         false
     ).subscribe(
 
@@ -93,8 +115,9 @@ export class SearchFormComponent implements OnInit {
 
   }
 
-  selectedUser(): void {
-
+  selectUser(): void {
+    this.selectedUser = this.searchFormGroup.get('owner');
+    this.searchFormGroup.get('owner').disable();
   }
 
   selectedTag(value: string): void {
@@ -149,5 +172,53 @@ export class SearchFormComponent implements OnInit {
           this.searchFormGroup.get('folder').setValue(container.path);
         }
     );
+  }
+
+  private filterUsers(allUsers: Array<User>, inputVal: string, excludedUser: User): Array<User> {
+    return this.allUsers.filter(user => (
+        inputVal == null
+        || inputVal === undefined
+        || inputVal.trim() === ''
+        || user.uid.toLowerCase().includes(inputVal.trim().toLowerCase())
+        || user.firstName.toLowerCase().includes(inputVal.trim().toLowerCase())
+        || user.lastName.toLowerCase().includes(inputVal.trim().toLowerCase())
+        ) && (
+        excludedUser == null
+        || excludedUser.uid !== user.uid
+        || excludedUser.source !== user.source
+        )
+    );
+  }
+
+  private initAndReturnAllUsers(): Observable<Array<User>> {
+    return this.securityService.getAuthenticationSources().pipe(
+        concatMap(sources => sources),
+        concatMap(source => this.securityService.getUsers(
+            this.sessionService.sessionToken,
+            source.name
+        )),
+        concatMap(users => users),
+        map(user => user),
+        tap(user => this.allUsers.push(user)),
+        toArray()
+    );
+  }
+
+  displayAutoCompleteUser(user: User): string {
+    return user != null && user !== undefined && user instanceof Object ?
+        user.lastName
+        + ', '
+        + user.firstName
+        + ' ('
+        + user.uid
+        + '@'
+        + user.source
+        + ')' :
+        '';
+  }
+
+  deselectUser(): void {
+    this.searchFormGroup.get('owner').setValue('');
+    this.searchFormGroup.get('owner').enable();
   }
 }

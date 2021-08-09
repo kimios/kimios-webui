@@ -18,21 +18,34 @@
           {{option.path}}
         </mat-option>
       </mat-autocomplete>
+      <button mat-button *ngIf="searchFormGroup.get('name').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('name').setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Content" aria-label="document's content" matInput [formControlName]="'content'">
+      <button mat-button *ngIf="searchFormGroup.get('content').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('content').setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Owner" aria-label="document's owner" matInput [formControlName]="'owner'"
              [matAutocomplete]="autoCompleteDocumentOwner" >
       <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openUserList()">people</mat-icon>
-      <mat-autocomplete #autoCompleteDocumentOwner="matAutocomplete" (optionSelected)="selectedUser()">
+      <mat-autocomplete #autoCompleteDocumentOwner="matAutocomplete" (optionSelected)="selectUser()"
+                        [displayWith]="displayAutoCompleteUser">
         <mat-option *ngFor="let option of filteredUsers$ | async" [value]="option">
           {{option.name + ', ' + option.firstName + ' (' + option.name + '@' + option.source + ')'}}
         </mat-option>
       </mat-autocomplete>
+      <button mat-button *ngIf="searchFormGroup.get('owner').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="deselectUser()">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
       <ng-container *ngIf="allTags$ | async as allTagsData" >
@@ -71,23 +84,39 @@
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Document id" aria-label="document's id" matInput [formControlName]="'id'">
+      <button mat-button *ngIf="searchFormGroup.get('id').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('id').setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Folder" aria-label="document's folder" matInput [formControlName]="'folder'" >
       <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openFolderTree()">folder_open</mat-icon>
+      <button mat-button *ngIf="searchFormGroup.get('folder').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('folder').setValue(null)">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field fxFlex="45">
       <input matInput [matDatepicker]="dateMinPicker" placeholder="Date min" [formControlName]="'dateMin'">
       <mat-datepicker-toggle matSuffix [for]="dateMinPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMinPicker></mat-datepicker>
+      <button mat-button *ngIf="searchFormGroup.get('dateMin').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('dateMin').setValue(null)">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field fxFlex="45">
       <input matInput [matDatepicker]="dateMaxPicker" placeholder="Date max" [formControlName]="'dateMax'">
       <mat-datepicker-toggle matSuffix [for]="dateMaxPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMaxPicker></mat-datepicker>
+      <button mat-button *ngIf="searchFormGroup.get('dateMax').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="searchFormGroup.get('dateMax').setValue(null)">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     </div>
