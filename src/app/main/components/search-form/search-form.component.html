@@ -94,7 +94,7 @@
       <input type="text" placeholder="Folder" aria-label="document's folder" matInput [formControlName]="'folder'" >
       <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openFolderTree()">folder_open</mat-icon>
       <button mat-button *ngIf="searchFormGroup.get('folder').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('folder').setValue(null)">
+              (click)="deselectContainerEntity()">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>

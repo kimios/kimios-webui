@@ -7,11 +7,13 @@ import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
 import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
+import {DatePipe} from '@angular/common';
 
 export const PAGE_SIZE_DEFAULT = 20;
 const DEFAULT_SORT_FIELD = 'versionUpdateDate';
 const DEFAULT_SORT_DIRECTION = 'desc';
 const DEFAULT_PAGE = 0;
+export const DATE_FORMAT = 'yyyy-MM-dd';
 
 @Injectable({
     providedIn: 'root'
@@ -60,7 +62,8 @@ export class SearchEntityService implements Resolve<any> {
         private workspaceService: WorkspaceService,
         private folderService: FolderService,
         private searchService: SearchService,
-        private tagService: TagService
+        private tagService: TagService,
+        private datePipe: DatePipe
     ) {
         this.onFilesChanged = new BehaviorSubject<Array<DMEntity>>([]);
         this.onFileSelected = new BehaviorSubject({});
@@ -263,15 +266,17 @@ export class SearchEntityService implements Resolve<any> {
         uid: number,
         documentParent: Folder | Workspace,
         owner: string,
+        dateMin: Date,
+        dateMax: Date,
         onlyTags = false
     ): Observable<DMEntity[]> {
         this.currentSearchEntityQuery = <SearchEntityQuery> {
             name: filename,
             content: content,
             tags: tagList,
-            folder: null,
-            dateMin: null,
-            dateMax: null,
+            folder: documentParent,
+            dateMin: dateMin,
+            dateMax: dateMax,
             owner: owner,
             id: uid
         };
@@ -283,6 +288,8 @@ export class SearchEntityService implements Resolve<any> {
             uid,
             documentParent != null ? documentParent.path : null,
             owner,
+            this.datePipe.transform(dateMin, DATE_FORMAT),
+            this.datePipe.transform(dateMax, DATE_FORMAT),
             onlyTags
         );
     }
@@ -294,6 +301,8 @@ export class SearchEntityService implements Resolve<any> {
         uid: number,
         documentParent: string,
         owner: string,
+        dateMin: string,
+        dateMax: string,
         onlyTags = false
     ): Observable<DMEntity[]> {
 
@@ -335,6 +344,17 @@ export class SearchEntityService implements Resolve<any> {
             criterias.push({
                 fieldName: 'DocumentOwner',
                 query: owner
+            });
+        }
+
+        const regexDateFormat = new RegExp('^\\\d\\\d\\\d\\\d-\\\d\\\d-\\\d\\\d$');
+        const hasDateMin = dateMin != null && dateMin !== undefined && regexDateFormat.test(dateMin);
+        const hasDateMax = dateMax != null && dateMax !== undefined && regexDateFormat.test(dateMax);
+        if (hasDateMin || hasDateMax) {
+            criterias.push({
+                fieldName: 'DocumentVersionUpdateDate',
+                rangeMin: hasDateMin ? dateMin : null,
+                rangeMax: hasDateMax ? dateMax : null
             });
         }
 
@@ -497,8 +517,10 @@ export class SearchEntityService implements Resolve<any> {
             query.name,
             query.tags,
             query.id,
-            query.folder.path,
-            query.owner
+            query.folder != null ? query.folder.path : null,
+            query.owner,
+            this.datePipe.transform(query.dateMin, DATE_FORMAT),
+            this.datePipe.transform(query.dateMax, DATE_FORMAT)
         );
     }
 }

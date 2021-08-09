@@ -105,6 +105,8 @@ export class SearchFormComponent implements OnInit {
             + this.searchFormGroup.get('owner').value.source :
             this.searchFormGroup.get('owner').value
         ,
+        this.searchFormGroup.get('dateMin').value,
+        this.searchFormGroup.get('dateMax').value,
         false
     ).subscribe(
 
@@ -170,8 +172,15 @@ export class SearchFormComponent implements OnInit {
         container => {
           this.selectedContainerEntity = container;
           this.searchFormGroup.get('folder').setValue(container.path);
+          this.searchFormGroup.get('folder').disable();
         }
     );
+  }
+
+  deselectContainerEntity(): void {
+    this.selectedContainerEntity = null;
+    this.searchFormGroup.get('folder').setValue('');
+    this.searchFormGroup.get('folder').enable();
   }
 
   private filterUsers(allUsers: Array<User>, inputVal: string, excludedUser: User): Array<User> {
