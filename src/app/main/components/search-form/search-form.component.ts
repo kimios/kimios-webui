@@ -1,7 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {BehaviorSubject, iif, Observable, of} from 'rxjs';
 
-import {AdministrationService, Document as KimiosDocument, Folder, SecurityService, User, Workspace} from 'app/kimios-client-api';
+import {
+  AdministrationService,
+  Document as KimiosDocument,
+  Folder,
+  SecurityService,
+  User,
+  Workspace,
+  DocumentType as KimiosDocumentType,
+  StudioService
+} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
@@ -27,11 +36,14 @@ export class SearchFormComponent implements OnInit {
   selectedTags: Array<string>;
   allTags: Array<string>;
   allTags$: Observable<Array<string>>;
+  allDocumentTypes: Array<KimiosDocumentType>;
+  filteredDocumentTypes$: Observable<Array<KimiosDocumentType>>;
 
   selectedContainerEntity: Folder | Workspace;
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
+  private selectedDocumentType: KimiosDocumentType;
 
   constructor(
       private fb: FormBuilder,
@@ -40,12 +52,15 @@ export class SearchFormComponent implements OnInit {
       private bes: BrowseEntityService,
       private administrationService: AdministrationService,
       private securityService: SecurityService,
-      private sessionService: SessionService
+      private sessionService: SessionService,
+      private studioService: StudioService
   ) {
     this.filteredUsers$ = new Observable<Array<User>>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
     this.selectedTags = new Array<string>();
     this.allUsers = new Array<User>();
+    this.allDocumentTypes = new Array<KimiosDocumentType>();
+    this.filteredDocumentTypes$ = new Observable<Array<KimiosDocumentType>>(null);
 
     this.searchFormGroup = this.fb.group({
       'name': this.fb.control(''),
@@ -55,7 +70,8 @@ export class SearchFormComponent implements OnInit {
       'owner': this.fb.control(''),
       'folder': this.fb.control(''),
       'dateMin': this.fb.control(''),
-      'dateMax': this.fb.control('')
+      'dateMax': this.fb.control(''),
+      'documentType': this.fb.control('')
     });
   }
 
@@ -88,6 +104,16 @@ export class SearchFormComponent implements OnInit {
             () => inputVal != null,
             of(this.filterUsers(this.allUsers, inputVal, this.selectedUser)),
             this.initAndReturnAllUsers()
+        ))
+    );
+
+    this.filteredDocumentTypes$ = this.searchFormGroup.get('documentType').valueChanges.pipe(
+        filter(value =>  ! (value instanceof Object)),
+        startWith(null),
+        concatMap(inputVal => iif(
+            () => inputVal != null,
+            of(this.filterDocumentTypes(this.allDocumentTypes, inputVal, this.selectedDocumentType)),
+            this.initAndReturnAllDocumentTypes()
         ))
     );
   }
@@ -227,7 +253,42 @@ export class SearchFormComponent implements OnInit {
   }
 
   deselectUser(): void {
+    this.selectedUser = null;
     this.searchFormGroup.get('owner').setValue('');
     this.searchFormGroup.get('owner').enable();
+  }
+
+  selectDocumentType(): void {
+    this.selectedDocumentType = this.searchFormGroup.get('documentType').value;
+    this.searchFormGroup.get('documentType').disable();
+  }
+
+  deselectDocumentType(): void {
+    this.selectedDocumentType = null;
+    this.searchFormGroup.get('documentType').setValue('');
+    this.searchFormGroup.get('documentType').enable();
+  }
+
+  private filterDocumentTypes(allDocumentTypes: Array<KimiosDocumentType>, inputVal: string, excludedDocumentType: KimiosDocumentType): Array<KimiosDocumentType> {
+    return this.allDocumentTypes.filter(docType => (
+        inputVal == null
+        || inputVal === undefined
+        || inputVal.trim() === ''
+        || docType.name.toLowerCase().includes(inputVal.trim().toLowerCase())
+        ) && (
+        excludedDocumentType == null
+        || excludedDocumentType.name !== docType.name
+        )
+    );
+  }
+
+  private initAndReturnAllDocumentTypes(): Observable<Array<KimiosDocumentType>> {
+    return this.studioService.getDocumentTypes(this.sessionService.sessionToken).pipe(
+        tap(res => this.allDocumentTypes = res)
+    );
+  }
+
+  displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {
+    return docType.name;
   }
 }

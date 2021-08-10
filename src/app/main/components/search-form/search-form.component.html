@@ -8,7 +8,7 @@
 
   <div fxFill fxLayout="row" fxLayoutAlign="space-between start">
 
-    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="45">
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="30">
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Document name" aria-label="document's name" matInput [formControlName]="'name'"
@@ -80,7 +80,7 @@
 
     </div>
 
-    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="45">
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="30">
 
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Document id" aria-label="document's id" matInput [formControlName]="'id'">
@@ -118,6 +118,25 @@
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
+
+    </div>
+
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="30">
+
+      <mat-form-field class="example-full-width" fxFill>
+        <input type="text" placeholder="Document type" aria-label="document type" matInput [formControlName]="'documentType'"
+               [matAutocomplete]="autoCompleteDocumentType" >
+        <mat-autocomplete #autoCompleteDocumentType="matAutocomplete" (optionSelected)="selectDocumentType()"
+                          [displayWith]="displayAutoCompleteDocumentType">
+          <mat-option *ngFor="let documentType of filteredDocumentTypes$ | async" [value]="documentType">
+            {{documentType.name}}
+          </mat-option>
+        </mat-autocomplete>
+        <button mat-button *ngIf="searchFormGroup.get('documentType').value" matSuffix mat-icon-button aria-label="Clear"
+                (click)="deselectDocumentType()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
     </div>
 
