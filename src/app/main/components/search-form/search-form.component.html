@@ -99,7 +99,7 @@
       </button>
     </mat-form-field>
 
-    <mat-form-field fxFlex="45">
+    <mat-form-field fxFill>
       <input matInput [matDatepicker]="dateMinPicker" placeholder="Date min" [formControlName]="'dateMin'">
       <mat-datepicker-toggle matSuffix [for]="dateMinPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMinPicker></mat-datepicker>
@@ -109,7 +109,7 @@
       </button>
     </mat-form-field>
 
-    <mat-form-field fxFlex="45">
+    <mat-form-field fxFill>
       <input matInput [matDatepicker]="dateMaxPicker" placeholder="Date max" [formControlName]="'dateMax'">
       <mat-datepicker-toggle matSuffix [for]="dateMaxPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMaxPicker></mat-datepicker>
@@ -137,6 +137,50 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
+
+      <ng-container *ngIf="selectedDocumentType != null" [formGroupName]="'metas'">
+        <mat-form-field fxFill *ngFor="let meta of documentTypeMetaDatas$ | async; index as i;">
+          <ng-container *ngIf="documentTypeMetaDataValuesMap.get(meta.uid) != null else noSelect;" >
+            <mat-select
+                    [formControlName]="meta.uid"
+                    (selectionChange)="onSelectChange($event.value)"
+                    (closed)="onPanelClose()"
+            >
+              <input matInput
+                     [formControlName]="'filterControl_' + meta.uid"
+                     type="text"
+                     name="filter-options"
+                     id="filter-options"
+                     placeholder="Search"
+                     (input)="inputMetaValueChange(meta.uid)"
+              >
+              <mat-option *ngFor="let value of filteredDocumentTypeMetaDataValues$Map.get(meta.uid) | async"
+                          [value]="value">
+                {{value}}
+              </mat-option>
+            </mat-select>
+          </ng-container>
+          <ng-template #noSelect>
+            <input type="text" placeholder="{{meta.name}}" matInput
+                   [formControlName]="meta.uid" >
+            <!--[matAutocomplete]="i"<mat-autocomplete #i="matAutocomplete">
+              <mat-option *ngFor="let value of documentTypeMetaDataValuesMap.get(meta.uid)" [value]="value">
+                {{value}}
+              </mat-option>
+            </mat-autocomplete>-->
+          </ng-template>
+          <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).value" matSuffix mat-icon-button aria-label="Clear"
+                  (click)="resetMetaValue(meta.uid)">
+            <mat-icon>close</mat-icon>
+          </button>
+
+
+        </mat-form-field>
+
+
+      </ng-container>
+
+
 
     </div>
 

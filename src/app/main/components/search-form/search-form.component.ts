@@ -1,15 +1,17 @@
 import {Component, OnInit} from '@angular/core';
-import {BehaviorSubject, iif, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, iif, Observable, of} from 'rxjs';
 
 import {
   AdministrationService,
   Document as KimiosDocument,
-  Folder,
-  SecurityService,
-  User,
-  Workspace,
   DocumentType as KimiosDocumentType,
-  StudioService
+  DocumentVersionService,
+  Folder,
+  Meta,
+  SecurityService,
+  StudioService,
+  User,
+  Workspace
 } from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -38,12 +40,16 @@ export class SearchFormComponent implements OnInit {
   allTags$: Observable<Array<string>>;
   allDocumentTypes: Array<KimiosDocumentType>;
   filteredDocumentTypes$: Observable<Array<KimiosDocumentType>>;
+  documentTypeMetaDatas$: BehaviorSubject<Array<Meta>>;
+  documentTypeMetaDataValuesMap: Map<number, Array<string | number>>;
+  documentTypeMetaDataIds: Array<number>;
+  filteredDocumentTypeMetaDataValues$Map: Map<number, BehaviorSubject<Array<string>>>;
 
   selectedContainerEntity: Folder | Workspace;
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
-  private selectedDocumentType: KimiosDocumentType;
+  private selectedDocumentType: KimiosDocumentType = null;
 
   constructor(
       private fb: FormBuilder,
@@ -53,7 +59,8 @@ export class SearchFormComponent implements OnInit {
       private administrationService: AdministrationService,
       private securityService: SecurityService,
       private sessionService: SessionService,
-      private studioService: StudioService
+      private studioService: StudioService,
+      private documentVersionService: DocumentVersionService
   ) {
     this.filteredUsers$ = new Observable<Array<User>>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
@@ -61,6 +68,10 @@ export class SearchFormComponent implements OnInit {
     this.allUsers = new Array<User>();
     this.allDocumentTypes = new Array<KimiosDocumentType>();
     this.filteredDocumentTypes$ = new Observable<Array<KimiosDocumentType>>(null);
+    this.documentTypeMetaDatas$ = new BehaviorSubject<Array<Meta>>(null);
+    this.documentTypeMetaDataValuesMap = new Map<number, Array<string | number>>(null);
+    this.documentTypeMetaDataIds = new Array<number>();
+    this.filteredDocumentTypeMetaDataValues$Map = new Map<number, BehaviorSubject<Array<string>>>();
 
     this.searchFormGroup = this.fb.group({
       'name': this.fb.control(''),
@@ -71,7 +82,8 @@ export class SearchFormComponent implements OnInit {
       'folder': this.fb.control(''),
       'dateMin': this.fb.control(''),
       'dateMax': this.fb.control(''),
-      'documentType': this.fb.control('')
+      'documentType': this.fb.control(''),
+      'metas': this.fb.group({})
     });
   }
 
@@ -259,8 +271,28 @@ export class SearchFormComponent implements OnInit {
   }
 
   selectDocumentType(): void {
-    this.selectedDocumentType = this.searchFormGroup.get('documentType').value;
-    this.searchFormGroup.get('documentType').disable();
+    const docType = this.searchFormGroup.get('documentType').value;
+    this.documentVersionService.getMetas(this.sessionService.sessionToken, docType.uid).pipe(
+        tap(() => this.documentTypeMetaDataValuesMap = new Map<number, Array<string | number>>()),
+        tap(metas => this.documentTypeMetaDatas$.next(metas)),
+        tap(metas => this.updateFormControlsWithMetas(this.searchFormGroup, 'metas', metas)),
+        concatMap(metas => metas),
+        concatMap(meta => combineLatest(
+            of(meta),
+            meta.metaFeedUid === -1 ?
+                of(null) :
+                this.studioService.getMetaFeedValues(this.sessionService.sessionToken, meta.metaFeedUid)
+        )),
+        tap(([meta, metaFeedValues]) => this.updateFormControlsWithMetaValues(this.searchFormGroup, 'metas', meta)),
+        tap(([meta, metaFeedValues]) => console.dir(meta)),
+        tap(([meta, metaFeedValues]) => console.dir(metaFeedValues)),
+        tap(([meta, metaFeedValues]) => this.documentTypeMetaDataValuesMap.set(meta.uid, metaFeedValues)),
+        tap(([meta, metaFeedValues]) => this.filteredDocumentTypeMetaDataValues$Map.set(meta.uid, new BehaviorSubject<Array<string>>(metaFeedValues))),
+        tap(() => this.documentTypeMetaDataValuesMap.forEach((val, key) =>
+            this.documentTypeMetaDataIds.push(key))),
+        tap(() => this.searchFormGroup.get('documentType').disable()),
+        tap(() => this.selectedDocumentType = this.searchFormGroup.get('documentType').value),
+    ).subscribe();
   }
 
   deselectDocumentType(): void {
@@ -290,5 +322,38 @@ export class SearchFormComponent implements OnInit {
 
   displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {
     return docType.name;
+  }
+
+  private updateFormControlsWithMetas(form: FormGroup, formGroupName: string, metas: Array<Meta>): void {
+    const metasFormGroup = this.fb.group({});
+    metas.forEach(meta => metasFormGroup.addControl(String(meta.uid), this.fb.control('')));
+
+    form.setControl('metas', metasFormGroup);
+  }
+
+  onSelectChange(value: any): void {
+
+  }
+
+  onPanelClose(): void {
+
+  }
+
+  private updateFormControlsWithMetaValues(searchFormGroup: FormGroup, formGroupName: string, meta: any): void {
+    (searchFormGroup.get(formGroupName) as FormGroup).addControl('filterControl_' + meta.uid, this.fb.control(''));
+  }
+
+  inputMetaValueChange(uid: number): void {
+    const inputVal = (this.searchFormGroup.get('metas') as FormGroup).get('filterControl_' + uid).value;
+    const allValues = this.documentTypeMetaDataValuesMap.get(uid).map(value => String(value));
+    this.filteredDocumentTypeMetaDataValues$Map.get(uid).next(
+        inputVal.trim().length > 0 ?
+            allValues.filter(value => value.includes(inputVal)) :
+            allValues
+    );
+  }
+
+  resetMetaValue(uid: number): void {
+    (this.searchFormGroup.get('metas') as FormGroup).get('filterControl_' + uid).setValue('');
   }
 }
