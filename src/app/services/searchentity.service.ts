@@ -20,6 +20,7 @@ import {Tag} from 'app/main/model/tag';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 import {DatePipe} from '@angular/common';
 import {MetaWithValue} from 'app/main/model/meta-with-value';
+import {MetaValueRange} from 'app/main/model/meta-value-range';
 
 export const PAGE_SIZE_DEFAULT = 20;
 const DEFAULT_SORT_FIELD = 'versionUpdateDate';
@@ -554,11 +555,9 @@ export class SearchEntityService implements Resolve<any> {
             fieldName: metaTypeToCriteriaFieldNameMapping[meta.metaType] + '_' + meta.uid,
             level: 0,
             position: 0,
-            rangeMin: [2, 3].includes(meta.metaType) ? String(meta.value).split(metaValueFromToSeparator)[0] : null,
-            rangeMax: [2, 3].includes(meta.metaType) ? String(meta.value).split(metaValueFromToSeparator)[1] : null,
-            query: [2, 3].includes(meta.metaType) ? null : meta.value
+            rangeMin: meta.value instanceof MetaValueRange ? this.datePipe.transform(meta.value.min, DATE_FORMAT) : null,
+            rangeMax: meta.value instanceof MetaValueRange ? this.datePipe.transform(meta.value.max, DATE_FORMAT) : null,
+            query: meta.value instanceof MetaValueRange ? null : meta.value
         });
     }
-
-
 }

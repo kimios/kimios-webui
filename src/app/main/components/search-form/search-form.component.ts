@@ -13,7 +13,7 @@ import {
   User,
   Workspace
 } from 'app/kimios-client-api';
-import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {SearchEntityService} from 'app/services/searchentity.service';
@@ -23,6 +23,7 @@ import {MatDialog} from '@angular/material';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {SessionService} from 'app/services/session.service';
 import {MetaWithValue} from 'app/main/model/meta-with-value';
+import {MetaValueRange} from 'app/main/model/meta-value-range';
 
 @Component({
   selector: 'search-form',
@@ -152,7 +153,7 @@ export class SearchFormComponent implements OnInit {
             .map(keyControl =>
                 this.makeMetaWithValueFromMeta(
                     this.documentTypeMetaDatas$.getValue().filter(meta => meta.uid.toString() === keyControl)[0],
-                    this.searchFormGroup.get('metas').get(keyControl).value
+                    this.searchFormGroup.get('metas').get(keyControl)
                 )
             ),
         false
@@ -161,7 +162,7 @@ export class SearchFormComponent implements OnInit {
     );
   }
 
-  private makeMetaWithValueFromMeta(meta: Meta, value: any): MetaWithValue {
+  private makeMetaWithValueFromMeta(meta: Meta, formControl: AbstractControl): MetaWithValue {
     return <MetaWithValue> {
       uid: meta.uid,
       name: meta.name,
@@ -170,7 +171,12 @@ export class SearchFormComponent implements OnInit {
       metaType: meta.metaType,
       mandatory: meta.mandatory,
       position: meta.position,
-      value: value
+      value: formControl instanceof FormControl ?
+          formControl.value :
+          new MetaValueRange(
+              (formControl as FormGroup).get('min').value,
+              (formControl as FormGroup).get('max').value
+          )
     };
   }
 
