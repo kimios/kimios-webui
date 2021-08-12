@@ -316,6 +316,8 @@ export class SearchEntityService implements Resolve<any> {
             owner,
             this.datePipe.transform(dateMin, DATE_FORMAT),
             this.datePipe.transform(dateMax, DATE_FORMAT),
+            documentType.uid,
+            metas,
             onlyTags
         );
     }
@@ -329,6 +331,8 @@ export class SearchEntityService implements Resolve<any> {
         owner: string,
         dateMin: string,
         dateMax: string,
+        documentTypeUid: number,
+        metas: Array<MetaWithValue>,
         onlyTags = false
     ): Observable<DMEntity[]> {
 
@@ -371,6 +375,15 @@ export class SearchEntityService implements Resolve<any> {
                 fieldName: 'DocumentOwner',
                 query: owner
             });
+        }
+        if (documentTypeUid != null) {
+            criterias.push({
+                fieldName: 'DocumentTypeUid',
+                query: documentTypeUid.toString()
+            });
+        }
+        if (metas != null && metas.length > 0) {
+            criterias.concat(this.makeCriteriasFromMetas(metas));
         }
 
         const regexDateFormat = new RegExp('^\\\d\\\d\\\d\\\d-\\\d\\\d-\\\d\\\d$');
@@ -546,7 +559,9 @@ export class SearchEntityService implements Resolve<any> {
             query.folder != null ? query.folder.path : null,
             query.owner,
             this.datePipe.transform(query.dateMin, DATE_FORMAT),
-            this.datePipe.transform(query.dateMax, DATE_FORMAT)
+            this.datePipe.transform(query.dateMax, DATE_FORMAT),
+            query.documentType.uid,
+            query.metas
         );
     }
 

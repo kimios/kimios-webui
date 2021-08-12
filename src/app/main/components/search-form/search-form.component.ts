@@ -105,12 +105,6 @@ export class SearchFormComponent implements OnInit {
                 this.filterTags(this.allTags, null, this.selectedTags))
     );
 
-    if (this.searchEntityService.currentSearchEntityQuery != null
-        && this.searchEntityService.currentSearchEntityQuery !== undefined) {
-      this.searchEntityService.loadQuery(this.searchEntityService.currentSearchEntityQuery);
-      this.initFormFromQuery(this.searchFormGroup, this.searchEntityService.currentSearchEntityQuery);
-    }
-
     this.filteredUsers$ = this.searchFormGroup.get('owner').valueChanges.pipe(
         filter(value =>  ! (value instanceof Object)),
         startWith(null),
@@ -130,6 +124,12 @@ export class SearchFormComponent implements OnInit {
             this.initAndReturnAllDocumentTypes()
         ))
     );
+
+    if (this.searchEntityService.currentSearchEntityQuery != null
+        && this.searchEntityService.currentSearchEntityQuery !== undefined) {
+      this.searchEntityService.loadQuery(this.searchEntityService.currentSearchEntityQuery);
+      this.initFormFromQuery(this.searchFormGroup, this.searchEntityService.currentSearchEntityQuery);
+    }
   }
 
   onSubmit(): void {
@@ -155,7 +155,13 @@ export class SearchFormComponent implements OnInit {
                     this.documentTypeMetaDatas$.getValue().filter(meta => meta.uid.toString() === keyControl)[0],
                     this.searchFormGroup.get('metas').get(keyControl)
                 )
-            ),
+            ).filter(metaWithValue => metaWithValue.value != null
+            && metaWithValue.value !== undefined
+            && (
+                (typeof metaWithValue.value === 'string' && metaWithValue.value !== '')
+                || (metaWithValue.value instanceof MetaValueRange && !(metaWithValue.value as MetaValueRange).isEmpty())
+            )
+        ),
         false
     ).subscribe(
 
@@ -223,6 +229,12 @@ export class SearchFormComponent implements OnInit {
 
     this.selectedTags = searchEntityQuery.tags;
     formGroup.get('tagInput').setValue('');
+
+    formGroup.get('documentType').setValue(searchEntityQuery.documentType);
+    this.loadDocumentTypeMetas(searchEntityQuery.documentType).subscribe(
+        () => this.initMetasFormGroupFromQuery(formGroup.get('metas') as FormGroup, searchEntityQuery)
+    );
+    this.selectedDocumentType = searchEntityQuery.documentType;
   }
 
   openUserList(): void {
@@ -301,7 +313,11 @@ export class SearchFormComponent implements OnInit {
 
   selectDocumentType(): void {
     const docType = this.searchFormGroup.get('documentType').value;
-    this.documentVersionService.getMetas(this.sessionService.sessionToken, docType.uid).pipe(
+    this.loadDocumentTypeMetas(docType).subscribe();
+  }
+
+  private loadDocumentTypeMetas(docType: KimiosDocumentType): Observable<any> {
+    return this.documentVersionService.getMetas(this.sessionService.sessionToken, docType.uid).pipe(
         tap(() => this.documentTypeMetaDataValuesMap = new Map<number, Array<string | number>>()),
         tap(metas => this.documentTypeMetaDatas$.next(metas)),
         tap(metas => this.updateFormControlsWithMetas(this.searchFormGroup, 'metas', metas)),
@@ -321,7 +337,7 @@ export class SearchFormComponent implements OnInit {
             this.documentTypeMetaDataIds.push(key))),
         tap(() => this.searchFormGroup.get('documentType').disable()),
         tap(() => this.selectedDocumentType = this.searchFormGroup.get('documentType').value),
-    ).subscribe();
+    );
   }
 
   deselectDocumentType(): void {
@@ -400,5 +416,22 @@ export class SearchFormComponent implements OnInit {
   resetMetaValue(uid: number): void {
     (this.searchFormGroup.get('metas') as FormGroup).get('filterControl_' + uid).setValue('');
     (this.searchFormGroup.get('metas') as FormGroup).get(uid.toString()).setValue('');
+  }
+
+  private initMetasFormGroupFromQuery(formGroup: FormGroup, searchEntityQuery: SearchEntityQuery): void {
+    if (searchEntityQuery.metas != null
+        && searchEntityQuery.metas !== undefined
+        && searchEntityQuery.metas.length > 0) {
+      searchEntityQuery.metas.forEach(metaWithValue => this.initFormControlFromMetaValue(formGroup.get(metaWithValue.uid.toString()), metaWithValue));
+    }
+  }
+
+  private initFormControlFromMetaValue(abstractControl: AbstractControl, metaWithValue: MetaWithValue): void {
+    if (abstractControl instanceof FormGroup) {
+      (abstractControl as FormGroup).get('min').setValue((metaWithValue.value as MetaValueRange).min);
+      (abstractControl as FormGroup).get('max').setValue((metaWithValue.value as MetaValueRange).min);
+    } else {
+      (abstractControl as FormControl).setValue(metaWithValue.value);
+    }
   }
 }
