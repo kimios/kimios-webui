@@ -13,7 +13,7 @@ import {
   User,
   Workspace
 } from 'app/kimios-client-api';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {SearchEntityService} from 'app/services/searchentity.service';
@@ -22,6 +22,7 @@ import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/
 import {MatDialog} from '@angular/material';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {SessionService} from 'app/services/session.service';
+import {MetaWithValue} from 'app/main/model/meta-with-value';
 
 @Component({
   selector: 'search-form',
@@ -145,10 +146,32 @@ export class SearchFormComponent implements OnInit {
         ,
         this.searchFormGroup.get('dateMin').value,
         this.searchFormGroup.get('dateMax').value,
+        this.selectedDocumentType,
+        Object.keys((this.searchFormGroup.get('metas') as FormGroup).controls)
+            .filter(keyControl => ! new RegExp('^filterControl_').test(keyControl))
+            .map(keyControl =>
+                this.makeMetaWithValueFromMeta(
+                    this.documentTypeMetaDatas$.getValue().filter(meta => meta.uid.toString() === keyControl)[0],
+                    this.searchFormGroup.get('metas').get(keyControl).value
+                )
+            ),
         false
     ).subscribe(
 
     );
+  }
+
+  private makeMetaWithValueFromMeta(meta: Meta, value: any): MetaWithValue {
+    return <MetaWithValue> {
+      uid: meta.uid,
+      name: meta.name,
+      documentTypeUid: meta.documentTypeUid,
+      metaFeedUid: meta.metaFeedUid,
+      metaType: meta.metaType,
+      mandatory: meta.mandatory,
+      position: meta.position,
+      value: value
+    };
   }
 
   selectedDocumentName(): void {
@@ -326,9 +349,24 @@ export class SearchFormComponent implements OnInit {
 
   private updateFormControlsWithMetas(form: FormGroup, formGroupName: string, metas: Array<Meta>): void {
     const metasFormGroup = this.fb.group({});
-    metas.forEach(meta => metasFormGroup.addControl(String(meta.uid), this.fb.control('')));
+    metas.forEach(meta => metasFormGroup.addControl(String(meta.uid), this.makeFormGroupOrFormControlAccordingToMetaType(meta)));
 
     form.setControl('metas', metasFormGroup);
+  }
+
+  private makeFormGroupOrFormControlAccordingToMetaType(meta: Meta): FormGroup | FormControl {
+    if ([2, 3].includes(meta.metaType)) {
+      // meta with range
+      // so FormGroup must be created
+      // with 2 FormControl: one for min and one for max
+      const metaFormGroup = this.fb.group({});
+      ['min', 'max'].forEach(
+          formControlId => metaFormGroup.addControl(formControlId, this.fb.control(''))
+      );
+      return metaFormGroup;
+    } else {
+      return this.fb.control('');
+    }
   }
 
   onSelectChange(value: any): void {
@@ -355,5 +393,6 @@ export class SearchFormComponent implements OnInit {
 
   resetMetaValue(uid: number): void {
     (this.searchFormGroup.get('metas') as FormGroup).get('filterControl_' + uid).setValue('');
+    (this.searchFormGroup.get('metas') as FormGroup).get(uid.toString()).setValue('');
   }
 }

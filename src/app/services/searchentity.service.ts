@@ -1,5 +1,16 @@
 import {Injectable} from '@angular/core';
-import {Criteria, DMEntity, DocumentService, Folder, FolderService, SearchResponse, SearchService, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {
+    Criteria,
+    DMEntity,
+    DocumentService,
+    DocumentType as KimiosDocumentType,
+    Folder,
+    FolderService,
+    SearchResponse,
+    SearchService,
+    Workspace,
+    WorkspaceService
+} from 'app/kimios-client-api';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
@@ -8,12 +19,22 @@ import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 import {DatePipe} from '@angular/common';
+import {MetaWithValue} from 'app/main/model/meta-with-value';
 
 export const PAGE_SIZE_DEFAULT = 20;
 const DEFAULT_SORT_FIELD = 'versionUpdateDate';
 const DEFAULT_SORT_DIRECTION = 'desc';
 const DEFAULT_PAGE = 0;
 export const DATE_FORMAT = 'yyyy-MM-dd';
+
+export const metaTypeToCriteriaFieldNameMapping = {
+    1: 'MetaDataString',
+    2: 'MetaDataNumber',
+    3: 'MetaDataDate',
+    4: 'MetaDataBoolean',
+    5: 'MetaDataList'
+};
+export const metaValueFromToSeparator = '#|#';
 
 @Injectable({
     providedIn: 'root'
@@ -268,6 +289,8 @@ export class SearchEntityService implements Resolve<any> {
         owner: string,
         dateMin: Date,
         dateMax: Date,
+        documentType: KimiosDocumentType,
+        metas: Array<MetaWithValue>,
         onlyTags = false
     ): Observable<DMEntity[]> {
         this.currentSearchEntityQuery = <SearchEntityQuery> {
@@ -278,7 +301,9 @@ export class SearchEntityService implements Resolve<any> {
             dateMin: dateMin,
             dateMax: dateMax,
             owner: owner,
-            id: uid
+            id: uid,
+            documentType: documentType,
+            metas: metas
         };
 
         return this.searchWithFilters(
@@ -523,4 +548,17 @@ export class SearchEntityService implements Resolve<any> {
             this.datePipe.transform(query.dateMax, DATE_FORMAT)
         );
     }
+
+    private makeCriteriasFromMetas(metas: Array<MetaWithValue>): Array<Criteria> {
+        return metas.map(meta => <Criteria> {
+            fieldName: metaTypeToCriteriaFieldNameMapping[meta.metaType] + '_' + meta.uid,
+            level: 0,
+            position: 0,
+            rangeMin: [2, 3].includes(meta.metaType) ? String(meta.value).split(metaValueFromToSeparator)[0] : null,
+            rangeMax: [2, 3].includes(meta.metaType) ? String(meta.value).split(metaValueFromToSeparator)[1] : null,
+            query: [2, 3].includes(meta.metaType) ? null : meta.value
+        });
+    }
+
+
 }

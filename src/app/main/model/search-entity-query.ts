@@ -1,4 +1,5 @@
-import {Folder, Workspace} from 'app/kimios-client-api';
+import {DocumentType as KimiosDocumentType, Folder, Workspace} from 'app/kimios-client-api';
+import {MetaWithValue} from './meta-with-value';
 
 export interface SearchEntityQuery {
     name: string;
@@ -9,4 +10,6 @@ export interface SearchEntityQuery {
     tags: Array<string>;
     dateMin: Date;
     dateMax: Date;
+    documentType: KimiosDocumentType;
+    metas: Array<MetaWithValue>;
 }
