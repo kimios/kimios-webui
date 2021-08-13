@@ -1,6 +1,6 @@
 export class MetaValueRange {
-    min: number | Date;
-    max: number | Date;
+    min: any;
+    max: any;
 
     constructor(min, max) {
         this.min = min;
@@ -11,4 +11,14 @@ export class MetaValueRange {
         return (this.min == null || this.min === undefined)
         && (this.max == null || this.max === undefined);
     }
+}
+
+export class MetaValueRangeNumber extends MetaValueRange {
+    min: number;
+    max: number;
+}
+
+export class MetaValueRangeDate extends MetaValueRange {
+    min: Date;
+    max: Date;
 }

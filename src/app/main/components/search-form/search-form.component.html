@@ -141,6 +141,8 @@
       <ng-container *ngIf="selectedDocumentType != null" [formGroupName]="'metas'">
         <ng-container *ngFor="let meta of documentTypeMetaDatas$ | async;">
           <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;">
+
+            <ng-container *ngIf="meta.metaType != 4">
             <mat-form-field fxFill >
               <ng-container *ngIf="documentTypeMetaDataValuesMap.get(meta.uid) != null
               && !([2, 3].includes(meta.metaType)) else noValueList;" >
@@ -166,13 +168,8 @@
               </ng-container>
               <ng-template #noValueList>
                 <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;" >
-                  <input type="text" placeholder="{{meta.name}}" matInput
+                    <input type="text" placeholder="{{meta.name}}" matInput
                          [formControlName]="meta.uid" >
-                  <!--[matAutocomplete]="i"<mat-autocomplete #i="matAutocomplete">
-                  <mat-option *ngFor="let value of documentTypeMetaDataValuesMap.get(meta.uid)" [value]="value">
-                    {{value}}
-                  </mat-option>
-                </mat-autocomplete>-->
                 </ng-container>
               </ng-template>
               <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).value" matSuffix mat-icon-button aria-label="Clear"
@@ -180,6 +177,12 @@
                 <mat-icon>close</mat-icon>
               </button>
             </mat-form-field>
+            </ng-container>
+
+            <ng-container *ngIf="meta.metaType === 4">
+              <mat-checkbox [formControlName]="meta.uid" >{{meta.name}}</mat-checkbox>
+            </ng-container>
+
           </ng-container>
 
           <ng-template #metaWithRange>
@@ -241,14 +244,11 @@
                       </button>
                     </mat-form-field>
                   </ng-container>
-
-
-
                 </div>
-
               </div>
             </div>
           </ng-template>
+
         </ng-container>
       </ng-container>
 

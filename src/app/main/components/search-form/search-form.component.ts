@@ -23,7 +23,7 @@ import {MatDialog} from '@angular/material';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {SessionService} from 'app/services/session.service';
 import {MetaWithValue} from 'app/main/model/meta-with-value';
-import {MetaValueRange} from 'app/main/model/meta-value-range';
+import {MetaValueRange, MetaValueRangeDate, MetaValueRangeNumber} from 'app/main/model/meta-value-range';
 
 @Component({
   selector: 'search-form',
@@ -160,6 +160,7 @@ export class SearchFormComponent implements OnInit {
             && (
                 (typeof metaWithValue.value === 'string' && metaWithValue.value !== '')
                 || (metaWithValue.value instanceof MetaValueRange && !(metaWithValue.value as MetaValueRange).isEmpty())
+                || (typeof metaWithValue.value === 'boolean' && metaWithValue.value === true)
             )
         ),
         false
@@ -179,10 +180,15 @@ export class SearchFormComponent implements OnInit {
       position: meta.position,
       value: formControl instanceof FormControl ?
           formControl.value :
-          new MetaValueRange(
-              (formControl as FormGroup).get('min').value,
-              (formControl as FormGroup).get('max').value
-          )
+          meta.metaType === 2 ?
+              new MetaValueRangeNumber(
+                  (formControl as FormGroup).get('min').value,
+                  (formControl as FormGroup).get('max').value
+              ) :
+              new MetaValueRangeDate(
+                  (formControl as FormGroup).get('min').value,
+                  (formControl as FormGroup).get('max').value
+              )
     };
   }
 
@@ -387,7 +393,11 @@ export class SearchFormComponent implements OnInit {
       );
       return metaFormGroup;
     } else {
-      return this.fb.control('');
+      if (meta.metaType === 4) {
+        return this.fb.control(false);
+      } else {
+        return this.fb.control('');
+      }
     }
   }
 
@@ -429,7 +439,7 @@ export class SearchFormComponent implements OnInit {
   private initFormControlFromMetaValue(abstractControl: AbstractControl, metaWithValue: MetaWithValue): void {
     if (abstractControl instanceof FormGroup) {
       (abstractControl as FormGroup).get('min').setValue((metaWithValue.value as MetaValueRange).min);
-      (abstractControl as FormGroup).get('max').setValue((metaWithValue.value as MetaValueRange).min);
+      (abstractControl as FormGroup).get('max').setValue((metaWithValue.value as MetaValueRange).max);
     } else {
       (abstractControl as FormControl).setValue(metaWithValue.value);
     }
