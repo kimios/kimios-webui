@@ -21,7 +21,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
   formGroup: FormGroup;
   metaDataSource: MetaDataSource;
   columnsDescription = METAS_DEFAULT_DISPLAYED_COLUMNS;
-  displayedColumns = [ 'name', 'type', 'mandatory' ];
+  displayedColumns = [ 'remove', 'name', 'type', 'mandatory' ];
   sort = <DMEntitySort> {
     name: 'name',
     direction: 'asc',
@@ -72,7 +72,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     ).subscribe();
   }
 
-  removeFromData(row: any): void {
+  removeMetaData(row: any): void {
 
   }
 

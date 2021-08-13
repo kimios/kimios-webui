@@ -18,12 +18,12 @@
              [formGroupName]="'documentTypeMetas'" >
 
     <!-- remove Column -->
-    <ng-container>
+    <ng-container matColumnDef="remove">
       <mat-header-cell *matHeaderCellDef>
 
       </mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeFromData(row)" >remove</mat-icon>
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeMetaData(row)" >remove</mat-icon>
       </mat-cell>
     </ng-container>
 
