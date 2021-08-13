@@ -1,5 +1,5 @@
-<form [formGroup]="formGroup" *ngIf="formGroup.get('documentTypeName') != null">
-  <mat-form-field>
+<form [formGroup]="formGroup" *ngIf="formGroup.get('documentTypeName') != null" [ngClass]="'kimios-section-content'">
+  <mat-form-field [ngClass]="'center'">
     <mat-label>Document type name</mat-label>
     <input
             matInput
