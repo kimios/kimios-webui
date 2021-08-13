@@ -23,6 +23,7 @@ export class AdminService {
   groupCreated$: BehaviorSubject<boolean>;
   groupModified$: BehaviorSubject<GroupIdSource>;
   selectedDocumentType$: BehaviorSubject<number>;
+  newDocumentType$: BehaviorSubject<boolean>;
 
   closeUserDialog$: Subject<boolean>;
 
@@ -40,6 +41,7 @@ export class AdminService {
     this.groupCreated$ = new BehaviorSubject<boolean>(false);
     this.selectedDocumentType$ = new BehaviorSubject<number>(0);
     this.groupModified$ = new BehaviorSubject<GroupIdSource>(null);
+    this.newDocumentType$ = new BehaviorSubject<boolean>(null);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {

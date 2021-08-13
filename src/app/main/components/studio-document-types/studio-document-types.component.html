@@ -1,19 +1,23 @@
 <div fxLayout="row" fxLayoutAlign="start start">
 
-  <div>
-
-    <mat-list>
-      <mat-list-item *ngFor="let docType of docTypes$ | async"
-                     (click)="selectDocType(docType)"
-                     [ngClass]="{'cursor-pointer' : true,
+  <div fxLayout="column" fxLayoutAlign="start start">
+    <button mat-button mat-icon-button aria-label="Create document type"
+            (click)="handleCreateDocumentType()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <div>
+      <mat-list>
+        <mat-list-item *ngFor="let docType of docTypes$ | async"
+                       (click)="selectDocType(docType)"
+                       [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : docType.uid === adminService.selectedDocumentType$.getValue()}"
-      >
-        {{docType.name}}
-      </mat-list-item>
-    </mat-list>
+        >
+          {{docType.name}}
+        </mat-list-item>
+      </mat-list>
 
+    </div>
   </div>
-
   <div>
     <studio-document-type-admin></studio-document-type-admin>
   </div>

@@ -16,7 +16,7 @@ export class StudioDocumentTypesComponent implements OnInit {
   constructor(
       private studioService: StudioService,
       private adminService: AdminService,
-      private sessionService: SessionService
+      private sessionService: SessionService,
   ) {
     this.docTypes$ = studioService.getDocumentTypes(sessionService.sessionToken);
   }
@@ -27,5 +27,9 @@ export class StudioDocumentTypesComponent implements OnInit {
 
   selectDocType(docType: DocumentType): void {
     this.adminService.selectedDocumentType$.next(docType.uid);
+  }
+
+  handleCreateDocumentType(): void {
+    this.adminService.newDocumentType$.next(true);
   }
 }

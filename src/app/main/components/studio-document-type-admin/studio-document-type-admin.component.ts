@@ -65,6 +65,11 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
           this.documentType = docType;
         })
     ).subscribe();
+
+    this.adminService.newDocumentType$.pipe(
+        filter(val => val === true),
+        tap(() => this.formGroup = this.initDocumentTypeFormGroup(null, []))
+    ).subscribe();
   }
 
   removeFromData(row: any): void {
@@ -82,7 +87,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
 
   private initDocumentTypeFormGroup(docType: DocumentType, metas: Array<Meta>): FormGroup {
     const formGroup = this.fb.group({});
-    formGroup.addControl('documentTypeName', this.fb.control(docType.name));
+    formGroup.addControl('documentTypeName', this.fb.control(docType != null ? docType.name : ''));
     formGroup.addControl('documentTypeMetas', this.fb.group({}));
     metas.forEach(meta =>
         (formGroup.get('documentTypeMetas') as FormGroup)
