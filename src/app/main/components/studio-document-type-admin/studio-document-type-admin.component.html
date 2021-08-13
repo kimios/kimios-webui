@@ -59,9 +59,8 @@
       <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
       <mat-cell *matCellDef="let element" [formGroupName]="element.uid.toString()">
         <mat-form-field>
-          <mat-select [formControl]="formGroup.get('documentTypeMetas').get(element.uid.toString()).get('metaDataType')"
-                      [(value)]="element.metaType">
-            <mat-option *ngFor="let typeId of metaDataPossibleTypesKey" value="{{typeId}}">
+          <mat-select [formControl]="formGroup.get('documentTypeMetas').get(element.uid.toString()).get('metaDataType')">
+            <mat-option *ngFor="let typeId of metaDataPossibleTypesKey" [value]="typeId">
               {{metaDataPossibleTypes.get(typeId)}}
             </mat-option>
           </mat-select>
