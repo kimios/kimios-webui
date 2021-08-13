@@ -68,7 +68,10 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
 
     this.adminService.newDocumentType$.pipe(
         filter(val => val === true),
-        tap(() => this.formGroup = this.initDocumentTypeFormGroup(null, []))
+        tap(() => {
+          this.metaDataSource.setData([]);
+          this.formGroup = this.initDocumentTypeFormGroup(null, []);
+        })
     ).subscribe();
   }
 
