@@ -102,4 +102,8 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     );
     return formGroup;
   }
+
+  addMetaData(): void {
+
+  }
 }

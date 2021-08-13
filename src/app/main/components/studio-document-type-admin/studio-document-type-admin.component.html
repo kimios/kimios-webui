@@ -20,7 +20,7 @@
     <!-- remove Column -->
     <ng-container matColumnDef="remove">
       <mat-header-cell *matHeaderCellDef>
-
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="addMetaData()" >add</mat-icon>
       </mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-icon [ngClass]="'cursor-pointer'" (click)="removeMetaData(row)" >remove</mat-icon>
