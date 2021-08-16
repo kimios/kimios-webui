@@ -30,6 +30,7 @@ export class StudioDocumentTypesComponent implements OnInit {
   }
 
   handleCreateDocumentType(): void {
+    this.adminService.selectedDocumentType$.next(0);
     this.adminService.newDocumentType$.next(true);
   }
 }
