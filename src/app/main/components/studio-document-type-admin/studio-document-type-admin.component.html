@@ -9,6 +9,32 @@
             aria-label="Document type name" >
   </mat-form-field>
 
+  <mat-form-field [ngClass]="'center'">
+    <mat-select
+            placeholder="Inherited document type"
+            [formControlName]="'inheritedDocumentType'"
+            (selectionChange)="onSelectDocumentTypeInheritedChange($event.value)"
+            (closed)="onPanelClose()"
+    >
+      <input matInput
+             [formControlName]="'filterControl_inheritedDocumentType'"
+             type="text"
+             name="filter-options"
+             id="filter-options"
+             placeholder="Search"
+             (input)="inputDocumentTypeInherited()"
+      >
+      <mat-option *ngFor="let documentType of filteredDocumentTypes$ | async"
+                  [value]="documentType">
+        {{documentType.name}}
+      </mat-option>
+    </mat-select>
+    <button mat-button *ngIf="formGroup.get('inheritedDocumentType').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="resetDocumentTypeInheritedValue()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
   <mat-table [dataSource]="metaDataSource"
              matSort
              matSortActive="{{sort.name}}"
