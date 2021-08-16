@@ -96,7 +96,17 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
             () => inputVal == null || inputVal === '',
             this.initAndReturnAllDocumentTypes(),
             of(this.filterDocumentTypes(inputVal, this.allDocumentTypes, null))
-        ))
+        )),
+        tap(documentTypes => {
+          if (
+              this.formGroup.get('inheritedDocumentType').value != null
+              && this.formGroup.get('inheritedDocumentType').value !== undefined
+              && this.formGroup.get('inheritedDocumentType').value !== ''
+          ) {
+            this.formGroup.get('inheritedDocumentType').setValue(
+                documentTypes.filter(docType => docType.uid === this.formGroup.get('inheritedDocumentType').value.uid)[0]
+            );
+          }})
     );
   }
 
