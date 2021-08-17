@@ -60,22 +60,23 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminService.selectedDocumentType$.pipe(
-        filter(docTypeUid => docTypeUid !== 0),
+        filter(docTypeUid => (docTypeUid != null && docTypeUid !== undefined && docTypeUid !== 0)),
         concatMap(docTypeUid => combineLatest(
             of(docTypeUid),
             this.studioService.getDocumentType(this.sessionService.sessionToken, docTypeUid)
         )),
         concatMap(([docTypeUid, docType]) => combineLatest(
             of(docType),
-            this.documentVersionService.getUnheritedMetas(this.sessionService.sessionToken, docTypeUid),
+            this.documentVersionService.getMetas(this.sessionService.sessionToken, docTypeUid),
             docType.documentTypeUid != null ?
                 this.studioService.getDocumentType(this.sessionService.sessionToken, docType.documentTypeUid) :
                 null
         )),
         tap(([docType, metas, inheritedDocType]) => {
-          metas.forEach(meta => this.metaDataTypesValue[meta.uid] = MetaDataTypeMapping[meta.metaType]);
-          this.formGroup = this.initDocumentTypeFormGroup(docType, metas, inheritedDocType);
-          this.metaDataSource.setData(metas);
+          const metasFiltered = metas.filter(meta => meta.documentTypeUid === docType.uid);
+          metasFiltered.forEach(meta => this.metaDataTypesValue[meta.uid] = MetaDataTypeMapping[meta.metaType]);
+          this.initDocumentTypeFormGroup(this.formGroup, docType, metasFiltered, inheritedDocType);
+          this.metaDataSource.setData(metasFiltered);
           this.documentType = docType;
         })
     ).subscribe();
@@ -85,7 +86,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
         tap(() => {
           this.documentType = null;
           this.metaDataSource.setData([]);
-          this.formGroup = this.initDocumentTypeFormGroup(null, [], null);
+          this.initDocumentTypeFormGroup(this.formGroup, null, [], null);
         })
     ).subscribe();
 
@@ -131,11 +132,12 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     this.metaDataSource.sortData1(this.sort);
   }
 
-  private initDocumentTypeFormGroup(docType: DocumentType, metas: Array<Meta>, inheritedDocType: DocumentType): FormGroup {
-    const formGroup = this.fb.group({});
-    formGroup.addControl('documentTypeName', this.fb.control(docType != null ? docType.name : ''));
-    formGroup.addControl('inheritedDocumentType', this.fb.control(inheritedDocType != null ? inheritedDocType : null));
-    formGroup.addControl('filterControl_inheritedDocumentType', this.fb.control(''));
+  private initDocumentTypeFormGroup(formGroup: FormGroup, docType: DocumentType, metas: Array<Meta>, inheritedDocType: DocumentType): FormGroup {
+    formGroup.get('documentTypeName').setValue(docType != null ? docType.name : '');
+    formGroup.get('inheritedDocumentType').setValue(inheritedDocType != null ? inheritedDocType : null);
+    formGroup.get('filterControl_inheritedDocumentType').setValue('');
+    // reset documentTypeMetas formGroup
+    formGroup.removeControl('documentTypeMetas');
     formGroup.addControl('documentTypeMetas', this.fb.group({}));
     metas.forEach(meta =>
         (formGroup.get('documentTypeMetas') as FormGroup)
@@ -159,6 +161,9 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
         null;
 
     const metaDataSourceData = this.metaDataSource.connect().getValue();
+    const position = metaDataSourceData.length > 0 ?
+        metaDataSourceData.slice().sort((a, b) => a.position < b.position ? 1 : -1)[0].position + 1 :
+        1;
 
     const emptyMeta = <Meta> {
       uid: metaWithLowestUid == null ? -1 : metaWithLowestUid.uid - 1,
@@ -167,7 +172,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
       metaFeedUid: -1,
       metaType: null,
       mandatory: false,
-      position: metaDataSourceData.slice().sort((a, b) => a.position < b.position ? 1 : -1)[0].position + 1
+      position: position
     };
     this.createFormGroupForMeta(this.formGroup.get('documentTypeMetas') as FormGroup, emptyMeta);
     this.metaDataSource.setData(metaDataSourceData.concat(emptyMeta));
@@ -219,9 +224,20 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
   }
 
   submit(): void {
-    const xmlStream = this.makeXmlStreamFromFormGroup(this.formGroup);
 
-    this.studioService.updateDocumentType(this.sessionService.sessionToken, xmlStream).subscribe();
+    if (this.documentType != null) {
+      const xmlStream = this.makeXmlStreamFromFormGroup(this.formGroup, this.documentType.uid);
+      this.studioService.updateDocumentType(this.sessionService.sessionToken, xmlStream).subscribe(
+          res => { if (this.formGroup.get('documentTypeName').value !== this.documentType.name) {
+            this.adminService.needRefreshDocumentTypes$.next(true);
+          }}
+      );
+    } else {
+      const xmlStream = this.makeXmlStreamFromFormGroup(this.formGroup, -1);
+      this.studioService.createDocumentType(this.sessionService.sessionToken, xmlStream).subscribe(
+          res => this.adminService.needRefreshDocumentTypes$.next(true)
+      );
+    }
   }
 
   cancel(): void {
@@ -232,27 +248,24 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     }
   }
 
-  private makeXmlStreamFromFormGroup(formGroup: FormGroup): string {
+  private makeXmlStreamFromFormGroup(formGroup: FormGroup, documentUid: number): string {
     let xmlStream = '<?xml version="1.0" encoding="UTF-8"?>';
 
-    let uid = -1;
+    const uid = documentUid != null ? documentUid : -1;
     const name = formGroup.get('documentTypeName').value ;
     const parentUid = formGroup.get('inheritedDocumentType').value != null ?
         formGroup.get('inheritedDocumentType').value.uid :
         -1;
-    if (this.documentType != null) {
-      uid = this.documentType.uid;
-    }
 
     xmlStream += '<document-type uid="' + uid + '" name="' + name + '" document-type-uid="' + parentUid + '">';
     Object.keys((formGroup.get('documentTypeMetas') as FormGroup).controls).forEach(keyControl => {
       const keyControlStr = Number(keyControl);
       const metaFormGroup = formGroup.get('documentTypeMetas').get(keyControl);
       xmlStream += this.makeMetaXmlElement(
-          uid,
+          Number(keyControl),
           Number(metaFormGroup.get('metaDataType').value),
           metaFormGroup.get('metaDataName').value,
-          // metaFormGroup.get('metaDataType').value,
+          // metaFormGroup.get('metaFeed').value,
           -1,
           metaFormGroup.get('metaDataMandatory').value,
           metaFormGroup.get('metaDataPosition').value

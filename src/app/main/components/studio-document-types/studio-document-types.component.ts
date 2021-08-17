@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {DocumentType, StudioService} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
+import {concatMap, filter, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'studio-document-types',
@@ -11,18 +12,26 @@ import {SessionService} from 'app/services/session.service';
 })
 export class StudioDocumentTypesComponent implements OnInit {
 
-  docTypes$: Observable<Array<DocumentType>>;
+  docTypes$: BehaviorSubject<Array<DocumentType>>;
 
   constructor(
       private studioService: StudioService,
       private adminService: AdminService,
       private sessionService: SessionService,
   ) {
-    this.docTypes$ = studioService.getDocumentTypes(sessionService.sessionToken);
+    this.docTypes$ = new BehaviorSubject<Array<DocumentType>>(null);
   }
 
   ngOnInit(): void {
+    this.studioService.getDocumentTypes(this.sessionService.sessionToken).subscribe(
+        res => this.docTypes$.next(res)
+    );
 
+    this.adminService.needRefreshDocumentTypes$.pipe(
+        filter(val => val === true),
+        concatMap(() => this.studioService.getDocumentTypes(this.sessionService.sessionToken)),
+        tap(documentTypes => this.docTypes$.next(documentTypes))
+    ).subscribe();
   }
 
   selectDocType(docType: DocumentType): void {
