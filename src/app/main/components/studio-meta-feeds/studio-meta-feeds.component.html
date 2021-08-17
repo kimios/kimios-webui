@@ -1,0 +1,25 @@
+<div fxLayout="row" fxLayoutAlign="start start">
+
+  <div fxLayout="column" fxLayoutAlign="start start">
+    <button mat-button mat-icon-button aria-label="Create meta feed"
+            (click)="handleCreateMetaFeed()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <div>
+      <mat-list>
+        <mat-list-item *ngFor="let metaFeed of metaFeeds$ | async"
+                       (click)="selectMetaFeed(metaFeed)"
+                       [ngClass]="{'cursor-pointer' : true,
+                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
+        >
+          {{metaFeed.name}}
+        </mat-list-item>
+      </mat-list>
+
+    </div>
+  </div>
+  <div>
+    <!--<studio-meta-feeds-admin></studio-meta-feeds-admin>-->
+  </div>
+
+</div>

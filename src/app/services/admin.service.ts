@@ -27,6 +27,8 @@ export class AdminService {
   needRefreshDocumentTypes$: BehaviorSubject<boolean>;
 
   closeUserDialog$: Subject<boolean>;
+  selectedMetaFeed$: BehaviorSubject<number>;
+  needRefreshMetaFeeds$: BehaviorSubject<boolean>;
 
   constructor(
       private sessionService: SessionService,
@@ -44,6 +46,8 @@ export class AdminService {
     this.groupModified$ = new BehaviorSubject<GroupIdSource>(null);
     this.newDocumentType$ = new BehaviorSubject<boolean>(null);
     this.needRefreshDocumentTypes$ = new BehaviorSubject<boolean>(null);
+    this.selectedMetaFeed$ = new BehaviorSubject<number>(null);
+    this.needRefreshMetaFeeds$ = new BehaviorSubject<boolean>(null);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {
