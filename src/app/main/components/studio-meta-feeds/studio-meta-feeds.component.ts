@@ -34,10 +34,11 @@ export class StudioMetaFeedsComponent implements OnInit {
   }
 
   handleCreateMetaFeed(): void {
-
+    this.adminService.newMetaFeed$.next(true);
   }
 
   selectMetaFeed(metaFeed: MetaFeed): void {
-
+    console.log('selected metafeed : ' + metaFeed.uid);
+    this.adminService.selectedMetaFeed$.next(metaFeed.uid);
   }
 }

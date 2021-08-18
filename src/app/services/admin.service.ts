@@ -28,6 +28,7 @@ export class AdminService {
 
   closeUserDialog$: Subject<boolean>;
   selectedMetaFeed$: BehaviorSubject<number>;
+  newMetaFeed$: BehaviorSubject<boolean>;
   needRefreshMetaFeeds$: BehaviorSubject<boolean>;
 
   constructor(
@@ -48,6 +49,7 @@ export class AdminService {
     this.needRefreshDocumentTypes$ = new BehaviorSubject<boolean>(null);
     this.selectedMetaFeed$ = new BehaviorSubject<number>(null);
     this.needRefreshMetaFeeds$ = new BehaviorSubject<boolean>(null);
+    this.newMetaFeed$ = new BehaviorSubject<boolean>(false);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {

@@ -1,0 +1,91 @@
+<form [formGroup]="formGroup" *ngIf="formGroup.get('metaFeedName') != null" [ngClass]="'kimios-section-content'">
+
+
+  <mat-form-field [ngClass]="'center'">
+    <mat-label>Document type name</mat-label>
+    <input
+            matInput
+            type="text"
+            name="metaFeedName"
+            [formControlName]="'metaFeedName'"
+            aria-label="Meta feed name" >
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="'center'">
+    <mat-select
+            placeholder="Java class name"
+            [formControlName]="'metaFeedJavaClassName'"
+    >
+<!--
+      (selectionChange)="onSelectDocumentTypeInheritedChange($event.value)"
+      (closed)="onPanelClose()"
+-->
+      <!--<input matInput
+             [formControlName]="'filterControl_javaClassName'"
+             type="text"
+             name="filter-options"
+             id="filter-options"
+             placeholder="Search"
+
+      >-->
+<!--      (input)="inputDocumentTypeInherited()"-->
+      <mat-option *ngFor="let javaClassName of filteredJavaClassNames$ | async"
+                  [value]="javaClassName">
+        {{javaClassName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-table *ngIf="metaFeedHasValues"
+          [dataSource]="metaFeedValuesDataSource"
+             [formArrayName]="'metaFeedValues'" >
+
+    <!-- remove Column -->
+    <ng-container matColumnDef="remove">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="addValue()" >add</mat-icon>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeValue(row)" >remove</mat-icon>
+      </mat-cell>
+    </ng-container>
+
+    <!--<ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}">
+      <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="{{col.matColumnDef}}"
+              [disabled]="col.matColumnDef === 'mandatory'"
+      > {{col.displayName}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
+        <span *ngIf="col.id != 'icon'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+      </mat-cell>
+    </ng-container>-->
+
+    <ng-container matColumnDef="name" *ngIf="columnsDescription[0]; let col">
+      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-cell *matCellDef="let element; let i = index" [formControlName]="i">
+        <mat-form-field>
+          <input
+                  matInput
+                  type="text"
+                  name="metaFeedValue"
+                  aria-label="Meta feed value" >
+        </mat-form-field>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;">
+    </mat-row>
+
+  </mat-table>
+
+  <div  fxLayout="row" fxLayoutAlign="center center">
+    <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
+    <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
+  </div>
+
+</form>

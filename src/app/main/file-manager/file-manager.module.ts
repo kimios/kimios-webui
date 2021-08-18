@@ -123,6 +123,7 @@ import {ShareEditComponent} from 'app/main/components/share-edit/share-edit.comp
 import {SearchFormComponent} from 'app/main/components/search-form/search-form.component';
 import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
 import {StudioMetaFeedsComponent} from 'app/main/components/studio-meta-feeds/studio-meta-feeds.component';
+import {StudioMetaFeedAdminComponent} from '../components/studio-meta-feed-admin/studio-meta-feed-admin.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -208,7 +209,8 @@ library.add(far, fas);
         ShareEditComponent,
         SearchFormComponent,
         BrowseTreeDialogComponent,
-        StudioMetaFeedsComponent
+        StudioMetaFeedsComponent,
+        StudioMetaFeedAdminComponent
     ],
     imports: [
         FileManagerRoutingModule,
