@@ -5,6 +5,7 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 
 export interface MetaFeedValue {
     value: string;
+    id: number;
 }
 
 export const META_FEED_VALUES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [

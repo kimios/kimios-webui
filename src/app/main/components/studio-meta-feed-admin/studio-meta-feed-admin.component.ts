@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {combineLatest, Observable, of} from 'rxjs';
 import {META_FEED_VALUES_DEFAULT_DISPLAYED_COLUMNS, MetaFeedValue, MetaFeedValuesDataSource} from './meta-feed-values-data-source';
@@ -21,6 +21,8 @@ export class StudioMetaFeedAdminComponent implements OnInit {
   metaFeedValuesDataSource: MetaFeedValuesDataSource;
   columnsDescription = META_FEED_VALUES_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns = [ 'remove', 'value' ];
+
+  @ViewChildren('metaFeedValueInput') metaFeedValueInputs: QueryList<ElementRef>;
 
   constructor(
       private studioService: StudioService,
@@ -49,7 +51,11 @@ export class StudioMetaFeedAdminComponent implements OnInit {
         )),
         tap(([metaFeed, values]) => {
           this.initMetaFeedFormGroup(this.formGroup, metaFeed, values);
-          this.metaFeedValuesDataSource.setData(values.map(val => <MetaFeedValue> {value: val} ));
+          this.metaFeedValuesDataSource.setData(
+              values
+                  .map((val, index) => <MetaFeedValue> {value: val, id: index} )
+                  .sort((a, b) => a.id < b.id ? -1 : 1)
+          );
         })
     ).subscribe();
 
@@ -72,27 +78,99 @@ export class StudioMetaFeedAdminComponent implements OnInit {
     formGroup.addControl('metaFeedValues', this.fb.group({}));
     metaFeedValues.forEach((value, index) =>
         (formGroup.get('metaFeedValues') as FormGroup).addControl(index.toString(), this.fb.control(value)));
+    if (metaFeed != null) {
+      formGroup.get('metaFeedJavaClassName').disable();
+    }
   }
 
   addValue(): void {
+    const data = this.metaFeedValuesDataSource.connect().getValue();
+    const newValueId = data.length > 0 ?
+        data.sort((a, b) => a.id > b.id ? -1 : 1)[0].id + 1 :
+        0;
     (this.formGroup.get('metaFeedValues') as FormGroup).addControl(
-        (Number(Object.keys((this.formGroup.get('metaFeedValues') as FormGroup).controls)
-            .sort((a, b) => Number(a) > Number(b) ? -1 : 1)[0]) + 1).toString(),
+        newValueId.toString(),
         this.fb.control('')
     );
-    const data = this.metaFeedValuesDataSource.connect().getValue();
-    this.metaFeedValuesDataSource.setData(data.concat(<MetaFeedValue> {value: ''}));
+    this.metaFeedValuesDataSource.setData(
+        data
+            .concat(<MetaFeedValue> {value: '', id: newValueId})
+            .sort((a, b) => a.id < b.id ? -1 : 1)
+    );
+    setTimeout(() => {
+      console.dir(this.metaFeedValueInputs.toArray());
+          this.metaFeedValueInputs
+              .toArray()
+              .filter(value => Number(value['_elementRef'].nativeElement.getAttribute('id')) === newValueId)
+              [0]['_elementRef'].nativeElement.focus();
+          /*array.filter((input: ElementRef) => input.getAttribute('id') === newValueId)[0]
+              .nativeElement.focus();*/
+        },
+        300
+    );
   }
 
   removeValue(row: any): void {
-
+    const data = this.metaFeedValuesDataSource.connect().getValue();
+    const indexToDelete = data.findIndex(value => value.id === row.id);
+    if (indexToDelete !== -1) {
+      data.splice(indexToDelete, 1);
+    }
+    this.metaFeedValuesDataSource.setData(data.sort((a, b) => a.id < b.id ? -1 : 1));
+    (this.formGroup.get('metaFeedValues') as FormGroup).removeControl(row.id.toString());
   }
 
   submit(): void {
-
+    if (this.metaFeed != null) {
+      // update metaFeed
+      this.studioService.updateMetaFeed(
+          this.sessionService.sessionToken,
+          this.metaFeed.uid, this.formGroup.get('metaFeedName').value
+      ).subscribe();
+      if (this.metaFeedHasValues) {
+        this.studioService.updateEnumerationValues(
+            this.sessionService.sessionToken,
+            this.makeEnumerationValuesXmlStream(
+                this.metaFeed.uid,
+                Object.keys((this.formGroup.get('metaFeedValues') as FormGroup).controls).map(key =>
+                    this.formGroup.get('metaFeedValues').get(key).value
+                )
+            )
+        ).subscribe();
+      }
+    } else {
+      // creation
+      this.studioService.createMetaFeed(
+          this.sessionService.sessionToken,
+          this.formGroup.get('metaFeedName').value,
+          this.formGroup.get('metaFeedJavaClassName').value
+      ).pipe(
+          concatMap(metaFeedUid => this.studioService.updateEnumerationValues(
+              this.sessionService.sessionToken,
+              this.makeEnumerationValuesXmlStream(
+                  metaFeedUid,
+                  Object.keys((this.formGroup.get('metaFeedValues') as FormGroup).controls).map(key =>
+                      this.formGroup.get('metaFeedValues').get(key).value
+                  )
+          ))
+      )).subscribe();
+    }
   }
 
   cancel(): void {
 
+  }
+
+  private makeEnumerationValuesXmlStream(uid: number, metaFeedValues: Array<string>): string {
+    let xmlStream = '<?xml version="1.0" encoding="UTF-8"?>';
+    xmlStream += '<enumeration uid="' + uid + '">';
+    xmlStream += metaFeedValues.map(value => this.makeEnumerationValueXmlElement(value)).join('');
+    xmlStream += '</enumeration>';
+
+    return xmlStream;
+  }
+
+  private makeEnumerationValueXmlElement(value: string): string {
+    return '<entry value="' + value + '" />';
   }
 }

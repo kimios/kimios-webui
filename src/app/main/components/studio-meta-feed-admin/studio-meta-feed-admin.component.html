@@ -66,14 +66,15 @@
 
     <ng-container matColumnDef="value">
       <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
-      <mat-cell *matCellDef="let element; let i = index" >
+      <mat-cell *matCellDef="let element;" >
         <mat-form-field>
-          <input
+          <input #metaFeedValueInput="matInput"
+                 id="{{element.id}}"
                   matInput
                   type="text"
                   name="metaFeedValue"
                   aria-label="Meta feed value"
-                  [formControlName]="i.toString()" >
+                  [formControlName]="element.id">
         </mat-form-field>
       </mat-cell>
     </ng-container>
