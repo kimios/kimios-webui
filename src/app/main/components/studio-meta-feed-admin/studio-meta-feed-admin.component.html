@@ -36,9 +36,9 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-table *ngIf="metaFeedHasValues"
+  <mat-table [ngClass]="{'hidden': !metaFeedHasValues}"
           [dataSource]="metaFeedValuesDataSource"
-             [formArrayName]="'metaFeedValues'" >
+             [formGroupName]="'metaFeedValues'" >
 
     <!-- remove Column -->
     <ng-container matColumnDef="remove">
@@ -64,15 +64,16 @@
       </mat-cell>
     </ng-container>-->
 
-    <ng-container matColumnDef="name" *ngIf="columnsDescription[0]; let col">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let element; let i = index" [formControlName]="i">
+    <ng-container matColumnDef="value">
+      <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
+      <mat-cell *matCellDef="let element; let i = index" >
         <mat-form-field>
           <input
                   matInput
                   type="text"
                   name="metaFeedValue"
-                  aria-label="Meta feed value" >
+                  aria-label="Meta feed value"
+                  [formControlName]="i.toString()" >
         </mat-form-field>
       </mat-cell>
     </ng-container>

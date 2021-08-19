@@ -3,20 +3,24 @@ import {MatTableDataSource} from '@angular/material';
 import {BehaviorSubject} from 'rxjs';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 
+export interface MetaFeedValue {
+    value: string;
+}
+
 export const META_FEED_VALUES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
-        id: 'name',
-        matColumnDef: 'name',
+        id: 'value',
+        matColumnDef: 'value',
         position: 1,
-        matHeaderCellDef: 'name',
+        matHeaderCellDef: 'value',
         sticky: false,
-        displayName: 'name',
+        displayName: 'Value',
         cell: null
     }
 ];
 
-export class MetaFeedValuesDataSource extends MatTableDataSource<string> {
-    private dataSubject = new BehaviorSubject<Array<string>>([]);
+export class MetaFeedValuesDataSource extends MatTableDataSource<MetaFeedValue> {
+    private dataSubject = new BehaviorSubject<Array<MetaFeedValue>>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
@@ -25,7 +29,7 @@ export class MetaFeedValuesDataSource extends MatTableDataSource<string> {
         super();
     }
 
-    connect(): BehaviorSubject<Array<string>> {
+    connect(): BehaviorSubject<Array<MetaFeedValue>> {
         return this.dataSubject;
     }
 
@@ -34,11 +38,11 @@ export class MetaFeedValuesDataSource extends MatTableDataSource<string> {
         this.loadingSubject.complete();
     }
 
-    setData(array: Array<string>): void {
+    setData(array: Array<MetaFeedValue>): void {
         this.dataSubject.next(array);
     }
 
     sortData1(sort: DMEntitySort): void {
-        this.dataSubject.next(this.dataSubject.getValue().sort((a, b) => a.localeCompare(b)));
+        this.dataSubject.next(this.dataSubject.getValue().sort((a, b) => a.value.localeCompare(b.value)));
     }
 }
