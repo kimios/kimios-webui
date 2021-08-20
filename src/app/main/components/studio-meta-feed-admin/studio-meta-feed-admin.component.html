@@ -85,6 +85,13 @@
 
   </mat-table>
 
+  <ng-container *ngIf="metaFeedHasValues && metaFeedValuesDataSource.connect() | async as dataSourceConnection">
+    <div *ngIf="dataSourceConnection.length === 0" style="width: 100%" fxLayout="row" fxLayoutAlign="center"
+         [ngClass]="'kimios-section-content'">
+      <p style="font-style: italic;">no items</p>
+    </div>
+  </ng-container>
+
   <div  fxLayout="row" fxLayoutAlign="center center">
     <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
     <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
