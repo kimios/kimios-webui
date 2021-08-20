@@ -8,14 +8,14 @@
     <div>
       <mat-list>
         <mat-list-item *ngFor="let metaFeed of metaFeeds$ | async"
-                       (click)="selectMetaFeed(metaFeed)"
                        [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
         >
           <button mat-button mat-icon-button aria-label="Remove meta feed"
                   (click)="removeMetaFeed(metaFeed.uid)">
             <mat-icon>remove</mat-icon>
-          </button>{{metaFeed.name}}
+          </button>
+          <span (click)="selectMetaFeed(metaFeed)">{{metaFeed.name}}</span>
         </mat-list-item>
       </mat-list>
 
