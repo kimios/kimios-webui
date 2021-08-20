@@ -140,7 +140,11 @@ export class StudioMetaFeedAdminComponent implements OnInit {
       this.studioService.updateMetaFeed(
           this.sessionService.sessionToken,
           this.metaFeed.uid, this.formGroup.get('metaFeedName').value
-      ).subscribe();
+      ).subscribe(
+          res => { if (this.formGroup.get('metaFeedName').value !== this.metaFeed.name) {
+            this.adminService.needRefreshMetaFeeds$.next(true);
+          }}
+      );
       if (this.metaFeedHasValues) {
         this.studioService.updateEnumerationValues(
             this.sessionService.sessionToken,
@@ -159,6 +163,7 @@ export class StudioMetaFeedAdminComponent implements OnInit {
           this.formGroup.get('metaFeedName').value,
           this.formGroup.get('metaFeedJavaClassName').value
       ).pipe(
+          tap(metaFeedUid => this.adminService.selectedMetaFeed$.next(metaFeedUid)),
           concatMap(metaFeedUid => this.studioService.updateEnumerationValues(
               this.sessionService.sessionToken,
               this.makeEnumerationValuesXmlStream(
@@ -166,8 +171,11 @@ export class StudioMetaFeedAdminComponent implements OnInit {
                   Object.keys((this.formGroup.get('metaFeedValues') as FormGroup).controls).map(key =>
                       this.formGroup.get('metaFeedValues').get(key).value
                   )
+              )
           ))
-      )).subscribe();
+      ).subscribe(
+          res => this.adminService.needRefreshMetaFeeds$.next(true)
+      );
     }
   }
 
