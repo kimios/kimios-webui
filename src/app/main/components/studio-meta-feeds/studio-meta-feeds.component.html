@@ -12,7 +12,10 @@
                        [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
         >
-          {{metaFeed.name}}
+          <button mat-button mat-icon-button aria-label="Remove meta feed"
+                  (click)="removeMetaFeed(metaFeed.uid)">
+            <mat-icon>remove</mat-icon>
+          </button>{{metaFeed.name}}
         </mat-list-item>
       </mat-list>
 

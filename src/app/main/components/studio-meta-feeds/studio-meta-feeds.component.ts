@@ -41,4 +41,10 @@ export class StudioMetaFeedsComponent implements OnInit {
     console.log('selected metafeed : ' + metaFeed.uid);
     this.adminService.selectedMetaFeed$.next(metaFeed.uid);
   }
+
+  removeMetaFeed(uid: number): void {
+    this.studioService.deleteMetaFeed(this.sessionService.sessionToken, uid).pipe(
+        tap(() => this.adminService.needRefreshMetaFeeds$.next(true))
+    ).subscribe();
+  }
 }
