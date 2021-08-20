@@ -42,4 +42,10 @@ export class StudioDocumentTypesComponent implements OnInit {
     this.adminService.selectedDocumentType$.next(0);
     this.adminService.newDocumentType$.next(true);
   }
+
+  removeDocumentType(uid: number): void {
+    this.studioService.deleteDocumentType(this.sessionService.sessionToken, uid).pipe(
+        tap(() => this.adminService.needRefreshDocumentTypes$.next(true))
+    ).subscribe();
+  }
 }

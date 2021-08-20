@@ -8,11 +8,14 @@
     <div>
       <mat-list>
         <mat-list-item *ngFor="let docType of docTypes$ | async"
-                       (click)="selectDocType(docType)"
                        [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : docType.uid === adminService.selectedDocumentType$.getValue()}"
         >
-          {{docType.name}}
+          <button mat-button mat-icon-button aria-label="Remove meta feed"
+                  (click)="removeDocumentType(docType.uid)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span (click)="selectDocType(docType)">{{docType.name}}</span>
         </mat-list-item>
       </mat-list>
 
