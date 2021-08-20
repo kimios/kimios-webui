@@ -7,6 +7,8 @@ import {SessionService} from 'app/services/session.service';
 import {AdminService} from 'app/services/admin.service';
 import {concatMap, filter, tap} from 'rxjs/operators';
 
+export const META_FEED_ENUMERATION_CLASS_NAME = 'org.kimios.kernel.dms.metafeeds.impl.Enumeration';
+
 @Component({
   selector: 'studio-meta-feed-admin',
   templateUrl: './studio-meta-feed-admin.component.html',
@@ -44,7 +46,7 @@ export class StudioMetaFeedAdminComponent implements OnInit {
         filter(metaFeedUid => metaFeedUid != null && metaFeedUid !== undefined && metaFeedUid !== 0),
         concatMap(metaFeedUid => this.studioService.getMetaFeed(this.sessionService.sessionToken, metaFeedUid)),
         tap(metaFeed => this.metaFeed = metaFeed),
-        tap(metaFeed => this.metaFeedHasValues = (metaFeed.className === 'org.kimios.kernel.dms.metafeeds.impl.Enumeration')),
+        tap(metaFeed => this.metaFeedHasValues = (metaFeed.className === META_FEED_ENUMERATION_CLASS_NAME)),
         concatMap(metaFeed => combineLatest(of(metaFeed), this.metaFeedHasValues ?
             this.studioService.getMetaFeedValues(this.sessionService.sessionToken, metaFeed.uid) :
             of([])
@@ -69,6 +71,16 @@ export class StudioMetaFeedAdminComponent implements OnInit {
     ).subscribe();
 
     this.filteredJavaClassNames$ = this.studioService.getAvailableMetaFeeds(this.sessionService.sessionToken);
+
+    this.formGroup.get('metaFeedJavaClassName').valueChanges.pipe(
+        tap((value) => {
+          if (value === META_FEED_ENUMERATION_CLASS_NAME) {
+            this.metaFeedHasValues = true;
+          } else {
+            this.metaFeedHasValues = false;
+          }
+        })
+    ).subscribe();
   }
 
   private initMetaFeedFormGroup(formGroup: FormGroup, metaFeed: MetaFeed, metaFeedValues: Array<string>): void {
@@ -80,6 +92,8 @@ export class StudioMetaFeedAdminComponent implements OnInit {
         (formGroup.get('metaFeedValues') as FormGroup).addControl(index.toString(), this.fb.control(value)));
     if (metaFeed != null) {
       formGroup.get('metaFeedJavaClassName').disable();
+    } else {
+      formGroup.get('metaFeedJavaClassName').enable();
     }
   }
 
