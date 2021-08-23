@@ -2,7 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import {AdministrationService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {tap} from 'rxjs/operators';
+import {concatMap, tap} from 'rxjs/operators';
+import {iif, Observable} from 'rxjs';
 
 const PATTERN_EMAIL = new RegExp('^\\w+@\\w{2,}\\.\\w{2,}$');
 
@@ -47,16 +48,7 @@ export class PersonalSettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.sessionService.getCurrentUserObs().pipe(
-        tap(user => this.currentUser = user)
-    ).subscribe(
-        user => {
-          this.formGroup.get('firstname').setValue(user.firstName);
-          this.formGroup.get('lastname').setValue(user.lastName);
-          this.formGroup.get('phoneNumber').setValue(user.phoneNumber);
-          this.formGroup.get('mail').setValue(user.mail);
-        }
-    );
+    this.initCurrentUserAndFormGroup(this.formGroup, false).subscribe();
   }
 
   submit(): void {
@@ -70,11 +62,31 @@ export class PersonalSettingsComponent implements OnInit {
           this.formGroup.get('mail').value,
           this.formGroup.get('password').value,
           this.currentUser.source
+      ).pipe(
+          concatMap(() => this.initCurrentUserAndFormGroup(this.formGroup, true))
       ).subscribe();
     }
   }
 
   cancel(): void {
+    this.initCurrentUserAndFormGroup(this.formGroup, false).subscribe();
+  }
 
+  private initCurrentUserAndFormGroup(formGroup: FormGroup, reload: boolean): Observable<KimiosUser> {
+    return iif(
+        () => reload === true,
+        this.sessionService.retrieveUserData(),
+        this.sessionService.getCurrentUserObs()
+    ).pipe(
+        tap(user => this.currentUser = user),
+        tap(user => this.initFormGroupFromCurrentUser(this.formGroup, user))
+    );
+  }
+
+  private initFormGroupFromCurrentUser(formGroup: FormGroup, user: KimiosUser): void {
+    this.formGroup.get('firstname').setValue(user.firstName);
+    this.formGroup.get('lastname').setValue(user.lastName);
+    this.formGroup.get('phoneNumber').setValue(user.phoneNumber);
+    this.formGroup.get('mail').setValue(user.mail);
   }
 }
