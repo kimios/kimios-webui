@@ -1,4 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import {AdministrationService} from 'app/kimios-client-api';
+import {SessionService} from 'app/services/session.service';
+
+const PATTERN_EMAIL = new RegExp('^\w+@\w{2,}\.\w{2,}$');
+
+export const passwordConfirmValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+  const pass1 = (control as FormGroup).get('password');
+  const pass2 = (control as FormGroup).get('confirmPassword');
+
+  console.log(pass1.value + ' ==? ' + pass2.value);
+  const res = pass1 && pass2 && pass1.value === pass2.value;
+  (control as FormGroup).get('confirmPassword').setErrors(
+      res ?
+          null :
+          {'passwordNotConfirmed': true}
+  );
+
+  return res ? null : {'passwordNotConfirmed': true};
+};
 
 @Component({
   selector: 'personal-settings',
@@ -7,9 +27,39 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PersonalSettingsComponent implements OnInit {
 
-  constructor() { }
+  formGroup: FormGroup;
 
-  ngOnInit(): void {
+  constructor(
+      private fb: FormBuilder,
+      private administrationService: AdministrationService,
+      private sessionService: SessionService
+  ) {
+    this.formGroup = this.fb.group({
+      'firstname': this.fb.control('', [Validators.required]),
+      'lastname': this.fb.control('', [Validators.required]),
+      'phoneNumber': this.fb.control('', [Validators.required]),
+      'password': this.fb.control('', [Validators.minLength(8)]),
+      'confirmPassword': this.fb.control(''),
+      'mail': this.fb.control('', [Validators.required, Validators.pattern(PATTERN_EMAIL)])
+    }, { validators: passwordConfirmValidator });
   }
 
+  ngOnInit(): void {
+    this.sessionService.getCurrentUserObs().subscribe(
+        user => {
+          this.formGroup.get('firstname').setValue(user.firstName);
+          this.formGroup.get('lastname').setValue(user.lastName);
+          this.formGroup.get('phoneNumber').setValue(user.phoneNumber);
+          this.formGroup.get('mail').setValue(user.mail);
+        }
+    );
+  }
+
+  submit(): void {
+
+  }
+
+  cancel(): void {
+
+  }
 }

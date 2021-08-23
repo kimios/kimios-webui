@@ -1,3 +1,74 @@
-<p>
-  personal-settings works!
-</p>
+<form [formGroup]="formGroup" [ngClass]="'kimios-section-content'">
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="text" placeholder="Firstname" aria-label="firstname" matInput [formControlName]="'firstname'">
+    <button mat-button *ngIf="formGroup.get('firstname').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('firstname').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('required', 'firstname')">
+      Please enter your firstname
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="text" placeholder="Lastname" aria-label="lastname" matInput [formControlName]="'lastname'" >
+    <button mat-button *ngIf="formGroup.get('lastname').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('lastname').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('required', 'lastname')">
+      Please enter your lastname
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="text" placeholder="Phone Number" aria-label="phone number" matInput [formControlName]="'phoneNumber'">
+    <button mat-button *ngIf="formGroup.get('phoneNumber').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('phoneNumber').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('required', 'phoneNumber')">
+      Please enter your phone number
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="text" placeholder="Mail" aria-label="mail" matInput [formControlName]="'mail'" >
+    <button mat-button *ngIf="formGroup.get('mail').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('mail').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('required', 'mail')">
+      Please enter your email
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="password" placeholder="New password" aria-label="new password" matInput [formControlName]="'password'" >
+    <button mat-button *ngIf="formGroup.get('password').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('password').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('minlength', 'password')">
+      Please enter your password (at least 8 signs)
+    </mat-error>
+  </mat-form-field>
+
+  {{formGroup.errors != null && formGroup.errors['passwordNotConfirmed']}}
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="password" placeholder="Confirm password" aria-label="confirm password" matInput [formControlName]="'confirmPassword'" >
+    <button mat-button *ngIf="formGroup.get('confirmPassword').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="formGroup.get('confirmPassword').setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-error *ngIf="formGroup.hasError('passwordNotConfirmed', 'confirmPassword')">
+      Password confirmation does not match with password
+    </mat-error>
+  </mat-form-field>
+
+</form>
+
+  <div  fxLayout="row" fxLayoutAlign="center center">
+    <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
+    <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
+  </div>

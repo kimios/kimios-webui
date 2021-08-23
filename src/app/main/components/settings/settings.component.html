@@ -11,7 +11,7 @@
 <mat-tab-group *ngIf="(isAdmin$ | async) || (hasStudioAccess$ | async); else personalSettingsOnly">
 
   <mat-tab label="Settings">
-    <personal-settings></personal-settings>
+    <personal-settings [ngClass]="'kimios-section-content'"></personal-settings>
   </mat-tab>
 
   <mat-tab *ngIf="(isAdmin$ | async)" label="Administration">
@@ -24,7 +24,7 @@
 </mat-tab-group>
 
 <ng-template #personalSettingsOnly>
-  <personal-settings></personal-settings>
+  <personal-settings [ngClass]="'kimios-section-content'"></personal-settings>
 </ng-template>
 
 </div>
