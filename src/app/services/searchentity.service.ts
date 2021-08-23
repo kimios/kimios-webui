@@ -560,7 +560,7 @@ export class SearchEntityService implements Resolve<any> {
             query.owner,
             this.datePipe.transform(query.dateMin, DATE_FORMAT),
             this.datePipe.transform(query.dateMax, DATE_FORMAT),
-            query.documentType.uid,
+            query.documentType != null ? query.documentType.uid : null,
             query.metas
         );
     }

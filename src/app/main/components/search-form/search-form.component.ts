@@ -237,9 +237,11 @@ export class SearchFormComponent implements OnInit {
     formGroup.get('tagInput').setValue('');
 
     formGroup.get('documentType').setValue(searchEntityQuery.documentType);
-    this.loadDocumentTypeMetas(searchEntityQuery.documentType).subscribe(
-        () => this.initMetasFormGroupFromQuery(formGroup.get('metas') as FormGroup, searchEntityQuery)
-    );
+    if (searchEntityQuery.documentType != null) {
+      this.loadDocumentTypeMetas(searchEntityQuery.documentType).subscribe(
+          () => this.initMetasFormGroupFromQuery(formGroup.get('metas') as FormGroup, searchEntityQuery)
+      );
+    }
     this.selectedDocumentType = searchEntityQuery.documentType;
   }
 
