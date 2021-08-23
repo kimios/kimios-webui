@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from 
 import {AdministrationService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 
-const PATTERN_EMAIL = new RegExp('^\w+@\w{2,}\.\w{2,}$');
+const PATTERN_EMAIL = new RegExp('^\\w+@\\w{2,}\\.\\w{2,}$');
 
 export const passwordConfirmValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
   const pass1 = (control as FormGroup).get('password');

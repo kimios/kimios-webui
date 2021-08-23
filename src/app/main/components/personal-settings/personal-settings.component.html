@@ -41,6 +41,9 @@
     <mat-error *ngIf="formGroup.hasError('required', 'mail')">
       Please enter your email
     </mat-error>
+    <mat-error *ngIf="formGroup.hasError('pattern', 'mail')">
+      This is not valid email address
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field class="example-full-width" fxFill>
