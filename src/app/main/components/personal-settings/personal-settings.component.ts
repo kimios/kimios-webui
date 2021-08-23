@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
-import {AdministrationService} from 'app/kimios-client-api';
+import {AdministrationService, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
+import {tap} from 'rxjs/operators';
 
 const PATTERN_EMAIL = new RegExp('^\\w+@\\w{2,}\\.\\w{2,}$');
 
@@ -28,6 +29,7 @@ export const passwordConfirmValidator: ValidatorFn = (control: FormGroup): Valid
 export class PersonalSettingsComponent implements OnInit {
 
   formGroup: FormGroup;
+  private currentUser: KimiosUser;
 
   constructor(
       private fb: FormBuilder,
@@ -45,7 +47,9 @@ export class PersonalSettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.sessionService.getCurrentUserObs().subscribe(
+    this.sessionService.getCurrentUserObs().pipe(
+        tap(user => this.currentUser = user)
+    ).subscribe(
         user => {
           this.formGroup.get('firstname').setValue(user.firstName);
           this.formGroup.get('lastname').setValue(user.lastName);
@@ -56,7 +60,18 @@ export class PersonalSettingsComponent implements OnInit {
   }
 
   submit(): void {
-
+    if (this.formGroup.valid) {
+      this.administrationService.updateUser(
+          this.sessionService.sessionToken,
+          this.currentUser.uid,
+          this.formGroup.get('firstname').value,
+          this.formGroup.get('lastname').value,
+          this.formGroup.get('phoneNumber').value,
+          this.formGroup.get('mail').value,
+          this.formGroup.get('password').value,
+          this.currentUser.source
+      ).subscribe();
+    }
   }
 
   cancel(): void {
