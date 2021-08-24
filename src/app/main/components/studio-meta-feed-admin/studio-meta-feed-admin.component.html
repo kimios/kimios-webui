@@ -43,10 +43,18 @@
     <!-- remove Column -->
     <ng-container matColumnDef="remove">
       <mat-header-cell *matHeaderCellDef>
-        <mat-icon [ngClass]="'cursor-pointer'" (click)="addValue()" >add</mat-icon>
+        <button mat-icon-button aria-label="add enumeration value"
+                (click)="addValue()"
+                [ngClass]="{'kimios-remove' : true}" >
+          <mat-icon [ngClass]="'cursor-pointer'"  >add</mat-icon>
+        </button>
       </mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <mat-icon [ngClass]="'cursor-pointer'" (click)="removeValue(row)" >remove</mat-icon>
+        <button mat-icon-button aria-label="Remove meta feed enumeration value"
+                (click)="removeValue(row)"
+                [ngClass]="{'kimios-remove' : true}" >
+          <mat-icon [ngClass]="'cursor-pointer remove'" >remove</mat-icon>
+        </button>
       </mat-cell>
     </ng-container>
 

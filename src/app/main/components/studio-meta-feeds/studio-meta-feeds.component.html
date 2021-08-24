@@ -11,8 +11,9 @@
                        [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
         >
-          <button mat-button mat-icon-button aria-label="Remove meta feed"
-                  (click)="removeMetaFeed(metaFeed.uid)">
+          <button mat-icon-button aria-label="Remove meta feed"
+                  (click)="removeMetaFeed(metaFeed.uid)"
+                  [ngClass]="{'kimios-remove' : true}" >
             <mat-icon>remove</mat-icon>
           </button>
           <span (click)="selectMetaFeed(metaFeed)">{{metaFeed.name}}</span>

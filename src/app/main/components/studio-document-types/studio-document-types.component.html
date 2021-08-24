@@ -11,11 +11,19 @@
                        [ngClass]="{'cursor-pointer' : true,
                                'selected-item' : docType.uid === adminService.selectedDocumentType$.getValue()}"
         >
-          <button mat-button mat-icon-button aria-label="Remove meta feed"
-                  (click)="removeDocumentType(docType.uid)">
-            <mat-icon>remove</mat-icon>
-          </button>
-          <span (click)="selectDocType(docType)">{{docType.name}}</span>
+          <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectDocType(docType)"
+               fxLayoutGap="10px" >
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <button mat-button mat-icon-button aria-label="Remove meta feed"
+                      (click)="removeDocumentType(docType.uid)"
+                      [ngClass]="{'kimios-remove' : true}" >
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+            <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+              <div>{{docType.name}}</div>
+            </div>
+          </div>
         </mat-list-item>
       </mat-list>
 

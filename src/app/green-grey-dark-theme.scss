@@ -34,7 +34,7 @@ $mat-green-grey: (
 // Define the primary, accent and warn palettes
 $green-grey-dark-theme-primary-palette: mat-palette($mat-grey);
 $green-grey-dark-theme-accent-palette: mat-palette($mat-green-grey);
-$green-grey-dark-theme-warn-palette: mat-palette($mat-red);
+$green-grey-dark-theme-warn-palette: mat-palette($mat-orange);
 
 // Create the Material theme object
 $green-grey-dark-theme: mat-dark-theme($green-grey-dark-theme-primary-palette, $green-grey-dark-theme-accent-palette, $green-grey-dark-theme-warn-palette);
