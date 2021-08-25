@@ -188,7 +188,7 @@
     }
 
     .kimios-content-area {
-        border-radius: 10px;
+        // border-radius: 10px;
         padding: 10px;
     }
 
@@ -237,5 +237,9 @@
 
     .kimios-selection-item:hover {
         background-color: map-get($accent, 500);
+    }
+
+    .kimios-width-max-content {
+        width: max-content;
     }
 }

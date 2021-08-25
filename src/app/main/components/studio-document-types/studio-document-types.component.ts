@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DocumentType, StudioService} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
 import {BehaviorSubject} from 'rxjs';
@@ -10,9 +10,11 @@ import {concatMap, filter, tap} from 'rxjs/operators';
   templateUrl: './studio-document-types.component.html',
   styleUrls: ['./studio-document-types.component.scss']
 })
-export class StudioDocumentTypesComponent implements OnInit {
+export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
 
   docTypes$: BehaviorSubject<Array<DocumentType>>;
+
+  @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
 
   constructor(
       private studioService: StudioService,
@@ -47,5 +49,13 @@ export class StudioDocumentTypesComponent implements OnInit {
     this.studioService.deleteDocumentType(this.sessionService.sessionToken, uid).pipe(
         tap(() => this.adminService.needRefreshDocumentTypes$.next(true))
     ).subscribe();
+  }
+
+  ngAfterViewChecked(): void {
+    const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
+    this.divider.nativeElement.style.height = dividerHeight + 'px';
+    console.log('set divider height to ' + dividerHeight + 'px');
   }
 }
