@@ -1,11 +1,12 @@
 import {ColumnDescription} from 'app/main/model/column-description';
 import {MatTableDataSource} from '@angular/material';
 import {BehaviorSubject} from 'rxjs';
-import {DocumentVersionService, Meta} from 'app/kimios-client-api';
+import {DocumentVersionService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {MetaUtils} from 'app/main/utils/meta-utils';
 import {MetaDataTypeMapping} from 'app/main/model/meta-data-type.enum';
+import {MetaWithMetaFeedImpl} from 'app/main/model/meta-with-meta-feed';
 
 export const METAS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -25,7 +26,16 @@ export const METAS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'type',
         cell: (meta) => MetaDataTypeMapping[meta.metaType]
-    }, {
+    }/*,
+    {
+        id: 'metaFeed',
+        matColumnDef: 'metaFeed',
+        position: 2,
+        matHeaderCellDef: 'metaFeed',
+        sticky: false,
+        displayName: 'meta feed',
+        cell: (meta) => meta instanceof MetaWithMetaFeedImpl ? meta.metaFeed.name : ' - '
+    }*/, {
         id: 'mandatory',
         matColumnDef: 'mandatory',
         position: 3,
@@ -36,8 +46,8 @@ export const METAS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     }
 ];
 
-export class MetaDataSource extends MatTableDataSource<Meta> {
-    private dataSubject = new BehaviorSubject<Meta[]>([]);
+export class MetaDataSource extends MatTableDataSource<MetaWithMetaFeedImpl> {
+    private dataSubject = new BehaviorSubject<MetaWithMetaFeedImpl[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
 
     public loading$ = this.loadingSubject.asObservable();
@@ -49,7 +59,7 @@ export class MetaDataSource extends MatTableDataSource<Meta> {
         super();
     }
 
-    connect(): BehaviorSubject<Meta[]> {
+    connect(): BehaviorSubject<MetaWithMetaFeedImpl[]> {
         return this.dataSubject;
     }
 
@@ -60,11 +70,11 @@ export class MetaDataSource extends MatTableDataSource<Meta> {
 
     loadData(docTypeUid: number): void {
         this.documentVersionService.getUnheritedMetas(this.sessionService.sessionToken, docTypeUid).subscribe(
-            metas => this.dataSubject.next(metas)
+            metas => this.dataSubject.next(metas.map(meta => MetaWithMetaFeedImpl.fromMeta(meta)))
         );
     }
 
-    setData(metas: Array<Meta>): void {
+    setData(metas: Array<MetaWithMetaFeedImpl>): void {
         this.dataSubject.next(metas);
     }
 

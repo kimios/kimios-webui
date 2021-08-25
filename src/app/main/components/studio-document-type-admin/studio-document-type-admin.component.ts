@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {DocumentType, DocumentVersionService, Meta, StudioService} from 'app/kimios-client-api';
+import {DocumentType, DocumentVersionService, Meta, MetaFeed, StudioService} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
-import {concatMap, filter, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {MetaDataSource, METAS_DEFAULT_DISPLAYED_COLUMNS} from './meta-data-source';
@@ -9,6 +9,7 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
 import {MetaDataTypeMapping} from 'app/main/model/meta-data-type.enum';
 import {combineLatest, iif, Observable, of} from 'rxjs';
+import {MetaWithMetaFeedImpl} from 'app/main/model/meta-with-meta-feed';
 
 @Component({
   selector: 'studio-document-type-admin',
@@ -67,7 +68,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
         )),
         concatMap(([docTypeUid, docType]) => combineLatest(
             of(docType),
-            this.documentVersionService.getMetas(this.sessionService.sessionToken, docTypeUid),
+            this.retrieveMetasWithMetaFeed(docTypeUid),
             docType.documentTypeUid != null ?
                 this.studioService.getDocumentType(this.sessionService.sessionToken, docType.documentTypeUid) :
                 null
@@ -115,7 +116,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     // remove from form
     (this.formGroup.get('documentTypeMetas') as FormGroup).removeControl(row.uid.toString());
     // remove from dataSource
-    const data: Array<Meta> = this.metaDataSource.connect().getValue();
+    const data: Array<MetaWithMetaFeedImpl> = this.metaDataSource.connect().getValue();
     const index = data.findIndex(meta => meta.uid === row.uid);
     if (index !== -1) {
       data.splice(index, 1);
@@ -174,8 +175,9 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
       mandatory: false,
       position: position
     };
-    this.createFormGroupForMeta(this.formGroup.get('documentTypeMetas') as FormGroup, emptyMeta);
-    this.metaDataSource.setData(metaDataSourceData.concat(emptyMeta));
+    const emptyMetaWithMetaFeed = MetaWithMetaFeedImpl.fromMeta(emptyMeta);
+    this.createFormGroupForMeta(this.formGroup.get('documentTypeMetas') as FormGroup, emptyMetaWithMetaFeed);
+    this.metaDataSource.setData(metaDataSourceData.concat(emptyMetaWithMetaFeed));
   }
 
   onSelectDocumentTypeInheritedChange(value: any): void {
@@ -284,5 +286,26 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
         + '" mandatory="' + mandatory
         + '" position="' + position +
         '"/>';
+  }
+
+  private retrieveMetasWithMetaFeed(docTypeUid: number): Observable<Array<MetaWithMetaFeedImpl>> {
+    return this.documentVersionService.getMetas(this.sessionService.sessionToken, docTypeUid).pipe(
+        concatMap(metas => metas),
+        concatMap(meta => combineLatest(of(meta), this.retrieveMetaMetaFeed(meta))),
+        map(([meta, metaFeed]) => MetaWithMetaFeedImpl.fromMetaWithMetaFeed(meta, metaFeed)),
+        toArray()
+    );
+  }
+
+  private retrieveMetaMetaFeed(meta: Meta): Observable<MetaFeed> {
+    if ([1, 5].includes(meta.metaType)) {
+        return of(null);
+    } else {
+      if (meta.metaFeedUid == null || meta.metaFeedUid === undefined || meta.metaFeedUid === -1) {
+        return of(undefined);
+      } else {
+        return this.studioService.getMetaFeed(this.sessionService.sessionToken, meta.metaFeedUid);
+      }
+    }
   }
 }
