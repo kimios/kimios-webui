@@ -104,7 +104,40 @@
             </mat-option>
           </mat-select>
         </mat-form-field>-->
-        {{element.metaFeed ? element.metaFeed.name : 'null'}}
+
+
+        <ng-container *ngIf="[1, 5].includes(element.metaType) else metaFeedNotRelevant;" >
+          <mat-form-field fxFill >
+            <mat-select
+                    placeholder="meta feed"
+                    [formControlName]="'metaDataMetaFeed'"
+                    (selectionChange)="onSelectChange($event.value)"
+                    (closed)="onPanelClose()"
+                    [compareWith]="metaWithMetaFeedComparisonFunction"
+            >
+              <input matInput
+                     [formControlName]="'filterControl_metaDataMetaFeed'"
+                     type="text"
+                     name="filter-options"
+                     [id]="'filter-options' + element.uid"
+                     placeholder="Search"
+                     (input)="inputMetaFeedChange(element.uid)"
+              >
+              <mat-option *ngFor="let value of filteredMetaFeedsMap$.get(element.uid) | async"
+                          [value]="value">
+                {{value.name}}
+              </mat-option>
+            </mat-select>
+            <button *ngIf="formGroup.get('documentTypeMetas').get(element.uid.toString()).get('metaDataMetaFeed').value"
+                    matSuffix mat-icon-button aria-label="Clear" (click)="resetMetaFeed(element.uid)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </ng-container>
+        <ng-template #metaFeedNotRelevant>
+           -
+        </ng-template>
+
       </mat-cell>
     </ng-container>
 

@@ -8,7 +8,7 @@ import {MetaDataSource, METAS_DEFAULT_DISPLAYED_COLUMNS} from './meta-data-sourc
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
 import {MetaDataTypeMapping} from 'app/main/model/meta-data-type.enum';
-import {combineLatest, iif, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, iif, Observable, of} from 'rxjs';
 import {MetaWithMetaFeedImpl} from 'app/main/model/meta-with-meta-feed';
 
 @Component({
@@ -34,6 +34,10 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
   filteredDocumentTypes$: Observable<Array<DocumentType>>;
   allDocumentTypes: Array<DocumentType>;
   documentTypesLoaded: boolean;
+  filteredMetaFeedsMap$: Map<number, BehaviorSubject<Array<MetaFeed>>>;
+  allMetaFeeds: Array<MetaFeed>;
+
+  metaWithMetaFeedComparisonFunction = (a: MetaFeed, b: MetaFeed) => a != null && b != null && a.uid === b.uid;
   
   constructor(
       private documentVersionService: DocumentVersionService,
@@ -57,6 +61,8 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     this.filteredDocumentTypes$ = new Observable<Array<DocumentType>>(null);
     this.documentTypesLoaded = false;
     this.allDocumentTypes = new Array<DocumentType>();
+    this.filteredMetaFeedsMap$ = new Map<number, BehaviorSubject<Array<MetaFeed>>>();
+    this.allMetaFeeds = new Array<MetaFeed>();
   }
 
   ngOnInit(): void {
@@ -71,19 +77,24 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
             this.retrieveMetasWithMetaFeed(docTypeUid),
             docType.documentTypeUid != null ?
                 this.studioService.getDocumentType(this.sessionService.sessionToken, docType.documentTypeUid) :
-                null
+                null,
+            this.studioService.getMetaFeeds(this.sessionService.sessionToken)
         )),
-        tap(([docType, metas, inheritedDocType]) => {
+        tap(([docType, metas, inheritedDocType, metaFeeds]) => {
           const metasFiltered = metas.filter(meta => meta.documentTypeUid === docType.uid);
           metasFiltered.forEach(meta => this.metaDataTypesValue[meta.uid] = MetaDataTypeMapping[meta.metaType]);
           this.initDocumentTypeFormGroup(this.formGroup, docType, metasFiltered, inheritedDocType);
           this.metaDataSource.setData(metasFiltered);
           this.documentType = docType;
+          this.allMetaFeeds = metaFeeds;
+          metas.forEach(meta => this.filteredMetaFeedsMap$.set(meta.uid, new BehaviorSubject<Array<MetaFeed>>(metaFeeds)));
         })
     ).subscribe();
 
     this.adminService.newDocumentType$.pipe(
         filter(val => val === true),
+        concatMap(() => this.studioService.getMetaFeeds(this.sessionService.sessionToken)),
+        tap(metaFeeds => this.allMetaFeeds = metaFeeds),
         tap(() => {
           this.documentType = null;
           this.metaDataSource.setData([]);
@@ -149,7 +160,8 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
                   'metaDataType': this.fb.control(meta.metaType),
                   'metaDataMetaFeed': this.fb.control(meta.metaFeed != null ? meta.metaFeed : null),
                   'metaDataMandatory': this.fb.control(meta.mandatory),
-                  'metaDataPosition': this.fb.control(meta.position)
+                  'metaDataPosition': this.fb.control(meta.position),
+                  'filterControl_metaDataMetaFeed': this.fb.control('')
                 })
             )
     );
@@ -222,7 +234,8 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
           'metaDataType': this.fb.control(emptyMeta.metaType),
           'metaDataMetaFeed': this.fb.control(emptyMeta.metaFeed),
           'metaDataMandatory': this.fb.control(emptyMeta.mandatory),
-          'metaDataPosition': this.fb.control(emptyMeta.position)
+          'metaDataPosition': this.fb.control(emptyMeta.position),
+          'filterControl_metaDataMetaFeed': this.fb.control('')
         })
     );
   }
@@ -265,14 +278,17 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     Object.keys((formGroup.get('documentTypeMetas') as FormGroup).controls).forEach(keyControl => {
       const keyControlStr = Number(keyControl);
       const metaFormGroup = formGroup.get('documentTypeMetas').get(keyControl);
+      const metaFeedFormGroupVal = metaFormGroup.get('metaDataMetaFeed').value;
+      const metaFeedUid = metaFeedFormGroupVal != null ?
+          metaFeedFormGroupVal.uid :
+          -1;
       xmlStream += this.makeMetaXmlElement(
           Number(keyControl),
           Number(metaFormGroup.get('metaDataType').value),
           metaFormGroup.get('metaDataName').value,
-          // metaFormGroup.get('metaFeed').value,
-          -1,
+          metaFeedUid,
           metaFormGroup.get('metaDataMandatory').value,
-          metaFormGroup.get('metaDataPosition').value
+          metaFormGroup.get('metaDataPosition').value,
       );
     });
     xmlStream += '</document-type>';
@@ -309,5 +325,24 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
         return this.studioService.getMetaFeed(this.sessionService.sessionToken, meta.metaFeedUid);
       }
     }
+  }
+
+  onSelectChange(value: any): void {
+  }
+
+  inputMetaFeedChange(metaUid: number): void {
+    const inputVal = (this.formGroup.get('documentTypeMetas') as FormGroup)
+        .get(metaUid.toString())
+        .get('filterControl_metaDataMetaFeed').value;
+    const allValues = this.allMetaFeeds;
+    this.filteredMetaFeedsMap$.get(metaUid).next(
+        inputVal.trim().length > 0 ?
+            allValues.filter(value => value.name.includes(inputVal)) :
+            allValues
+    );
+  }
+
+  resetMetaFeed(uid: number): void {
+    this.formGroup.get('documentTypeMetas').get(uid.toString()).get('metaDataMetaFeed').setValue(null);
   }
 }
