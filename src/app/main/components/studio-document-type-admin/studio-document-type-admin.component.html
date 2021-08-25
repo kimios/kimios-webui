@@ -94,7 +94,21 @@
       </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="mandatory" *ngIf="columnsDescription[2]; let col">
+    <ng-container matColumnDef="metafeed" *ngIf="columnsDescription[2]; let col">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
+      <mat-cell *matCellDef="let element" [formGroupName]="element.uid.toString()">
+        <!--<mat-form-field>
+          <mat-select [formControl]="formGroup.get('documentTypeMetas').get(element.uid.toString()).get('metaDataType')">
+            <mat-option *ngFor="let typeId of metaDataPossibleTypesKey" [value]="typeId">
+              {{metaDataPossibleTypes.get(typeId)}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>-->
+        {{element.metaFeed ? element.metaFeed.name : 'null'}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="mandatory" *ngIf="columnsDescription[3]; let col">
       <mat-header-cell *matHeaderCellDef> Mandatory </mat-header-cell>
       <mat-cell *matCellDef="let element" [formGroupName]="element.uid.toString()">
         <mat-checkbox [formControlName]="'metaDataMandatory'" [value]="element.mandatory">

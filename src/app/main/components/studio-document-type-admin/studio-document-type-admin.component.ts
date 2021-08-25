@@ -22,7 +22,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
   formGroup: FormGroup;
   metaDataSource: MetaDataSource;
   columnsDescription = METAS_DEFAULT_DISPLAYED_COLUMNS;
-  displayedColumns = [ 'remove', 'name', 'type', 'mandatory' ];
+  displayedColumns = [ 'remove', 'name', 'type', 'metafeed', 'mandatory' ];
   sort = <DMEntitySort> {
     name: 'name',
     direction: 'asc',
@@ -133,7 +133,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     this.metaDataSource.sortData1(this.sort);
   }
 
-  private initDocumentTypeFormGroup(formGroup: FormGroup, docType: DocumentType, metas: Array<Meta>, inheritedDocType: DocumentType): FormGroup {
+  private initDocumentTypeFormGroup(formGroup: FormGroup, docType: DocumentType, metas: Array<MetaWithMetaFeedImpl>, inheritedDocType: DocumentType): FormGroup {
     formGroup.get('documentTypeName').setValue(docType != null ? docType.name : '');
     formGroup.get('inheritedDocumentType').setValue(inheritedDocType != null ? inheritedDocType : null);
     formGroup.get('filterControl_inheritedDocumentType').setValue('');
@@ -147,6 +147,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
                 this.fb.group({
                   'metaDataName': this.fb.control(meta.name),
                   'metaDataType': this.fb.control(meta.metaType),
+                  'metaDataMetaFeed': this.fb.control(meta.metaFeed != null ? meta.metaFeed : null),
                   'metaDataMandatory': this.fb.control(meta.mandatory),
                   'metaDataPosition': this.fb.control(meta.position)
                 })
@@ -210,15 +211,16 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
     this.formGroup.get('filterControl_inheritedDocumentType').setValue('');
   }
 
-  private findNotExistingMetasInDataSource(metaDataSource: MetaDataSource): Array<Meta> {
+  private findNotExistingMetasInDataSource(metaDataSource: MetaDataSource): Array<MetaWithMetaFeedImpl> {
     return metaDataSource.connect().getValue().filter(meta => meta.uid < 0);
   }
 
-  private createFormGroupForMeta(documentTypeMetas: FormGroup, emptyMeta: Meta): void {
+  private createFormGroupForMeta(documentTypeMetas: FormGroup, emptyMeta: MetaWithMetaFeedImpl): void {
     documentTypeMetas.addControl(
         emptyMeta.uid.toString(), this.fb.group({
           'metaDataName': this.fb.control(emptyMeta.name),
           'metaDataType': this.fb.control(emptyMeta.metaType),
+          'metaDataMetaFeed': this.fb.control(emptyMeta.metaFeed),
           'metaDataMandatory': this.fb.control(emptyMeta.mandatory),
           'metaDataPosition': this.fb.control(emptyMeta.position)
         })
@@ -298,7 +300,7 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
   }
 
   private retrieveMetaMetaFeed(meta: Meta): Observable<MetaFeed> {
-    if ([1, 5].includes(meta.metaType)) {
+    if (! [1, 5].includes(meta.metaType)) {
         return of(null);
     } else {
       if (meta.metaFeedUid == null || meta.metaFeedUid === undefined || meta.metaFeedUid === -1) {

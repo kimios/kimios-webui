@@ -26,19 +26,19 @@ export const METAS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         sticky: false,
         displayName: 'type',
         cell: (meta) => MetaDataTypeMapping[meta.metaType]
-    }/*,
+    },
     {
-        id: 'metaFeed',
-        matColumnDef: 'metaFeed',
-        position: 2,
-        matHeaderCellDef: 'metaFeed',
+        id: 'metafeed',
+        matColumnDef: 'metafeed',
+        position: 3,
+        matHeaderCellDef: 'metafeed',
         sticky: false,
         displayName: 'meta feed',
-        cell: (meta) => meta instanceof MetaWithMetaFeedImpl ? meta.metaFeed.name : ' - '
-    }*/, {
+        cell: null
+    }, {
         id: 'mandatory',
         matColumnDef: 'mandatory',
-        position: 3,
+        position: 4,
         matHeaderCellDef: 'mandatory',
         sticky: false,
         displayName: 'mandatory',
