@@ -51,8 +51,6 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
       private route: ActivatedRoute,
       private iconService: IconService
   ) {
-    console.log('in workspace constructor');
-
     this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
   }
 

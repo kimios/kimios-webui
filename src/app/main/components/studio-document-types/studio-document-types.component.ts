@@ -56,6 +56,5 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
     const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
     const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
     this.divider.nativeElement.style.height = dividerHeight + 'px';
-    console.log('set divider height to ' + dividerHeight + 'px');
   }
 }

@@ -40,7 +40,6 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
   }
 
   selectMetaFeed(metaFeed: MetaFeed): void {
-    console.log('selected metafeed : ' + metaFeed.uid);
     this.adminService.selectedMetaFeed$.next(metaFeed.uid);
   }
 
@@ -55,6 +54,5 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
     const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
     const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
     this.divider.nativeElement.style.height = dividerHeight + 'px';
-    console.log('set divider height to ' + dividerHeight + 'px');
   }
 }
