@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {MetaFeed, StudioService} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
@@ -10,8 +10,10 @@ import {SessionService} from 'app/services/session.service';
   templateUrl: './studio-meta-feeds.component.html',
   styleUrls: ['./studio-meta-feeds.component.scss']
 })
-export class StudioMetaFeedsComponent implements OnInit {
+export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
   metaFeeds$: BehaviorSubject<Array<MetaFeed>>;
+
+  @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
 
   constructor(
       private adminService: AdminService,
@@ -46,5 +48,13 @@ export class StudioMetaFeedsComponent implements OnInit {
     this.studioService.deleteMetaFeed(this.sessionService.sessionToken, uid).pipe(
         tap(() => this.adminService.needRefreshMetaFeeds$.next(true))
     ).subscribe();
+  }
+
+  ngAfterViewChecked(): void {
+    const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
+    this.divider.nativeElement.style.height = dividerHeight + 'px';
+    console.log('set divider height to ' + dividerHeight + 'px');
   }
 }
