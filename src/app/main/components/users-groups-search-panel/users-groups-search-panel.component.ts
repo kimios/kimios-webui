@@ -1,9 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {SessionService} from '../../../services/session.service';
-import {AuthenticationSource, Group, SecurityService, User} from '../../../kimios-client-api';
-import {BehaviorSubject, from, pipe, ReplaySubject} from 'rxjs';
-import {concatMap, map, mergeMap, tap} from 'rxjs/operators';
+import {SessionService} from 'app/services/session.service';
+import {AuthenticationSource, Group, SecurityService, User} from 'app/kimios-client-api';
+import {BehaviorSubject, ReplaySubject} from 'rxjs';
+import {concatMap, map} from 'rxjs/operators';
 import {CdkDragEnd} from '@angular/cdk/drag-drop';
+import {AdminService} from 'app/services/admin.service';
 
 @Component({
   selector: 'users-groups-search-panel',
@@ -25,7 +26,8 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
 
   constructor(
       private sessionService: SessionService,
-      private securityService: SecurityService
+      private securityService: SecurityService,
+      private adminService: AdminService
   ) {
     this.allUsers$ = new BehaviorSubject<User[]>([]);
     this.allGroups$ = new BehaviorSubject<Group[]>([]);
@@ -64,4 +66,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
         $event.source._dragRef.reset();
     }
 
+    handleDblClick(user: User): void {
+      this.adminService.addUserToPermissions$.next(user);
+    }
 }

@@ -11,6 +11,7 @@
                      cdkDrag
                      [cdkDragData]="{'type': 'user', 'element': user}"
                      (cdkDragEnded)="dragEnd($event)"
+                     (dblclick)="handleDblClick(user)"
       >
         <mat-icon>person</mat-icon>
         <span title="{{user.name}} ({{user.uid}}@{{user.source}})">{{user.name}} (@{{user.source}})</span>
