@@ -4,6 +4,7 @@ import {AdministrationService, AuthenticationSource, Role, SecurityService, User
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {SPECIAL_ROLES} from 'app/main/model/special-roles.enum';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 export interface GroupIdSource {
     gid: string;
@@ -31,7 +32,7 @@ export class AdminService {
   newMetaFeed$: BehaviorSubject<boolean>;
   needRefreshMetaFeeds$: BehaviorSubject<boolean>;
 
-  addUserToPermissions$: BehaviorSubject<KimiosUser>;
+  addUserOrGroupToPermissions$: BehaviorSubject<UserOrGroup>;
 
   constructor(
       private sessionService: SessionService,
@@ -52,7 +53,7 @@ export class AdminService {
     this.selectedMetaFeed$ = new BehaviorSubject<number>(null);
     this.needRefreshMetaFeeds$ = new BehaviorSubject<boolean>(null);
     this.newMetaFeed$ = new BehaviorSubject<boolean>(false);
-    this.addUserToPermissions$ = new BehaviorSubject<KimiosUser>(null);
+    this.addUserOrGroupToPermissions$ = new BehaviorSubject<UserOrGroup>(null);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {

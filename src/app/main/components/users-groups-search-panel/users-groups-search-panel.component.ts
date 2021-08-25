@@ -5,6 +5,7 @@ import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {concatMap, map} from 'rxjs/operators';
 import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AdminService} from 'app/services/admin.service';
+import {UserOrGroup} from 'app/main/model/user-or-group';
 
 @Component({
   selector: 'users-groups-search-panel',
@@ -66,7 +67,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
         $event.source._dragRef.reset();
     }
 
-    handleDblClick(user: User): void {
-      this.adminService.addUserToPermissions$.next(user);
+    handleDblClick(userOrGroup: UserOrGroup): void {
+      this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
     }
 }

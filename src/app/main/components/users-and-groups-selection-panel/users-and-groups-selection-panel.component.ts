@@ -25,12 +25,9 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.adminService.addUserToPermissions$.pipe(
-        filter(user => user != null),
-        tap(user => this.updateUsersAndGroups(<UserOrGroup> {
-          type: 'user',
-          element: user
-        }))
+    this.adminService.addUserOrGroupToPermissions$.pipe(
+        filter(userOrGroup => userOrGroup != null),
+        tap(userOrGroup => this.updateUsersAndGroups(userOrGroup))
     ).subscribe();
   }
 
@@ -39,6 +36,14 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
   }
 
   updateUsersAndGroups(userOrGroup: UserOrGroup): void {
+    const index = this.selectedUsersAndGroups.findIndex(
+        obj => obj.type === userOrGroup.type
+            && obj.element.name === userOrGroup.element.name
+            && obj.element.source === userOrGroup.element.source
+    );
+    if (index !== -1) {
+      return;
+    }
     this.selectedUsersAndGroups.push(userOrGroup);
     this.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
   }

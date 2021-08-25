@@ -11,7 +11,7 @@
                      cdkDrag
                      [cdkDragData]="{'type': 'user', 'element': user}"
                      (cdkDragEnded)="dragEnd($event)"
-                     (dblclick)="handleDblClick(user)"
+                     (dblclick)="handleDblClick({'type': 'user', 'element': user})"
       >
         <mat-icon>person</mat-icon>
         <span title="{{user.name}} ({{user.uid}}@{{user.source}})">{{user.name}} (@{{user.source}})</span>
@@ -27,7 +27,8 @@
             [cdkDropListConnectedTo]="cdkDropListConnectedTo_var"
     >
       <mat-list-item *ngFor="let group of allGroups$ | async"
-                     cdkDrag [cdkDragData]="{'type': 'group', 'element': group}" (cdkDragEnded)="dragEnd($event)">
+                     cdkDrag [cdkDragData]="{'type': 'group', 'element': group}" (cdkDragEnded)="dragEnd($event)"
+                     (dblclick)="handleDblClick({'type': 'group', 'element': group})" >
         <mat-icon>group</mat-icon>{{group.name}} (@{{group.source}})
       </mat-list-item>
     </mat-list>
