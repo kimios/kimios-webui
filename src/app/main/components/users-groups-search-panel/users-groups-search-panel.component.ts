@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {AuthenticationSource, DMEntitySecurity, Group, SecurityService, User} from 'app/kimios-client-api';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
@@ -13,7 +13,7 @@ import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
   templateUrl: './users-groups-search-panel.component.html',
   styleUrls: ['./users-groups-search-panel.component.scss']
 })
-export class UsersGroupsSearchPanelComponent implements OnInit {
+export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked {
 
   allUsers$: BehaviorSubject<User[]>;
   allGroups$: BehaviorSubject<Group[]>;
@@ -27,6 +27,8 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
   userListId;
   @Input()
   currentSecurities: Array<DMEntitySecurity>;
+
+  @ViewChild('tabGroup', {read: ElementRef}) tabGroup: ElementRef;
 
   constructor(
       private sessionService: SessionService,
@@ -92,5 +94,14 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
 
     handleDblClick(userOrGroup: UserOrGroup): void {
       this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+    }
+
+    ngAfterViewChecked(): void {
+      console.log(this.tabGroup.nativeElement);
+      this.tabGroup.nativeElement.childNodes.forEach(node => {
+        if (node.classList.contains('mat-tab-body-wrapper')) {
+          console.dir(node); node.style['flex-grow'] = 1;
+        }
+      });
     }
 }

@@ -282,7 +282,8 @@ export class FileSecurityComponent implements OnInit {
             data: {
                 selectedUsersAndGroups: new Array<UserOrGroup>(),
                 currentSecurities: this.dataSource.connect().getValue()
-            }
+            },
+            width: '800px'
         });
 
         dialogRef.afterClosed().subscribe(result => {
