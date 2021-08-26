@@ -97,10 +97,9 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
     }
 
     ngAfterViewChecked(): void {
-      console.log(this.tabGroup.nativeElement);
       this.tabGroup.nativeElement.childNodes.forEach(node => {
         if (node.classList.contains('mat-tab-body-wrapper')) {
-          console.dir(node); node.style['flex-grow'] = 1;
+          node.style['flex-grow'] = 1;
         }
       });
     }
