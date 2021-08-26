@@ -1,6 +1,10 @@
 <div fxLayout="column" fxLayoutAlign="space-between center" fxFlex>
 
-    <users-and-groups-selection-panel [selectedUsersAndGroups]="selectedUsersAndGroups"></users-and-groups-selection-panel>
+    <users-and-groups-selection-panel
+            [selectedUsersAndGroups]="selectedUsersAndGroups"
+            [currentSecurities]="currentSecurities"
+    >
+    </users-and-groups-selection-panel>
 
     <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
         <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>

@@ -1,11 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
-import {AuthenticationSource, Group, SecurityService, User} from 'app/kimios-client-api';
+import {AuthenticationSource, DMEntitySecurity, Group, SecurityService, User} from 'app/kimios-client-api';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {concatMap, map} from 'rxjs/operators';
 import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AdminService} from 'app/services/admin.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
+import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
 
 @Component({
   selector: 'users-groups-search-panel',
@@ -24,6 +25,8 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
   groupListId;
   @Input()
   userListId;
+  @Input()
+  currentSecurities: Array<DMEntitySecurity>;
 
   constructor(
       private sessionService: SessionService,
@@ -48,6 +51,16 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
         concatMap(
             source => this.securityService.getUsers(this.sessionService.sessionToken, source.name)
         ),
+        map(users => {
+          if (this.currentSecurities) {
+            const secIds = this.currentSecurities
+                .filter(sec => sec.type === DMEntitySecurityType.USER)
+                .map(sec => [sec.name, sec.source].join('@'));
+            return users.filter(user => ! secIds.includes([user.uid, user.source].join('@')));
+          } else {
+            return users;
+          }
+        }),
         map(
             users => this.allUsers$.next(this.allUsers$.getValue().concat(users))
         )
@@ -57,6 +70,16 @@ export class UsersGroupsSearchPanelComponent implements OnInit {
           concatMap(
               source => this.securityService.getGroups(this.sessionService.sessionToken, source.name)
           ),
+          map(groups => {
+            if (this.currentSecurities) {
+              const secIds = this.currentSecurities
+                  .filter(sec => sec.type === DMEntitySecurityType.GROUP)
+                  .map(sec => [sec.name, sec.source].join('@'));
+              return groups.filter(group => ! secIds.includes([group.gid, group.source].join('@')));
+            } else {
+              return groups;
+            }
+          }),
           map(
               groups => this.allGroups$.next(this.allGroups$.getValue().concat(groups))
           )

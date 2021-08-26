@@ -4,6 +4,7 @@ import {BehaviorSubject} from 'rxjs';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {filter, tap} from 'rxjs/operators';
 import {AdminService} from 'app/services/admin.service';
+import {DMEntitySecurity} from 'app/kimios-client-api';
 
 @Component({
   selector: 'users-and-groups-selection-panel',
@@ -14,6 +15,8 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
 
   @Input()
   selectedUsersAndGroups: Array<UserOrGroup>;
+  @Input()
+  currentSecurities: Array<DMEntitySecurity>;
   selectedUsersAndGroups$: BehaviorSubject<Array<UserOrGroup>>;
   groupListId = 'groupList';
   userListId = 'userList';

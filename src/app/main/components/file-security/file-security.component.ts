@@ -12,6 +12,7 @@ import {UserOrGroup} from 'app/main/model/user-or-group';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
+    currentSecurities: Array<DMEntitySecurity>;
 }
 
 const DMENTITYTYPE_DOCUMENT = 3;
@@ -113,7 +114,7 @@ export class FileSecurityComponent implements OnInit {
 
     private removeSecurityInDatasource(userOrGroup: UserOrGroup): void {
         const idx = this.dataSource.data.findIndex(security =>
-            security.name === userOrGroup.element['uid'] ?
+            security.name === userOrGroup.element['uid'] ?
                 userOrGroup.element['uid'] :
                 userOrGroup.element['gid']
         );
@@ -235,7 +236,7 @@ export class FileSecurityComponent implements OnInit {
           appendMode: true,
           securities: Object.keys((this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).controls).map(control =>
               <DMEntitySecurity> {
-                  dmEntityUid: docId ? docId : this.documentId,
+                  dmEntityUid: docId ? docId : this.documentId,
                   dmEntityType: DMENTITYTYPE_DOCUMENT,
                   name: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('name').value,
                   source: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('source').value,
@@ -278,7 +279,10 @@ export class FileSecurityComponent implements OnInit {
 
     private openAddDialog(): void {
         const dialogRef = this.dialog.open(UsersAndGroupsSelectionDialogComponent, {
-            data: { selectedUsersAndGroups: new Array<UserOrGroup>() }
+            data: {
+                selectedUsersAndGroups: new Array<UserOrGroup>(),
+                currentSecurities: this.dataSource.connect().getValue()
+            }
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -290,7 +294,7 @@ export class FileSecurityComponent implements OnInit {
                 <DMEntitySecurity> {
                     dmEntityUid: this.documentId,
                     dmEntityType: DMENTITYTYPE_DOCUMENT,
-                    name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
+                    name: userOrGroup.element['uid'] ? userOrGroup.element['uid'] : userOrGroup.element['gid'],
                     source: userOrGroup.element.source,
                     fullName: userOrGroup.element.name,
                     type: userOrGroup.type === 'user' ? SECURITY_ENTITY_TYPE.USER : SECURITY_ENTITY_TYPE.GROUP,
