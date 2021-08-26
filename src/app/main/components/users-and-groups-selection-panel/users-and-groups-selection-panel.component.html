@@ -1,22 +1,23 @@
 
   <div  fxLayout="row" fxLayoutAlign="space-between stretch" style="width: 100%">
     <div fxFlex="45">
-      <div
+      <mat-list
               cdkDropList
               [id]="'selectedUsersAndGroups'"
               [cdkDropListConnectedTo]="[userListId, groupListId]"
               (cdkDropListDropped)="drop($event)"
               class="dropArea"
       >
-        <div *ngFor="let item of selectedUsersAndGroups$ | async">
+        <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async">
           <ng-container *ngIf="item.type === 'user'">
-            {{item.element.name}}, {{item.element.firstName}} ({{item.element.source}})
+            <mat-icon>person</mat-icon>
+            <span title="{{item.element.name}} ({{item.element.uid}}@{{item.element.source}})">{{item.element.name}} (@{{item.element.source}})</span>
           </ng-container>
           <ng-container *ngIf="item.type === 'group'">
-            {{item.element.name}} ({{item.element.source}})
+            <mat-icon>group</mat-icon>{{item.element.name}} (@{{item.element.source}})
           </ng-container>
-        </div>
-      </div>
+        </mat-list-item>
+      </mat-list>
     </div>
     <div fxFlex="45">
 
