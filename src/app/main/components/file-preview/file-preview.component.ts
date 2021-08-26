@@ -88,9 +88,9 @@ export class FilePreviewComponent implements OnInit, OnChanges {
     );
 
     this.link$ = this.docNeedsConversionToPdf(this.documentExtension) ?
-        of(this.makeApiCallForPreview(this.documentId)) :
+        of(this.makeApiCallForPreview(this.documentId)) :
         (this.documentExtension.toLowerCase() === 'pdf' || DocumentUtils.extensionIsImg(this.documentExtension.toLowerCase())) ?
-            this.documentDetailService.makeDownloadLink(this.documentVersionId) :
+            this.documentDetailService.makeDownloadLink(this.documentVersionId) :
             of('');
   }
 

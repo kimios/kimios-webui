@@ -25,14 +25,14 @@
     <div fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="20px">
         <div fxFlex="100px">
             <button id="historyBackButton"
-                    [ngClass]="historyHasBack ? 'icon-active' : 'icon-inactive'"
+                    [ngClass]="historyHasBack ? 'icon-active' : 'icon-inactive'"
                     [disabled]="!historyHasBack"
                     (click)="historyBack()"
             >
                 <mat-icon>arrow_back_ios</mat-icon>
             </button>
             <button id="historyForwardButton"
-                    [ngClass]="historyHasForward ? 'icon-active' : 'icon-inactive'"
+                    [ngClass]="historyHasForward ? 'icon-active' : 'icon-inactive'"
                     [disabled]="!historyHasForward"
                     (click)="historyForward()"
             >

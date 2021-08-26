@@ -123,7 +123,7 @@ export class FileSearchPanelComponent implements OnInit {
               catchError(error => {
                 console.log('server error: ');
                 console.dir(error);
-                return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
+                return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
               })
           )
           .subscribe(
