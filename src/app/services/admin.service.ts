@@ -33,6 +33,7 @@ export class AdminService {
   needRefreshMetaFeeds$: BehaviorSubject<boolean>;
 
   addUserOrGroupToPermissions$: BehaviorSubject<UserOrGroup>;
+  selectedUsersAndGroups$: BehaviorSubject<Array<UserOrGroup>>;
 
   constructor(
       private sessionService: SessionService,
@@ -54,6 +55,7 @@ export class AdminService {
     this.needRefreshMetaFeeds$ = new BehaviorSubject<boolean>(null);
     this.newMetaFeed$ = new BehaviorSubject<boolean>(false);
     this.addUserOrGroupToPermissions$ = new BehaviorSubject<UserOrGroup>(null);
+    this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>(null);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {

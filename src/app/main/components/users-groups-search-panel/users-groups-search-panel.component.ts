@@ -2,7 +2,7 @@ import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from 
 import {SessionService} from 'app/services/session.service';
 import {AuthenticationSource, DMEntitySecurity, Group, SecurityService, User} from 'app/kimios-client-api';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
-import {concatMap, map} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AdminService} from 'app/services/admin.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
@@ -15,9 +15,11 @@ import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
 })
 export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked {
 
-  allUsers$: BehaviorSubject<User[]>;
-  allGroups$: BehaviorSubject<Group[]>;
+  allUsers: Array<User>;
+  allGroups: Array<Group>;
   allSources$: BehaviorSubject<AuthenticationSource[]>;
+  filteredUsers$: BehaviorSubject<Array<User>>;
+  filteredGroups$: BehaviorSubject<Array<Group>>;
 
   @Input()
   cdkDropListConnectedTo_var;
@@ -35,9 +37,11 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
       private securityService: SecurityService,
       private adminService: AdminService
   ) {
-    this.allUsers$ = new BehaviorSubject<User[]>([]);
-    this.allGroups$ = new BehaviorSubject<Group[]>([]);
+    this.allUsers = new Array<User>();
+    this.allGroups = new Array<Group>();
     this.allSources$ = new BehaviorSubject<AuthenticationSource[]>([]);
+    this.filteredUsers$ = new BehaviorSubject<Array<User>>([]);
+    this.filteredGroups$ = new BehaviorSubject<Array<Group>>([]);
   }
 
   ngOnInit(): void {
@@ -63,9 +67,10 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
             return users;
           }
         }),
-        map(
-            users => this.allUsers$.next(this.allUsers$.getValue().concat(users))
-        )
+        tap(
+            users => this.allUsers = users
+        ),
+        tap(users => this.filteredUsers$.next(users))
     ).subscribe();
 
       source$.pipe(
@@ -82,9 +87,32 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
               return groups;
             }
           }),
-          map(
-              groups => this.allGroups$.next(this.allGroups$.getValue().concat(groups))
+          tap(groups => this.allGroups = groups),
+          tap(
+              groups => this.filteredGroups$.next(groups)
           )
+      ).subscribe();
+
+      this.adminService.selectedUsersAndGroups$.pipe(
+          filter(userAndGroups => userAndGroups != null),
+          tap(userAndGroups => {
+            const filteredUsers = this.allUsers
+                .filter(user => userAndGroups
+                    .findIndex(
+                        element => element.type === 'user'
+                            && element.element['uid'] === user.uid
+                            && element.element.source === user.source) === -1);
+            this.filteredUsers$.next(filteredUsers);
+          }),
+          tap(userAndGroups => {
+            const filteredGroups = this.allGroups
+                .filter(group => userAndGroups
+                    .findIndex(
+                        element => element.type === 'group'
+                            && element.element['gid'] === group.gid
+                            && element.element.source === group.source) === -1);
+            this.filteredGroups$.next(filteredGroups);
+          })
       ).subscribe();
   }
 

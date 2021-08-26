@@ -7,7 +7,7 @@
             [id]="'userList'"
             [cdkDropListConnectedTo]="cdkDropListConnectedTo_var"
     >
-      <mat-list-item *ngFor="let user of allUsers$ | async"
+      <mat-list-item *ngFor="let user of filteredUsers$ | async"
                      cdkDrag
                      [cdkDragData]="{'type': 'user', 'element': user}"
                      (cdkDragEnded)="dragEnd($event)"
@@ -26,7 +26,7 @@
             [id]="'groupList'"
             [cdkDropListConnectedTo]="cdkDropListConnectedTo_var"
     >
-      <mat-list-item *ngFor="let group of allGroups$ | async"
+      <mat-list-item *ngFor="let group of filteredGroups$ | async"
                      cdkDrag [cdkDragData]="{'type': 'group', 'element': group}" (cdkDragEnded)="dragEnd($event)"
                      (dblclick)="handleDblClick({'type': 'group', 'element': group})" >
         <mat-icon>group</mat-icon>{{group.name}} (@{{group.source}})

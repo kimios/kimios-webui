@@ -49,5 +49,6 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
     }
     this.selectedUsersAndGroups.push(userOrGroup);
     this.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
+    this.adminService.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
   }
 }

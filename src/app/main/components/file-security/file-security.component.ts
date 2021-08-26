@@ -9,6 +9,7 @@ import {concatMap, map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
+import {AdminService} from 'app/services/admin.service';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -50,7 +51,8 @@ export class FileSecurityComponent implements OnInit {
       private securityService: SecurityService,
       private sessionService: SessionService,
       public dialog: MatDialog,
-      private entityCreationService: EntityCreationService
+      private entityCreationService: EntityCreationService,
+      private adminService: AdminService
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -288,6 +290,8 @@ export class FileSecurityComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result !== true) {
+                this.adminService.addUserOrGroupToPermissions$.next(null);
+                this.adminService.selectedUsersAndGroups$.next(null);
                 return;
             }
 
@@ -313,6 +317,8 @@ export class FileSecurityComponent implements OnInit {
                 }
             );
 
+            this.adminService.addUserOrGroupToPermissions$.next(null);
+            this.adminService.selectedUsersAndGroups$.next(null);
         });
     }
 }
