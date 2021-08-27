@@ -1,6 +1,7 @@
 
   <div  fxLayout="row" fxLayoutAlign="space-between stretch" style="width: 100%">
-    <div fxFlex="45">
+    <div fxFlex="45" fxLayout="column" fxLayoutAlign="start stretch">
+      <div id="dropAreaHeader" [ngClass]="'dropAreaHeader'">drop users and groups here</div>
       <mat-list
               cdkDropList
               [id]="'selectedUsersAndGroups'"

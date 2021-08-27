@@ -247,6 +247,10 @@
         border-width: 1px;
         border-radius: 8px;
         border-style: solid;
-        border-color: map-get($foreground, text);
+        border-color: rgba(map-get($foreground, text), 0.75);
+    }
+
+    .dropAreaHeader {
+        color: rgba(map-get($foreground, text), 0.75);
     }
 }
