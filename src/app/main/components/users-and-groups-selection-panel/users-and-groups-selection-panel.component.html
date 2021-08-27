@@ -2,23 +2,23 @@
   <div  fxLayout="row" fxLayoutAlign="space-between stretch" style="width: 100%">
     <div fxFlex="45" fxLayout="column" fxLayoutAlign="start stretch">
       <div id="dropAreaHeader" [ngClass]="'dropAreaHeader'">drop users and groups here</div>
-      <mat-list
-              cdkDropList
-              [id]="'selectedUsersAndGroups'"
-              [cdkDropListConnectedTo]="[userListId, groupListId]"
-              (cdkDropListDropped)="drop($event)"
-              class="dropArea"
-      >
-        <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async" [ngClass]="'user-group-added-to-list'">
-          <ng-container *ngIf="item.type === 'user'">
-            <mat-icon>person</mat-icon>
-            <span title="{{item.element.name}} ({{item.element.uid}}@{{item.element.source}})">{{item.element.name}} (@{{item.element.source}})</span>
-          </ng-container>
-          <ng-container *ngIf="item.type === 'group'">
-            <mat-icon>group</mat-icon>{{item.element.name}} (@{{item.element.source}})
-          </ng-container>
-        </mat-list-item>
-      </mat-list>
+      <div class="dropArea"
+           cdkDropList
+           [id]="'selectedUsersAndGroups'"
+           [cdkDropListConnectedTo]="[userListId, groupListId]"
+           (cdkDropListDropped)="drop($event)">
+        <mat-list>
+          <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async" [ngClass]="'user-group-added-to-list'">
+            <ng-container *ngIf="item.type === 'user'">
+              <mat-icon>person</mat-icon>
+              <span title="{{item.element.name}} ({{item.element.uid}}@{{item.element.source}})">{{item.element.name}} (@{{item.element.source}})</span>
+            </ng-container>
+            <ng-container *ngIf="item.type === 'group'">
+              <mat-icon>group</mat-icon>{{item.element.name}} (@{{item.element.source}})
+            </ng-container>
+          </mat-list-item>
+        </mat-list>
+      </div>
     </div>
     <div fxFlex="45">
 

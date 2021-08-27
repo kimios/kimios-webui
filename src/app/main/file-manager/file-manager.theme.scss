@@ -248,6 +248,7 @@
         border-radius: 8px;
         border-style: solid;
         border-color: rgba(map-get($foreground, text), 0.75);
+        padding: 5px;
     }
 
     .dropAreaHeader {
