@@ -21,10 +21,13 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
   groupListId = 'groupList';
   userListId = 'userList';
 
+  itemOver: UserOrGroup;
+
   constructor(
       private adminService: AdminService
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
+    this.itemOver = null;
   }
 
   ngOnInit(): void {
@@ -50,5 +53,45 @@ export class UsersAndGroupsSelectionPanelComponent implements OnInit {
     this.selectedUsersAndGroups.push(userOrGroup);
     this.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
     this.adminService.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
+  }
+
+  handleMouseEnter(item: UserOrGroup): void {
+    this.itemOver = item;
+  }
+
+  handleMouseLeave(item: UserOrGroup): void {
+    this.itemOver = null;
+  }
+
+  removeFromSelected($event: MouseEvent, item: UserOrGroup): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    this.selectedUsersAndGroups = this.selectedUsersAndGroups.slice().filter(userOrGroup =>
+        userOrGroup.type !== item.type
+        || (userOrGroup.element['uid'] && item.element['uid'] && userOrGroup.element['uid'] !== item.element['uid'])
+        || (userOrGroup.element['gid'] && item.element['gid'] && userOrGroup.element['gid'] !== item.element['gid'])
+        || userOrGroup.element.source !== item.element.source
+    );
+
+    this.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
+    this.adminService.selectedUsersAndGroups$.next(this.selectedUsersAndGroups);
+  }
+
+  mousePointerIsOverItem(item: UserOrGroup): boolean {
+    return this.itemOver != null
+        && this.itemOver.type === item.type
+        && (
+            (this.itemOver.element['uid'] && item.element['uid'] && this.itemOver.element['uid'] === item.element['uid'])
+            || (this.itemOver.element['gid'] && item.element['gid'] && this.itemOver.element['gid'] === item.element['gid'])
+        ) && this.itemOver.element.source === item.element.source;
+    
+    /*this.selectedUsersAndGroups.findIndex(userOrGroup =>
+        userOrGroup.type === item.type
+        && (
+            (userOrGroup.element['uid'] && item.element['uid'] && userOrGroup.element['uid'] === item.element['uid'])
+            || (userOrGroup.element['gid'] && item.element['gid'] && userOrGroup.element['gid'] === item.element['gid'])
+        ) && userOrGroup.element.source === item.element.source
+    ) !== -1;*/
   }
 }

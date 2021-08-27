@@ -8,7 +8,12 @@
            [cdkDropListConnectedTo]="[userListId, groupListId]"
            (cdkDropListDropped)="drop($event)">
         <mat-list>
-          <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async" [ngClass]="'user-group-added-to-list'">
+          <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async"
+                         [ngClass]="'user-group-added-to-list'"
+                         (mouseenter)="handleMouseEnter(item)"
+                         (mouseleave)="handleMouseLeave(item)"
+                         (dblclick)="removeFromSelected($event, item)"
+          >
             <ng-container *ngIf="item.type === 'user'">
               <mat-icon>person</mat-icon>
               <span title="{{item.element.name}} ({{item.element.uid}}@{{item.element.source}})">{{item.element.name}} (@{{item.element.source}})</span>
@@ -16,6 +21,14 @@
             <ng-container *ngIf="item.type === 'group'">
               <mat-icon>group</mat-icon>{{item.element.name}} (@{{item.element.source}})
             </ng-container>
+            <button *ngIf="mousePointerIsOverItem(item)"
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="removeFromSelected($event, item)"
+                    [ngClass]="'remove-from-selection-list'"
+            >
+              <mat-icon>chevron_right</mat-icon>
+            </button>
           </mat-list-item>
         </mat-list>
       </div>

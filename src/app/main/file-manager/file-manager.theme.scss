@@ -260,9 +260,16 @@
         border-radius: 8px;
         border-style: solid;
         border-color: rgba(0,0,0, 0);
+        cursor: pointer;
     }
 
     mat-list-item.user-group-added-to-list:hover {
         border-color: rgba(map-get($foreground, text), 0.75);
+    }
+
+    button.remove-from-selection-list {
+        position: absolute;
+        right: 0;
+        background-color: map-get($warn, 400);
     }
 }
