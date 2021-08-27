@@ -9,7 +9,7 @@
               (cdkDropListDropped)="drop($event)"
               class="dropArea"
       >
-        <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async">
+        <mat-list-item *ngFor="let item of selectedUsersAndGroups$ | async" [ngClass]="'user-group-added-to-list'">
           <ng-container *ngIf="item.type === 'user'">
             <mat-icon>person</mat-icon>
             <span title="{{item.element.name}} ({{item.element.uid}}@{{item.element.source}})">{{item.element.name}} (@{{item.element.source}})</span>
