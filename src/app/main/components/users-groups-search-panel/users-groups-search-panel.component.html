@@ -12,7 +12,19 @@
                      [cdkDragData]="{'type': 'user', 'element': user}"
                      (cdkDragEnded)="dragEnd($event)"
                      (dblclick)="handleDblClick({'type': 'user', 'element': user})"
+                     (mouseenter)="handleMouseEnter({'type': 'user', 'element': user})"
+                     (mouseleave)="handleMouseLeave({'type': 'user', 'element': user})"
+                     [ngClass]="'item-to-be-selected'"
       >
+        <button
+                mat-icon-button
+                aria-label="Add to selected items"
+                (click)="handleDblClick({'type': 'user', 'element': user})"
+                [ngClass]="{'add-to-selection-list' : true,
+                'visible' : mousePointerIsOverItem({'type': 'user', 'element': user})}"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
         <mat-icon>person</mat-icon>
         <span title="{{user.name}} ({{user.uid}}@{{user.source}})">{{user.name}} (@{{user.source}})</span>
       </mat-list-item>
@@ -28,7 +40,19 @@
     >
       <mat-list-item *ngFor="let group of filteredGroups$ | async"
                      cdkDrag [cdkDragData]="{'type': 'group', 'element': group}" (cdkDragEnded)="dragEnd($event)"
-                     (dblclick)="handleDblClick({'type': 'group', 'element': group})" >
+                     (dblclick)="handleDblClick({'type': 'group', 'element': group})"
+                     (mouseenter)="handleMouseEnter({'type': 'group', 'element': group})"
+                     (mouseleave)="handleMouseLeave({'type': 'group', 'element': group})"
+                     [ngClass]="'item-to-be-selected'">
+        <button
+                mat-icon-button
+                aria-label="Add to selected items"
+                (click)="handleDblClick({'type': 'group', 'element': group})"
+                [ngClass]="{'add-to-selection-list' : true,
+                'visible' : mousePointerIsOverItem({'type': 'group', 'element': group})}"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
         <mat-icon>group</mat-icon>{{group.name}} (@{{group.source}})
       </mat-list-item>
     </mat-list>

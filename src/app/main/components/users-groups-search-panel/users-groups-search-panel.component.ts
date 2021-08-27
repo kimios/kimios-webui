@@ -20,6 +20,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   allSources$: BehaviorSubject<AuthenticationSource[]>;
   filteredUsers$: BehaviorSubject<Array<User>>;
   filteredGroups$: BehaviorSubject<Array<Group>>;
+  itemOver: UserOrGroup;
 
   @Input()
   cdkDropListConnectedTo_var;
@@ -42,6 +43,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
     this.allSources$ = new BehaviorSubject<AuthenticationSource[]>([]);
     this.filteredUsers$ = new BehaviorSubject<Array<User>>([]);
     this.filteredGroups$ = new BehaviorSubject<Array<Group>>([]);
+    this.itemOver = null;
   }
 
   ngOnInit(): void {
@@ -116,19 +118,37 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
       ).subscribe();
   }
 
-    dragEnd($event: CdkDragEnd<any>): void {
-        $event.source._dragRef.reset();
-    }
+  dragEnd($event: CdkDragEnd<any>): void {
+    $event.source._dragRef.reset();
+  }
 
-    handleDblClick(userOrGroup: UserOrGroup): void {
-      this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
-    }
+  handleDblClick(userOrGroup: UserOrGroup): void {
+    this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+  }
 
-    ngAfterViewChecked(): void {
-      this.tabGroup.nativeElement.childNodes.forEach(node => {
-        if (node.classList.contains('mat-tab-body-wrapper')) {
-          node.style['flex-grow'] = 1;
-        }
-      });
-    }
+  ngAfterViewChecked(): void {
+    this.tabGroup.nativeElement.childNodes.forEach(node => {
+      if (node.classList.contains('mat-tab-body-wrapper')) {
+        node.style['flex-grow'] = 1;
+      }
+    });
+  }
+
+  handleMouseEnter(item: UserOrGroup): void {
+    this.itemOver = item;
+  }
+
+  handleMouseLeave(item: UserOrGroup): void {
+    this.itemOver = null;
+  }
+
+  mousePointerIsOverItem(item: UserOrGroup): boolean {
+    return this.itemOver != null
+        && this.itemOver.type === item.type
+        && (
+            (this.itemOver.element['uid'] && item.element['uid'] && this.itemOver.element['uid'] === item.element['uid'])
+            || (this.itemOver.element['gid'] && item.element['gid'] && this.itemOver.element['gid'] === item.element['gid'])
+        ) && this.itemOver.element.source === item.element.source;
+
+  }
 }

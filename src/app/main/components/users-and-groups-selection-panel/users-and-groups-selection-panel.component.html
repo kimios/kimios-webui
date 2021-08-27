@@ -23,7 +23,7 @@
             </ng-container>
             <button *ngIf="mousePointerIsOverItem(item)"
                     mat-icon-button
-                    aria-label="Clear"
+                    aria-label="Remove from selected items"
                     (click)="removeFromSelected($event, item)"
                     [ngClass]="'remove-from-selection-list'"
             >

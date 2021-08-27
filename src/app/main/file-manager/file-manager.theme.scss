@@ -267,9 +267,24 @@
         border-color: rgba(map-get($foreground, text), 0.75);
     }
 
+    mat-list-item.item-to-be-selected:hover {
+        border-color: rgba(map-get($foreground, text), 0.75);
+        cursor: pointer;
+    }
+
     button.remove-from-selection-list {
         position: absolute;
         right: 0;
         background-color: map-get($warn, 400);
+    }
+
+    button.add-to-selection-list {
+        background-color: $kimios-green;
+        margin-right: 5px;
+        visibility: hidden;
+    }
+
+    button.add-to-selection-list.visible {
+        visibility: visible;
     }
 }
