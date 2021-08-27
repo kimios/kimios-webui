@@ -242,4 +242,11 @@
     .kimios-width-max-content {
         width: max-content;
     }
+
+    .dropArea {
+        border-width: 1px;
+        border-radius: 8px;
+        border-style: solid;
+        border-color: map-get($foreground, text);
+    }
 }
