@@ -5,4 +5,22 @@
 #treeAndGridRow {
   // background-color: white;
   // box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.35);
+  padding-top: 20px;
+  height: 100%;
+  border-radius: 10px;
+  padding-bottom: 10px;
+}
+
+#treeAndGridRowWrapper {
+  padding: 10px;
+  // flex-grow: 1;
+
+  width: 100%;
+  height: 100%;
+}
+
+#entity-listing-container {
+  // height: 100%;
+  // overflow: auto;
+  min-height: 0;
 }

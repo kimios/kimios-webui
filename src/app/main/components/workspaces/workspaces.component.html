@@ -1,63 +1,60 @@
-<div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px"
+<div #sectionContainer fxFlex
      (drop)="handleDrop($event)">
-
-  <div fxLayout="row"
+  <!--style="width: 100%; height: 100%; display: block;"-->
+  <!--<div fxLayout="row"
        fxLayoutAlign="start"
        style="width: 100%;">
-    <div fxFlexOffset="20px">
-      <h1 class="no-margin-bottom">Workspaces</h1>
+    <div fxFlexOffset="20px">-->
+
+  <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" fxFlexOffset="20px">
+
+  <div #sectionTitle style="width: 100%;">
+    <h1 class="no-margin-bottom">Workspaces</h1>
+  </div>
+    <!--</div>
+  </div>-->
+    <div #browsePathAndActions
+          fxLayout="row"
+       fxLayoutAlign="center"
+       style="width: 100%;"
+  >
+    <div
+         #browsePathRow id="browsePathRow" fxFlex>
+      <browse-path></browse-path>
     </div>
+    <div>
+      <form>
+        <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
+               multiple="multiple"
+        />
+        <!--              webkitdirectory=""
+          directory=""-->
+      </form>
+      <button mat-button>
+        <mat-icon class="cursor-pointer"
+                  (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
+      </button>
+    </div>
+    <ng-container *ngIf="isWorkspaceCreator | async as isWC">
+      <ng-container *ngIf="isWC">
+        <app-workspace-menu></app-workspace-menu>
+      </ng-container>
+    </ng-container>
   </div>
 
-  <div fxLayout="row"
-       fxLayoutAlign="start"
-       style="width: 100%; height: 100%">
-
-    <div fxLayout="column"
-         fxLayoutAlign="start"
-         fxLayoutGap="10px"
-         style="width: 100%; margin-left: 20px; margin-right: 20px; margin-bottom: 84px;"
-         #contentColumn id="contentColumn" >
-
-      <div fxLayout="row"
-           fxLayoutAlign="center"
-      >
-        <div
-             #browsePathRow id="browsePathRow" fxFlex>
-          <browse-path></browse-path>
-        </div>
-        <div>
-          <form>
-            <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
-                   multiple="multiple"
-            />
-            <!--              webkitdirectory=""
-              directory=""-->
-          </form>
-          <button mat-button>
-            <mat-icon class="cursor-pointer"
-                      (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
-          </button>
-        </div>
-        <ng-container *ngIf="isWorkspaceCreator | async as isWC">
-          <ng-container *ngIf="isWC">
-            <app-workspace-menu></app-workspace-menu>
-          </ng-container>
-        </ng-container>
-      </div>
-
-      <div fxLayout="row"
-           fxLayoutAlign="start"
-           style="padding-top: 20px; height: 100%; border-radius: 10px;"
+      <div id="treeAndGridRowWrapper" #treeAndGridRowWrapper>
+        <div fxLayout="row"
+           fxLayoutAlign="start stretch"
            #treeAndGridRow id="treeAndGridRow" >
 
-        <div fxFlex="21" id="workspacestreecontainer" style="overflow: auto;" >
+          <div fxFlex="21" id="workspacestreecontainer" style="overflow: auto;" >
 
-          <browse-tree></browse-tree>
+            <browse-tree></browse-tree>
 
-        </div>
-        <mat-divider [vertical]="true"></mat-divider>
-        <div fxFlex="79">
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div fxFlex id="entity-listing-container">
+            <!--<div style="background-color: #2AA198; height: 110%"></div>-->
           <!--<div>
             <mat-paginator
                     [length]="totalFilesFound$ | async"
@@ -71,8 +68,8 @@
           </div>-->
 
             <div fxLayout="column"
-                 fxLayoutAlign="start">
-              <div style="overflow: auto;">
+                 fxLayoutAlign="start" style="overflow: auto;">
+              <div>
                 <entity-listing></entity-listing>
               </div>
               <div *ngIf="length > 0 else noItemsFound;" style="float: bottom; height: 72px;">
@@ -93,11 +90,11 @@
               </ng-template>
             </div>
 
+          </div>
+
         </div>
 
       </div>
-
-    </div>
 
   </div>
 

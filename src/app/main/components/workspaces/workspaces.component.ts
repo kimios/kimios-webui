@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
@@ -22,11 +22,16 @@ import {IconService} from 'app/services/icon.service';
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss']
 })
-export class WorkspacesComponent implements OnInit, AfterViewInit {
+export class WorkspacesComponent implements OnInit, AfterViewChecked {
 
   @ViewChild('contentColumn') contentColumn: ElementRef;
   @ViewChild('browsePathRow') browsePathRow: ElementRef;
   @ViewChild('treeAndGridRow') treeAndGridRow: ElementRef;
+  @ViewChild('sectionContainer', { read: ElementRef }) sectionContainer: ElementRef;
+  @ViewChild('sectionTitle') sectionTitle: ElementRef;
+  @ViewChild('sectionContent') sectionContent: ElementRef;
+  @ViewChild('treeAndGridRowWrapper') treeAndGridRowWrapper: ElementRef;
+  @ViewChild('browsePathAndActions') browsePathAndActions: ElementRef;
 
   // paginator
   length: number;
@@ -88,10 +93,25 @@ export class WorkspacesComponent implements OnInit, AfterViewInit {
     );
   }
 
-  ngAfterViewInit(): void {
-    console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
+  ngAfterViewChecked(): void {
+    // console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
     // this.treeAndGridRow.nativeElement.style.height = this.contentColumn.nativeElement.offsetHeight - this.browsePathRow.nativeElement.offsetHeight + 'px';
-    console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
+    // console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
+
+    const sectionHeight = this.sectionContainer.nativeElement.offsetHeight;
+    const sectionTitleHeight = this.sectionTitle.nativeElement.offsetHeight;
+    const browsePathAndActionsHeight = this.browsePathAndActions.nativeElement.offsetHeight;
+    const sectionTitleMargin = this.sectionTitle.nativeElement.style.marginBottom.replace('.px', '');
+    const sectionTitleMarginNumber = Number(sectionTitleMargin.replace('px', ''));
+    const height = (sectionHeight - sectionTitleHeight - browsePathAndActionsHeight) + 'px';
+    this.treeAndGridRowWrapper.nativeElement.style.height = height;
+    this.treeAndGridRowWrapper.nativeElement.style.maxHeight = height;
+    this.treeAndGridRowWrapper.nativeElement.style.minHeight = height;
+
+    console.log(sectionHeight + ' - ' + sectionTitleHeight + ' - ' + browsePathAndActionsHeight);
+    console.log(this.treeAndGridRowWrapper.nativeElement.offsetHeight);
+
+
    }
 
   paginatorHandler($event: PageEvent): void {
