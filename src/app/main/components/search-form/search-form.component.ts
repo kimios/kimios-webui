@@ -51,7 +51,7 @@ export class SearchFormComponent implements OnInit {
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
-  private selectedDocumentType: KimiosDocumentType = null;
+  selectedDocumentType: KimiosDocumentType = null;
 
   constructor(
       private fb: FormBuilder,
