@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 export class DocumentUtils {
     static textExtensions = ['txt', 'java', 'cs', 'js', 'cpp', 'c', 'cc', 'html', 'log', 'sql', 'py', 'xml', 'java', 'eml', 'pl', 'caml'
         , 'css', 'scss', 'sh', 'bat'];
-    static extensionsToBeConvertedToPdf = ['odt', 'odp', 'xls', 'xlsx', 'docx', 'doc'];
+    static extensionsToBeConvertedToPdf = ['odt', 'odp', 'ods', 'xls', 'xlsx', 'docx', 'doc'];
     static imgExtensions = ['png', 'jpg', 'jpeg', 'tif', 'tiff', 'gif', 'pdf'];
 
     static viewableExtensions = ['asciidoc', 'adoc', 'ps']
