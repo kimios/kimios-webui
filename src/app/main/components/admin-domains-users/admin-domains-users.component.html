@@ -3,15 +3,22 @@
 
     <div fxLayout="column" fxLayoutGap="5px">
 
-      <div fxLayout="row">
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+        <ng-container *ngIf="currentUserIsAdmin$ | async as currentUserIsAdmin">
+          <ng-container *ngIf="currentUserIsAdmin && (modeIsAdmin() || _mode === 'roles')">
+            <div>
+              <button mat-button mat-icon-button aria-label="Create user" (click)="openDialog()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </ng-container>
+        </ng-container>
+
         <div *ngIf="modeIsAdmin()" fxFlex="70">
         <form (ngSubmit)="filterUsers()">
-          <mat-form-field style="width: 90%;">
+          <mat-form-field>
             <input #inputUserSearch type="text" name="inputFilename" matInput aria-label="Tags" [formControl]="userSearch"
-                   [matAutocomplete]="autoUserSearch" placeholder="login or name">
-            <button mat-button (click)="filterUsers()" >
-              <mat-icon>search</mat-icon>
-            </button>
+                   [matAutocomplete]="autoUserSearch" placeholder="search by login or name">
             <mat-autocomplete #autoUserSearch="matAutocomplete" fxFlex="40" [displayWith]="displayFn">
               <mat-option *ngFor="let user of filteredUsers$ | async" placeholder="File name" [value]="user"
                           (click)="showUser(user)" >
@@ -37,11 +44,6 @@
           <!--</ng-container>-->
         </div>
 
-        <ng-container *ngIf="modeIsAdmin() || _mode === 'roles'">
-        <div>
-          <button (click)="openDialog()"><mat-icon>add</mat-icon></button>
-        </div>
-        </ng-container>
 
       </div>
 

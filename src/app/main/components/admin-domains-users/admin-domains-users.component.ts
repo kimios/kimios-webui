@@ -45,6 +45,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   usersToAddToRole: FormGroup;
   showSpinnerFormSubmit = false;
   nbUsersToAdd = 0;
+  currentUserIsAdmin$: Observable<boolean>;
 
   constructor(
       private adminService: AdminService,
@@ -57,6 +58,7 @@ export class AdminDomainsUsersComponent implements OnInit {
     this.filteredUsers$ = new Observable<Array<KimiosUser>>();
     this.usersToAddToRole = this.fb.group({});
     this.selectDomain = this.fb.control('');
+    this.currentUserIsAdmin$ = new Observable<boolean>();
   }
 
   ngOnInit(): void {
@@ -71,6 +73,7 @@ export class AdminDomainsUsersComponent implements OnInit {
       );
 
       this.filteredUsers$ = this.userSearch.valueChanges.pipe(
+          filter(value => typeof value === 'string'),
           map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
       );
 
@@ -122,8 +125,9 @@ export class AdminDomainsUsersComponent implements OnInit {
               this.usersToAddToRole.get(controlKey).value === true
           ).length
       );
-
     }
+
+    this.currentUserIsAdmin$ = this.securityService.isAdmin(this.sessionService.sessionToken);
   }
 
   public modeIsAdmin(): boolean {
@@ -170,6 +174,8 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   showUser(user: KimiosUser): void {
+    this.userSearch.setValue('');
+    this.inputUserSearch.closePanel();
     this.dialogRef = this.dialog.open(UserDialogComponent, {
       data: {
         'user': user,
