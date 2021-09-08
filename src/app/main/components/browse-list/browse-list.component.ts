@@ -166,7 +166,6 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     if (! DMEntityUtils.dmEntityIsFolder(row)) {
         if ($event.dataTransfer
             && $event.dataTransfer.getData('text/plain').includes('kimiosEntityMove:')) {
-          console.log('moving in doc, just impossible…');
           $event.stopPropagation();
         }
         // it's a document import on current directory

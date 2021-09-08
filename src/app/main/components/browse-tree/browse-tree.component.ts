@@ -152,7 +152,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 (res) => {
                     this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
                 },
-                error => console.log('error : ' + error),
+                null,
                 () => {
                     this.initDataDone$.next(true);
                 }
@@ -461,7 +461,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     ).subscribe(
         ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.isLoading = false,
         null,
-        () => console.log('children loading finished')
+        null
     );
   }
 

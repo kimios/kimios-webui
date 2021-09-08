@@ -66,8 +66,6 @@ export class FilePreviewComponent implements OnInit, OnChanges {
                 result => of(result).catch(error => of(error))
             ),
             catchError((error) => {
-              console.log('we catched the error !');
-              console.log(error);
               return (error.status
                   && error.status === 200
                   && error.error

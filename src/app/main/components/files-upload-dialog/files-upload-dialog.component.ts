@@ -71,7 +71,6 @@ export class FilesUploadDialogComponent implements OnInit {
             filesArray.forEach((o, i) => {
                 const control = new FormControl(1);
                 formArray.push(control);
-                console.log(formArray.controls.length);
                 this.data.filesTags.set(o.name, new Array<string>());
                 this.filesTags$.set(o.name, new BehaviorSubject<Array<string>>([]));
                 this.filesTags.set(o.name, new Array<string>());
@@ -90,8 +89,6 @@ export class FilesUploadDialogComponent implements OnInit {
         console.dir(this.data.filesList);
         this.data.filesList.forEach((filesArray, path) => {
             console.log(path);
-            console.log(this.makeKeyFromPathForFormControl(path));
-            console.log(formCopyFilesList.get(this.makeKeyFromPathForFormControl(path)));
             fileToUpload.set(path, filesArray.filter((elem, i) =>
                 (formCopyFilesList.get(this.makeKeyFromPathForFormControl(path)) as FormArray).at(i).value === 1));
         });

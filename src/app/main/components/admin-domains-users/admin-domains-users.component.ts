@@ -138,7 +138,6 @@ export class AdminDomainsUsersComponent implements OnInit {
       Observable<Array<KimiosUser>> {
     return this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
         catchError(() => of(new Array<KimiosUser>())),
-        tap(users => console.log('returned ' + users.length + ' users')),
         map(users => users),
     );
   }

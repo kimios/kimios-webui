@@ -104,7 +104,6 @@ export class StudioDocumentTypeAdminComponent implements OnInit {
 
     this.filteredDocumentTypes$ = this.formGroup.get('filterControl_inheritedDocumentType').valueChanges.pipe(
         startWith(null),
-        tap(inputVal => console.log('inputVal : ' + inputVal)),
         concatMap(inputVal => iif(
             () => inputVal == null || inputVal === '',
             this.initAndReturnAllDocumentTypes(),

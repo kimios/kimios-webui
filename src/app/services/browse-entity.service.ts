@@ -12,7 +12,7 @@ import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
-const PAGE_SIZE_DEFAULT = 10;
+const PAGE_SIZE_DEFAULT = 20;
 
 export enum EXPLORER_MODE {
     BROWSE = 0,

@@ -88,7 +88,6 @@ export class AdminDomainsParametersComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('dirty ?' + this.formGroup.dirty);
     if (this.formGroup.dirty) {
       this.administrationService.updateAuthenticationSource_2(
           <AuthenticationSourceParam> {

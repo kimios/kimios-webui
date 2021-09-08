@@ -17,7 +17,6 @@ export class FileUploadListComponent implements OnInit {
 
   constructor(private fileUploadService: FileUploadService) {
 
-    console.log('FileUploadListComponent() with this.filesUploading:');
     this.progress = this.fileUploadService.filesProgress;
     this.filesUploaded = this.fileUploadService.filesUploaded;
     this.filesUploadedDocuments = this.fileUploadService.filesUploadedDocuments;

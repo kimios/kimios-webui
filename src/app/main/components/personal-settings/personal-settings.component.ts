@@ -11,7 +11,6 @@ export const passwordConfirmValidator: ValidatorFn = (control: FormGroup): Valid
   const pass1 = (control as FormGroup).get('password');
   const pass2 = (control as FormGroup).get('confirmPassword');
 
-  console.log(pass1.value + ' ==? ' + pass2.value);
   const res = pass1 && pass2 && pass1.value === pass2.value;
   (control as FormGroup).get('confirmPassword').setErrors(
       res ?

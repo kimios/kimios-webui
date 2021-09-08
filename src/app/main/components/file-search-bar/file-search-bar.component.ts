@@ -93,8 +93,6 @@ export class FileSearchBarComponent implements OnInit {
                 // this.filteredTags$ = this.tags$;
                 this.tags = res;
                 this.tagCtrl.updateValueAndValidity();
-                console.log('received tags');
-                console.dir(res);
             }
         );
 

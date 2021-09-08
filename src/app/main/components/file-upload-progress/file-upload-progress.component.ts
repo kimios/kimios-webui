@@ -67,8 +67,6 @@ export class FileUploadProgressComponent implements OnInit {
       ).subscribe(
           res => {
 
-              console.log('in FileUploadProgressComponent');
-              console.log(res);
               /*this.value = res.message ? res.message : this.value;
               if (this.value === -1) {
                   this.initProgressBar(res.name);
@@ -151,7 +149,6 @@ export class FileUploadProgressComponent implements OnInit {
     }
 
     initProgressBar(docName: string): void {
-        console.log('initProgressBar()');
         this.messageDisplayed.next('uploading: ' + docName);
         this.uploadStatus = 'uploading';
         this.value = 0;

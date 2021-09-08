@@ -92,7 +92,6 @@ export class SearchFormComponent implements OnInit {
   ngOnInit(): void {
     this.allTags$ = this.searchEntityService.retrieveAllTags()
         .pipe(
-            tap(res => console.log('retrieved ' + res.size)),
             map(res => Array.from(res.keys())),
             tap(res => this.allTags = res),
         );

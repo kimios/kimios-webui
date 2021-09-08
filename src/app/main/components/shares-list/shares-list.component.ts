@@ -247,7 +247,6 @@ export class SharesListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().pipe(
-        tap(uh => console.log('dialog closed')),
         filter(result => result === true),
         concatMap(result => this.shareService.removeShare(this.sessionService.sessionToken, element.id))
     ).subscribe(

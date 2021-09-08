@@ -69,6 +69,6 @@ export class FileTagsComponent implements OnInit {
   }
 
     dragStart($event: CdkDragStart<any>): void {
-        console.log('start drag');
+
     }
 }

@@ -105,8 +105,6 @@ export class AdminDomainsGroupsComponent implements OnInit {
     ).subscribe(
         group => {
           this.dataSource.loadNbUser(group.gid, group.source);
-          console.log('groupUpdated : ');
-          console.dir(group);
         }
     );
 
@@ -252,9 +250,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
           return newMap;
         }),
         concatMap(mapGroupsNew => this.adminService.saveUserGroups(this.user.uid, mapGroupsNew))
-    ).subscribe(
-        next => console.log('saveUserGroups() is ' + next)
-    );
+    ).subscribe();
   }
 
   removeFromData(row: GroupWithData): void {

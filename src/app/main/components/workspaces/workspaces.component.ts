@@ -70,9 +70,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
         entity => {
           if (entity !== undefined) {
             const path = this.location.path();
-            console.log('current location path: ' + path);
             const newPath = path.replace(new RegExp('(?:\/workspaces.*)?$'), '/workspaces/' + entity.uid);
-            console.log('new location path: ' + newPath);
             this.location.replaceState(newPath);
           }
         }
@@ -107,11 +105,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     this.treeAndGridRowWrapper.nativeElement.style.height = height;
     this.treeAndGridRowWrapper.nativeElement.style.maxHeight = height;
     this.treeAndGridRowWrapper.nativeElement.style.minHeight = height;
-
-    console.log(sectionHeight + ' - ' + sectionTitleHeight + ' - ' + browsePathAndActionsHeight);
-    console.log(this.treeAndGridRowWrapper.nativeElement.offsetHeight);
-
-
    }
 
   paginatorHandler($event: PageEvent): void {
@@ -223,7 +216,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           || Number(dataSplitted[1]) === NaN) {
         return false;
       }
-      console.log(dataSplitted.join(' : '));
       const entityMoved = this.browseEntityService.entities.get(Number(dataSplitted[1]));
       const entityTarget = event['droppedInDir'];
       if (DMEntityUtils.dmEntityIsDocument(entityMoved)
@@ -268,7 +260,6 @@ loading.pipe(
         loading.pipe(
             filter(value => value != null),
             map(value => nbLoading = nbLoading + (value === true ? 1 : -1)),
-            tap(value => console.log('nbLoading: ' + nbLoading)),
             takeWhile(() => nbLoading !== 0 && nbItemsToScan > 0),
         ).subscribe(
             null,
@@ -374,12 +365,6 @@ loading.pipe(
               this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialParentUid));
             }
             this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget);
-            console.log(
-                'moved entity '
-                + reloadedEntity.name
-                + ' to '
-                + entityTarget.name
-            );
           },
           // TODO : enhance dialog and message
           error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),

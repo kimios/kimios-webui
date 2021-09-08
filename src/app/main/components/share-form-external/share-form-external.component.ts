@@ -89,9 +89,6 @@ export class ShareFormExternalComponent implements OnInit {
           fullName: emailStr
         }));
 
-        console.log(this.shareFormGroup.get('email').value);
-        console.dir(recipients);
-
         this.shareService.shareByEmailFullContact_1( <ShareByEmailFullContactParam>{
           sessionId: this.sessionService.sessionToken,
           documentIds: [this.documentId],

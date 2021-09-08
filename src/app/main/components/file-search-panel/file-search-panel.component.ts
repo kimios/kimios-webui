@@ -81,7 +81,6 @@ export class FileSearchPanelComponent implements OnInit {
 
     if (event['dataTransfer'] != null
         && event['dataTransfer']['files'] != null) {
-      Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
       this.openFilesUploadDialog(event['dataTransfer']['files']);
     }
   }

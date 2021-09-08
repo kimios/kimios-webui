@@ -87,9 +87,7 @@ export class BrowseComponent implements OnInit {
           entity => {
               if (entity !== undefined) {
                   const path = this.location.path();
-                  console.log('current location path: ' + path);
                   const newPath = path.replace(new RegExp('(?:\/browse.*)?$'), '/browse/' + entity.uid);
-                  console.log('new location path: ' + newPath);
                   this.location.replaceState(newPath);
               }
           }
@@ -143,7 +141,6 @@ export class BrowseComponent implements OnInit {
 
         if (event['dataTransfer'] != null
             && event['dataTransfer']['files'] != null) {
-            Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
             this.openFilesUploadDialog(event['dataTransfer']['files'], event['droppedInDir'] ? event['droppedInDir'] : '');
         }
     }
@@ -237,12 +234,6 @@ export class BrowseComponent implements OnInit {
                 // TODO : enhance dialog and message
                 error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
                 () => {
-                    console.log(
-                        'moved entity '
-                        + entityMoved.name
-                        + ' to '
-                        + entityTarget.name
-                    );
                     if (DMEntityUtils.dmEntityIsFolder(entityMoved)) {
                         this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(entityMoved, entityTarget, null));
                     }
