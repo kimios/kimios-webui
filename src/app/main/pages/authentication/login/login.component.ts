@@ -25,6 +25,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     public showMessage: boolean;
     public message: string;
 
+    passwordInputType: 'password' | 'text' = 'password';
+    visibilityIconName: 'visibility_off' | 'visibility' = 'visibility_off';
+    visibilityIconTitle: string;
+
     loginForm = new FormGroup({
         login: new FormControl(''),
         password: new FormControl(''),
@@ -64,6 +68,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         };
         this.showMessage = false;
         this.message = '';
+
+        this.visibilityIconTitle = this.passwordInputType === 'text' ? 'Hide password' : 'Show password';
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -133,4 +139,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         clearInterval(this.intervalId);
     }
 
+    toggleVisibility(): void {
+        if (this.visibilityIconName === 'visibility_off') {
+            this.passwordInputType = 'text';
+            this.visibilityIconName = 'visibility';
+        } else {
+            this.passwordInputType = 'password';
+            this.visibilityIconName = 'visibility_off';
+        }
+    }
 }
