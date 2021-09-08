@@ -114,16 +114,17 @@ import {DocumentUploadProgressComponent} from 'app/main/components/document-uplo
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {StudioDocumentTypesComponent} from 'app/main/components/studio-document-types/studio-document-types.component';
 import {StudioDocumentTypeAdminComponent} from 'app/main/components/studio-document-type-admin/studio-document-type-admin.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {fas} from '@fortawesome/free-solid-svg-icons';
+import {far} from '@fortawesome/free-regular-svg-icons';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 import {ShareEditComponent} from 'app/main/components/share-edit/share-edit.component';
 import {SearchFormComponent} from 'app/main/components/search-form/search-form.component';
 import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
 import {StudioMetaFeedsComponent} from 'app/main/components/studio-meta-feeds/studio-meta-feeds.component';
-import {StudioMetaFeedAdminComponent} from '../components/studio-meta-feed-admin/studio-meta-feed-admin.component';
+import {StudioMetaFeedAdminComponent} from 'app/main/components/studio-meta-feed-admin/studio-meta-feed-admin.component';
+import {ShareFormExternalComponent} from 'app/main/components/share-form-external/share-form-external.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -210,7 +211,8 @@ library.add(far, fas);
         SearchFormComponent,
         BrowseTreeDialogComponent,
         StudioMetaFeedsComponent,
-        StudioMetaFeedAdminComponent
+        StudioMetaFeedAdminComponent,
+        ShareFormExternalComponent
     ],
     imports: [
         FileManagerRoutingModule,
