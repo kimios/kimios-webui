@@ -1,15 +1,29 @@
 <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
 
     <div fxFlex="30" fxLayout="column">
+        <div>
         <mat-list>
             <mat-list-item *ngFor="let domain of domains$ | async"
                            (click)="selectDomain(domain.name)"
                            [ngClass]="{'cursor-pointer' : true,
                            'selected-item' : domain.name === adminService.selectedDomain$.getValue()}"
             >
-                {{domain.name}}
+                <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectDomain(domain.name)"
+                     fxLayoutGap="10px" >
+                    <div fxLayout="row" fxLayoutAlign="start center">
+                        <button mat-button mat-icon-button aria-label="Remove domain"
+                                (click)="removeDomain(domain.name)"
+                                [ngClass]="{'kimios-remove' : true}" >
+                            <mat-icon>remove</mat-icon>
+                        </button>
+                    </div>
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+                        <div>{{domain.name}}</div>
+                    </div>
+                </div>
             </mat-list-item>
         </mat-list>
+        </div>
     </div>
 
     <div fxLayout="column" fxLayoutGap="10px" fxFlex>

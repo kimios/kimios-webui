@@ -29,4 +29,8 @@ export class AdminDomainsComponent implements OnInit {
   selectDomain(name: string): void {
     this.adminService.selectedDomain$.next(name);
   }
+
+    removeDomain(name: string) {
+        
+    }
 }
