@@ -1,5 +1,5 @@
 <div fxLayout="row"  fxLayoutGap="8px" fxLayoutAlign=" center" style="height: 100%">
-  <div (click)="contextIsWorkspace() ? goToHome() : router.navigate(['/workspaces'])" class="cursor-pointer">
+  <div (click)="contextIsWorkspace() ? goToHome() : router.navigate(['/workspaces', ''])" class="cursor-pointer">
     <mat-icon>home</mat-icon>
   </div>
   <ng-container *ngIf="contextIsWorkspace()" >
