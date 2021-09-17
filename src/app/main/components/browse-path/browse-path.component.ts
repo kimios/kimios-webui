@@ -3,6 +3,7 @@ import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {takeWhile} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {DocumentUtils} from '../../utils/document-utils';
 
 @Component({
   selector: 'browse-path',
@@ -55,6 +56,10 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       this.browseEntityService.currentPath.next(this.browseEntityService.currentPath.getValue().slice(0, index + 1));
     }
+  }
+
+  navigateToDir(entityContainerUid: number): void {
+    DocumentUtils.navigateToFolderOrWorkspace(this.router, entityContainerUid);
   }
 
   contextIsWorkspace(): boolean {
