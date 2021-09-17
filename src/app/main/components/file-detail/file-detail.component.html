@@ -1,5 +1,13 @@
 <div fxLayout="column" fxLayoutAlign="start start" fxFill>
 
+    <div fxLayout="row" fxLayoutAlign="start space-between" fxFill>
+        <div
+            #browsePathRow id="browsePathRow" fxFlex>
+            <browse-path></browse-path>
+        </div>
+        <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+    </div>
+
     <div class="content" fxFill>
 
 <!-- File details -->
@@ -11,7 +19,7 @@
 
                 <div style="margin-right: 20px">
 
-                    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+
 
                     <mat-tab-group dynamicHeight>
                         <mat-tab label="Data">
