@@ -1,8 +1,7 @@
 <div fxLayout="column" fxLayoutAlign="start stretch" fxFill>
 
     <div fxLayout="row" fxLayoutAlign="start space-between" fxFlex *ngIf="documentData$ | async as document">
-        <div>
-            #browsePathRow id="browsePathRow" fxFlex>
+        <div #browsePathRow id="browsePathRow" fxFlex>
             <browse-path [document]="document"></browse-path>
         </div>
         <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
