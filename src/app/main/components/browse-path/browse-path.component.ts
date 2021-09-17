@@ -33,7 +33,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
       );
     } else {
       if (this.document !== null && this.contextIsDocument()) {
-        this.browseEntityService.findAllParents(this.document.uid, true).subscribe(
+        this.browseEntityService.findAllParents(this.document.folderUid, true).subscribe(
             next => this.pathDirs = next.reverse()
         );
       }
