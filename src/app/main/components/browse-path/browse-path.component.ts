@@ -1,7 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DMEntity} from 'app/kimios-client-api';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {takeWhile} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'browse-path',
@@ -13,16 +14,30 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
   pathDirs: Array<DMEntity>;
   subscriptionOk = true;
 
-  constructor(private browseEntityService: BrowseEntityService) {
+  @Input()
+  document: KimiosDocument;
+
+  constructor(
+      private browseEntityService: BrowseEntityService,
+      private router: Router
+  ) {
     this.pathDirs = [];
   }
 
   ngOnInit(): void {
-    this.browseEntityService.currentPath.pipe(
-        takeWhile(next => this.subscriptionOk)
-    ).subscribe(
-        next => this.pathDirs = next
-    );
+    if (this.contextIsWorkspace()) {
+      this.browseEntityService.currentPath.pipe(
+          takeWhile(next => this.subscriptionOk)
+      ).subscribe(
+          next => this.pathDirs = next
+      );
+    } else {
+      if (this.document !== null && this.contextIsDocument()) {
+        this.browseEntityService.findAllParents(this.document.uid, true).subscribe(
+            next => this.pathDirs = next.reverse()
+        );
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -40,5 +55,13 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       this.browseEntityService.currentPath.next(this.browseEntityService.currentPath.getValue().slice(0, index + 1));
     }
+  }
+
+  contextIsWorkspace(): boolean {
+    return this.router.url.includes('/workspaces/');
+  }
+
+  contextIsDocument(): boolean {
+    return this.router.url.includes('/document/');
   }
 }
