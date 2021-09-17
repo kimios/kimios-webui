@@ -9,7 +9,7 @@
     </ng-container>
   </ng-container>
 
-  <ng-container *ngIf="contextIsWorkspace()" >
+  <ng-container *ngIf="contextIsDocument()" >
     <ng-container *ngFor="let dir of pathDirs; let index">
       <mat-icon>chevron_right</mat-icon>
       <div (click)="goToDir(dir)" class="cursor-pointer">{{dir.name}}</div>
