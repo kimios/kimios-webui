@@ -47,6 +47,8 @@
 
                         <mat-tab label="Data">
 
+                            <div [ngClass]="'data-tab-content'">
+
                             <!-- file properties : name, type, size, author, creation date -->
                             <file-detail-data [document]="data"></file-detail-data>
 
@@ -90,6 +92,8 @@
                                         </mat-chip>
                                     </mat-chip-list>
                                 </ng-template>
+                            </div>
+
                             </div>
 
                         </mat-tab>
