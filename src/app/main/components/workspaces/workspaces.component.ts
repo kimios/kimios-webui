@@ -65,6 +65,9 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
         && this.entityId !== undefined) {
       this.browseEntityService.getEntity(this.entityId)
           .subscribe(entity => this.browseEntityService.selectedEntity$.next(entity));
+      this.browseEntityService.findAllParents(this.entityId, true).pipe(
+          map(parents => this.browseEntityService.currentPath.next(parents.reverse()))
+      ).subscribe();
     }
     this.browseEntityService.selectedEntity$.subscribe(
         entity => {

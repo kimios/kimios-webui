@@ -1,7 +1,10 @@
-<div fxLayout="column" fxLayoutAlign="start start" fxFill>
-    <div fxLayout="row" fxLayoutAlign="start center" class="goBackDiv" (click)="goBack($event)">
-        <mat-icon id="goBackIcon" >arrow_back</mat-icon>
-        <span>Go back</span>
+<div fxLayout="column" fxLayoutAlign="start stretch" fxFill>
+
+    <div fxLayout="row" fxLayoutAlign="start space-between" fxFlex *ngIf="documentData$ | async as document">
+        <div #browsePathRow id="browsePathRow" fxFlex>
+            <browse-path [document]="document"></browse-path>
+        </div>
+        <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     </div>
 
     <div class="content" fxFill>
@@ -15,7 +18,7 @@
 
                 <div style="margin-right: 20px">
 
-                    <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+
 
                     <mat-tab-group dynamicHeight>
                         <mat-tab label="Data">

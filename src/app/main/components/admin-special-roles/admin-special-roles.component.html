@@ -1,12 +1,20 @@
 <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
 
-  <div fxFlex="30" fxLayout="column">
-    <div *ngFor="let possibleRoleId of possibleRolesId"
-         (click)="selectRole(possibleRoleId)"
-         class="cursor-pointer"
-    >
-      <span>{{_possibleRoles.get(possibleRoleId)}}</span>
-    </div>
+  <div>
+    <mat-list>
+      <mat-list-item *ngFor="let possibleRoleId of possibleRolesId"
+                     [ngClass]="{'cursor-pointer' : true}" >
+        <!--,
+                           'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
+      >-->
+        <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectRole(possibleRoleId)"
+             fxLayoutGap="10px" >
+          <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+            <div>{{_possibleRoles.get(possibleRoleId)}}</div>
+          </div>
+        </div>
+      </mat-list-item>
+    </mat-list>
   </div>
 
   <div fxLayout="column" fxLayoutGap="10px" fxFlex>
