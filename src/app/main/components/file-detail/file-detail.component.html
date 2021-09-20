@@ -108,6 +108,8 @@
                 <mat-expansion-panel-header>
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
+                            <div  [ngClass]="'data-tab-content'">
+
                             <mat-list id="versionList">
                                 <mat-list-item
                                         *ngFor="let version of versions"
@@ -128,10 +130,14 @@
         </div>
         <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
 -->
+                            </div>
+
                         </mat-tab>
 
                         <mat-tab label="Security">
+                            <div  [ngClass]="'data-tab-content'">
                             <file-security [documentId]="documentId"></file-security>
+                            </div>
                         </mat-tab>
                     </mat-tab-group>
                     <!--    </div>-->
