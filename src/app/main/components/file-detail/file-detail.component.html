@@ -12,15 +12,41 @@
 <!-- File details -->
         <div *ngIf="documentData$ | async as data">
 
-            <span id="docTitle">{{data.name + (data.extension ? '.' + data.extension : '')}}</span>
-
             <div fxLayout="row" fxLayoutAlign="start start" fxFlexFill>
 
-                <div style="margin-right: 20px">
-
-
-
                     <mat-tab-group dynamicHeight>
+
+                        <mat-tab label="Preview">
+                            <div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
+                                <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%">
+                                    <div>
+                                        <mat-icon
+                                                [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
+                                    'disabledIcon': currentVersionIsFirst()}"
+                                                (click)="handleVersionPreviewNextOrPrev(-1)">
+                                            navigate_before
+                                        </mat-icon>
+                                    </div>
+                                    <div style="text-align: center">{{previewTitle}}</div>
+                                    <div>
+                                        <mat-icon
+                                                [ngClass]="{'cursor-pointer': !currentVersionIsLast(),
+                                    'disabledIcon': currentVersionIsLast()}"
+                                                (click)="handleVersionPreviewNextOrPrev(1)">
+                                            navigate_next
+                                        </mat-icon>
+                                    </div>
+                                </div>
+                                <div style="width: 96%">
+                                    <file-preview
+                                            [documentId]="documentId"
+                                            [documentExtension]="document.extension"
+                                            [documentVersionId]="currentVersionId"
+                                    ></file-preview>
+                                </div>
+                            </div>
+                        </mat-tab>
+
                         <mat-tab label="Data">
 
                             <!-- file properties : name, type, size, author, creation date -->
@@ -107,37 +133,6 @@
                         </mat-tab>
                     </mat-tab-group>
                     <!--    </div>-->
-
-                </div>
-
-                <div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
-                    <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%">
-                        <div>
-                            <mat-icon
-                                    [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
-                                    'disabledIcon': currentVersionIsFirst()}"
-                                    (click)="handleVersionPreviewNextOrPrev(-1)">
-                                navigate_before
-                            </mat-icon>
-                        </div>
-                        <div style="text-align: center">{{previewTitle}}</div>
-                        <div>
-                            <mat-icon
-                                    [ngClass]="{'cursor-pointer': !currentVersionIsLast(),
-                                    'disabledIcon': currentVersionIsLast()}"
-                                    (click)="handleVersionPreviewNextOrPrev(1)">
-                                navigate_next
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <div style="width: 96%">
-                        <file-preview
-                                [documentId]="documentId"
-                                [documentExtension]="document.extension"
-                                [documentVersionId]="currentVersionId"
-                        ></file-preview>
-                    </div>
-                </div>
 
             </div>
 
