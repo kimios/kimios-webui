@@ -10,7 +10,7 @@
     <div class="content" fxFill>
 
 <!-- File details -->
-        <div *ngIf="documentData$ | async as data">
+        <ng-container *ngIf="documentData$ | async as data">
 
             <div fxLayout="row" fxLayoutAlign="start start" fxFlexFill>
 
@@ -136,7 +136,7 @@
 
             </div>
 
-        </div>
+        </ng-container>
 
     </div>
 
