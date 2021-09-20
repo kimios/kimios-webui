@@ -35,6 +35,7 @@ export class CacheService {
         msg => {
           console.log('message received: ' + msg);
           console.dir(msg);
+          this.handleMsg(msg);
         },
         // Called whenever there is a message from the server
         err => console.log(err),
@@ -42,5 +43,12 @@ export class CacheService {
         () => console.log('complete')
         // Called when connection is closed (for whatever reason)
     );
+  }
+
+  private handleMsg(msg: any): void {
+    if (msg.constructor === 'Message') {
+      console.log('Websocket received message: ');
+      console.dir(msg);
+    }
   }
 }
