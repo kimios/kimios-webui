@@ -1,11 +1,41 @@
 <div fxLayout="row">
-    <tree-root [nodes]="nodes"
-               [options]="options"
-               class="kimios-browse-tree"
-               (focus)="onFocusNode($event)"
-               (toggleExpanded)="onToggleExpanded($event)"
-               (click)="selectNode($event)" >
+    <tree-root #tree
+            [nodes]="nodes"
+            [options]="options"
+            class="kimios-browse-tree"
+            (focus)="onFocusNode($event)"
+            (toggleExpanded)="onToggleExpanded($event)"
+            (click)="selectNode($event)" >
 
+    <tree-root class="kimios-browse-tree"
+               [nodes]="nodes"
+               [options]="options" >
+        <!--<ng-template #treeNodeTemplate let-node let-index="index" >
+            <span (click)="selectNode($event)" >{{ node.data.name }}</span>
+        </ng-template>
+-->
+        <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+            <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+                <tree-node-expander *ngIf="node.data.type === 'domain'" [node]="node" (click)="onToggleExpanded($event)" >
+                    <mat-icon class="mat-icon-rtl-mirror">
+                        {{ tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </tree-node-expander>
+                <div class="node-content-wrapper"
+                     [class.node-content-wrapper-active]="node.isActive"
+                     [class.node-content-wrapper-focused]="node.isFocused"
+                     (click)="node.mouseAction('click', $event)"
+                     (dblclick)="node.mouseAction('dblClick', $event)"
+                     (contextmenu)="node.mouseAction('contextMenu', $event)"
+                     (treeDrop)="node.onDrop($event)"
+                     [treeAllowDrop]="node.allowDrop"
+                     [treeDrag]="node"
+                     [treeDragEnabled]="node.allowDrag()">
+
+                    <tree-node-content [node]="node" [index]="index">{{ node.data.name }</tree-node-content>
+                </div>
+            </div>
+        </ng-template>
     </tree-root>
     <div>
         <mat-table

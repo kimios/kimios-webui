@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ITreeOptions} from 'angular-tree-component';
 import {AdministrationService, Session, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
@@ -38,6 +38,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   sort: DMEntitySort;
   columnsDescription = SESSIONS_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
+  @ViewChild('tree') tree;
 
   constructor(
       private administrationService: AdministrationService,
@@ -147,21 +148,23 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     if (node.data.type
         && node.data.type === 'user') {
       this.adminService.selectedUser$.next(node.data.userData);
+    } else {
+      this.tree.getNodeById(node.id).toggleExpanded();
     }
   }
 
-  onFocusNode($event): void {
+  /*onFocusNode($event): void {
     // $event.node.data
+  }*/
+
+  /*onToggleExpanded($event): void {
+
   }
-
-  onToggleExpanded($event): void {
-
-  }
-
-  selectNode($event): void {
+*/
+  /*selectNode($event): void {
     if ($event.node.data['type'] && $event.node.data['type'] === 'domain') {
       // if domain clicked
       this.onToggleExpanded($event);
     }
-  }
+  }*/
 }
