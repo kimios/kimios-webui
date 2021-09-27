@@ -35,7 +35,7 @@
                                         </mat-icon>
                                     </div>
                                 </div>
-                                <div style="width: 96%; min-height: 100%; height: 100%;">
+                                <div #filePreviewDiv style="width: 96%; min-height: 100%; height: 100%;">
                                     <file-preview
                                             [documentId]="documentId"
                                             [documentExtension]="document.extension"
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                         </mat-tab>
-
+filePreviewDiv
                         <mat-tab label="Data">
 
                             <div [ngClass]="'data-tab-content'">
