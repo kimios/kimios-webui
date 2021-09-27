@@ -7,9 +7,10 @@
             (toggleExpanded)="onToggleExpanded($event)"
             (click)="selectNode($event)" >-->
 
-    <tree-root class="kimios-browse-tree"
-               [nodes]="nodes"
-               [options]="options" >
+    <tree-root #tree
+            class="kimios-browse-tree"
+            [nodes]="nodes"
+            [options]="options" >
         <!--<ng-template #treeNodeTemplate let-node let-index="index" >
             <span (click)="selectNode($event)" >{{ node.data.name }}</span>
         </ng-template>
