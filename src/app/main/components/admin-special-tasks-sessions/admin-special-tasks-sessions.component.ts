@@ -149,4 +149,19 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
       this.adminService.selectedUser$.next(node.data.userData);
     }
   }
+
+  onFocusNode($event): void {
+    // $event.node.data
+  }
+
+  onToggleExpanded($event): void {
+
+  }
+
+  selectNode($event): void {
+    if ($event.node.data['type'] && $event.node.data['type'] === 'domain') {
+      // if domain clicked
+      this.onToggleExpanded($event);
+    }
+  }
 }
