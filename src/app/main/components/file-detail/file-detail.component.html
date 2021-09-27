@@ -7,12 +7,12 @@
         <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     </div>
 
-    <div class="content" fxFill>
+    <div class="content" fxFill style="overflow: auto;">
 
 <!-- File details -->
         <ng-container *ngIf="documentData$ | async as data">
 
-                    <mat-tab-group dynamicHeight>
+                    <mat-tab-group>
 
                         <mat-tab label="Preview">
                             <div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
