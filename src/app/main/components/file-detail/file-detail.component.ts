@@ -60,6 +60,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
     @ViewChild('filePreviewDiv') filePreviewDivElement: ElementRef;
+    @ViewChild('filePreview') filePreviewElement: ElementRef;
 
     constructor(
         private route: ActivatedRoute,
@@ -396,9 +397,6 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngAfterViewChecked(): void {
-        const windowHeight = window.innerHeight;
-        const filePreviewDivElementHeight = this.filePreviewDivElement.nativeElement.offsetHeight;
-
-        this.filePreviewDivElement.nativeElement.style.height = windowHeight + 'px';
+        this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
     }
 }
