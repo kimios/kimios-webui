@@ -34,15 +34,6 @@
       <mat-icon>cloud_download</mat-icon>
     </button>
     <button mat-button mat-icon-button
-            aria-label="Delete"
-            label="Delete"
-            title="Delete"
-            style="margin: 10px 10px 10px 0px; "
-            [disabled]="!(canWrite$ | async)"
-            [ngClass]="'kimios-remove'" >
-      <mat-icon>delete</mat-icon>
-    </button>
-    <button mat-button mat-icon-button
             aria-label="Share"
             label="Share"
             title="Share"
@@ -52,5 +43,22 @@
             [ngClass]="'kimios-green'" >
         <mat-icon>share</mat-icon>
     </button>
-
+    <button mat-button mat-icon-button
+              [matMenuTriggerFor]="docToolbarMenu"
+              title="See more available actions"
+              [class.cursor-pointer]="true">
+        <mat-icon>more_horiz</mat-icon>
+    </button>
 </div>
+
+<mat-menu #docToolbarMenu="matMenu">
+    <button mat-button mat-icon-button
+            aria-label="Delete"
+            label="Delete"
+            title="Delete"
+            style="margin: 10px 10px 10px 0px; "
+            [disabled]="!(canWrite$ | async)"
+            [ngClass]="'kimios-remove'" >
+        <mat-icon>delete</mat-icon>
+    </button>
+</mat-menu>
