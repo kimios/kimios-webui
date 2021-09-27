@@ -17,8 +17,8 @@
 -->
         <ng-template #treeNodeWrapperTemplate let-node let-index="index">
             <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
-                <tree-node-expander *ngIf="node.data.type === 'domain'" [node]="node" (click)="onToggleExpanded($event)" >
-                    <mat-icon class="mat-icon-rtl-mirror">
+                <tree-node-expander [node]="node" (click)="onToggleExpanded($event)" >
+                    <mat-icon class="mat-icon-rtl-mirror" *ngIf="node.data.type === 'domain'">
                         {{ tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                 </tree-node-expander>
