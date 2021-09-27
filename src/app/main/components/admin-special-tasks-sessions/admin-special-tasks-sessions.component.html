@@ -1,5 +1,12 @@
 <div fxLayout="row">
-    <tree-root [nodes]="nodes" [options]="options" class="kimios-browse-tree"></tree-root>
+    <tree-root [nodes]="nodes"
+               [options]="options"
+               class="kimios-browse-tree"
+               (focus)="onFocusNode($event)"
+               (toggleExpanded)="onToggleExpanded($event)"
+               (click)="selectNode($event)" >
+
+    </tree-root>
     <div>
         <mat-table
                 *ngIf="dataSource != null"
