@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ITreeOptions} from 'angular-tree-component';
 import {AdministrationService, Session, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, tap} from 'rxjs/operators';
 import {SessionDataSource, SESSIONS_DEFAULT_DISPLAYED_COLUMNS} from './session-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
@@ -72,6 +72,11 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     );
 
     this.adminService.selectedUser$.pipe(
+        tap(user => {
+          if (user == null) {
+            this.dataSource.data = [];
+          }
+        }),
         filter(user => user != null)
     ).subscribe(
         user => {
@@ -150,6 +155,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
       this.adminService.selectedUser$.next(node.data.userData);
     } else {
       this.tree.treeModel.getNodeById(node.id).toggleExpanded();
+      this.adminService.selectedUser$.next(null);
     }
   }
 
