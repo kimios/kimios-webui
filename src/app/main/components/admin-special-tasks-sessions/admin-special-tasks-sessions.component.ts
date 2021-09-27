@@ -149,7 +149,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
         && node.data.type === 'user') {
       this.adminService.selectedUser$.next(node.data.userData);
     } else {
-      this.tree.getNodeById(node.id).toggleExpanded();
+      this.tree.treeModel.getNodeById(node.id).toggleExpanded();
     }
   }
 
@@ -158,7 +158,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   }*/
 
   onToggleExpanded($event): void {
-    this.tree.getNodeById($event.node.id).expand();
+    this.tree.treeModel.getNodeById($event.node.id).expand();
   }
 
   /*selectNode($event): void {
