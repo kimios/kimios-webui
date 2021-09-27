@@ -17,7 +17,8 @@
                 label="Import new version"
                 title="Import new version"
                 style="margin: 10px 10px 10px 0px; "
-                [disabled]="!(canWrite$ | async)" >
+                [disabled]="!(canWrite$ | async)"
+                [ngClass]="'kimios-green'" >
             <mat-icon>cloud_upload</mat-icon>
         </button>
     </ng-template>
