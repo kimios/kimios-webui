@@ -15,16 +15,22 @@
             <span (click)="selectNode($event)" >{{ node.data.name }}</span>
         </ng-template>
 -->
-        <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+        <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
             <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
-                <tree-node-expander [node]="node" >
+                <!--<tree-node-expander [node]="node" >-->
+                <button
+                        *ngIf="node.data.type === 'domain'"
+                        mat-icon-button
+                        [attr.aria-label]="'toggle ' + node.name"
+                        (click)="node.toggleExpanded()"
+                        class="kimios-tree-button-expand">
                     <mat-icon
                             class="mat-icon-rtl-mirror"
-                            *ngIf="node.data.type === 'domain'"
                             (click)="onToggleExpanded($event)" >
                         {{ tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
-                </tree-node-expander>
+                </button>
+                <!--</tree-node-expander>-->
                 <div class="node-content-wrapper"
                      [class.node-content-wrapper-active]="node.isActive"
                      [class.node-content-wrapper-focused]="node.isFocused"
@@ -39,6 +45,8 @@
                     <tree-node-content [node]="node" [index]="index">{{ node.data.name }</tree-node-content>
                 </div>
             </div>
+            <tree-node-children [node]="node" [templates]="templates">
+            </tree-node-children>
         </ng-template>
     </tree-root>
     <div>
