@@ -157,10 +157,10 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     // $event.node.data
   }*/
 
-  /*onToggleExpanded($event): void {
-
+  onToggleExpanded($event): void {
+    this.tree.getNodeById($event.node.id).expand();
   }
-*/
+
   /*selectNode($event): void {
     if ($event.node.data['type'] && $event.node.data['type'] === 'domain') {
       // if domain clicked
