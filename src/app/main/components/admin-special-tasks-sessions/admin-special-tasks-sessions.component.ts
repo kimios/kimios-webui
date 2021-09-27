@@ -72,11 +72,6 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     );
 
     this.adminService.selectedUser$.pipe(
-        tap(user => {
-          if (user == null) {
-            this.dataSource.data = [];
-          }
-        }),
         filter(user => user != null)
     ).subscribe(
         user => {
@@ -86,7 +81,11 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
                 data => console.dir(data)
             );
           }
-          this.dataSource.loadData(user, this.sort, null);
+          if (user === undefined) {
+            this.dataSource.data = [];
+          } else {
+            this.dataSource.loadData(user, this.sort, null);
+          }
         }
     );
   }
@@ -155,7 +154,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
       this.adminService.selectedUser$.next(node.data.userData);
     } else {
       this.tree.treeModel.getNodeById(node.id).toggleExpanded();
-      this.adminService.selectedUser$.next(null);
+      this.adminService.selectedUser$.next(undefined);
     }
   }
 
