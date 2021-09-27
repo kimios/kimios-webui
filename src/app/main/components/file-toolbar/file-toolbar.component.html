@@ -11,14 +11,12 @@
     <ng-template #elseBlock>
         <input hidden type="file" #fileInput (change)="handleFileInput($event.target, document.uid)"
                [disabled]="!(canWrite$ | async)" />
-        <button mat-fab
-                color="warn"
-                (click)="fileInput.click()"
+        <button (click)="fileInput.click()"
                 aria-label="Import new version"
                 label="Import new version"
                 style="margin: 10px 10px 10px 0px; "
                 [disabled]="!(canWrite$ | async)" >
-            <mat-icon>cloud_upload</mat-icon>
+            <mat-icon>remove</mat-icon>
         </button>
     </ng-template>
 
