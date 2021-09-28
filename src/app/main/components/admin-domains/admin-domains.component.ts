@@ -31,6 +31,6 @@ export class AdminDomainsComponent implements OnInit {
   }
 
     removeDomain(name: string) {
-        
+
     }
 }
