@@ -50,7 +50,7 @@
     </tree-root>
     <div>
         <mat-table
-                *ngIf="dataSource != null"
+                *ngIf="showSessionList && dataSource != null"
                 [dataSource]="dataSource"
                    matSort
                    matSortActive="{{sort.name}}"

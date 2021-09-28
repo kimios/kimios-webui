@@ -71,13 +71,14 @@ export class SessionDataSource extends MatTableDataSource<Session> {
 
     loadData(user: KimiosUser, sort: DMEntitySort, filter: string): void {
         this.administrationService.getEnabledSessions(this.sessionService.sessionToken, user.uid, user.source).pipe(
-            tap(sessions => this.sessionsSubject.next(this._sortData(sessions, sort)))
+            tap(sessions => this.sessionsSubject.next(this._sortData(sessions, sort))),
         ).subscribe();
     }
 
     private _sortData(data: Array<Session>, sort: DMEntitySort): Array<Session> {
-            return data.sort((session1, session2) => this._compareDataOnField(session1, session2, sort));
-        }
+        const array = data.sort((session1, session2) => this._compareDataOnField(session1, session2, sort));
+        return array;
+    }
 
     private _compareDataOnField(element1: Session, element2: Session, sort: DMEntitySort): number {
             const sortDir = sort.direction === 'asc' ?

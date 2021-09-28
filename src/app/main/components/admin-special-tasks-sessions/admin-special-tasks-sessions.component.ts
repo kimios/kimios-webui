@@ -39,6 +39,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   columnsDescription = SESSIONS_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
   @ViewChild('tree') tree;
+  showSessionList = false;
 
   constructor(
       private administrationService: AdministrationService,
@@ -71,20 +72,14 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
         () => this.nodes = this._initTreeData()
     );
 
-    this.adminService.selectedUser$.pipe(
-        filter(user => user != null)
-    ).subscribe(
+    this.adminService.selectedUser$.subscribe(
         user => {
-          if (this.dataSource == null) {
-            this.dataSource = new SessionDataSource(this.sessionService, this.administrationService);
-            this.dataSource.connect().subscribe(
-                data => console.dir(data)
-            );
-          }
-          if (user === undefined) {
-            this.dataSource.data = [];
+          if (user == null || user === undefined) {
+            this.showSessionList = false;
           } else {
+            this.dataSource = new SessionDataSource(this.sessionService, this.administrationService);
             this.dataSource.loadData(user, this.sort, null);
+            this.showSessionList = true;
           }
         }
     );
