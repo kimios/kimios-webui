@@ -149,6 +149,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
 
 
   private onClick(node: ITreeNode): void {
+    this.tree.treeModel.getNodeById(node.id).focus();
     if (node.data.type
         && node.data.type === 'user') {
       this.adminService.selectedUser$.next(node.data.userData);
@@ -162,8 +163,8 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     // $event.node.data
   }*/
 
-  onToggleExpanded($event): void {
-    this.tree.treeModel.getNodeById($event.node.id).expand();
+  onToggleExpanded(nodeId): void {
+    this.tree.treeModel.getNodeById(nodeId).expand();
   }
 
   /*selectNode($event): void {

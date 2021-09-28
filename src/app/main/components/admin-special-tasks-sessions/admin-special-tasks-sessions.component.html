@@ -22,11 +22,10 @@
                         *ngIf="node.data.type === 'domain'"
                         mat-icon-button
                         [attr.aria-label]="'toggle ' + node.name"
-                        (click)="node.toggleExpanded()"
+                        (click)="node.mouseAction('click', $event)"
                         class="kimios-tree-button-expand">
                     <mat-icon
-                            class="mat-icon-rtl-mirror"
-                            (click)="onToggleExpanded($event)" >
+                            class="mat-icon-rtl-mirror" >
                         {{ tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                 </button>
