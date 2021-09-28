@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, Input, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Inject, Input, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
@@ -23,7 +23,7 @@ export enum Direction {
   templateUrl: './file-detail.component.html',
   styleUrls: ['./file-detail.component.scss']
 })
-export class FileDetailComponent implements OnInit, OnDestroy {
+export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     @Input()
     documentId: number;
@@ -59,6 +59,8 @@ export class FileDetailComponent implements OnInit, OnDestroy {
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
+    @ViewChild('filePreviewDiv') filePreviewDivElement: ElementRef;
+    @ViewChild('filePreview') filePreviewElement: ElementRef;
 
     constructor(
         private route: ActivatedRoute,
@@ -392,5 +394,9 @@ export class FileDetailComponent implements OnInit, OnDestroy {
             }
             this.tagCtrl.setValue(null);
         }
+    }
+
+    ngAfterViewChecked(): void {
+        this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
     }
 }

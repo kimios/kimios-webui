@@ -56,8 +56,7 @@
       Please enter your password (at least 8 signs)
     </mat-error>
   </mat-form-field>
-
-  {{formGroup.errors != null && formGroup.errors['passwordNotConfirmed']}}
+  
   <mat-form-field class="example-full-width" fxFill>
     <input type="password" placeholder="Confirm password" aria-label="confirm password" matInput [formControlName]="'confirmPassword'" >
     <button mat-button *ngIf="formGroup.get('confirmPassword').value" matSuffix mat-icon-button aria-label="Clear"

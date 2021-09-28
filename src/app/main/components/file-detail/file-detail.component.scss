@@ -35,6 +35,12 @@
   // background-color: #039be5
 }
 
-.matTabData {
+.data-tab-content {
   max-width: 500px;
+  width: max-content;
+}
+
+.mat-tab-group {
+  //min-height: 100%;
+  //height: 100%;
 }

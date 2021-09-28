@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ITreeOptions} from 'angular-tree-component';
 import {AdministrationService, Session, User as KimiosUser} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, tap} from 'rxjs/operators';
 import {SessionDataSource, SESSIONS_DEFAULT_DISPLAYED_COLUMNS} from './session-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
@@ -38,6 +38,8 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   sort: DMEntitySort;
   columnsDescription = SESSIONS_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
+  @ViewChild('tree') tree;
+  showSessionList = false;
 
   constructor(
       private administrationService: AdministrationService,
@@ -70,17 +72,15 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
         () => this.nodes = this._initTreeData()
     );
 
-    this.adminService.selectedUser$.pipe(
-        filter(user => user != null)
-    ).subscribe(
+    this.adminService.selectedUser$.subscribe(
         user => {
-          if (this.dataSource == null) {
+          if (user == null || user === undefined) {
+            this.showSessionList = false;
+          } else {
             this.dataSource = new SessionDataSource(this.sessionService, this.administrationService);
-            this.dataSource.connect().subscribe(
-                data => console.dir(data)
-            );
+            this.dataSource.loadData(user, this.sort, null);
+            this.showSessionList = true;
           }
-          this.dataSource.loadData(user, this.sort, null);
         }
     );
   }
@@ -144,9 +144,28 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
 
 
   private onClick(node: ITreeNode): void {
+    this.tree.treeModel.getNodeById(node.id).focus();
     if (node.data.type
         && node.data.type === 'user') {
       this.adminService.selectedUser$.next(node.data.userData);
+    } else {
+      this.tree.treeModel.getNodeById(node.id).toggleExpanded();
+      this.adminService.selectedUser$.next(undefined);
     }
   }
+
+  /*onFocusNode($event): void {
+    // $event.node.data
+  }*/
+
+  onToggleExpanded(nodeId): void {
+    this.tree.treeModel.getNodeById(nodeId).expand();
+  }
+
+  /*selectNode($event): void {
+    if ($event.node.data['type'] && $event.node.data['type'] === 'domain') {
+      // if domain clicked
+      this.onToggleExpanded($event);
+    }
+  }*/
 }

@@ -233,6 +233,9 @@
         &.kimios-remove {
             background-color: map-get($warn, 400);
         }
+        &.kimios-green {
+            background-color: map-get($accent, 500);
+        }
     }
 
     .kimios-selection-item:hover {

@@ -1,8 +1,56 @@
 <div fxLayout="row">
-    <tree-root [nodes]="nodes" [options]="options"></tree-root>
+   <!-- <tree-root #tree
+            [nodes]="nodes"
+            [options]="options"
+            class="kimios-browse-tree"
+            (focus)="onFocusNode($event)"
+            (toggleExpanded)="onToggleExpanded($event)"
+            (click)="selectNode($event)" >-->
+
+    <tree-root #tree
+            class="kimios-browse-tree"
+            [nodes]="nodes"
+            [options]="options" >
+        <!--<ng-template #treeNodeTemplate let-node let-index="index" >
+            <span (click)="selectNode($event)" >{{ node.data.name }}</span>
+        </ng-template>
+-->
+        <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
+            <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+                <!--<tree-node-expander [node]="node" >-->
+                <button
+                        *ngIf="node.data.type === 'domain'"
+                        mat-icon-button
+                        [attr.aria-label]="'toggle ' + node.name"
+                        (click)="node.mouseAction('click', $event)"
+                        class="kimios-tree-button-expand">
+                    <mat-icon
+                            class="mat-icon-rtl-mirror" >
+                        {{ tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </button>
+                <!--</tree-node-expander>-->
+                <div class="node-content-wrapper"
+                     [class.node-content-wrapper-active]="node.isActive"
+                     [class.node-content-wrapper-focused]="node.isFocused"
+                     (click)="node.mouseAction('click', $event)"
+                     (dblclick)="node.mouseAction('dblClick', $event)"
+                     (contextmenu)="node.mouseAction('contextMenu', $event)"
+                     (treeDrop)="node.onDrop($event)"
+                     [treeAllowDrop]="node.allowDrop"
+                     [treeDrag]="node"
+                     [treeDragEnabled]="node.allowDrag()">
+
+                    <tree-node-content [node]="node" [index]="index">{{ node.data.name }</tree-node-content>
+                </div>
+            </div>
+            <tree-node-children [node]="node" [templates]="templates">
+            </tree-node-children>
+        </ng-template>
+    </tree-root>
     <div>
         <mat-table
-                *ngIf="dataSource != null"
+                *ngIf="showSessionList && dataSource != null"
                 [dataSource]="dataSource"
                    matSort
                    matSortActive="{{sort.name}}"

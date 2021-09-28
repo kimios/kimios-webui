@@ -7,12 +7,12 @@
         <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     </div>
 
-    <div class="content" fxFill>
+    <div class="content" fxFill style="overflow: auto;">
 
 <!-- File details -->
         <ng-container *ngIf="documentData$ | async as data">
 
-                    <mat-tab-group dynamicHeight>
+                    <mat-tab-group>
 
                         <mat-tab label="Preview">
                             <div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
@@ -35,8 +35,9 @@
                                         </mat-icon>
                                     </div>
                                 </div>
-                                <div style="width: 96%">
+                                <div #filePreviewDiv style="width: 96%; min-height: 100%; height: 100%;">
                                     <file-preview
+                                            #filePreview
                                             [documentId]="documentId"
                                             [documentExtension]="document.extension"
                                             [documentVersionId]="currentVersionId"
@@ -45,7 +46,9 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab label="Data" [ngClass]="'matTabData'">
+                        <mat-tab label="Data">
+
+                            <div [ngClass]="'data-tab-content'">
 
                             <!-- file properties : name, type, size, author, creation date -->
                             <file-detail-data [document]="data"></file-detail-data>
@@ -92,6 +95,8 @@
                                 </ng-template>
                             </div>
 
+                            </div>
+
                         </mat-tab>
 
                         <!-- file versions -->
@@ -104,6 +109,8 @@
                 <mat-expansion-panel-header>
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
+                            <div  [ngClass]="'data-tab-content'">
+
                             <mat-list id="versionList">
                                 <mat-list-item
                                         *ngFor="let version of versions"
@@ -124,10 +131,14 @@
         </div>
         <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
 -->
+                            </div>
+
                         </mat-tab>
 
                         <mat-tab label="Security">
+                            <div  [ngClass]="'data-tab-content'">
                             <file-security [documentId]="documentId"></file-security>
+                            </div>
                         </mat-tab>
                     </mat-tab-group>
                     <!--    </div>-->

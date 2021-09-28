@@ -32,12 +32,23 @@ export class CacheService {
   public initWebSocket(url: string): void {
     this.webSocket = webSocket(url.replace('http', 'ws'));
     this.webSocket.subscribe(
-        msg => console.log('message received: ' + msg),
+        msg => {
+          console.log('message received: ' + msg);
+          console.dir(msg);
+          this.handleMsg(msg);
+        },
         // Called whenever there is a message from the server
         err => console.log(err),
         // Called if WebSocket API signals some kind of error
         () => console.log('complete')
         // Called when connection is closed (for whatever reason)
     );
+  }
+
+  private handleMsg(msg: any): void {
+    if (msg.constructor === 'Message') {
+      console.log('Websocket received message: ');
+      console.dir(msg);
+    }
   }
 }
