@@ -719,6 +719,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             DocumentUtils.navigateToFile(router, entity.uid);
         }
     }
+
+    retrieveWorkspaces(): Observable<Array<Workspace>> {
+      return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
+    }
 }
 
 

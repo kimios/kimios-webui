@@ -43,6 +43,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
 
   @Input()
   entityId: number;
+  initial = true;
 
   constructor(
       private browseEntityService: BrowseEntityService,
@@ -72,12 +73,20 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     this.browseEntityService.selectedEntity$.subscribe(
         entity => {
           if (entity !== undefined) {
+            this.initial = false;
             const path = this.location.path();
             const newPath = path.replace(new RegExp('(?:\/workspaces.*)?$'), '/workspaces/' + entity.uid);
             this.location.replaceState(newPath);
           }
         }
     );
+    if ((this.entityId === 0)
+        && this.initial === true) {
+      this.browseEntityService.retrieveWorkspaces().pipe(
+          filter(workspaces => workspaces.length > 0),
+          tap(workspaces => this.browseEntityService.selectedEntity$.next(workspaces[0]))
+      ).subscribe();
+    }
 
     this.browseEntityService.totalEntitiesToDisplay$.subscribe(
         next => this.length = next.length
