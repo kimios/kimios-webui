@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <div [ngClass]="'kimios-content-area'">
+  <div [ngClass]="'kimios-content-area'" fxLayout="column" fxLayoutAlign="start stretch" >
 
     <form (ngSubmit)="filterData()">
       <mat-form-field>
@@ -21,7 +21,7 @@
       </mat-form-field>
     </form>
 
-<mat-table
+      <mat-table #matTable
         *ngIf="dataSource != null"
         [dataSource]="dataSource"
         matSort
@@ -30,42 +30,42 @@
         matSortDisableClear
         (matSortChange)="sortData($event)">
 
-  <!-- remove Column -->
-  <ng-container matColumnDef="remove">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'mw100'">
-    </mat-header-cell>
-    <mat-cell *matCellDef="let row" [ngClass]="'mw100'">
-      <mat-icon [ngClass]="'cursor-pointer'" (click)="removeBookmark(row)"
-                title="remove bookmark">
-        remove
-      </mat-icon>
-    </mat-cell>
-  </ng-container>
+        <!-- remove Column -->
+        <ng-container matColumnDef="remove">
+          <mat-header-cell *matHeaderCellDef [ngClass]="'mw100'">
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" [ngClass]="'mw100'">
+            <mat-icon [ngClass]="'cursor-pointer'" (click)="removeBookmark(row)"
+                      title="remove bookmark">
+              remove
+            </mat-icon>
+          </mat-cell>
+        </ng-container>
 
-  <ng-container
-          *ngFor="let col of columnsDescription"
-          matColumnDef="{{col.matColumnDef}}"
-          sticky="{{col.sticky}}">
-    <mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="{{col.matColumnDef}}"
-    > {{col.displayName}} </mat-header-cell>
-    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" title="{{col.title ? col.title(element) : ''}}">
-      <fa-icon *ngIf="col.id == 'name' && element.entity.type == 3"
-               [icon]="['far', retrieveDocumentIcon(element.entity, 'far')]"
-               size="lg"
-               [ngClass]="'file-icon-list'"></fa-icon>
-      <mat-icon *ngIf="col.id == 'name' && element.entity.type != 3" class="type-icon" fxFlex="40px">folder</mat-icon>
-      <span *ngIf="col.id != 'icon'">{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
-    </mat-cell>
-  </ng-container>
+        <ng-container
+                *ngFor="let col of columnsDescription"
+                matColumnDef="{{col.matColumnDef}}"
+                sticky="{{col.sticky}}">
+          <mat-header-cell
+                  *matHeaderCellDef
+                  mat-sort-header="{{col.matColumnDef}}"
+          > {{col.displayName}} </mat-header-cell>
+          <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" title="{{col.title ? col.title(element) : ''}}">
+            <fa-icon *ngIf="col.id == 'name' && element.entity.type == 3"
+                     [icon]="['far', retrieveDocumentIcon(element.entity, 'far')]"
+                     size="lg"
+                     [ngClass]="'file-icon-list'"></fa-icon>
+            <mat-icon *ngIf="col.id == 'name' && element.entity.type != 3" class="type-icon" fxFlex="40px">folder</mat-icon>
+            <span *ngIf="col.id != 'icon'">{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+          </mat-cell>
+        </ng-container>
 
-  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-header-row #matHeaderRow *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
-  <mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="goToEntity(row.entity)">
-  </mat-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="goToEntity(row.entity)">
+        </mat-row>
+      </mat-table>
 
-</mat-table>
 
     <ng-container *ngIf="dataSource.connect() | async as dataSourceConnection">
       <div *ngIf="dataSourceConnection.length === 0" style="width: 100%" fxLayout="row" fxLayoutAlign="center"

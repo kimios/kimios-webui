@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, OnInit, ViewChild} from '@angular/core';
 import {Bookmark, DMEntity, DocumentService} from 'app/kimios-client-api';
 import {BOOKMARKS_DEFAULT_DISPLAYED_COLUMNS, BookmarksDataSource} from './bookmarks-data-source';
 import {SessionService} from 'app/services/session.service';
-import {MatDialog, Sort} from '@angular/material';
+import {MatDialog, MatTable, Sort} from '@angular/material';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {concatMap, filter, map} from 'rxjs/operators';
@@ -18,7 +18,7 @@ import {Observable} from 'rxjs';
   templateUrl: './my-bookmarks.component.html',
   styleUrls: ['./my-bookmarks.component.scss']
 })
-export class MyBookmarksComponent implements OnInit {
+export class MyBookmarksComponent implements OnInit, AfterViewChecked {
 
   dataSource: BookmarksDataSource;
   sort: DMEntitySortSubElement;
@@ -29,6 +29,7 @@ export class MyBookmarksComponent implements OnInit {
 
   dataSearch = new FormControl('');
   filteredData$: Observable<Array<Bookmark>>;
+  @ViewChild('matTable') matTable: MatTable<Bookmark>;
 
   constructor(
       private documentService: DocumentService,
@@ -53,6 +54,25 @@ export class MyBookmarksComponent implements OnInit {
     this.dataSearch.valueChanges.pipe(
         map(value => this.filterData())
     ).subscribe();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.matTable == null || this.matTable === undefined) {
+      return;
+    }
+    const matTableOffsetTop = this.matTable['_elementRef'].nativeElement.offsetTop;
+    let matHeaderRowElement;
+    this.matTable['_elementRef'].nativeElement.childNodes
+        .forEach(node => {
+          if ((matHeaderRowElement == null || matHeaderRowElement === undefined)
+              && node.tagName
+              && node.tagName.toLowerCase() === 'mat-header-row') {
+            matHeaderRowElement = node;
+          }
+        });
+    const matHeaderRowElementOffsetHeight = matHeaderRowElement ? matHeaderRowElement.offsetHeight : 0;
+    const windowTotalScreen = window.innerHeight;
+    this.matTable['_elementRef'].nativeElement.style.height = windowTotalScreen - matTableOffsetTop - matHeaderRowElementOffsetHeight - 10 + 'px';
   }
 
   sortData($event: Sort): void {
