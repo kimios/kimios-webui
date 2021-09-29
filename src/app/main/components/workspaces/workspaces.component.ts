@@ -63,7 +63,8 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.entityId = Number(this.route.snapshot.paramMap.get('entityId'));
     if (this.entityId != null
-        && this.entityId !== undefined) {
+        && this.entityId !== undefined
+        && this.entityId !== 0) {
       this.browseEntityService.getEntity(this.entityId)
           .subscribe(entity => this.browseEntityService.selectedEntity$.next(entity));
       this.browseEntityService.findAllParents(this.entityId, true).pipe(
@@ -80,13 +81,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           }
         }
     );
-    if ((this.entityId === 0)
-        && this.initial === true) {
-      this.browseEntityService.retrieveWorkspaces().pipe(
-          filter(workspaces => workspaces.length > 0),
-          tap(workspaces => this.browseEntityService.selectedEntity$.next(workspaces[0]))
-      ).subscribe();
-    }
 
     this.browseEntityService.totalEntitiesToDisplay$.subscribe(
         next => this.length = next.length
@@ -101,6 +95,16 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     this.browseEntityService.pageIndex.subscribe(
         next => this.pageIndex = next
     );
+
+    if ((this.entityId === 0)
+        && this.initial === true) {
+      this.initial = false;
+      this.browseEntityService.retrieveWorkspaces().pipe(
+          filter(workspaces => workspaces.length > 0),
+          tap(workspaces => this.browseEntityService.selectedEntity$.next(workspaces[0])),
+          tap(workspaces => this.browseEntityService.currentPath.next([workspaces[0]]))
+      ).subscribe();
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -117,7 +121,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     this.treeAndGridRowWrapper.nativeElement.style.height = height;
     this.treeAndGridRowWrapper.nativeElement.style.maxHeight = height;
     this.treeAndGridRowWrapper.nativeElement.style.minHeight = height;
-   }
+  }
 
   paginatorHandler($event: PageEvent): void {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);

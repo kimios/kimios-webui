@@ -63,7 +63,8 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
   }
 
   contextIsWorkspace(): boolean {
-    return this.router.url.includes('/workspaces/');
+    const regExp = new RegExp('^/workspaces($|/)');
+    return regExp.test(this.router.url);
   }
 
   contextIsDocument(): boolean {
