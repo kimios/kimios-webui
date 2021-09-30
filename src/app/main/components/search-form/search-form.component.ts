@@ -373,7 +373,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {
-    return docType.name;
+    return docType == null || docType === undefined ? '' : docType.name;
   }
 
   private updateFormControlsWithMetas(form: FormGroup, formGroupName: string, metas: Array<Meta>): void {
@@ -444,5 +444,10 @@ export class SearchFormComponent implements OnInit {
     } else {
       (abstractControl as FormControl).setValue(metaWithValue.value);
     }
+  }
+
+  resetForm(): void {
+    this.deselectDocumentType();
+    this.searchFormGroup.reset();
   }
 }
