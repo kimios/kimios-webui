@@ -11,6 +11,7 @@ import {ContainerEntityDialogComponent} from 'app/main/components/container-enti
 import {MatDialog} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
+import {ITreeNode} from 'angular-tree-component/dist/defs/api';
 
 @Component({
   selector: 'browse-tree',
@@ -165,6 +166,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             concatMap(res => this.browseEntityService.selectedEntity$),
             filter(entity => entity !== undefined),
             tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
+            tap(entity => this.tree.treeModel.getNodeById(entity.uid).expand()),
             concatMap(
                 entity => this.browseEntityService.findAllParents(entity.uid)
             ),
@@ -413,14 +415,15 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     );
   }
 
-  selectNode(uid: number): void {
+  selectNode(node: ITreeNode): void {
       if (this.mode === BROWSE_TREE_MODE.BROWSE) {
           this.browseEntityService.selectedEntityFromGridOrTree$.next(
-              this.browseEntityService.entities.get(Number(uid))
+              this.browseEntityService.entities.get(Number(node.id))
           );
+          node.expand();
       } else {
           if (this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG) {
-              this.browseEntityService.chosenContainerEntityUid$.next(uid);
+              this.browseEntityService.chosenContainerEntityUid$.next(Number(node.id.toString()));
           }
       }
   }
