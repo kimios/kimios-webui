@@ -39,6 +39,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   columnsDescription = SESSIONS_DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns: Array<string>;
   @ViewChild('tree') tree;
+  showSessionList = false;
 
   constructor(
       private administrationService: AdministrationService,
@@ -71,20 +72,14 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
         () => this.nodes = this._initTreeData()
     );
 
-    this.adminService.selectedUser$.pipe(
-        filter(user => user != null)
-    ).subscribe(
+    this.adminService.selectedUser$.subscribe(
         user => {
-          if (this.dataSource == null) {
-            this.dataSource = new SessionDataSource(this.sessionService, this.administrationService);
-            this.dataSource.connect().subscribe(
-                data => console.dir(data)
-            );
-          }
-          if (user === undefined) {
-            this.dataSource.data = [];
+          if (user == null || user === undefined) {
+            this.showSessionList = false;
           } else {
+            this.dataSource = new SessionDataSource(this.sessionService, this.administrationService);
             this.dataSource.loadData(user, this.sort, null);
+            this.showSessionList = true;
           }
         }
     );
@@ -149,6 +144,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
 
 
   private onClick(node: ITreeNode): void {
+    this.tree.treeModel.getNodeById(node.id).focus();
     if (node.data.type
         && node.data.type === 'user') {
       this.adminService.selectedUser$.next(node.data.userData);
@@ -162,8 +158,8 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     // $event.node.data
   }*/
 
-  onToggleExpanded($event): void {
-    this.tree.treeModel.getNodeById($event.node.id).expand();
+  onToggleExpanded(nodeId): void {
+    this.tree.treeModel.getNodeById(nodeId).expand();
   }
 
   /*selectNode($event): void {
