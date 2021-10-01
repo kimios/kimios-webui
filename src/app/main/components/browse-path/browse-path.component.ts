@@ -20,7 +20,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
 
   constructor(
       private browseEntityService: BrowseEntityService,
-      private router: Router
+      public router: Router
   ) {
     this.pathDirs = [];
   }
