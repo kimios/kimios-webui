@@ -70,7 +70,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   }
 
   drop($event: CdkDragDrop<UserOrGroup>): void {
-    this.adminService.addUserOrGroupToPermissions$.next($event.item.data);
+    this.entityCreationService.newUserOrGroupTmp$.next($event.item.data);
   }
 
   dropListEnter($event: CdkDragEnter<UserOrGroup>): void {

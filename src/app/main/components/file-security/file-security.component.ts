@@ -76,7 +76,7 @@ export class FileSecurityComponent implements OnInit {
         }
     );
 
-      this.adminService.addUserOrGroupToPermissions$.pipe(
+      this.entityCreationService.newUserOrGroupTmp$.pipe(
           filter(userOrGroup => userOrGroup != null && userOrGroup !== undefined),
           filter(userOrGroup => ! this.isInDatasource(this.dataSource, userOrGroup))
       ).subscribe(

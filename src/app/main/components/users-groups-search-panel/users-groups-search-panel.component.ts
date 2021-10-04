@@ -7,6 +7,7 @@ import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AdminService} from 'app/services/admin.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
+import {EntityCreationService} from 'app/services/entity-creation.service';
 
 @Component({
   selector: 'users-groups-search-panel',
@@ -30,13 +31,16 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   userListId;
   @Input()
   currentSecurities: Array<DMEntitySecurity>;
+  @Input()
+  mode: 'containerEntityCreation' | 'other' = 'other';
 
   @ViewChild('tabGroup', {read: ElementRef}) tabGroup: ElementRef;
 
   constructor(
       private sessionService: SessionService,
       private securityService: SecurityService,
-      private adminService: AdminService
+      private adminService: AdminService,
+      private entityCreationService: EntityCreationService
   ) {
     this.allUsers = new Array<User>();
     this.allGroups = new Array<Group>();
@@ -125,7 +129,11 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   handleDblClick(userOrGroup: UserOrGroup): void {
     console.log('handleDblClick(): ');
     console.dir(userOrGroup);
-    this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+    if (this.mode === 'containerEntityCreation') {
+      this.entityCreationService.newUserOrGroupTmp$.next(userOrGroup);
+    } else {
+      this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+    }
   }
 
   ngAfterViewChecked(): void {
