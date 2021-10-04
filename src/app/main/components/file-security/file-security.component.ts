@@ -5,7 +5,7 @@ import {SessionService} from 'app/services/session.service';
 import {Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatDialog, MatTableDataSource} from '@angular/material';
-import {concatMap, map} from 'rxjs/operators';
+import {concatMap, filter, map} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
@@ -76,7 +76,9 @@ export class FileSecurityComponent implements OnInit {
         }
     );
 
-      this.adminService.addUserOrGroupToPermissions$.subscribe(
+      this.adminService.addUserOrGroupToPermissions$.pipe(
+          filter(userOrGroup => userOrGroup != null && userOrGroup !== undefined),
+      ).subscribe(
           next =>  this.addNewSecurityToDatasource(next)
       );
       this.entityCreationService.removedUserOrGroupTmp$.subscribe(
