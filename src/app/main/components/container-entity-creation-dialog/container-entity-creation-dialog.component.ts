@@ -8,6 +8,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {concatMap, tap} from 'rxjs/operators';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {Folder, Workspace} from 'app/kimios-client-api';
+import {AdminService} from 'app/services/admin.service';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -39,6 +40,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       @Inject(MAT_DIALOG_DATA) public data: ContainerEntityCreationDialogData,
       private entityCreationService: EntityCreationService,
       private browseEntityService: BrowseEntityService,
+      private adminService: AdminService,
       private fb: FormBuilder
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
@@ -68,7 +70,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   }
 
   drop($event: CdkDragDrop<UserOrGroup>): void {
-    this.entityCreationService.newUserOrGroupTmp$.next($event.item.data);
+    this.adminService.addUserOrGroupToPermissions$.next($event.item.data);
   }
 
   dropListEnter($event: CdkDragEnter<UserOrGroup>): void {

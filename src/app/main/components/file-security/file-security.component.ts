@@ -76,7 +76,7 @@ export class FileSecurityComponent implements OnInit {
         }
     );
 
-      this.entityCreationService.newUserOrGroupTmp$.subscribe(
+      this.adminService.addUserOrGroupToPermissions$.subscribe(
           next =>  this.addNewSecurityToDatasource(next)
       );
       this.entityCreationService.removedUserOrGroupTmp$.subscribe(
