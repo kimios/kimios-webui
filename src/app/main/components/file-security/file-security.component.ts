@@ -327,9 +327,13 @@ export class FileSecurityComponent implements OnInit {
 
     private isInDatasource(dataSource: MatTableDataSource<DMEntitySecurity>, userOrGroup: UserOrGroup): boolean {
         const idx = dataSource.data.findIndex(dmEntitySecurity =>
-            ((dmEntitySecurity.type === SECURITY_ENTITY_TYPE.USER && userOrGroup.type === 'user')
-                || (dmEntitySecurity.type === SECURITY_ENTITY_TYPE.GROUP && userOrGroup.type === 'group'))
-            && dmEntitySecurity.name === userOrGroup.element.name
+            ((dmEntitySecurity.type === SECURITY_ENTITY_TYPE.USER
+                    && userOrGroup.type === 'user'
+                    && dmEntitySecurity.name === userOrGroup.element['uid'])
+                || (dmEntitySecurity.type === SECURITY_ENTITY_TYPE.GROUP
+                    && userOrGroup.type === 'group'
+                    && dmEntitySecurity.name === userOrGroup.element['gid']
+                ))
             && dmEntitySecurity.source === userOrGroup.element.source
         );
 
