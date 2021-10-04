@@ -123,6 +123,8 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   }
 
   handleDblClick(userOrGroup: UserOrGroup): void {
+    console.log('handleDblClick(): ');
+    console.dir(userOrGroup);
     this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
   }
 
