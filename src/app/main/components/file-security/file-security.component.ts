@@ -78,6 +78,7 @@ export class FileSecurityComponent implements OnInit {
 
       this.adminService.addUserOrGroupToPermissions$.pipe(
           filter(userOrGroup => userOrGroup != null && userOrGroup !== undefined),
+          filter(userOrGroup => ! this.isInDatasource(this.dataSource, userOrGroup))
       ).subscribe(
           next =>  this.addNewSecurityToDatasource(next)
       );
@@ -322,6 +323,17 @@ export class FileSecurityComponent implements OnInit {
             this.adminService.addUserOrGroupToPermissions$.next(null);
             this.adminService.selectedUsersAndGroups$.next(null);
         });
+    }
+
+    private isInDatasource(dataSource: MatTableDataSource<DMEntitySecurity>, userOrGroup: UserOrGroup): boolean {
+        const idx = dataSource.data.findIndex(dmEntitySecurity =>
+            ((dmEntitySecurity.type === SECURITY_ENTITY_TYPE.USER && userOrGroup.type === 'user')
+                || (dmEntitySecurity.type === SECURITY_ENTITY_TYPE.GROUP && userOrGroup.type === 'group'))
+            && dmEntitySecurity.name === userOrGroup.element.name
+            && dmEntitySecurity.source === userOrGroup.element.source
+        );
+
+        return idx !== -1;
     }
 }
 
