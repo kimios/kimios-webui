@@ -125,6 +125,7 @@ import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/
 import {StudioMetaFeedsComponent} from 'app/main/components/studio-meta-feeds/studio-meta-feeds.component';
 import {StudioMetaFeedAdminComponent} from 'app/main/components/studio-meta-feed-admin/studio-meta-feed-admin.component';
 import {ShareFormExternalComponent} from 'app/main/components/share-form-external/share-form-external.component';
+import {EntityPathComponent} from 'app/main/components/entity-path/entity-path.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -212,7 +213,8 @@ library.add(far, fas);
         BrowseTreeDialogComponent,
         StudioMetaFeedsComponent,
         StudioMetaFeedAdminComponent,
-        ShareFormExternalComponent
+        ShareFormExternalComponent,
+        EntityPathComponent
     ],
     imports: [
         FileManagerRoutingModule,

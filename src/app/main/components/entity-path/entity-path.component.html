@@ -1,0 +1,5 @@
+<span>
+    <ng-container *ngFor="let entityName of entityPathSplitted; let i=index">
+        <ng-container *ngIf="i > 0">&nbsp;/&nbsp;</ng-container>{{entityName}}
+    </ng-container>
+</span>

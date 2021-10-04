@@ -3,7 +3,7 @@
         <div>Create {{data.entityType}}</div>
         <ng-container *ngIf="data.entityType === 'folder'">
             <div *ngIf="parentEntity$ | async">
-                at path: {{parentEntity.path}}
+                at path: <entity-path [entityPath]="parentEntity.path"></entity-path>
             </div>
         </ng-container>
     </div>
