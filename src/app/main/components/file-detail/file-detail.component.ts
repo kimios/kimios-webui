@@ -397,6 +397,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngAfterViewChecked(): void {
-        this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
+        if (this.filePreviewElement
+            && this.filePreviewElement.nativeElement
+            && this.filePreviewElement.nativeElement.offsetHeight != null
+            && this.filePreviewElement.nativeElement.offsetHeight !== undefined
+        ) {
+            this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
+        }
     }
 }
