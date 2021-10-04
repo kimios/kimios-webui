@@ -1,5 +1,5 @@
-<div fxLayout="column" fxLayoutAlign="start space-between">
-    <div fxLayout="column" fxLayoutAlign="center center">
+<div fxLayout="column" fxLayoutAlign="start space-between" fxFlexOffset="10px">
+    <div fxLayout="column" fxLayoutAlign="start start">
         <div>Create {{data.entityType}}</div>
         <ng-container *ngIf="data.entityType === 'folder'">
             <div *ngIf="parentEntity$ | async">
@@ -17,28 +17,34 @@
             </div>
         </form>
     </div>
-    <div fxLayout="row" fxLayoutAlign="space-between">
-        <file-security
-                [documentId]="undefined"
-                [showButtonForSearchUsersAndGroups]="false"
-                [showFormButtons]="false"
-                cdkDropList
-                [id]="'selectedUsersAndGroups'"
-                [cdkDropListConnectedTo]="[userListId, groupListId]"
-                (cdkDropListDropped)="drop($event)"
-                (cdkDropListEntered)="dropListEnter($event)"
-                (cdkDropListEntered)="dropListExited($event)"
-                style="width: 48%"
-        ></file-security>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Entity security</mat-panel-title>
+            <mat-panel-description>open to configure entity's access rights</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div fxLayout="row" fxLayoutAlign="space-between">
+            <file-security
+                    [documentId]="undefined"
+                    [showButtonForSearchUsersAndGroups]="false"
+                    [showFormButtons]="false"
+                    cdkDropList
+                    [id]="'selectedUsersAndGroups'"
+                    [cdkDropListConnectedTo]="[userListId, groupListId]"
+                    (cdkDropListDropped)="drop($event)"
+                    (cdkDropListEntered)="dropListEnter($event)"
+                    (cdkDropListEntered)="dropListExited($event)"
+                    style="width: 48%"
+            ></file-security>
 
-        <users-groups-search-panel
-                [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
-                [userListId]="userListId"
-                [groupListId]="groupListId"
-                style="width: 48%"
-        >
-        </users-groups-search-panel>
-    </div>
+            <users-groups-search-panel
+                    [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
+                    [userListId]="userListId"
+                    [groupListId]="groupListId"
+                    style="width: 48%"
+            >
+            </users-groups-search-panel>
+        </div>
+    </mat-expansion-panel>
     <div fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
         <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
         <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
