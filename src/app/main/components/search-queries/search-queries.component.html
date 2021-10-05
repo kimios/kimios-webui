@@ -8,14 +8,14 @@
     </div>
   </div>
 
-  <div [ngClass]="'kimios-content-area'" fxLayout="column">
+  <div #kimiosContentArea [ngClass]="'kimios-content-area'" fxLayout="column" style="overflow-y: auto;" >
     <div fxLayout="row"
          fxLayoutAlign="start"
          [ngClass]="'kimios-search-queries-form'"
     >
       <search-form></search-form>
     </div>
-    <div>
+    <div #paginator>
       <mat-paginator
               [length]="totalFilesFound$ | async"
               [pageSize]="pageSize"
@@ -26,7 +26,7 @@
       </mat-paginator>
       <mat-divider></mat-divider>
     </div>
-    <div>
+    <div #fileListContainer>
       <file-list></file-list>
     </div>
   </div>
