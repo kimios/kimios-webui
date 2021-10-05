@@ -1,12 +1,11 @@
 <form [ngClass]="'full-width'" #form
       [formGroup]="searchFormGroup"
       (ngSubmit)="onSubmit()"
-      (keyup)="$event.key === 'Enter' ? onSubmit():1"
-      style="margin-top: 20px">
+      (keyup)="$event.key === 'Enter' ? onSubmit():1">
 
-  <div fxFill fxLayout="column" fxLayoutAlign="space-between start">
+  <div fxFill fxLayout="column" fxLayoutAlign="space-between stretch">
 
-  <div fxFill fxLayout="row" fxLayoutAlign="space-between start">
+  <div *ngIf="showForm" fxFill fxLayout="row" fxLayoutAlign="space-between start">
 
     <div fxFill fxLayout="column" fxLayoutAlign="space-between start" fxFlex="30">
 
@@ -258,28 +257,45 @@
 
   </div>
 
-    <div style="margin-top: 20px; width: 100%;">
+    <div>
       <div fxLayout="row"
+           fxLayoutAlign="start start"
+           fxLayoutGap="20px"
+           fxFlex>
+        <div style="width: 50px;">
+            <button
+                    mat-icon-button
+                    (click)="toggleShowForm($event)"
+                    title="{{showForm ? 'Hide search form' : 'Show search form'}}">
+              <mat-icon>{{showForm ? 'expand_less' : 'expand_more'}}</mat-icon>
+              </button>
+        </div>
+        <div *ngIf="showForm"
+           fxLayout="row"
            fxLayoutAlign="center center"
            fxLayoutGap="20px"
-           fxFill
+           fxFlex
            style="margin-top: 20px !important;">
-        <div [class.kimios-button]="true"
-             [class.kimios-green]="true"
-             [class.inactive]="true"
-             fxLayout="row"
-             fxLayoutAlign="center center"
-             matDialogClose
-             (click)="resetForm()">
-          <span [class.kimios-button-text]="true">CANCEL</span>
+          <div [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.inactive]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               matDialogClose
+               (click)="resetForm()">
+            <span [class.kimios-button-text]="true">CANCEL</span>
+          </div>
+          <div [class.kimios-button]="true"
+               [class.kimios-green]="true"
+               [class.active]="true"
+               fxLayout="row"
+               fxLayoutAlign="center center"
+               (click)="onSubmit()">
+            <span class="kimios-button-text">SEARCH</span>
+          </div>
         </div>
-        <div [class.kimios-button]="true"
-             [class.kimios-green]="true"
-             [class.active]="true"
-             fxLayout="row"
-             fxLayoutAlign="center center"
-             (click)="onSubmit()">
-          <span class="kimios-button-text">SEARCH</span>
+        <div style="width: 50px;">
+
         </div>
       </div>
     </div>
