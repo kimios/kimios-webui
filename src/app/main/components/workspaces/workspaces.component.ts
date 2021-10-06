@@ -1,6 +1,6 @@
-import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
-import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {BrowseEntityService, PAGE_SIZE_DEFAULT} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
@@ -58,6 +58,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       private iconService: IconService
   ) {
     this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
+    this.pageSize = PAGE_SIZE_DEFAULT;
   }
 
   ngOnInit(): void {
