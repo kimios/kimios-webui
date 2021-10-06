@@ -28,7 +28,7 @@ export class SearchQueriesComponent implements OnInit {
       private searchEntityService: SearchEntityService
   ) {
     this.totalFilesFound$ = new BehaviorSubject<number>(undefined);
-    this.pageSize = PAGE_SIZE_DEFAULT;
+    this.pageSize = this.searchEntityService.pageSize;
   }
 
   ngOnInit(): void {

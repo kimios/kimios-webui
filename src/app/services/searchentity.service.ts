@@ -56,7 +56,7 @@ export class SearchEntityService implements Resolve<any> {
     private sortField: string;
     private sortDirection: string;
 //    private page: number;
-    private pageSize: number;
+    private _pageSize: number;
     private page: number;
     private query: string;
     private _criterias: Criteria[];
@@ -92,7 +92,7 @@ export class SearchEntityService implements Resolve<any> {
         this.onTagsDataChanged = new BehaviorSubject([]);
         this.onTotalFilesChanged = new BehaviorSubject(undefined);
         this.onSortChanged = new BehaviorSubject({});
-        this.pageSize = PAGE_SIZE_DEFAULT;
+        this._pageSize = PAGE_SIZE_DEFAULT;
         this._criterias = new Array<Criteria>();
     }
 
@@ -108,7 +108,7 @@ export class SearchEntityService implements Resolve<any> {
                     this.sortField ? this.sortField : DEFAULT_SORT_FIELD,
                     this.sortDirection ? this.sortDirection : DEFAULT_SORT_DIRECTION,
                     this.page ? this.page : DEFAULT_PAGE,
-                    this.pageSize ? this.pageSize : PAGE_SIZE_DEFAULT,
+                    this._pageSize ? this._pageSize : PAGE_SIZE_DEFAULT,
                     this.query,
                     this._criterias
                 );
@@ -132,7 +132,7 @@ export class SearchEntityService implements Resolve<any> {
         // TODO: enhance search requests history
         this.sortField = sortField;
         this.sortDirection = sortDirection;
-        this.pageSize = pageSize ? pageSize : this.pageSize;
+        this._pageSize = pageSize ? pageSize : this._pageSize;
         this.page = page;
         this.query = query;
         this._criterias = criterias;
@@ -235,11 +235,11 @@ export class SearchEntityService implements Resolve<any> {
     }
 
     reloadFiles(): Observable<DMEntity[]> {
-        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query);
+        return this.getFiles(this.sortField, this.sortDirection, 0, this._pageSize, this.query);
     }
 
     reloadTags(): Observable<DMEntity[]> {
-        return this.getFiles(this.sortField, this.sortDirection, this.page, this.pageSize, this.query, this._criterias, true);
+        return this.getFiles(this.sortField, this.sortDirection, this.page, this._pageSize, this.query, this._criterias, true);
     }
 
     searchInContent(content: string, criterias = []): Observable<DMEntity[]> {
@@ -248,7 +248,7 @@ export class SearchEntityService implements Resolve<any> {
             query: content,
 //            filterQuery: true
         });
-        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias);
+        return this.getFiles(this.sortField, this.sortDirection, 0, this._pageSize, this.query, criterias);
     }
 
     searchWithFiltersOld(content: string, filename: string, tagList: Tag[], documentParent = '', onlyTags = false): Observable<DMEntity[]> {
@@ -278,7 +278,7 @@ export class SearchEntityService implements Resolve<any> {
                 // filterQuery: true
             }));
         }
-        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
+        return this.getFiles(this.sortField, this.sortDirection, 0, this._pageSize, this.query, criterias, onlyTags);
     }
 
     searchWithFiltersAndSetCurrentQuery(
@@ -397,7 +397,7 @@ export class SearchEntityService implements Resolve<any> {
             });
         }
 
-        return this.getFiles(this.sortField, this.sortDirection, 0, this.pageSize, this.query, criterias, onlyTags);
+        return this.getFiles(this.sortField, this.sortDirection, 0, this._pageSize, this.query, criterias, onlyTags);
     }
 
     searchInContentWithFacets(content: string, facetFields: string[]): Observable<DMEntity[]> {
@@ -501,7 +501,7 @@ export class SearchEntityService implements Resolve<any> {
 
     public changeSort(sortField, sortDirection, page): Observable<DMEntity[]> {
         this.onSortChanged.next(sortField + ' ' + sortDirection);
-        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, this._criterias);
+        return this.getFiles(sortField, sortDirection, page, this._pageSize, this.query, this._criterias);
     }
 
     public getDocumentsInDir(sortField: string, sortDirection: string, page: number, parentDirUid: number): Observable<DMEntity[]> {
@@ -510,7 +510,7 @@ export class SearchEntityService implements Resolve<any> {
             fieldName: 'DocumentParentId',
             query: parentDirUid.toString()
         });
-        return this.getFiles(sortField, sortDirection, page, this.pageSize, this.query, criterias);
+        return this.getFiles(sortField, sortDirection, page, this._pageSize, this.query, criterias);
     }
 
     public retrieveAllTags(): Observable<Map<string, number>> {
@@ -584,5 +584,9 @@ export class SearchEntityService implements Resolve<any> {
             metaId: meta.uid,
             metaType: meta.metaType
         });
+    }
+
+    get pageSize(): number {
+        return this._pageSize;
     }
 }
