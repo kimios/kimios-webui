@@ -1,0 +1,29 @@
+<mat-table [dataSource]="dataSource"
+           matSort
+           matSortActive="{{sort.name}}"
+           matSortDirection="{{sort.direction}}"
+           matSortDisableClear
+           (matSortChange)="sortData($event)">
+
+    <ng-container
+            *ngFor="let col of columnsDescription"
+            matColumnDef="{{col.matColumnDef}}"
+            sticky="{{col.sticky}}">
+        <mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header="{{col.matColumnDef}}"
+        > {{col.displayName}} </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+            <span *ngIf="col.id === 'date' else notADateTemplate;">{{element[col.matColumnDef] | date}}</span>
+            <ng-template #notADateTemplate>
+                <span>{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+            </ng-template>
+        </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns;" >
+    </mat-row>
+
+</mat-table>

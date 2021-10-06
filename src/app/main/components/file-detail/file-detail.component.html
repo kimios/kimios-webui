@@ -140,6 +140,12 @@
                             <file-security [documentId]="documentId"></file-security>
                             </div>
                         </mat-tab>
+
+                        <mat-tab label="History">
+                            <div  [ngClass]="'data-tab-content'">
+                                <file-history [documentId]="documentId"></file-history>
+                            </div>
+                        </mat-tab>
                     </mat-tab-group>
                     <!--    </div>-->
 

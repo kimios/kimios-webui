@@ -126,6 +126,7 @@ import {StudioMetaFeedsComponent} from 'app/main/components/studio-meta-feeds/st
 import {StudioMetaFeedAdminComponent} from 'app/main/components/studio-meta-feed-admin/studio-meta-feed-admin.component';
 import {ShareFormExternalComponent} from 'app/main/components/share-form-external/share-form-external.component';
 import {EntityPathComponent} from 'app/main/components/entity-path/entity-path.component';
+import {FileHistoryComponent} from 'app/main/components/file-history/file-history.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -214,7 +215,8 @@ library.add(far, fas);
         StudioMetaFeedsComponent,
         StudioMetaFeedAdminComponent,
         ShareFormExternalComponent,
-        EntityPathComponent
+        EntityPathComponent,
+        FileHistoryComponent
     ],
     imports: [
         FileManagerRoutingModule,
