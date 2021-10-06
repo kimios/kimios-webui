@@ -14,9 +14,13 @@
                 mat-sort-header="{{col.matColumnDef}}"
         > {{col.displayName}} </mat-header-cell>
         <mat-cell *matCellDef="let element">
-            <span *ngIf="col.id === 'date' else notADateTemplate;">{{element[col.matColumnDef] | date}}</span>
+            <span *ngIf="col.id === 'date' else notADateTemplate;" title="{{element[col.matColumnDef] | date : 'short'}}">
+                {{element[col.matColumnDef] | date : 'short'}}
+            </span>
             <ng-template #notADateTemplate>
-                <span>{{col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+                <span title="{{col.cell ? col.cell(element) : element[col.matColumnDef]}}">
+                    {{col.cell ? col.cell(element) : element[col.matColumnDef]}}
+                </span>
             </ng-template>
         </mat-cell>
     </ng-container>
