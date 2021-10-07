@@ -3,7 +3,7 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
-import {concatMap, map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormBuilder, FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatChipInputEvent} from '@angular/material';
@@ -103,7 +103,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
-                tap(res => this.currentVersionId = res.lastVersionId),
+                tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
                 tap(res => this.document = res),
                 tap(res => this.loading$ = of(false)),
                 tap(res => this.documentTags$.next(res.tags)),
@@ -156,6 +156,11 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
         );
+
+        this.documentDetailService.currentVersionId.pipe(
+            filter(currentVersionId => currentVersionId != null),
+            tap(currentVersionId => this.currentVersionId = currentVersionId)
+        ).subscribe();
     }
 
     initDocumentVersions(): Observable<Array<DocumentVersion>> {
@@ -169,7 +174,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                         (res instanceof Array) ?
                             (res.length === 0) ?
                                 'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
-                                this.makePreviewTitle(this.currentVersionId, res) :
+                                this.makePreviewTitle(this.documentDetailService.currentVersionId.getValue(), res) :
                             'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
                 ),
                 tap(
@@ -327,7 +332,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     handleVersionPreview(uid: number): void {
         this.previewTitle = this.makePreviewTitle(uid, this.documentVersions);
-        this.currentVersionId = uid;
+        this.documentDetailService.currentVersionId.next(uid);
     }
 
     handleVersionPreviewNextOrPrev(direction: Direction): void {
@@ -337,7 +342,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         ) {
             return;
         }
-        const uid = this.computeVersionUidToDisplay(this.currentVersionId, this.documentVersions, direction);
+        const uid = this.computeVersionUidToDisplay(this.documentDetailService.currentVersionId.getValue(), this.documentVersions, direction);
         this.handleVersionPreview(uid);
     }
 
@@ -364,11 +369,11 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     currentVersionIsLast(): boolean {
-        return (this.documentVersionIds.indexOf(this.currentVersionId) === this.documentVersionIds.length - 1);
+        return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) === this.documentVersionIds.length - 1);
     }
 
     currentVersionIsFirst(): boolean {
-        return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
+        return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) == null);
     }
 
     addTag(tag: string): void {

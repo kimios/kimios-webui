@@ -110,23 +110,8 @@
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
                             <div  [ngClass]="'data-tab-content'">
+                                <document-versions [versionList]="versions"></document-versions>
 
-                            <mat-list id="versionList">
-                                <mat-list-item
-                                        *ngFor="let version of versions"
-                                        [ngClass]="{'selected' : version.uid === currentVersionId}"
-                                        (click)="handleVersionPreview(version.uid)"
-                                        class="cursor-pointer">
-                                    <mat-icon id="downloadVersion" mat-list-icon class="cursor-pointer"
-                                              (click)="handleVersionDownload(version.uid)">
-                                        cloud_download
-                                    </mat-icon>
-                                    <mat-icon mat-list-icon>
-                                        visibility
-                                    </mat-icon>
-                                    <p mat-line> {{version.creationDate | date}}, by {{version.author}} </p>
-                                </mat-list-item>
-                            </mat-list>
                             <!--</mat-expansion-panel>
         </div>
         <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
