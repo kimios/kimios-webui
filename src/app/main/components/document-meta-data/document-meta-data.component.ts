@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, MetaValue, StudioService} from 'app/kimios-client-api';
+import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, Meta, MetaValue, StudioService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {concatMap, filter, startWith, tap} from 'rxjs/operators';
-import {iif, Observable, of} from 'rxjs';
+import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
+import {combineLatest, iif, Observable, of} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 
@@ -16,10 +16,14 @@ export class DocumentMetaDataComponent implements OnInit {
   @Input()
   documentId: number;
   documentType: KimiosDocumentType;
-  documentMetas: Array<MetaValue>;
+  documentMetasMap: Map<number, MetaValue>;
+  documentTypeMetas: Array<Meta>;
+  selectedDocumentType: KimiosDocumentType;
   filteredDocumentTypes$: Observable<Array<KimiosDocumentType>>;
   formGroup: FormGroup;
   allDocumentTypes: Array<KimiosDocumentType>;
+  documentTypeMetaDataValuesMap: Map<number, Array<string | number>>;
+  metaValuesLoaded = false;
 
   constructor(
       private sessionService: SessionService,
@@ -28,10 +32,12 @@ export class DocumentMetaDataComponent implements OnInit {
       private fb: FormBuilder,
       private studioService: StudioService
   ) {
-    this.documentMetas = new Array<MetaValue>();
+    this.documentMetasMap = new Map<number, MetaValue>();
     this.documentType = null;
+    this.selectedDocumentType = null;
     this.filteredDocumentTypes$ = new Observable<Array<DocumentType>>();
     this.allDocumentTypes = new Array<KimiosDocumentType>();
+    this.documentTypeMetaDataValuesMap = new Map<number, Array<string | number>>();
     this.formGroup = this.fb.group({
       'documentType': this.fb.control(''),
       'metas': this.fb.group({})
@@ -41,10 +47,28 @@ export class DocumentMetaDataComponent implements OnInit {
   ngOnInit(): void {
     this.documentVersionService.getLastDocumentVersion(this.sessionService.sessionToken, this.documentId).pipe(
         filter(docVersion => docVersion.documentTypeUid != null && docVersion.documentTypeUid !== undefined),
-        concatMap(docVersion => this.documentVersionService.getMetaValues(this.sessionService.sessionToken, docVersion.uid)
+        concatMap(docVersion => combineLatest(
+            this.documentVersionService.getMetaValues(this.sessionService.sessionToken, docVersion.uid),
+            this.documentVersionService.getMetas(this.sessionService.sessionToken, docVersion.documentTypeUid),
+            this.studioService.getDocumentType(this.sessionService.sessionToken, docVersion.documentTypeUid))
         ),
-        filter(metaValues => metaValues != null),
-        tap(metaValues => this.documentMetas = metaValues)
+        tap(([metaValues, metas, documentType]) => {
+          this.documentType = documentType;
+          this.documentTypeMetas = metas;
+          metas.forEach(meta => this.documentMetasMap.set(meta.uid, null));
+          metaValues.forEach(metaValue => this.documentMetasMap.set(metaValue.meta.uid, metaValue.value));
+        }),
+        tap(() => this.initFormMetas(this.formGroup, this.documentMetasMap, this.documentTypeMetas)),
+        concatMap(([metaValues, metas, documentType]) => metas),
+        map(meta => meta),
+        tap(meta => this.documentTypeMetaDataValuesMap.set(meta.uid, null)),
+        filter(meta => meta.metaFeedUid !== -1),
+        concatMap(meta => combineLatest(
+            of(meta),
+            this.studioService.getMetaFeedValues(this.sessionService.sessionToken, meta.metaFeedUid)
+        )),
+        tap(([meta, metaFeedValues]) => this.documentTypeMetaDataValuesMap.set(meta.uid, metaFeedValues)),
+        tap(() => this.metaValuesLoaded = true)
     ).subscribe();
 
     this.filteredDocumentTypes$ = this.formGroup.get('documentType').valueChanges.pipe(
@@ -78,5 +102,20 @@ export class DocumentMetaDataComponent implements OnInit {
     return this.studioService.getDocumentTypes(this.sessionService.sessionToken).pipe(
         tap(res => this.allDocumentTypes = res)
     );
+  }
+
+  resetMetaValue(uid: number): void {
+    (this.formGroup.get('metas') as FormGroup).get(uid.toString()).setValue('');
+  }
+
+  private initFormMetas(
+      formGroup: FormGroup,
+      documentMetasMap: Map<number, MetaValue>,
+      documentMetas: Array<Meta>
+  ): void {
+    documentMetas.forEach(meta => (formGroup.get('metas') as FormGroup).addControl(
+        meta.uid.toString(),
+        this.fb.control(documentMetasMap.get(meta.uid) ? documentMetasMap.get(meta.uid) : '')
+    ));
   }
 }
