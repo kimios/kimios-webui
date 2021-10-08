@@ -3,3 +3,26 @@
     {{metaValue.meta.name}} : {{metaValue.value}}
   </mat-list-item>
 </mat-list>
+
+<form [ngClass]="'full-width'" #form
+      [formGroup]="formGroup"
+      (ngSubmit)="onSubmit()"
+      (keyup)="$event.key === 'Enter' ? onSubmit():1">
+  <mat-form-field class="example-full-width" fxFill>
+    <input type="text" placeholder="Document type" aria-label="document type" matInput [formControlName]="'documentType'"
+           [matAutocomplete]="autoCompleteDocumentType" >
+    <mat-autocomplete #autoCompleteDocumentType="matAutocomplete" (optionSelected)="selectDocumentType()"
+                      [displayWith]="displayAutoCompleteDocumentType">
+      <mat-option *ngFor="let documentType of filteredDocumentTypes$ | async" [value]="documentType">
+        {{documentType.name}}
+      </mat-option>
+    </mat-autocomplete>
+    <button mat-button *ngIf="formGroup.get('documentType').value" matSuffix mat-icon-button aria-label="Clear"
+            (click)="deselectDocumentType()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+
+
+</form>
