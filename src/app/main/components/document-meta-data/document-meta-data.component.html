@@ -1,3 +1,5 @@
-<p>
-  document-meta-data works!
-</p>
+<mat-list>
+  <mat-list-item *ngFor="let metaValue of documentMetas">
+    {{metaValue.meta.name}} : {{metaValue.value}}
+  </mat-list-item>
+</mat-list>
