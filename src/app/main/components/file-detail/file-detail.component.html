@@ -109,7 +109,7 @@
                 <mat-expansion-panel-header>
                     {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
                 </mat-expansion-panel-header>-->
-                            <div  [ngClass]="'data-tab-content'">
+                            <div  style="max-width: 900px">
                                 <document-versions [versionList]="versions"></document-versions>
 
                             <!--</mat-expansion-panel>
@@ -127,7 +127,7 @@
                         </mat-tab>
 
                         <mat-tab label="History">
-                            <div  [ngClass]="'data-tab-content'">
+                            <div style="max-width: 500px">
                                 <file-history [documentId]="documentId"></file-history>
                             </div>
                         </mat-tab>
