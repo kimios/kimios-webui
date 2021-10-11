@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, Meta, MetaValue, StudioService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
-import {combineLatest, iif, Observable, of} from 'rxjs';
+import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
+import {MatAutocompleteTrigger} from '@angular/material';
 
 @Component({
   selector: 'document-meta-data',
@@ -18,12 +19,13 @@ export class DocumentMetaDataComponent implements OnInit {
   documentType: KimiosDocumentType;
   documentMetasMap: Map<number, MetaValue>;
   documentTypeMetas: Array<Meta>;
-  selectedDocumentType: KimiosDocumentType;
+  selectedDocumentType: BehaviorSubject<KimiosDocumentType>;
   filteredDocumentTypes$: Observable<Array<KimiosDocumentType>>;
   formGroup: FormGroup;
   allDocumentTypes: Array<KimiosDocumentType>;
   documentTypeMetaDataValuesMap: Map<number, Array<string | number>>;
   metaValuesLoaded = false;
+  @ViewChild(MatAutocompleteTrigger, {read: MatAutocompleteTrigger}) trigger: MatAutocompleteTrigger;
 
   constructor(
       private sessionService: SessionService,
@@ -34,7 +36,7 @@ export class DocumentMetaDataComponent implements OnInit {
   ) {
     this.documentMetasMap = new Map<number, MetaValue>();
     this.documentType = null;
-    this.selectedDocumentType = null;
+    this.selectedDocumentType = new BehaviorSubject<DocumentType>(null);
     this.filteredDocumentTypes$ = new Observable<Array<DocumentType>>();
     this.allDocumentTypes = new Array<KimiosDocumentType>();
     this.documentTypeMetaDataValuesMap = new Map<number, Array<string | number>>();
@@ -57,17 +59,10 @@ export class DocumentMetaDataComponent implements OnInit {
           this.documentTypeMetas = metas;
           metas.forEach(meta => this.documentMetasMap.set(meta.uid, null));
           metaValues.forEach(metaValue => this.documentMetasMap.set(metaValue.meta.uid, metaValue.value));
+          this.formGroup.get('documentType').setValue(documentType);
         }),
-        tap(() => this.initFormMetas(this.formGroup, this.documentMetasMap, this.documentTypeMetas)),
-        concatMap(([metaValues, metas, documentType]) => metas),
-        map(meta => meta),
-        tap(meta => this.documentTypeMetaDataValuesMap.set(meta.uid, null)),
-        filter(meta => meta.metaFeedUid !== -1),
-        concatMap(meta => combineLatest(
-            of(meta),
-            this.studioService.getMetaFeedValues(this.sessionService.sessionToken, meta.metaFeedUid)
-        )),
-        tap(([meta, metaFeedValues]) => this.documentTypeMetaDataValuesMap.set(meta.uid, metaFeedValues)),
+        tap(() => this.initFormMetas((this.formGroup.get('metas') as FormGroup), this.documentMetasMap, this.documentTypeMetas)),
+        concatMap(([metaValues, metas, documentType]) => this.initMetaFeedValues(metas, this.documentTypeMetaDataValuesMap)),
         tap(() => this.metaValuesLoaded = true)
     ).subscribe();
 
@@ -80,6 +75,22 @@ export class DocumentMetaDataComponent implements OnInit {
             this.initAndReturnAllDocumentTypes()
         ))
     );
+
+    this.selectedDocumentType.pipe(
+        tap(() => this.metaValuesLoaded = false),
+        tap(() => this.resetFormMetas()),
+        tap(documentType => this.documentType = documentType),
+        filter(documentType => documentType != null),
+        concatMap(documentType => this.documentVersionService.getMetas(this.sessionService.sessionToken, documentType.uid)),
+        tap(metas => {
+          this.documentTypeMetas = metas;
+          this.initFormMetas((this.formGroup.get('metas') as FormGroup), null, this.documentTypeMetas);
+          metas.forEach(meta => this.documentMetasMap.set(meta.uid, null));
+          // this.formGroup.get('documentType').setValue(documentType);
+        }),
+        concatMap(metas => this.initMetaFeedValues(metas, this.documentTypeMetaDataValuesMap)),
+        tap(() => this.metaValuesLoaded = true)
+    ).subscribe();
   }
 
   displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {
@@ -91,11 +102,12 @@ export class DocumentMetaDataComponent implements OnInit {
   }
 
   selectDocumentType(): void {
-
+    this.selectedDocumentType.next(this.formGroup.get('documentType').value);
   }
 
   deselectDocumentType(): void {
-
+    this.selectedDocumentType.next(null);
+    this.formGroup.get('documentType').setValue('');
   }
 
   private initAndReturnAllDocumentTypes(): Observable<Array<KimiosDocumentType>> {
@@ -113,9 +125,36 @@ export class DocumentMetaDataComponent implements OnInit {
       documentMetasMap: Map<number, MetaValue>,
       documentMetas: Array<Meta>
   ): void {
-    documentMetas.forEach(meta => (formGroup.get('metas') as FormGroup).addControl(
+    documentMetas.forEach(meta => formGroup.addControl(
         meta.uid.toString(),
-        this.fb.control(documentMetasMap.get(meta.uid) ? documentMetasMap.get(meta.uid) : '')
+        this.fb.control(documentMetasMap && documentMetasMap.get(meta.uid) ? documentMetasMap.get(meta.uid) : '')
     ));
+  }
+
+  private resetFormMetas(): void {
+    this.formGroup.removeControl('metas');
+    this.formGroup.addControl('metas', this.fb.group({}));
+  }
+
+  private initMetaFeedValues(
+      metas: Array<Meta>,
+      documentTypeMetaDataValuesMap: Map<number, Array<string | number>>
+  ): Observable<boolean> {
+    return from(metas).pipe(
+        map(meta => meta),
+        tap(meta => documentTypeMetaDataValuesMap.set(meta.uid, null)),
+        filter(meta => meta.metaFeedUid !== -1),
+        concatMap(meta => combineLatest(
+            of(meta),
+            this.studioService.getMetaFeedValues(this.sessionService.sessionToken, meta.metaFeedUid)
+        )),
+        tap(([meta, metaFeedValues]) => documentTypeMetaDataValuesMap.set(meta.uid, metaFeedValues)),
+        toArray(),
+        map(array => true)
+    );
+  }
+
+  handleClick(): void {
+    this.trigger.openPanel();
   }
 }

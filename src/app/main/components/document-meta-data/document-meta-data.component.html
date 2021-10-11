@@ -2,9 +2,15 @@
       [formGroup]="formGroup"
       (ngSubmit)="onSubmit()"
       (keyup)="$event.key === 'Enter' ? onSubmit():1">
-  <mat-form-field class="example-full-width" fxFill>
+
+  <div fxFill fxLayout="column" fxLayoutAlign="space-between start">
+
+  <mat-form-field>
     <input type="text" aria-label="document type" matInput [formControlName]="'documentType'"
-           [matAutocomplete]="autoCompleteDocumentType" >
+           [matAutocomplete]="autoCompleteDocumentType"
+           (click)="handleClick()"
+           #trigger="matAutocompleteTrigger"
+    >
     <mat-autocomplete #autoCompleteDocumentType="matAutocomplete" (optionSelected)="selectDocumentType()"
                       [displayWith]="displayAutoCompleteDocumentType">
       <mat-option *ngFor="let documentType of filteredDocumentTypes$ | async" [value]="documentType">
@@ -22,7 +28,7 @@
       <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;">
 
         <ng-container *ngIf="meta.metaType != 4">
-          <mat-form-field fxFill >
+          <mat-form-field>
             <ng-container *ngIf="documentTypeMetaDataValuesMap.get(meta.uid) != null
               && !([2, 3].includes(meta.metaType)) else noValueList;" >
               <mat-select
@@ -66,9 +72,9 @@
                     <input matInput placeholder="min" [formControlName]="meta.uid" [matDatepicker]="datePickerBind">
                     <mat-datepicker-toggle matSuffix [for]="datePickerBind"></mat-datepicker-toggle>
                     <mat-datepicker #datePickerBind></mat-datepicker>
-                    <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).get('min').value"
+                    <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
                             matSuffix mat-icon-button aria-label="Clear"
-                            (click)="formGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')">
+                            (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
                       <mat-icon>close</mat-icon>
                     </button>
                   </mat-form-field>
@@ -77,9 +83,9 @@
               <ng-container *ngIf="meta.metaType!= 3" >
                 <mat-form-field fxFill>
                   <input type="text" placeholder="min" matInput [formControlName]="meta.uid">
-                  <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).get('min').value"
+                  <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
                           matSuffix mat-icon-button aria-label="Clear"
-                          (click)="formGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')">
+                          (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
                     <mat-icon>close</mat-icon>
                   </button>
                 </mat-form-field>
@@ -93,5 +99,6 @@
     </ng-container>
   </ng-container>
 
+  </div>
 
 </form>
