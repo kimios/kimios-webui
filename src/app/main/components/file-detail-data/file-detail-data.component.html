@@ -1,16 +1,28 @@
 <table id="table">
 
   <tr>
-    <td class="talign-right data-title">document Id:</td>
+    <td class="talign-right data-title">Document Id:</td>
     <td>{{document.uid}}</td>
   </tr>
   <tr>
-    <td class="talign-right data-title">document name:</td>
-    <td>{{document.name + (document.extension ? '.' + document.extension : '')}}</td>
+    <td class="talign-right data-title">Document name:</td>
+    <td>{{document.name}}</td>
   </tr>
   <tr>
+    <td class="talign-right data-title">Document extension:</td>
+    <td>{{document.extension ? '.' + document.extension : ''}}</td>
+  </tr>
+  <!--<tr>
     <td class="talign-right data-title">Type:</td>
     <td>{{document.mimeType}}</td>
+  </tr>-->
+  <tr>
+    <td class="talign-right data-title">Document type:</td>
+    <td>{{document.documentTypeName}}</td>
+  </tr>
+  <tr>
+    <td class="talign-right data-title">Size:</td>
+    <td>{{document.length | fileSize}}</td>
   </tr>
   <tr>
     <td class="talign-right data-title">Owner:</td>

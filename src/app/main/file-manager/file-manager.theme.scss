@@ -290,4 +290,9 @@
     button.add-to-selection-list.visible {
         visibility: visible;
     }
+
+    table, tr, td {
+        // border-color: rgba(255, 255, 255, 0.4);
+        border-color: rgba(map-get($foreground, text), 0.4);
+    }
 }
