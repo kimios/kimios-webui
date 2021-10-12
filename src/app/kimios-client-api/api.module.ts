@@ -8,6 +8,7 @@ import { ConverterService } from './api/converter.service';
 import { DefaultService } from './api/default.service';
 import { DocumentService } from './api/document.service';
 import { DocumentVersionService } from './api/documentVersion.service';
+import { DocumentVersionRestOnlyService } from './api/documentVersionRestOnly.service';
 import { EditorsService } from './api/editors.service';
 import { FiletransferService } from './api/filetransfer.service';
 import { FolderService } from './api/folder.service';
@@ -32,6 +33,7 @@ import { WorkspaceService } from './api/workspace.service';
     DefaultService,
     DocumentService,
     DocumentVersionService,
+    DocumentVersionRestOnlyService,
     EditorsService,
     FiletransferService,
     FolderService,

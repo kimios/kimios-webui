@@ -1,11 +1,12 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, Meta, MetaValue, StudioService} from 'app/kimios-client-api';
+import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, Meta, MetaValue, StudioService, DocumentVersionRestOnlyService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 import {MatAutocompleteTrigger} from '@angular/material';
+import {UpdateDocumentVersionMetaDataParam} from 'app/kimios-client-api/model/updateDocumentVersionMetaDataParam';
 
 @Component({
   selector: 'document-meta-data',
@@ -31,6 +32,7 @@ export class DocumentMetaDataComponent implements OnInit {
       private sessionService: SessionService,
       private documentService: DocumentService,
       private documentVersionService: DocumentVersionService,
+      private documentVersionRestOnlyService: DocumentVersionRestOnlyService,
       private fb: FormBuilder,
       private studioService: StudioService
   ) {
@@ -156,5 +158,29 @@ export class DocumentMetaDataComponent implements OnInit {
 
   handleClick(): void {
     this.trigger.openPanel();
+  }
+
+  submit($event: MouseEvent): void {
+    let documentTypeUid = this.documentType.uid;
+    // handle document type property removed from document
+    if (this.documentType == null) {
+      documentTypeUid = -1;
+    }
+    const metaValues = {};
+    Object.keys((this.formGroup.get('metas') as FormGroup).controls).forEach(metaUidStr =>
+        metaValues[metaUidStr] = this.formGroup.get('metas').get(metaUidStr).value);
+    this.documentVersionRestOnlyService.updateDocumentMetaData(
+        <UpdateDocumentVersionMetaDataParam> {
+          sessionId: this.sessionService.sessionToken,
+          createNewVersion: true,
+          documentUid: this.documentId,
+          documentTypeUid: documentTypeUid,
+          metaValues: metaValues
+        }
+    ).subscribe();
+  }
+
+  cancel($event: MouseEvent): void {
+
   }
 }
