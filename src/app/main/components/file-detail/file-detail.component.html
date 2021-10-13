@@ -54,7 +54,7 @@
                         <file-detail-data [document]="data"></file-detail-data>
 
                         <!-- tags -->
-                        <div fxFlexFill>
+                        <div fxFlexFill [ngClass]="'fileDataSectionContainer'" >
                             <mat-form-field *ngIf="canWrite$ | async; else elseBlockTags" fxFlexFill>
                                 <mat-chip-list #chipList>
                                     <mat-chip
