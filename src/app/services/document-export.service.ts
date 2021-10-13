@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, from, Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {BrowseEntityService} from './browse-entity.service';
 import {TreeNode} from 'angular-tree-component';
@@ -27,7 +27,9 @@ export class DocumentExportService {
   addToCart(entity: DMEntity): void {
     this.makeNodeFromDMEntity(entity).pipe(
         tap(node => this._nodes.push(node)),
-        tap(() => this.nodesModified$.next(true))
+        tap(() => this.nodesModified$.next(true)),
+        concatMap(() => this.calculateCartNbDocuments(this._nodes)),
+        tap(nb => this.cartSize$.next(nb))
     ).subscribe();
   }
 
@@ -62,6 +64,24 @@ export class DocumentExportService {
         tap(nodeChild => node.children.push(nodeChild)),
         toArray(),
         map(() => node)
+    );
+  }
+
+  private calculateCartNbDocuments(nodes: Array<any>): Observable<number> {
+    const nb = nodes.filter(node => node['isFolder'] === false).length;
+    return from(nodes.filter(node => node['isFolder'] === true)).pipe(
+        concatMap(folder => this.calculateNbDocumentsInNode(folder)),
+        toArray(),
+        map(array => array.reduce((a, b) => a + b, nb))
+    );
+  }
+
+  private calculateNbDocumentsInNode(node: any): Observable<number> {
+    const nb = node['children'].filter(child => child['isFolder'] === false).length;
+    return from(node['children'].filter(child => child['isFolder'] === true)).pipe(
+        concatMap(folder => this.calculateNbDocumentsInNode(folder)),
+        toArray(),
+        map(array => array.reduce((a, b) => a + b, nb))
     );
   }
 }
