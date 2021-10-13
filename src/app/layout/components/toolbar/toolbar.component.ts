@@ -1,18 +1,19 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Subject} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil} from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
+import {Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
+import {Subject} from 'rxjs';
+import {catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {TranslateService} from '@ngx-translate/core';
 import * as _ from 'lodash';
 
-import { FuseConfigService } from '@fuse/services/config.service';
-import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
+import {FuseConfigService} from '@fuse/services/config.service';
+import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
 
 import {navigation} from 'app/navigation/navigation';
 import {User} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {Router} from '@angular/router';
 import {SearchEntityService} from 'app/services/searchentity.service';
-import {FileUploadService} from '../../../services/file-upload.service';
+import {FileUploadService} from 'app/services/file-upload.service';
+import {DocumentExportService} from 'app/services/document-export.service';
 
 @Component({
     selector     : 'toolbar',
@@ -32,6 +33,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
     userStatusOptions: any[];
 
     user: User = null;
+    cartSize: number;
 
     // Private
     private _unsubscribeAll: Subject<any>;
@@ -54,7 +56,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
         private sessionService: SessionService,
         private searchEntityService: SearchEntityService,
         private fileUploadService: FileUploadService,
-        private router: Router
+        private router: Router,
+        private documentExportService: DocumentExportService
     )
     {
         // Set the defaults
@@ -151,6 +154,10 @@ export class ToolbarComponent implements OnInit, OnDestroy
         ).subscribe(
             res =>  this.showSpinner = res
         );
+
+        this.documentExportService.cartSize$.pipe(
+            tap(size => this.cartSize = size)
+        ).subscribe();
     }
 
     /**
@@ -207,5 +214,10 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
     logout(): void {
         this.sessionService.logout();
+    }
+
+    navigateToCart(): boolean {
+        this.router.navigate(['/cart']);
+        return false;
     }
 }

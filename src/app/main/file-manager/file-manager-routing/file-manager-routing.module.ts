@@ -12,6 +12,7 @@ import {SearchQueriesComponent} from 'app/main/components/search-queries/search-
 import {SettingsComponent} from 'app/main/components/settings/settings.component';
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
 import {WorkspacesComponent} from 'app/main/components/workspaces/workspaces.component';
+import {CartContentComponent} from '../../components/cart-content/cart-content.component';
 
 const fileManagerRoutes: Routes = [
     {
@@ -93,6 +94,11 @@ const fileManagerRoutes: Routes = [
     {
         path: 'overview',
         component: OverviewComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'cart',
+        component: CartContentComponent,
         canActivate: [ LoggedInGuard ]
     }
 

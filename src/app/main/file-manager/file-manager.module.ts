@@ -129,7 +129,8 @@ import {EntityPathComponent} from 'app/main/components/entity-path/entity-path.c
 import {FileHistoryComponent} from 'app/main/components/file-history/file-history.component';
 import {DocumentVersionsComponent} from 'app/main/components/document-versions/document-versions.component';
 import {FileSizePipe} from 'app/main/utils/file-size.pipe';
-import {DocumentMetaDataComponent} from '../components/document-meta-data/document-meta-data.component';
+import {DocumentMetaDataComponent} from 'app/main/components/document-meta-data/document-meta-data.component';
+import {CartContentComponent} from 'app/main/components/cart-content/cart-content.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -222,7 +223,8 @@ library.add(far, fas);
         FileHistoryComponent,
         DocumentVersionsComponent,
         FileSizePipe,
-        DocumentMetaDataComponent
+        DocumentMetaDataComponent,
+        CartContentComponent
     ],
     imports: [
         FileManagerRoutingModule,
