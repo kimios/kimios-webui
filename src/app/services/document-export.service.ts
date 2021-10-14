@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, from, Observable, of} from 'rxjs';
-import {DMEntity} from 'app/kimios-client-api';
+import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from './browse-entity.service';
 import {TreeNode} from 'angular-tree-component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -42,7 +42,8 @@ export class DocumentExportService {
         isFolder: false,
         data: {
           entity: entity,
-          isFolder: false
+          isFolder: false,
+          documentExtension: (entity as KimiosDocument).extension
         }
       });
     } else {
