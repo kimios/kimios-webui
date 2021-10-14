@@ -8,9 +8,9 @@
                [options]="treeOptions"
                >
     </tree-root>-->
-    <tree-root [nodes]="nodes" #tree [options]="treeOptions">
+    <tree-root [nodes]="nodes" #tree [options]="treeOptions" class="kimios-browse-tree" >
         <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
-            <div class="node-wrapper"
+            <div class="node-wrapper" [ngClass]="{'folder': node.data.isFolder === true}"
                  [style.padding-left]="node.getNodePadding()"
                  [attr.data-nodeuid]="node.uid"
             >

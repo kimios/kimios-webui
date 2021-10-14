@@ -1,0 +1,26 @@
+.kimios-tree-button-expand {
+  width: 25px;
+  height: 25px;
+}
+
+.kimios-browse-tree {
+
+  .tree-node-loading .toggle-children {
+    z-index: 1;
+    background-image: url('assets_kimios/images/loader.gif');
+  }
+
+  .node-content-wrapper {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .node-wrapper {
+    height: 40px;
+    margin-left: 10px;
+  }
+
+  .node-wrapper.folder {
+    margin-left: 6px;
+  }
+}
