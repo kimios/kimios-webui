@@ -46,7 +46,4 @@ export class CartContentComponent implements OnInit {
   retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
     return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
   }
-  public nodeAsString(node: TreeNode): string {
-    return Object.keys(node.data).join(' - ');
-  }
 }
