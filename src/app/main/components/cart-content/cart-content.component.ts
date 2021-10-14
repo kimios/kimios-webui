@@ -1,6 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {DocumentExportService} from 'app/services/document-export.service';
 import {filter, tap} from 'rxjs/operators';
+import {DMEntity} from 'app/kimios-client-api';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {IconService} from 'app/services/icon.service';
 
 @Component({
   selector: 'app-cart-content',
@@ -13,7 +16,8 @@ export class CartContentComponent implements OnInit {
   @ViewChild('tree') tree;
 
   constructor(
-      private documentExportService: DocumentExportService
+      private documentExportService: DocumentExportService,
+      private iconService: IconService
   ) {
 
   }
@@ -36,5 +40,9 @@ export class CartContentComponent implements OnInit {
     this.nodes.push(node);
     // this.nodes = nodes;
     this.tree.treeModel.update();
+  }
+
+  retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
   }
 }

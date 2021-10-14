@@ -40,6 +40,10 @@ export class DocumentExportService {
         id: entity.uid,
         children: [],
         isFolder: false,
+        data: {
+          entity: entity,
+          isFolder: false
+        }
       });
     } else {
       return this.makeNodeFromFolder(entity);
@@ -57,6 +61,10 @@ export class DocumentExportService {
       id: entity.uid,
       children: [],
       isFolder: true,
+      data: {
+        entity: entity,
+        isFolder: false
+      }
     };
     return this.browseEntityService.findEntitiesAtPath(entity).pipe(
         concatMap(children => children),

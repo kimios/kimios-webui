@@ -5,6 +5,7 @@
 export const environment = {
     production: false,
     hmr       : false,
+    // apiPath: 'http://212.47.242.63:8181'
     apiPath: 'http://localhost:8181'
 };
 

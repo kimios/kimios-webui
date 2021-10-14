@@ -37,6 +37,23 @@ export class DMEntityUtils {
 
         return iconName;
     }
+
+    /*public static retrieveEntityIconName(iconService: IconService, dmEntity: DMEntity, iconPrefix: string): string {
+        let iconName = 'file';
+        if (this.dmEntityIsDocument(dmEntity)) {
+            const iconNameWanted = (dmEntity as KimiosDocument).extension ?
+                'file-' + (fileExtensionIconNameMapping[(dmEntity as KimiosDocument).extension] != null
+                && fileExtensionIconNameMapping[(dmEntity as KimiosDocument).extension] !== undefined ?
+                fileExtensionIconNameMapping[(dmEntity as KimiosDocument).extension] :
+                (dmEntity as KimiosDocument).extension) :
+                '';
+            if (iconNameWanted !== '' && iconService.iconIsAvailableWithPrefix(iconPrefix, iconNameWanted)) {
+                iconName = iconNameWanted;
+            }
+        }
+
+        return iconName;
+    }*/
 }
 
 export const fileExtensionIconNameMapping = {
