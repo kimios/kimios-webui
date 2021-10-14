@@ -53,7 +53,7 @@
                         && node.data.isFolder === true else iconDocument;">folder</mat-icon>
                         <ng-template #iconDocument>
                             {{node.data.entity != null ? 'not null' : 'null'}}
-                            {{node.data.extension ? node.data.extension : 'no extension'}}
+                            {{node.data.documentExtension ? node.data.documentExtension : 'no extension'}}
                             {{node.data.test ? node.data.test : 'no test'}}
                             <fa-icon *ngIf="node.data.entity != null"
                                      [icon]="['far', retrieveDocumentIcon(node.data['entity'], 'far')]"
