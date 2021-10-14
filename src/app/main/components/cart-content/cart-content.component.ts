@@ -4,6 +4,7 @@ import {filter, tap} from 'rxjs/operators';
 import {DMEntity} from 'app/kimios-client-api';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
+import {TreeNode} from 'angular-tree-component';
 
 @Component({
   selector: 'app-cart-content',
@@ -44,5 +45,8 @@ export class CartContentComponent implements OnInit {
 
   retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
     return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
+  }
+  public nodeAsString(node: TreeNode): string {
+    return Object.keys(node.data).join(' - ');
   }
 }
