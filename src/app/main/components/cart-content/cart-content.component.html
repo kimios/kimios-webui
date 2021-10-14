@@ -54,7 +54,7 @@
                         <ng-template #iconDocument>
                             {{nodeAsString(node)}}
                             <fa-icon *ngIf="node.data.entity != null"
-                                     [icon]="['far', retrieveDocumentIcon(node.data['entity'], 'far')]"
+                                     [icon]="['far', retrieveDocumentIcon(node.data.entity, 'far')]"
                                      size="lg"
                                      [ngClass]="'file-icon-browse-list'"></fa-icon>
                         </ng-template>

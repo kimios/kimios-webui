@@ -40,11 +40,7 @@ export class DocumentExportService {
         id: entity.uid,
         children: [],
         isFolder: false,
-        data: {
-          entity: entity,
-          isFolder: false,
-          documentExtension: (entity as KimiosDocument).extension
-        }
+        entity: entity,
       });
     } else {
       return this.makeNodeFromFolder(entity);
@@ -62,10 +58,7 @@ export class DocumentExportService {
       id: entity.uid,
       children: [],
       isFolder: true,
-      data: {
-        entity: entity,
-        isFolder: false
-      }
+      entity: entity
     };
     return this.browseEntityService.findEntitiesAtPath(entity).pipe(
         concatMap(children => children),
