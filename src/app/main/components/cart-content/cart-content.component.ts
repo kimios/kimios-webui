@@ -7,6 +7,7 @@ import {IconService} from 'app/services/icon.service';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {TreeNode} from 'angular-tree-component';
 
 @Component({
   selector: 'app-cart-content',
@@ -61,5 +62,32 @@ export class CartContentComponent implements OnInit {
 
   retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
     return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
+  }
+
+  removeNode(node: TreeNode): void {
+    this.removeNodeInNodes(node.id, this.nodes);
+    this.tree.treeModel.update();
+  }
+
+  removeNodeInNodes(nodeId: number, nodes: Array<any>): boolean {
+    const idx = nodes.findIndex(node => node.id === nodeId);
+    if (idx !== -1) {
+      nodes.splice(idx, 1);
+      return true;
+    } else {
+      let removed = false;
+      let i = 0;
+      while (i < nodes.length && removed === false) {
+        const node = nodes[i];
+        if (node.children == null || node.children === undefined || node.children.length === 0) {
+          continue;
+        }
+        if (this.removeNodeInNodes(nodeId, nodes['children'])) {
+          removed = true;
+        }
+        i++;
+      }
+      return removed;
+    }
   }
 }
