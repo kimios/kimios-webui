@@ -4,7 +4,8 @@ import {filter, tap} from 'rxjs/operators';
 import {DMEntity} from 'app/kimios-client-api';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
-import {TreeNode} from 'angular-tree-component';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-cart-content',
@@ -13,12 +14,21 @@ import {TreeNode} from 'angular-tree-component';
 })
 export class CartContentComponent implements OnInit {
   nodes = [];
-  treeOptions = {};
+  treeOptions = {
+    actionMapping: {
+      mouse: {
+        dblclick: (tree, node, $event) => {
+          DocumentUtils.navigateToFile(this.router, node.id);
+        }
+      }
+    }
+  };
   @ViewChild('tree') tree;
 
   constructor(
       private documentExportService: DocumentExportService,
-      private iconService: IconService
+      private iconService: IconService,
+      private router: Router
   ) {
 
   }
