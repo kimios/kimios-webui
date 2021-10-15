@@ -17,7 +17,7 @@ export class CartContentComponent implements OnInit {
   treeOptions = {
     actionMapping: {
       mouse: {
-        dblclick: (tree, node, $event) => {
+        dblClick: (tree, node, $event) => {
           DocumentUtils.navigateToFile(this.router, node.id);
         }
       }
