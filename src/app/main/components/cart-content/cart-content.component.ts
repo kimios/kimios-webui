@@ -19,7 +19,11 @@ export class CartContentComponent implements OnInit {
     actionMapping: {
       mouse: {
         dblClick: (tree, node, $event) => {
-          this.bes.goToEntity(node.id, this.router);
+          if (node.data.isFolder === true) {
+            DocumentUtils.navigateToFolderOrWorkspace(this.router, node.id);
+          } else {
+            DocumentUtils.navigateToFile(this.router, node.id);
+          }
         }
       }
     }
