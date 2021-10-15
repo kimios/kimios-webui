@@ -6,6 +6,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'app-cart-content',
@@ -18,7 +19,7 @@ export class CartContentComponent implements OnInit {
     actionMapping: {
       mouse: {
         dblClick: (tree, node, $event) => {
-          DocumentUtils.navigateToFile(this.router, node.id);
+          this.bes.goToEntity(node.id, this.router);
         }
       }
     }
@@ -28,6 +29,7 @@ export class CartContentComponent implements OnInit {
   constructor(
       private documentExportService: DocumentExportService,
       private iconService: IconService,
+      private bes: BrowseEntityService,
       private router: Router
   ) {
 
