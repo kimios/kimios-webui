@@ -46,7 +46,10 @@
                      (treeDrop)="node.onDrop($event)"
                      [treeAllowDrop]="node.allowDrop"
                      [treeDrag]="node"
-                     [treeDragEnabled]="true">
+                     [treeDragEnabled]="true"
+                     (mouseenter)="node.data.isHover = true"
+                     (mouseleave)="node.data.isHover = false"
+                >
                     <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
                         <!--<mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>-->
                         <mat-icon *ngIf="node.data.isFolder != null && node.data.isFolder !== undefined
@@ -60,7 +63,10 @@
                         <div>
                             <tree-node-content [node]="node" [index]="index"></tree-node-content>
                         </div>
-                        <mat-icon (click)="removeNode(node)" >cancel</mat-icon>
+                        <mat-icon (click)="removeNode(node)"
+                                  [ngClass]="{'action' : !node.data.isHover}" >
+                            cancel
+                        </mat-icon>
                     </div>
                 </div>
             </div>

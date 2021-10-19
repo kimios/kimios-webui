@@ -82,7 +82,7 @@ export class CartContentComponent implements OnInit {
         if (node.children == null || node.children === undefined || node.children.length === 0) {
           continue;
         }
-        if (this.removeNodeInNodes(nodeId, nodes['children'])) {
+        if (this.removeNodeInNodes(nodeId, node['children'])) {
           removed = true;
         }
         i++;
