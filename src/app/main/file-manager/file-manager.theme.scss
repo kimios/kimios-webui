@@ -90,6 +90,14 @@
             margin-right: 20px;
             font-weight: bold;
         }
+
+        &:hover {
+            background-color: $kimios-green;
+
+            span.kimios-button-text {
+                color: #F5F5F5;
+            }
+        }
     }
 
     .kimios-dialog .mat-dialog-container {
