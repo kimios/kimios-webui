@@ -22,6 +22,8 @@ import { SecurityService } from './api/security.service';
 import { ShareService } from './api/share.service';
 import { StudioService } from './api/studio.service';
 import { WorkspaceService } from './api/workspace.service';
+import { ZipService } from './api/zip.service';
+import { ZipRestOnlyService } from './api/zipRestOnly.service';
 
 @NgModule({
   imports:      [],
@@ -46,7 +48,9 @@ import { WorkspaceService } from './api/workspace.service';
     SecurityService,
     ShareService,
     StudioService,
-    WorkspaceService ]
+    WorkspaceService,
+    ZipService,
+    ZipRestOnlyService ]
 })
 export class ApiModule {
     public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders {

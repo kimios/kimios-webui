@@ -1,4 +1,4 @@
-<div fxFlex fxLayout="column" fxLayoutAlign="start stretch" fxFlexOffset="20px">
+<div fxFlex fxLayout="column" fxLayoutAlign="start stretch" fxFlexOffset="20px" fxLayoutGap="20px">
     <div>
         <h1 class="no-margin-bottom">Export to ZIP</h1>
     </div>
@@ -8,6 +8,27 @@
                [options]="treeOptions"
                >
     </tree-root>-->
+    <div
+         fxLayout="row"
+         fxLayoutAlign="start start"
+         fxLayoutGap="20px">
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="doZip()" >
+            <span [class.kimios-button-text]="true">Export Documents</span>
+        </div>
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="emptyCart()">
+            <span class="kimios-button-text">Empty cart</span>
+        </div>
+    </div>
     <tree-root [nodes]="nodes" #tree [options]="treeOptions" class="kimios-browse-tree" >
         <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
             <div class="node-wrapper" [ngClass]="{'folder': node.data.isFolder === true}"
