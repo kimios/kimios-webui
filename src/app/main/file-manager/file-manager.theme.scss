@@ -191,6 +191,19 @@
         background-color: map-get($background, card);
     }
 
+    .cartContainer {
+        background-color: map-get($background, card);
+        padding-top: 20px;
+        height: 100%;
+        border-radius: 10px;
+        padding-bottom: 10px;
+    }
+
+    .cartContainerWrapper {
+        padding-right: 20px;
+        padding-bottom: 20px;
+    }
+
     .kimios-section-content {
         background: mat-color($background, 'card');
     }

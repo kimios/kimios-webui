@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DocumentExportService} from 'app/services/document-export.service';
 import {filter, tap} from 'rxjs/operators';
 import {DMEntity} from 'app/kimios-client-api';
@@ -20,7 +20,7 @@ import {APP_CONFIG} from 'app/app-config/config';
   templateUrl: './cart-content.component.html',
   styleUrls: ['./cart-content.component.scss']
 })
-export class CartContentComponent implements OnInit {
+export class CartContentComponent implements OnInit, AfterViewChecked {
   nodes = [];
   treeOptions = {
     actionMapping: {
@@ -36,6 +36,7 @@ export class CartContentComponent implements OnInit {
     }
   };
   @ViewChild('tree') tree;
+  @ViewChild('cartContainerWrapper') cartContainerWrapper: ElementRef;
 
   constructor(
       private documentExportService: DocumentExportService,
@@ -142,4 +143,14 @@ export class CartContentComponent implements OnInit {
 
     return dmEntityTreeNode;
   }
+
+  ngAfterViewChecked(): void {
+    const windowTotalScreen = window.innerHeight;
+    const cartContainerWrapperOffSetTop = this.cartContainerWrapper.nativeElement.getBoundingClientRect().top;
+    const height = windowTotalScreen - cartContainerWrapperOffSetTop;
+    this.cartContainerWrapper.nativeElement.style.height = height + 'px';
+    this.cartContainerWrapper.nativeElement.style.minHeight = height + 'px';
+    this.cartContainerWrapper.nativeElement.style.maxHeight = height + 'px';
+  }
+
 }
