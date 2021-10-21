@@ -88,4 +88,11 @@ export class DocumentExportService {
         map(array => array.reduce((a, b) => a + b, nb))
     );
   }
+
+  setNodes(nodes: any[]): void {
+    this._nodes = nodes;
+    this.calculateCartNbDocuments(this._nodes).pipe(
+        tap(res => this.cartSize$.next(res))
+    ).subscribe();
+  }
 }

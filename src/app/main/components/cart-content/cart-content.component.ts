@@ -76,6 +76,7 @@ export class CartContentComponent implements OnInit, AfterViewChecked {
   removeNode(node: TreeNode): void {
     this.removeNodeInNodes(node.id, this.nodes);
     this.tree.treeModel.update();
+    this.documentExportService.setNodes(this.nodes);
   }
 
   removeNodeInNodes(nodeId: number, nodes: Array<any>): boolean {
