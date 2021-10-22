@@ -25,12 +25,14 @@ export class DocumentExportService {
   }
 
   addToCart(entity: DMEntity): void {
-    this.makeNodeFromDMEntity(entity).pipe(
-        tap(node => this._nodes.push(node)),
-        tap(() => this.nodesModified$.next(true)),
-        concatMap(() => this.calculateCartNbDocuments(this._nodes)),
-        tap(nb => this.cartSize$.next(nb))
-    ).subscribe();
+    if (this._nodes.findIndex(node => node.id === entity.uid) === -1) {
+      this.makeNodeFromDMEntity(entity).pipe(
+          tap(node => this._nodes.push(node)),
+          tap(() => this.nodesModified$.next(true)),
+          concatMap(() => this.calculateCartNbDocuments(this._nodes)),
+          tap(nb => this.cartSize$.next(nb))
+      ).subscribe();
+    }
   }
 
   private makeNodeFromDMEntity(entity: DMEntity): Observable<any> {
