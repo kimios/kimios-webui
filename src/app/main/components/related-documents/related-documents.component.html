@@ -1,3 +1,34 @@
-<p>
-  related-documents works!
-</p>
+<mat-table [dataSource]="dataSource"
+           matSort
+           matSortActive="{{sort.name}}"
+           matSortDirection="{{sort.direction}}"
+           matSortDisableClear
+           (matSortChange)="sortData($event)">
+
+  <ng-container
+          *ngFor="let col of columnsDescription"
+          matColumnDef="{{col.matColumnDef}}"
+          sticky="{{col.sticky}}">
+    <mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header="{{col.matColumnDef}}"
+    > {{col.displayName}} </mat-header-cell>
+    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
+      <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">
+        {{ element[col.matColumnDef] | fileSize }}
+      </span>
+      <ng-template #dateTemplate>
+        <span *ngIf="col.id.endsWith('Date') else otherColumnTemplate">{{ element[col.matColumnDef] | date : 'short'}}</span>
+      </ng-template>
+      <ng-template #otherColumnTemplate>
+        <span>{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+      </ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+  <mat-row *matRowDef="let row; columns: displayedColumns;">
+  </mat-row>
+
+</mat-table>

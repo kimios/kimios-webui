@@ -1,7 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
-import * as moment from 'moment';
 import {MatTableDataSource} from '@angular/material';
 
 export class KimiosDocumentDataSource extends MatTableDataSource<KimiosDocument> {
@@ -38,7 +37,7 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         matHeaderCellDef: 'name',
         sticky: false,
         displayName: 'Name',
-        cell: null
+        cell: (row: KimiosDocument) => `${ row.name + (row.extension ? '.' + row.extension : '') }`
     },
     {
         id: 'documentTypeName',
@@ -46,43 +45,26 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         position: 2,
         matHeaderCellDef: 'documentTypeName',
         sticky: false,
-        displayName: 'Type',
+        displayName: 'Document type',
         cell: null
     },
-    {
+    /*{
         id: 'versionUpdateDate',
         matColumnDef: 'versionUpdateDate',
         position: 3,
         matHeaderCellDef: 'versionUpdateDate',
         sticky: false,
         displayName: 'Last Update',
-        cell: (row: KimiosDocument) => `${ moment(row.updateDate).fromNow() }`
-    },
-    /*{
-        id: 'length',
-        matColumnDef: 'length',
-        position: 4,
-        matHeaderCellDef: 'length',
-        sticky: false,
-        displayName: 'Size',
-        cell: (row: any) => `${ KimiosDocumentDataSource.humanFileSize(row.length, 1024) }`
+        cell: null
     },*/
     {
-        id: 'extension',
-        matColumnDef: 'extension',
-        position: 5,
-        matHeaderCellDef: 'extension',
-        sticky: false,
-        displayName: 'File Type',
-        cell: null
-    }
-    /*{
         id: 'creationDate',
         matColumnDef: 'creationDate',
         position: 4,
         matHeaderCellDef: 'creationDate',
         sticky: false,
-        displayName: 'Creation Date'
+        displayName: 'Creation Date',
+        cell: null
     },
     {
         id: 'owner',
@@ -90,9 +72,10 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
         position: 5,
         matHeaderCellDef: 'owner',
         sticky: false,
-        displayName: 'Owner'
+        displayName: 'Owner',
+        cell: null
     },
-    {
+    /*{
         id: 'lastVersionId',
         matColumnDef: 'lastVersionId',
         position: 6,

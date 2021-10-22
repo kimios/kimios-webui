@@ -126,6 +126,12 @@
 
                 </mat-tab>
 
+                <mat-tab label="Related documents">
+                    <div>
+                        <related-documents [documentUid]="documentId" ></related-documents>
+                    </div>
+                </mat-tab>
+
                 <mat-tab label="Security">
                     <div  [ngClass]="'data-tab-content'">
                         <file-security [documentId]="documentId"></file-security>
