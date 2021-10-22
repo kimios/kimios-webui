@@ -131,6 +131,7 @@ import {DocumentVersionsComponent} from 'app/main/components/document-versions/d
 import {FileSizePipe} from 'app/main/utils/file-size.pipe';
 import {DocumentMetaDataComponent} from 'app/main/components/document-meta-data/document-meta-data.component';
 import {CartContentComponent} from 'app/main/components/cart-content/cart-content.component';
+import {RelatedDocumentsComponent} from 'app/main/components/related-documents/related-documents.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -224,7 +225,8 @@ library.add(far, fas);
         DocumentVersionsComponent,
         FileSizePipe,
         DocumentMetaDataComponent,
-        CartContentComponent
+        CartContentComponent,
+        RelatedDocumentsComponent
     ],
     imports: [
         FileManagerRoutingModule,
