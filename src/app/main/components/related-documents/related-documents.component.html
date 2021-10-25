@@ -19,7 +19,7 @@
       </mat-icon>
       {{col.displayName}}
     </mat-header-cell>
-    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
+    <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" (dblclick)="goToDocument($event, element.uid, col.id)" >
       <mat-icon *ngIf="col.element === 'iconName' else lengthTemplate;" class="cursor-pointer" (click)="deleteRow(element.uid, $event)"> {{ col.cell }} </mat-icon>
       <ng-template #lengthTemplate>
         <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">

@@ -3,10 +3,10 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
-import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, switchMap, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormBuilder, FormControl} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatChipInputEvent} from '@angular/material';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
@@ -94,7 +94,16 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngOnInit(): void {
-        this.documentId = Number(this.route.snapshot.paramMap.get('documentId'));
+        this.route.paramMap.pipe(
+            switchMap(params => {
+                this.documentId = Number(params.get('documentId'));
+                this.initDocumentDetail();
+                return of(true);
+            })
+        ).subscribe();
+    }
+
+    initDocumentDetail(): void {
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
         this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 
@@ -149,9 +158,9 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 }
             );
 
-       /* this.documentTags$.pipe(
-            tap(res => this.searchEntityService.reloadTags())
-        ).subscribe();*/
+        /* this.documentTags$.pipe(
+             tap(res => this.searchEntityService.reloadTags())
+         ).subscribe();*/
 
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')

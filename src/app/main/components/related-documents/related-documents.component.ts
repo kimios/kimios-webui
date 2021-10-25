@@ -6,6 +6,8 @@ import {DEFAULT_DISPLAYED_COLUMNS, KimiosDocumentDataSource} from 'app/main/mode
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {Router} from '@angular/router';
 
 const sortTypeMapping = {
   'name': 'string',
@@ -35,7 +37,8 @@ export class RelatedDocumentsComponent implements OnInit {
 
   constructor(
       private sessionService: SessionService,
-      private documentService: DocumentService
+      private documentService: DocumentService,
+      private router: Router
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
   }
@@ -74,5 +77,11 @@ export class RelatedDocumentsComponent implements OnInit {
 
   deleteRow(i: any, $event: MouseEvent): void {
 
+  }
+
+  goToDocument($event: MouseEvent, uid: number, colId: string): void {
+    if (colId !== 'actionRemove') {
+      DocumentUtils.navigateToFile(this.router, uid);
+    }
   }
 }
