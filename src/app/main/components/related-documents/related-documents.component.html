@@ -11,12 +11,21 @@
           sticky="{{col.sticky}}">
     <mat-header-cell
             *matHeaderCellDef
-            mat-sort-header="{{col.matColumnDef}}"
-    > {{col.displayName}} </mat-header-cell>
+            mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
+            class="{{col.class ? col.class : ''}}"
+    >
+      <mat-icon *ngIf="col.cellHeaderIcon" (click)="add()">
+        {{col.cellHeaderIcon}}
+      </mat-icon>
+      {{col.displayName}}
+    </mat-header-cell>
     <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
-      <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">
-        {{ element[col.matColumnDef] | fileSize }}
-      </span>
+      <mat-icon *ngIf="col.element === 'iconName' else lengthTemplate;" class="cursor-pointer" (click)="deleteRow(element.uid, $event)"> {{ col.cell }} </mat-icon>
+      <ng-template #lengthTemplate>
+        <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">
+          {{ element[col.matColumnDef] | fileSize }}
+        </span>
+      </ng-template>
       <ng-template #dateTemplate>
         <span *ngIf="col.id.endsWith('Date') else otherColumnTemplate">{{ element[col.matColumnDef] | date : 'short'}}</span>
       </ng-template>

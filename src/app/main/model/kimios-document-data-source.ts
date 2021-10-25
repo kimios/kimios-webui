@@ -2,6 +2,7 @@ import {BehaviorSubject} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {MatTableDataSource} from '@angular/material';
+import {ColumnDescriptionWithElement} from './column-description-with-element';
 
 export class KimiosDocumentDataSource extends MatTableDataSource<KimiosDocument> {
     private documentsSubject = new BehaviorSubject<KimiosDocument[]>([]);
@@ -29,11 +30,25 @@ export class KimiosDocumentDataSource extends MatTableDataSource<KimiosDocument>
     }
 }
 
-export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
+export const DEFAULT_DISPLAYED_COLUMNS: Array<ColumnDescriptionWithElement | ColumnDescription> = [
+    {
+        // to delete this row
+        id: 'actionRemove',
+        matColumnDef: 'actionRemove',
+        position: 1,
+        matHeaderCellDef: 'actionRemove',
+        sticky: false,
+        displayName: '',
+        cell: 'remove',
+        element: 'iconName',
+        class: 'mat-column-width50',
+        noSortHeader: true,
+        cellHeaderIcon: 'add_circle'
+    },
     {
         id: 'name',
         matColumnDef: 'name',
-        position: 1,
+        position: 2,
         matHeaderCellDef: 'name',
         sticky: false,
         displayName: 'Name',
@@ -42,11 +57,11 @@ export const DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
         id: 'documentTypeName',
         matColumnDef: 'documentTypeName',
-        position: 2,
+        position: 3,
         matHeaderCellDef: 'documentTypeName',
         sticky: false,
         displayName: 'Document type',
-        cell: null
+        cell: (row: KimiosDocument) => `${ (row.documentTypeName ? row.documentTypeName : '-') }`
     },
     /*{
         id: 'versionUpdateDate',

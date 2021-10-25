@@ -67,4 +67,12 @@ export class RelatedDocumentsComponent implements OnInit {
     });
     this.dataSource.setData(sortedData);
   }
+
+  add(): void {
+
+  }
+
+  deleteRow(i: any, $event: MouseEvent): void {
+
+  }
 }
