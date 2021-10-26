@@ -135,7 +135,8 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       data: {
         filesList: filesMap,
         filesTags: new Map<string, Map<number, Tag>>()
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
