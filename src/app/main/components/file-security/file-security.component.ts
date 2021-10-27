@@ -288,7 +288,8 @@ export class FileSecurityComponent implements OnInit {
                 selectedUsersAndGroups: new Array<UserOrGroup>(),
                 currentSecurities: this.dataSource.connect().getValue()
             },
-            width: '800px'
+            width: '800px',
+            disableClose: true
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -298,7 +299,7 @@ export class FileSecurityComponent implements OnInit {
                 return;
             }
 
-            const newSecurities = dialogRef.componentInstance.data.selectedUsersAndGroups.map(userOrGroup =>
+            const newSecurities = this.adminService.selectedUsersAndGroups$.getValue().map(userOrGroup =>
                 <DMEntitySecurity> {
                     dmEntityUid: this.documentId,
                     dmEntityType: DMENTITYTYPE_DOCUMENT,
