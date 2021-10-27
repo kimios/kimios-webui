@@ -513,8 +513,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
     private openDialog(entityType: 'workspace' | 'folder', entityId: number): void {
         const dialogRef = this.createContainerEntityDialog.open(ContainerEntityCreationDialogComponent, {
-            width: '60%',
-            height: '75%',
+            // width: '60%',
+            // height: '75%',
             data: {
                 entityType: entityType,
                 parentId: entityId

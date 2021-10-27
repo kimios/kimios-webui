@@ -1,11 +1,13 @@
 <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
     <div fxLayout="column" fxLayoutAlign="start start">
-        <div>Create {{data.entityType}}</div>
-        <ng-container *ngIf="data.entityType === 'folder'">
-            <div *ngIf="parentEntity$ | async">
-                at path: <entity-path [entityPath]="parentEntity.path"></entity-path>
-            </div>
-        </ng-container>
+        <div>
+            Create {{data.entityType}}
+            <ng-container *ngIf="data.entityType === 'folder'">
+                <span *ngIf="parentEntity$ | async">
+                    at path: <entity-path [entityPath]="parentEntity.path"></entity-path>
+                </span>
+            </ng-container>
+        </div>
     </div>
     <div>
         <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
