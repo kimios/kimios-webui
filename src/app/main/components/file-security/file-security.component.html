@@ -25,11 +25,15 @@
       <mat-header-cell
               *matHeaderCellDef
               mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
-              class="{{col.class ? col.class : ''}}"
-      ><mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()">{{col.cellHeaderIcon}}</mat-icon>{{col.displayName}}</mat-header-cell>
+              [ngClass]="[col.class ? col.class : '', 'mat-header-cell-custom']"
+      >
+          <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()">
+              {{col.cellHeaderIcon}}
+          </mat-icon>{{col.displayName}}
+      </mat-header-cell>
       <mat-cell
               *matCellDef="let element; let i = index;"
-              class="{{col.class ? col.class : ''}}"
+              [ngClass]="[col.class ? col.class : '']"
               [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())"
       >
           <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(i, $event)"> {{ col.cell }} </mat-icon>
