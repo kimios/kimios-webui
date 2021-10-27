@@ -67,10 +67,11 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         this.loadingSubject.complete();
     }
 
-    loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
+    loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize, refresh?): void {
         this.loadingSubject.next(true);
         if (this.usersCacheByDomain.get(source) == null
-            || this.usersCacheByDomain.get(source) === undefined) {
+            || this.usersCacheByDomain.get(source) === undefined
+            || refresh) {
             this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
                 tap(users => this._setCacheForDomain(source, users)),

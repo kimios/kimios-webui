@@ -128,6 +128,18 @@ export class AdminDomainsUsersComponent implements OnInit {
     }
 
     this.currentUserIsAdmin$ = this.securityService.isAdmin(this.sessionService.sessionToken);
+
+    this.adminService.newUserCreated$.pipe(
+        filter(res => res === true),
+        filter(res => this.adminService.selectedDomain$.getValue() !== ''),
+        tap(() => this.dataSource.loadUsers(
+            this.adminService.selectedDomain$.getValue(),
+            this.sort,
+            this.userSearch.value,
+            this.page,
+            this.pageSize,
+            true))
+    ).subscribe();
   }
 
   public modeIsAdmin(): boolean {

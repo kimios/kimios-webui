@@ -34,6 +34,7 @@ export class AdminService {
 
   addUserOrGroupToPermissions$: BehaviorSubject<UserOrGroup>;
   selectedUsersAndGroups$: BehaviorSubject<Array<UserOrGroup>>;
+  newUserCreated$: BehaviorSubject<boolean>;
 
   constructor(
       private sessionService: SessionService,
@@ -56,6 +57,7 @@ export class AdminService {
     this.newMetaFeed$ = new BehaviorSubject<boolean>(false);
     this.addUserOrGroupToPermissions$ = new BehaviorSubject<UserOrGroup>(null);
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>(null);
+    this.newUserCreated$ = new BehaviorSubject<boolean>(false);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {
