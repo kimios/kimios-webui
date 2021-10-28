@@ -4,6 +4,7 @@ import {DocumentVersion, DocumentVersionService, Document as KimiosDocument, Doc
 import {SessionService} from './session.service';
 import {concatMap, map, tap} from 'rxjs/operators';
 import {iif, Observable, of} from 'rxjs';
+import {SearchEntityService} from './searchentity.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +12,16 @@ import {iif, Observable, of} from 'rxjs';
 export class EntityCacheService {
 
   private entitiesCache: Map<number, EntityCacheData>;
+  private allTags: Map<string, number>;
 
   constructor(
       private sessionService: SessionService,
       private documentVersionService: DocumentVersionService,
-      private documentService: DocumentService
+      private documentService: DocumentService,
+      private searchEntityService: SearchEntityService
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
+    this.allTags = null;
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -97,6 +101,20 @@ export class EntityCacheService {
       () => documentCacheData.versions == null,
       this.updateDocumentCacheDataVersions(documentCacheData),
       of(documentCacheData)
+    );
+  }
+
+  findAllTags(): Observable<Map<string, number>> {
+    return iif(
+      () => this.allTags == null,
+      this.initAllTags(),
+      of(this.allTags)
+    );
+  }
+
+  private initAllTags(): Observable<Map<string, number>> {
+    return this.searchEntityService.retrieveAllTags().pipe(
+      tap(allTags => this.allTags = allTags)
     );
   }
 }

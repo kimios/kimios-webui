@@ -78,7 +78,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         @Inject(LOCALE_ID) private locale: string,
         private entityCacheService: EntityCacheService
     ) {
-        this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
+        this.allTagsKey$ = this.entityCacheService.findAllTags()
             .pipe(
                 tap(res => this.allTags = res),
                 map(res => Array.from(res.keys()))
