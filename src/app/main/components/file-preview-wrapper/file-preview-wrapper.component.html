@@ -1,0 +1,29 @@
+<div fxLayout="column" fxLayoutAlign="start start" style="width: 100%">
+  <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%">
+    <div>
+      <mat-icon
+              [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
+                                    'disabledIcon': currentVersionIsFirst()}"
+              (click)="handleVersionPreviewNextOrPrev(-1)">
+        navigate_before
+      </mat-icon>
+    </div>
+    <div style="text-align: center">{{previewTitle}}</div>
+    <div>
+      <mat-icon
+              [ngClass]="{'cursor-pointer': !currentVersionIsLast(),
+                                    'disabledIcon': currentVersionIsLast()}"
+              (click)="handleVersionPreviewNextOrPrev(1)">
+        navigate_next
+      </mat-icon>
+    </div>
+  </div>
+  <div #filePreviewDiv style="width: 96%; min-height: 100%; height: 100%;">
+    <file-preview
+            #filePreview
+            [documentId]="document.uid"
+            [documentExtension]="document.extension"
+            [documentVersionId]="currentVersionId"
+    ></file-preview>
+  </div>
+</div>
