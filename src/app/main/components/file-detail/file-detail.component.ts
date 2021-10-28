@@ -12,6 +12,7 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
 import {formatDate, Location} from '@angular/common';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 export enum Direction {
     NEXT = 1,
@@ -74,7 +75,8 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         private securityService: SecurityService,
         private location: Location,
         private fb: FormBuilder,
-        @Inject(LOCALE_ID) private locale: string
+        @Inject(LOCALE_ID) private locale: string,
+        private entityCacheService: EntityCacheService
     ) {
         this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
             .pipe(
@@ -111,7 +113,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
             .pipe(
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
-                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
                 tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
                 tap(res => this.document = res),
                 tap(res => this.loading$ = of(false)),
