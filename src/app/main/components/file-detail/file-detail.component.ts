@@ -175,7 +175,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     initDocumentVersions(): Observable<Array<DocumentVersion>> {
-        return this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
+        return this.entityCacheService.findDocumentVersionsInCache(this.documentId)
             .pipe(
                 map(
                     res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
