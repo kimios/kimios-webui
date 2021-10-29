@@ -3,10 +3,11 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {Direction} from 'app/main/components/file-detail/file-detail.component';
 import {Document as KimiosDocument, DocumentVersion} from 'app/kimios-client-api';
 import {formatDate} from '@angular/common';
-import {Observable, Subject} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {filter, tap} from 'rxjs/operators';
+import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'file-preview-wrapper',
@@ -16,6 +17,7 @@ import {EntityCacheService} from 'app/services/entity-cache.service';
 export class FilePreviewWrapperComponent implements OnInit {
 
   @Input()
+  documentId: number;
   document: KimiosDocument;
   documentVersions: Array<DocumentVersion>;
   documentVersionIds: Array<number>;
@@ -42,7 +44,8 @@ export class FilePreviewWrapperComponent implements OnInit {
   constructor(
       private documentDetailService: DocumentDetailService,
       @Inject(LOCALE_ID) private locale: string,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private route: ActivatedRoute
   ) {
     this.documentVersionIds = new Array<number>();
     this.currentVersionId = 0;
@@ -51,8 +54,16 @@ export class FilePreviewWrapperComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.entityCacheService.findDocumentVersionsInCache(this.document.uid).pipe(
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        this.documentId = Number(params.get('documentId'));
+        return of(this.documentId);
+      }),
+      concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId)),
+      tap(doc => this.document = doc),
+      concatMap(doc => this.entityCacheService.findDocumentVersionsInCache(doc.uid)),
       tap(documentVersions => this.documentVersions = documentVersions),
+      tap(res => this.previewTitle = this.makePreviewTitle(this.currentVersionId, res)),
       tap(
         res => this.documentVersionIds = this.documentVersions.slice()
           .sort((a, b) => a.modificationDate < b.modificationDate ? -1 : 1)
@@ -63,10 +74,6 @@ export class FilePreviewWrapperComponent implements OnInit {
     this.documentDetailService.currentVersionId.pipe(
       filter(currentVersionId => currentVersionId != null),
       tap(currentVersionId => this.currentVersionId = currentVersionId)
-    ).subscribe();
-
-    this.entityCacheService.findDocumentVersionsInCache(this.document.uid).pipe(
-      tap(res => this.previewTitle = this.makePreviewTitle(this.currentVersionId, res))
     ).subscribe();
   }
 

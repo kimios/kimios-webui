@@ -15,11 +15,11 @@
             <mat-tab-group>
 
                 <mat-tab label="Preview">
-                    <file-preview-wrapper [document]="document"></file-preview-wrapper>
+                    <file-preview-wrapper [documentId]="data.uid"></file-preview-wrapper>
                 </mat-tab>
 
                 <mat-tab label="Data">
-                    <file-detail-data-and-tags [document]="data"></file-detail-data-and-tags>
+                    <file-detail-data-and-tags [documentId]="data.uid"></file-detail-data-and-tags>
                 </mat-tab>
 
                 <!-- file versions -->

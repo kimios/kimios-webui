@@ -1,4 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {concatMap, switchMap, tap} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {EntityCacheService} from 'app/services/entity-cache.service';
+import {ActivatedRoute} from '@angular/router';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
 
 @Component({
@@ -9,11 +13,33 @@ import {Document as KimiosDocument} from 'app/kimios-client-api';
 export class FileDetailDataAndTagsComponent implements OnInit {
 
   @Input()
-  document: KimiosDocument;
+  documentId: number;
+  documentId$: BehaviorSubject<number>;
+  document$: Observable<KimiosDocument>;
 
-  constructor() { }
+  constructor(
+    private entityCacheService: EntityCacheService,
+    private route: ActivatedRoute
+  ) {
+    this.documentId$ = new BehaviorSubject<number>(null);
+  }
 
   ngOnInit(): void {
+    this.document$ = this.documentId$.pipe(
+      concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
+    );
+
+    if (this.documentId == null) {
+      this.route.paramMap.pipe(
+        switchMap(params => {
+          this.documentId = Number(params.get('documentId'));
+          return of(this.documentId);
+        }),
+        tap(docId => this.documentId$.next(docId))
+      ).subscribe();
+    } else {
+      this.documentId$.next(this.documentId);
+    }
   }
 
 }
