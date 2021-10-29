@@ -26,45 +26,23 @@
                 <!--    <div *ngIf="documentVersions$ | async as versions">-->
 
                 <mat-tab label="Meta data">
-                    <div>
-                        <document-meta-data [documentId]="documentId" ></document-meta-data>
-                    </div>
+                    <document-meta-data [documentId]="documentId" ></document-meta-data>
                 </mat-tab>
 
                 <mat-tab *ngIf="documentVersions$ | async as versions" label="Versions">
-
-                            <!--<div *ngIf="versions.length > 1; else versionsElseBlock">
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    {{versions.length}} versions recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.
-                </mat-expansion-panel-header>-->
-                    <div  style="max-width: 900px">
-                        <document-versions [versionList]="versions"></document-versions>
-
-                        <!--</mat-expansion-panel>
-        </div>
-        <ng-template #versionsElseBlock>1 version recorded, last on {{versions[0].creationDate | date}} by {{versions[0].author}}.</ng-template>
--->
-                    </div>
-
+                    <document-versions [versionList]="versions"></document-versions>
                 </mat-tab>
 
                 <mat-tab label="Related documents">
-                    <div>
-                        <related-documents [documentUid]="documentId" ></related-documents>
-                    </div>
+                    <related-documents [documentUid]="documentId" ></related-documents>
                 </mat-tab>
 
                 <mat-tab label="Security">
-                    <div  [ngClass]="'data-tab-content'">
-                        <file-security [documentId]="documentId"></file-security>
-                    </div>
+                    <file-security [documentId]="documentId"></file-security>
                 </mat-tab>
 
                 <mat-tab label="History">
-                    <div style="max-width: 500px">
-                        <file-history [documentId]="documentId"></file-history>
-                    </div>
+                    <file-history [documentId]="documentId"></file-history>
                 </mat-tab>
             </mat-tab-group>
             <!--    </div>-->

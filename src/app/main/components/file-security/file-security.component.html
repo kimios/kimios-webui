@@ -1,70 +1,71 @@
-<div class="wrapper">
-    <div class="overlay" *ngIf="showSpinner">
-        <div class="spinner-wrapper">
-            <mat-spinner
-                    color="primary"
-            ></mat-spinner>
-        </div>
-    </div>
-
-    <div class="loaded-content" [class.blurred]="showSpinner">
-
-
-<form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
-
-    <div fxLayout="column" fxLayoutAlign="space-between center">
-
-    <mat-table #table [dataSource]="dataSource"
-             matSort class="w100pc">
-    <!--matSortActive="" matSortDirection="desc" matSortDisableClear-->
-
-    <ng-container
-            *ngFor="let col of columnsDescription"
-            matColumnDef="{{col.matColumnDef}}"
-            sticky="{{col.sticky}}" >
-      <mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
-              [ngClass]="[col.class ? col.class : '', 'mat-header-cell-custom']"
-      >
-          <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()">
-              {{col.cellHeaderIcon}}
-          </mat-icon>{{col.displayName}}
-      </mat-header-cell>
-      <mat-cell
-              *matCellDef="let element; let i = index;"
-              [ngClass]="[col.class ? col.class : '']"
-              [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())"
-      >
-          <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(i, $event)"> {{ col.cell }} </mat-icon>
-          <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
-          <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
-          <mat-checkbox
-                  *ngIf="col.element === 'checkbox'"
-                  [formControlName]="col.matColumnDef">
-          </mat-checkbox>
-      </mat-cell>
-    </ng-container>
-
-
-
-    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-
-    <mat-row *matRowDef="let row; columns: displayedColumns;">
-    </mat-row>
-
-  </mat-table>
-
-        <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" >
-            <button mat-button (click)="submit($event)"><mat-icon>check</mat-icon></button>
-            <button mat-button (click)="cancel($event)"><mat-icon>cancel</mat-icon></button>
+<div  [ngClass]="'data-tab-content'">
+    <div class="wrapper">
+        <div class="overlay" *ngIf="showSpinner">
+            <div class="spinner-wrapper">
+                <mat-spinner
+                        color="primary"
+                ></mat-spinner>
+            </div>
         </div>
 
-    </div>
-
-</form>
+        <div class="loaded-content" [class.blurred]="showSpinner">
 
 
+    <form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
+
+        <div fxLayout="column" fxLayoutAlign="space-between center">
+
+        <mat-table #table [dataSource]="dataSource"
+                 matSort class="w100pc">
+        <!--matSortActive="" matSortDirection="desc" matSortDisableClear-->
+
+        <ng-container
+                *ngFor="let col of columnsDescription"
+                matColumnDef="{{col.matColumnDef}}"
+                sticky="{{col.sticky}}" >
+          <mat-header-cell
+                  *matHeaderCellDef
+                  mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
+                  [ngClass]="[col.class ? col.class : '', 'mat-header-cell-custom']"
+          >
+              <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()">
+                  {{col.cellHeaderIcon}}
+              </mat-icon>{{col.displayName}}
+          </mat-header-cell>
+          <mat-cell
+                  *matCellDef="let element; let i = index;"
+                  [ngClass]="[col.class ? col.class : '']"
+                  [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())"
+          >
+              <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(i, $event)"> {{ col.cell }} </mat-icon>
+              <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
+              <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+              <mat-checkbox
+                      *ngIf="col.element === 'checkbox'"
+                      [formControlName]="col.matColumnDef">
+              </mat-checkbox>
+          </mat-cell>
+        </ng-container>
+
+
+
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+        <mat-row *matRowDef="let row; columns: displayedColumns;">
+        </mat-row>
+
+      </mat-table>
+
+            <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" >
+                <button mat-button (click)="submit($event)"><mat-icon>check</mat-icon></button>
+                <button mat-button (click)="cancel($event)"><mat-icon>cancel</mat-icon></button>
+            </div>
+
+        </div>
+
+    </form>
+
+
+        </div>
     </div>
 </div>
-
