@@ -2,14 +2,15 @@ import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {DMEntitySecurity, SecurityService, TaskInfo, UpdateSecurityCommand} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatDialog, MatTableDataSource} from '@angular/material';
-import {concatMap, filter, map} from 'rxjs/operators';
+import {concatMap, filter, map, switchMap, tap} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AdminService} from 'app/services/admin.service';
+import {ActivatedRoute} from '@angular/router';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -31,6 +32,7 @@ export class FileSecurityComponent implements OnInit {
 
   @Input()
   documentId: number;
+  documentId$: BehaviorSubject<number>;
 
     @Input()
     showFormButtons = true;
@@ -52,7 +54,8 @@ export class FileSecurityComponent implements OnInit {
       private sessionService: SessionService,
       public dialog: MatDialog,
       private entityCreationService: EntityCreationService,
-      private adminService: AdminService
+      private adminService: AdminService,
+      private route: ActivatedRoute
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -61,12 +64,16 @@ export class FileSecurityComponent implements OnInit {
       this.displayedColumns.push(elem.matHeaderCellDef);
     });
     this.formArray$ = new Observable<AbstractControl[]>();
+    this.documentId$ = new BehaviorSubject<number>(null);
   }
 
   ngOnInit(): void {
     this.dataSource = new MatTableDataSource<DMEntitySecurity>([]);
 
-    this.loadData().subscribe(
+    this.documentId$.pipe(
+      filter(docId => docId != null),
+      concatMap(docId => this.loadData())
+    ).subscribe(
         res => {
           if (res && res.length > 0) {
             this.dmEntitySecuritiesForm.setControl('formGroupSecurities', this.createFormGroup(res));
@@ -97,7 +104,17 @@ export class FileSecurityComponent implements OnInit {
           error => this.entityCreationService.onFormSecuritiesSubmitted$.next(false)
       );
 
-
+    if (this.documentId == null) {
+      this.route.paramMap.pipe(
+        switchMap(params => {
+          this.documentId = Number(params.get('documentId'));
+          return of(this.documentId);
+        }),
+        tap(docId => this.documentId$.next(docId))
+      ).subscribe();
+    } else {
+      this.documentId$.next(this.documentId);
+    }
   }
 
     private addNewSecurityToDatasource(userOrGroup: UserOrGroup): void {
