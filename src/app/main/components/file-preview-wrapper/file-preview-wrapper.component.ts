@@ -5,8 +5,8 @@ import {Document as KimiosDocument, DocumentVersion} from 'app/kimios-client-api
 import {formatDate} from '@angular/common';
 import {Observable, Subject} from 'rxjs';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {tap} from 'rxjs/operators';
-import {EntityCacheService} from '../../../services/entity-cache.service';
+import {filter, tap} from 'rxjs/operators';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'file-preview-wrapper',
@@ -61,7 +61,12 @@ export class FilePreviewWrapperComponent implements OnInit {
     ).subscribe();
 
     this.documentDetailService.currentVersionId.pipe(
-        tap(currentVersionId => this.currentVersionId = currentVersionId)
+      filter(currentVersionId => currentVersionId != null),
+      tap(currentVersionId => this.currentVersionId = currentVersionId)
+    ).subscribe();
+
+    this.entityCacheService.findDocumentVersionsInCache(this.document.uid).pipe(
+      tap(res => this.previewTitle = this.makePreviewTitle(this.currentVersionId, res))
     ).subscribe();
   }
 
@@ -71,7 +76,7 @@ export class FilePreviewWrapperComponent implements OnInit {
   }
 
   currentVersionIsFirst(): boolean {
-    return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) == null);
+    return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) === 0);
   }
 
   handleVersionPreviewNextOrPrev(direction: Direction): void {
@@ -113,7 +118,7 @@ export class FilePreviewWrapperComponent implements OnInit {
   }
 
   makePreviewTitle(versionId: number, versions: Array<DocumentVersion>): string {
-    let version = versions[versions.length - 1];
+    let version: DocumentVersion;
     const sortedVersions = versions.slice().sort((a, b) => (a.modificationDate < b.modificationDate) ? -1 : 1);
     switch (versionId) {
       case null:
