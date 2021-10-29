@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {concatMap, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {ActivatedRoute} from '@angular/router';
@@ -26,6 +26,7 @@ export class FileDetailDataAndTagsComponent implements OnInit {
 
   ngOnInit(): void {
     this.document$ = this.documentId$.pipe(
+      filter(docId => docId != null),
       concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
     );
 
