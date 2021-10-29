@@ -134,6 +134,7 @@ import {CartContentComponent} from 'app/main/components/cart-content/cart-conten
 import {RelatedDocumentsComponent} from 'app/main/components/related-documents/related-documents.component';
 import {FilePreviewWrapperComponent} from 'app/main/components/file-preview-wrapper/file-preview-wrapper.component';
 import {FileDetailTagsComponent} from 'app/main/components/file-detail-tags/file-detail-tags.component';
+import {FileDetailDataAndTagsComponent} from 'app/main/components/file-detail-data-and-tags/file-detail-data-and-tags.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -230,7 +231,8 @@ library.add(far, fas);
         CartContentComponent,
         RelatedDocumentsComponent,
         FilePreviewWrapperComponent,
-        FileDetailTagsComponent
+        FileDetailTagsComponent,
+        FileDetailDataAndTagsComponent
     ],
     imports: [
         FileManagerRoutingModule,
