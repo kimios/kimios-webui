@@ -19,6 +19,7 @@ export class FilePreviewWrapperComponent implements OnInit {
   @Input()
   documentId: number;
   document: KimiosDocument;
+  document$: Observable<KimiosDocument>;
   documentVersions: Array<DocumentVersion>;
   documentVersionIds: Array<number>;
   allTags: Map<string, number>;
@@ -54,12 +55,15 @@ export class FilePreviewWrapperComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
+    this.document$ = this.route.paramMap.pipe(
       switchMap(params => {
         this.documentId = Number(params.get('documentId'));
         return of(this.documentId);
       }),
-      concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId)),
+      concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId))
+    );
+
+    this.document$.pipe(
       tap(doc => this.document = doc),
       concatMap(doc => this.entityCacheService.findDocumentVersionsInCache(doc.uid)),
       tap(documentVersions => this.documentVersions = documentVersions),
