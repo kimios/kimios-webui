@@ -41,7 +41,7 @@
                     </div>
                 </mat-tab>
 
-                <mat-tab *ngIf="documentVersions$ | async as versions" [disabled]="versions.length <= 1" label="Versions">
+                <mat-tab *ngIf="documentVersions$ | async as versions" label="Versions">
 
                             <!--<div *ngIf="versions.length > 1; else versionsElseBlock">
             <mat-expansion-panel>
