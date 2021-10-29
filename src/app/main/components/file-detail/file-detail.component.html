@@ -29,8 +29,8 @@
                     <document-meta-data [documentId]="documentId" ></document-meta-data>
                 </mat-tab>
 
-                <mat-tab *ngIf="documentVersions$ | async as versions" label="Versions">
-                    <document-versions [versionList]="versions"></document-versions>
+                <mat-tab label="Versions">
+                    <document-versions [documentId]="data.uid"></document-versions>
                 </mat-tab>
 
                 <mat-tab label="Related documents">

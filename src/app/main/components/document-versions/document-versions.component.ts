@@ -1,12 +1,15 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DocumentVersion} from 'app/kimios-client-api';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {filter, tap} from 'rxjs/operators';
+import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
 import {Sort} from '@angular/material';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DocumentVersionDataSource} from './document-version-data-source';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {EntityCacheService} from 'app/services/entity-cache.service';
+import {ActivatedRoute} from '@angular/router';
 
 const sortTypeMapping = {
       'uid': 'number',
@@ -26,7 +29,10 @@ const sortTypeMapping = {
 export class DocumentVersionsComponent implements OnInit {
 
   @Input()
+  documentId: number;
+  documentId$: BehaviorSubject<number>;
   versionList: Array<DocumentVersion>;
+  versionList$: Observable<Array<DocumentVersion>>;
 
   currentVersionId = 0;
   dataSource: DocumentVersionDataSource;
@@ -39,19 +45,39 @@ export class DocumentVersionsComponent implements OnInit {
   };
 
   constructor(
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private entityCacheService: EntityCacheService,
+      private route: ActivatedRoute
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
+    this.versionList = new Array<DocumentVersion>();
+    this.documentId$ = new BehaviorSubject<number>(null);
   }
 
   ngOnInit(): void {
     this.dataSource = new DocumentVersionDataSource();
-    this.dataSource.setData(this.versionList);
+    this.versionList$ = this.documentId$.pipe(
+      filter(docId => docId != null),
+      concatMap(docId => this.entityCacheService.findDocumentVersionsInCache(docId)),
+      tap(versionList => this.dataSource.setData(versionList)),
+    );
 
     this.documentDetailService.currentVersionId.pipe(
         filter(currentVersionId => currentVersionId != null),
         tap(currentVersionId => this.currentVersionId = currentVersionId)
     ).subscribe();
+
+    if (this.documentId == null) {
+      this.route.paramMap.pipe(
+        switchMap(params => {
+          this.documentId = Number(params.get('documentId'));
+          return of(this.documentId);
+        }),
+        tap(docId => this.documentId$.next(docId))
+      ).subscribe();
+    } else {
+      this.documentId$.next(this.documentId);
+    }
   }
 
   handleVersionDownload(versionId: number): void {
