@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {concatMap, filter, tap} from 'rxjs/operators';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {ActivatedRoute} from '@angular/router';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'file-detail-data-and-tags',
@@ -19,7 +19,7 @@ export class FileDetailDataAndTagsComponent implements OnInit {
 
   constructor(
     private entityCacheService: EntityCacheService,
-    private route: ActivatedRoute
+    private documentDetailService: DocumentDetailService
   ) {
     this.documentId$ = new BehaviorSubject<number>(null);
   }
@@ -31,11 +31,9 @@ export class FileDetailDataAndTagsComponent implements OnInit {
     );
 
     if (this.documentId == null) {
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          this.documentId = Number(params.get('documentId'));
-          return of(this.documentId);
-        }),
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
     } else {

@@ -1,14 +1,15 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {Document as KimiosDocument, DocumentService} from 'app/kimios-client-api';
-import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, tap} from 'rxjs/operators';
 import {DEFAULT_DISPLAYED_COLUMNS, KimiosDocumentDataSource} from 'app/main/model/kimios-document-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DocumentUtils} from 'app/main/utils/document-utils';
-import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, of} from 'rxjs';
+import {Router} from '@angular/router';
+import {BehaviorSubject} from 'rxjs';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 const sortTypeMapping = {
   'name': 'string',
@@ -41,7 +42,7 @@ export class RelatedDocumentsComponent implements OnInit {
       private sessionService: SessionService,
       private documentService: DocumentService,
       private router: Router,
-      private route: ActivatedRoute
+      private documentDetailService: DocumentDetailService
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.documentId$ = new BehaviorSubject<number>(null);
@@ -57,11 +58,9 @@ export class RelatedDocumentsComponent implements OnInit {
     ).subscribe();
 
     if (this.documentId == null) {
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          this.documentId = Number(params.get('documentId'));
-          return of(this.documentId);
-        }),
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
     } else {

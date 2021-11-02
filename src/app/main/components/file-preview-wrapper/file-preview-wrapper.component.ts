@@ -45,8 +45,7 @@ export class FilePreviewWrapperComponent implements OnInit {
   constructor(
       private documentDetailService: DocumentDetailService,
       @Inject(LOCALE_ID) private locale: string,
-      private entityCacheService: EntityCacheService,
-      private route: ActivatedRoute
+      private entityCacheService: EntityCacheService
   ) {
     this.documentVersionIds = new Array<number>();
     this.currentVersionId = 0;
@@ -55,11 +54,9 @@ export class FilePreviewWrapperComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.document$ = this.route.paramMap.pipe(
-      switchMap(params => {
-        this.documentId = Number(params.get('documentId'));
-        return of(this.documentId);
-      }),
+    this.document$ = this.documentDetailService.currentDocumentId$.pipe(
+      filter(docId => docId != null),
+      tap(docId => this.documentId = docId),
       concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId))
     );
 

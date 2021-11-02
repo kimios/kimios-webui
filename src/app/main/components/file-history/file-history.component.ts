@@ -1,12 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {Log, LogService} from 'app/kimios-client-api';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {LOG_DEFAULT_DISPLAYED_COLUMNS, LogDataSource} from './log-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
-import {filter, switchMap, tap} from 'rxjs/operators';
-import {ActivatedRoute} from '@angular/router';
+import {filter, tap} from 'rxjs/operators';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 const sortTypeMapping = {
   'date' : 'number',
@@ -33,7 +33,7 @@ export class FileHistoryComponent implements OnInit {
   constructor(
       private sessionService: SessionService,
       private logService: LogService,
-      private route: ActivatedRoute
+      private documentDetailService: DocumentDetailService
   ) {
     this.sort = <DMEntitySort> {
       name: 'date',
@@ -51,11 +51,9 @@ export class FileHistoryComponent implements OnInit {
     ).subscribe();
 
     if (this.documentId == null) {
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          this.documentId = Number(params.get('documentId'));
-          return of(this.documentId);
-        }),
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
     } else {

@@ -7,6 +7,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 import {MatAutocompleteTrigger} from '@angular/material';
 import {UpdateDocumentVersionMetaDataParam} from 'app/kimios-client-api/model/updateDocumentVersionMetaDataParam';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'document-meta-data',
@@ -17,6 +18,7 @@ export class DocumentMetaDataComponent implements OnInit {
 
   @Input()
   documentId: number;
+  documentId$: BehaviorSubject<number>;
   documentType: KimiosDocumentType;
   documentMetasMap: Map<number, MetaValue>;
   documentTypeMetas: Array<Meta>;
@@ -34,7 +36,8 @@ export class DocumentMetaDataComponent implements OnInit {
       private documentVersionService: DocumentVersionService,
       private documentVersionRestOnlyService: DocumentVersionRestOnlyService,
       private fb: FormBuilder,
-      private studioService: StudioService
+      private studioService: StudioService,
+      private documentDetailService: DocumentDetailService
   ) {
     this.documentMetasMap = new Map<number, MetaValue>();
     this.documentType = null;
@@ -46,10 +49,13 @@ export class DocumentMetaDataComponent implements OnInit {
       'documentType': this.fb.control(''),
       'metas': this.fb.group({})
     });
+    this.documentId$ = new BehaviorSubject<number>(null);
   }
 
   ngOnInit(): void {
-    this.documentVersionService.getLastDocumentVersion(this.sessionService.sessionToken, this.documentId).pipe(
+    this.documentId$.pipe(
+        filter(documentId => documentId != null),
+        concatMap(documentId => this.documentVersionService.getLastDocumentVersion(this.sessionService.sessionToken, documentId)),
         filter(docVersion => docVersion.documentTypeUid != null && docVersion.documentTypeUid !== undefined),
         concatMap(docVersion => combineLatest(
             this.documentVersionService.getMetaValues(this.sessionService.sessionToken, docVersion.uid),
@@ -93,6 +99,16 @@ export class DocumentMetaDataComponent implements OnInit {
         concatMap(metas => this.initMetaFeedValues(metas, this.documentTypeMetaDataValuesMap)),
         tap(() => this.metaValuesLoaded = true)
     ).subscribe();
+
+    if (this.documentId == null) {
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
+        tap(docId => this.documentId$.next(docId))
+      ).subscribe();
+    } else {
+      this.documentId$.next(this.documentId);
+    }
   }
 
   displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {

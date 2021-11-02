@@ -46,8 +46,7 @@ export class DocumentVersionsComponent implements OnInit {
 
   constructor(
       private documentDetailService: DocumentDetailService,
-      private entityCacheService: EntityCacheService,
-      private route: ActivatedRoute
+      private entityCacheService: EntityCacheService
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.versionList = new Array<DocumentVersion>();
@@ -68,11 +67,9 @@ export class DocumentVersionsComponent implements OnInit {
     ).subscribe();
 
     if (this.documentId == null) {
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          this.documentId = Number(params.get('documentId'));
-          return of(this.documentId);
-        }),
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
     } else {

@@ -2,15 +2,15 @@ import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
 import {DMEntitySecurity, SecurityService, TaskInfo, UpdateSecurityCommand} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 import {MatDialog, MatTableDataSource} from '@angular/material';
-import {concatMap, filter, map, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AdminService} from 'app/services/admin.service';
-import {ActivatedRoute} from '@angular/router';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -55,7 +55,7 @@ export class FileSecurityComponent implements OnInit {
       public dialog: MatDialog,
       private entityCreationService: EntityCreationService,
       private adminService: AdminService,
-      private route: ActivatedRoute
+      private documentDetailService: DocumentDetailService
   ) {
     this.dmEntitySecuritiesForm = this.fb.group({
       formGroupSecurities: this.fb.group({})
@@ -105,11 +105,9 @@ export class FileSecurityComponent implements OnInit {
       );
 
     if (this.documentId == null) {
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          this.documentId = Number(params.get('documentId'));
-          return of(this.documentId);
-        }),
+      this.documentDetailService.currentDocumentId$.pipe(
+        filter(docId => docId != null),
+        tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
     } else {

@@ -12,42 +12,17 @@
 <!-- File details -->
         <ng-container *ngIf="documentData$ | async as data">
 
-            <mat-tab-group>
+            <nav mat-tab-nav-bar>
+                <a mat-tab-link
+                   *ngFor="let link of navLinks"
+                   [routerLink]="link.path"
+                   routerLinkActive #rla="routerLinkActive"
+                   [active]="rla.isActive || activePath === link.path">
+                    {{link.label}}
+                </a>
+            </nav>
 
-                <mat-tab label="Preview">
-                    <file-preview-wrapper [documentId]="data.uid"></file-preview-wrapper>
-                </mat-tab>
-
-                <mat-tab label="Data">
-                    <file-detail-data-and-tags [documentId]="data.uid"></file-detail-data-and-tags>
-                </mat-tab>
-
-                <!-- file versions -->
-                <!--    <div *ngIf="documentVersions$ | async as versions">-->
-
-                <mat-tab label="Meta data">
-                    <document-meta-data [documentId]="documentId" ></document-meta-data>
-                </mat-tab>
-
-                <mat-tab label="Versions">
-                    <document-versions [documentId]="data.uid"></document-versions>
-                </mat-tab>
-
-                <mat-tab label="Related documents">
-                    <related-documents [documentId]="documentId"></related-documents>
-                </mat-tab>
-
-                <mat-tab label="Security">
-                    <file-security [documentId]="documentId"></file-security>
-                </mat-tab>
-
-                <mat-tab label="History">
-                    <file-history [documentId]="documentId"></file-history>
-                </mat-tab>
-            </mat-tab-group>
-            <!--    </div>-->
-
-
+            <router-outlet></router-outlet>
 
         </ng-container>
 

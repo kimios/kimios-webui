@@ -57,11 +57,21 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     spinnerColor = 'primary';
     spinnerMode = 'indeterminate';
 
-
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
     @ViewChild('filePreviewDiv') filePreviewDivElement: ElementRef;
     @ViewChild('filePreview') filePreviewElement: ElementRef;
+
+    navLinks = [
+      {path: 'preview', label: 'Preview'},
+      {path: 'data', label: 'Data'},
+      {path: 'metadata', label: 'Meta data'},
+      {path: 'version', label: 'Versions'},
+      {path: 'related', label: 'Related documents'},
+      {path: 'security', label: 'Security'},
+      {path: 'history', label: 'History'}
+    ];
+    activePath = 'preview';
 
     constructor(
         private route: ActivatedRoute,
@@ -99,6 +109,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.route.paramMap.pipe(
             switchMap(params => {
                 this.documentId = Number(params.get('documentId'));
+                this.documentDetailService.currentDocumentId$.next(this.documentId);
                 this.initDocumentDetail();
                 return of(true);
             })

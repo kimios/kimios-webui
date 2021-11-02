@@ -14,6 +14,8 @@ import {CacheSecurityService} from 'app/services/cache-security.service';
 export class DocumentDetailService {
 
   currentVersionId: BehaviorSubject<number>;
+  currentDocumentId$: BehaviorSubject<number>;
+  currentPath$: BehaviorSubject<string>;
 
   constructor(
       private documentService: DocumentService,
@@ -24,6 +26,8 @@ export class DocumentDetailService {
       private cacheSecurityService: CacheSecurityService
   ) {
       this.currentVersionId = new BehaviorSubject<number>(null);
+      this.currentDocumentId$ = new BehaviorSubject<number>(null);
+      this.currentPath$ = new BehaviorSubject<string>('');
   }
 
   retrieveDocumentFromId(docId: number): Observable<KimiosDocument> {
