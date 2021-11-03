@@ -112,7 +112,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                                 children: null,
                                 isLoading: true,
                                 allowDrop: true,
-                                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                                svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+                                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
                             };
                             this.nodes.push(newNode);
                             this.tree.treeModel.update();
@@ -126,19 +127,20 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                         if (this.entitiesToExpand$.getValue().filter(entity => entity.uid === entityRet.uid).length > 0) {
                             return combineLatest(of(entityRet),
                                 this.loadNodesChildren(this.entitiesToExpand$.getValue().map(val => val.uid)).pipe(
-                                toArray(),
-                                tap(array => {
+                                  toArray(),
+                                  tap(array => {
                                     if (array.length > 0) {
-                                        this.tree.treeModel.setFocusedNode(
-                                            this.tree.treeModel.getNodeById(array.reverse()[0])
-                                        );
-                                        this.browseEntityService.selectedFolder$.next(this.entitiesToExpand$.getValue().slice().reverse()[0]);
+                                      this.tree.treeModel.setFocusedNode(
+                                        this.tree.treeModel.getNodeById(array.reverse()[0])
+                                      );
+                                      this.browseEntityService.selectedFolder$.next(this.entitiesToExpand$.getValue().slice().reverse()[0]);
                                     }
-                                }),
+                                  }),
 //                                tap(array => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(nodeIdToFocus))),
-                                map(array => true)
-                            )).pipe(
-                                map(res => true)
+                                  map(array => true)
+                                )
+                            ).pipe(
+                              map(res => true)
                             );
                         } else {
                             if (this.tree.treeModel.getNodeById(entityRet.uid).data.children === null) {
@@ -252,7 +254,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 id: entity.uid.toString(),
                 children: null,
                 isLoading: false,
-                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
             };
             this.nodes.push(newNode);
             this.tree.treeModel.update();
@@ -282,7 +285,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                             id: entity.uid.toString(),
                             children: null,
                             isLoading: false,
-                            svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                            svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+                            dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
                         });
                     });
                 this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
@@ -333,7 +337,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 id: entityRet.uid.toString(),
                 children: null,
                 isLoading: true,
-                  svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
               };
               this.nodes.push(newNode);
               this.tree.treeModel.update();
@@ -342,7 +347,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             }
         ),
         concatMap(
-            entityRet => combineLatest(of(entityRet), this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid))
+            entityRet => combineLatest(of(entityRet),
+              iif(
+                () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
+                this.browseEntityService.findEntitiesAtPath(entityRet),
+                this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid)
+              )
+            )
         ),
         tap(
             ([entityRet, entities]) => this.tree.treeModel.getNodeById(entityRet.uid).data.children = entities.map(entityChild => {
@@ -351,7 +362,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 id: entityChild.uid.toString(),
                 children: null,
                 isLoading: false,
-                  svgIcon: DMEntityUtils.dmEntityIsWorkspace(entity) ? 'workspace' : 'folder'
+                svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
               };
             })
         ),
@@ -372,7 +384,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
   loadChildren(entityUid: number): Observable<number> {
     this.tree.treeModel.getNodeById(entityUid.toString()).data.isLoading = true;
-    return combineLatest(of(entityUid), this.browseEntityService.findContainerEntitiesAtPath(entityUid)).pipe(
+    return combineLatest(of(entityUid),
+      iif(
+        () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
+        this.browseEntityService.findEntitiesAtPathFromId(entityUid),
+        this.browseEntityService.findContainerEntitiesAtPath(entityUid)
+      )
+    ).pipe(
         tap(
             ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityChild => {
               return {
@@ -380,7 +398,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 id: entityChild.uid.toString(),
                 children: null,
                 isLoading: false,
-                svgIcon: DMEntityUtils.dmEntityIsWorkspace(entityChild) ? 'workspace' : 'folder'
+                svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document')
               };
             })
         ),
@@ -406,7 +425,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 //          takeWhile(uid => uid !== -1),
         concatMap(
             res => iif(
-                () => this.tree.treeModel.getNodeById(res).data.children === null,
+                () => this.tree.treeModel.getNodeById(res).data.children === null
+                  && this.tree.treeModel.getNodeById(res).data.dmEntityType !== 'document',
                 this.loadChildren(res),
                 of(res)
             )
@@ -440,7 +460,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             }
         ),
         mergeMap(
-            child => combineLatest(of(child['id']), this.browseEntityService.findContainerEntitiesAtPath(child['id']))
+            child => combineLatest(of(child['id']),
+              iif(
+                () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
+                this.browseEntityService.findEntitiesAtPathFromId(child['id']),
+                this.browseEntityService.findContainerEntitiesAtPath(child['id']))
+              )
         ),
         tap(
             ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.length === 0 ?
@@ -451,7 +476,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                     id: entityChild.uid.toString(),
                     children: null,
                     isLoading: false,
-                    svgIcon: DMEntityUtils.dmEntityIsWorkspace(entityChild) ? 'workspace' : 'folder'
+                    svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
+                    dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document')
                   };
                 })
         ),

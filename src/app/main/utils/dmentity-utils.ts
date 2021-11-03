@@ -38,6 +38,14 @@ export class DMEntityUtils {
         return iconName;
     }
 
+    public static determinePropertyValue(entity: DMEntity, workspaceValue: string, folderValue: string, documentValue: string): string {
+        return DMEntityUtils.dmEntityIsWorkspace(entity) ?
+          workspaceValue :
+          DMEntityUtils.dmEntityIsFolder(entity) ?
+            folderValue :
+            documentValue;
+    }
+
     /*public static retrieveEntityIconName(iconService: IconService, dmEntity: DMEntity, iconPrefix: string): string {
         let iconName = 'file';
         if (this.dmEntityIsDocument(dmEntity)) {
