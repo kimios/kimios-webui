@@ -4,12 +4,14 @@ import {Document as KimiosDocument, DocumentService} from 'app/kimios-client-api
 import {concatMap, filter, tap} from 'rxjs/operators';
 import {DEFAULT_DISPLAYED_COLUMNS, KimiosDocumentDataSource} from 'app/main/model/kimios-document-data-source';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
-import {Sort} from '@angular/material';
+import {MatDialog, Sort} from '@angular/material';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
 const sortTypeMapping = {
   'name': 'string',
@@ -42,7 +44,8 @@ export class RelatedDocumentsComponent implements OnInit {
       private sessionService: SessionService,
       private documentService: DocumentService,
       private router: Router,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      public dialog: MatDialog
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.documentId$ = new BehaviorSubject<number>(null);
@@ -89,7 +92,11 @@ export class RelatedDocumentsComponent implements OnInit {
   }
 
   add(): void {
-
+    const dialog = this.dialog.open(BrowseTreeDialogComponent, {
+      data: {
+        browseTreeMode: BROWSE_TREE_MODE.WITH_DOCUMENTS
+      }
+    });
   }
 
   deleteRow(i: any, $event: MouseEvent): void {

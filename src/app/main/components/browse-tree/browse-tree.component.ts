@@ -12,6 +12,7 @@ import {MatDialog} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
+import {IconService} from 'app/services/icon.service';
 
 @Component({
   selector: 'browse-tree',
@@ -62,7 +63,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
       private route: ActivatedRoute,
       private entityCreationService: EntityCreationService,
       public containerEntityDialog: MatDialog,
-      public createContainerEntityDialog: MatDialog
+      public createContainerEntityDialog: MatDialog,
+      private iconService: IconService
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -547,4 +549,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             }
         });
     }
+
+  retrieveDocumentIcon(documentId: number, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconName(
+      this.iconService,
+      this.browseEntityService.entities.get(documentId),
+      iconPrefix
+    );
+  }
 }
