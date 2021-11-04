@@ -75,8 +75,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
       this.browseEntityService.browseMode$.next(this.mode);
 
-    if (this.treeNodesService.treeNodes.length > 0) {
-      this.nodes = this.treeNodesService.treeNodes;
+    if (this.treeNodesService.getTreeNodes(this.mode) != null) {
+      this.nodes = this.treeNodesService.getTreeNodes(this.mode);
       this.tree.treeModel.update();
     }
 
@@ -94,7 +94,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
 
         // load initial nodes
-        if (this.treeNodesService.treeNodes.length > 0) {
+        if (this.treeNodesService.getTreeNodes(this.mode) != null) {
             // if (this.browseEntityService.selectedEntity$.)
             this.initDataDone$.next(true);
         } else {
@@ -155,7 +155,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 ),
             ).subscribe(
                 (res) => {
-                    this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+                    this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
                 },
                 null,
                 () => {
@@ -217,7 +217,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         )
         .subscribe(
             next => {
-              this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+              this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
             },
             null,
             () => {
@@ -263,7 +263,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             this.tree.treeModel.update();
             this.entitiesLoaded.set(entity.uid, entity);
             this.browseEntityService.entities.set(entity.uid, entity);
-            this.treeNodesService.treeNodes = this.tree.treeModel.nodes;
+            this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
         })
     ).subscribe(
 
