@@ -1,10 +1,22 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {DocumentCacheData, EntityCacheData} from 'app/main/model/entity-cache-data';
-import {DocumentVersion, DocumentVersionService, Document as KimiosDocument, DocumentService} from 'app/kimios-client-api';
+import {
+  DMEntity,
+  Document as KimiosDocument,
+  DocumentService,
+  DocumentVersion,
+  DocumentVersionService,
+  Folder,
+  FolderService,
+  Workspace,
+  WorkspaceService
+} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
-import {concatMap, map, tap} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {iif, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
+import {BrowseEntityService} from './browse-entity.service';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -12,13 +24,17 @@ import {SearchEntityService} from './searchentity.service';
 export class EntityCacheService {
 
   private entitiesCache: Map<number, EntityCacheData>;
+  private entitiesHierarchyCache: Map<number, Array<number>>;
   private allTags: Map<string, number>;
 
   constructor(
       private sessionService: SessionService,
       private documentVersionService: DocumentVersionService,
       private documentService: DocumentService,
-      private searchEntityService: SearchEntityService
+      private searchEntityService: SearchEntityService,
+      private browseEntityService: BrowseEntityService,
+      private workspaceService: WorkspaceService,
+      private folderService: FolderService
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
@@ -28,7 +44,7 @@ export class EntityCacheService {
     return this.entitiesCache.get(uid);
   }
 
-  getDocumentInCache(uid: number): DocumentCacheData {
+  getDocumentCacheData(uid: number): DocumentCacheData {
     const documentCacheDate = this.entitiesCache.get(uid);
     return (documentCacheDate instanceof DocumentCacheData) ?
         documentCacheDate :
@@ -36,7 +52,7 @@ export class EntityCacheService {
   }
 
   findDocumentVersions(uid: number): Array<DocumentVersion> {
-    const documentCacheData = this.getDocumentInCache(uid);
+    const documentCacheData = this.getDocumentCacheData(uid);
     if (documentCacheData == null) {
       return null;
     }
@@ -48,13 +64,13 @@ export class EntityCacheService {
   }
 
   private updateDocumentVersions(uid: number, versions: Array<DocumentVersion>): void {
-    const documentCacheData = this.getDocumentInCache(uid);
+    const documentCacheData = this.getDocumentCacheData(uid);
     documentCacheData.versions = versions;
     this.entitiesCache.set(uid, documentCacheData);
   }
 
   findDocumentInCache(uid: number): Observable<KimiosDocument> {
-    const documentInCache = this.getDocumentInCache(uid);
+    const documentInCache = this.getDocumentCacheData(uid);
 
     return documentInCache == null ?
         this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
@@ -64,9 +80,9 @@ export class EntityCacheService {
   }
 
   findDocumentVersionsInCache(uid: number): Observable<Array<DocumentVersion>> {
-    return iif(() => this.getDocumentInCache(uid) == null,
+    return iif(() => this.getDocumentCacheData(uid) == null,
       this.initDocumentDataInCache(uid),
-      of(this.getDocumentInCache(uid))
+      of(this.getDocumentCacheData(uid))
     ).pipe(
       tap(documentCacheData => console.dir(documentCacheData)),
       concatMap(documentCacheData => iif(
@@ -91,7 +107,7 @@ export class EntityCacheService {
       map(documentVersions => {
         documentCacheData.versions = documentVersions;
         this.entitiesCache.set(documentCacheData.entity.uid, documentCacheData);
-        return this.getDocumentInCache(documentCacheData.entity.uid);
+        return this.getDocumentCacheData(documentCacheData.entity.uid);
       })
     );
   }
@@ -116,5 +132,185 @@ export class EntityCacheService {
     return this.searchEntityService.retrieveAllTags().pipe(
       tap(allTags => this.allTags = allTags)
     );
+  }
+
+  public findEntityChildrenInCache(uid: number, onlyContainers: boolean): Observable<Array<DMEntity>> {
+    return iif(
+      () => this.entitiesHierarchyCache.get(uid == null ? 0 : uid) != null,
+      of(this.entitiesHierarchyCache.get(uid).map(entityUid => this.entitiesCache.get(entityUid).entity)),
+      this.initHierarchyCacheForEntity(uid)
+    ).pipe(
+      concatMap(entityList => iif(
+        () => onlyContainers === true,
+        of(entityList.filter(entity => DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity))),
+        of(entityList)
+      ))
+    );
+  }
+
+  public reloadEntityChildren(uid: number): Observable<Array<DMEntity>> {
+    return this.initHierarchyCacheForEntity(uid);
+  }
+
+  private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntity>> {
+    return this.browseEntityService.findEntitiesAtPathFromId(uid).pipe(
+      tap(entityList => entityList.forEach(entity => this.entitiesCache.set(entity.uid, new EntityCacheData(entity)))),
+      tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
+    );
+  }
+
+  public findEntityInCache(entityUid: number): Observable<DMEntity> {
+    return iif(
+      () => this.entitiesCache.get(entityUid) != null,
+      of(this.entitiesCache.get(entityUid).entity),
+      this.initEntityInCache(entityUid)
+    );
+  }
+
+  private initEntityInCache(entityUid: number): Observable<DMEntity> {
+    return this.retrieveEntity(entityUid).pipe(
+      tap(entity => {
+        if (entity != null && entity !== undefined && entity !== '') {
+          this.entitiesCache.set(
+            entity.uid,
+            DMEntityUtils.dmEntityIsDocument(entity) ?
+              new DocumentCacheData(entity) :
+              new EntityCacheData(entity)
+          );
+        }
+      })
+    );
+  }
+
+  public findContainerEntityInCache(entityUid): Observable<DMEntity> {
+    return iif(
+      () => this.entitiesCache.get(entityUid) != null,
+      of(this.entitiesCache.get(entityUid).entity),
+      this.initContainerEntityInCache(entityUid)
+    );
+  }
+
+  private retrieveEntity(uid: number): Observable<DMEntity> {
+    return this.retrieveContainerEntity(uid).pipe(
+      concatMap(res => iif(
+        () => res == null || res === undefined || res === '',
+        this.documentService.getDocument(this.sessionService.sessionToken, uid),
+        of(res)
+      )));
+  }
+
+  private retrieveContainerEntity(uid: number): Observable<DMEntity> {
+    return this.retrieveFolderEntity(uid).pipe(
+        concatMap(
+          res => (res === null || res === undefined || res === '') ?
+            this.retrieveWorkspaceEntity(uid) :
+            of(res)
+        )
+      );
+  }
+
+  private retrieveWorkspaceEntity(uid: number): Observable<Workspace> {
+    return this.workspaceService.getWorkspace(this.sessionService.sessionToken, uid).pipe(
+      switchMap(
+        res => of(res).catch(error => of(error))
+      ),
+      catchError(error => {
+        console.log(error);
+        return of('');
+      }),
+      map(res => res)
+    );
+  }
+
+  private retrieveFolderEntity(uid: number): Observable<Folder> {
+    return this.folderService.getFolder(this.sessionService.sessionToken, uid).pipe(
+      switchMap(
+        res => of(res).catch(error => of(error))
+      ),
+      catchError(error => {
+        console.log(error);
+        return of('');
+      }),
+      map(res => res)
+    );
+  }
+
+  private initContainerEntityInCache(entityUid: number): Observable<DMEntity> {
+    return this.retrieveContainerEntity(entityUid).pipe(
+      tap(entity => {
+        if (entity != null && entity !== undefined && entity !== '') {
+          this.entitiesCache.set(entity.uid, new EntityCacheData(entity));
+        }
+      })
+    );
+  }
+
+  public findWorkspaceInCache(uid: number): Observable<Workspace> {
+    return iif(
+      () => this.getWorkspaceInCache(uid) == null,
+      this.initContainerEntityInCache(uid),
+      of(this.getWorkspaceInCache(uid))
+    ).pipe(
+      concatMap(entity => iif(
+        () => entity != null && DMEntityUtils.dmEntityIsWorkspace(entity),
+        of(entity),
+        of(null)
+      ))
+    );
+  }
+
+  private getWorkspaceInCache(uid: number): Workspace {
+    const entityCacheData = this.entitiesCache.get(uid);
+    if (entityCacheData && DMEntityUtils.dmEntityIsWorkspace(entityCacheData.entity)) {
+      return entityCacheData.entity as Workspace;
+    } else {
+      return null;
+    }
+  }
+
+  public getEntity(uid: number): DMEntity {
+    const entityCacheData = this.entitiesCache.get(uid);
+    return entityCacheData != null ?
+      entityCacheData.entity :
+      null;
+  }
+
+  reloadEntity(uid: number): Observable<DMEntity> {
+    const entity = this.getEntity(uid);
+    if (entity != null) {
+      return this.updateEntityInCache(entity);
+    } else {
+      return this.initEntityInCache(uid);
+    }
+  }
+
+  private updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
+    if (DMEntityUtils.dmEntityIsDocument(entity)) {
+      return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
+        tap(res => {
+          if (res != null && res !== undefined && res !== '') {
+            this.entitiesCache.set(res.uid, new EntityCacheData(res));
+          }
+        })
+      );
+    } else {
+      if (DMEntityUtils.dmEntityIsFolder(entity)) {
+        return this.folderService.getFolder(this.sessionService.sessionToken, entity.uid).pipe(
+          tap(res => {
+            if (res != null && res !== undefined && res !== '') {
+              this.entitiesCache.set(res.uid, new EntityCacheData(res));
+            }
+          })
+        );
+      } else {
+        return this.workspaceService.getWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
+          tap(res => {
+            if (res != null && res !== undefined && res !== '') {
+              this.entitiesCache.set(res.uid, new EntityCacheData(res));
+            }
+          })
+        );
+      }
+    }
   }
 }
