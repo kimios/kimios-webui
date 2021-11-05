@@ -2,10 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 import {SessionService} from 'app/services/session.service';
 import {BrowseEntityService, EXPLORER_MODE} from 'app/services/browse-entity.service';
-import {of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
-import {catchError} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {MatDialog, PageEvent} from '@angular/material';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
@@ -13,6 +11,7 @@ import {Tag} from 'app/main/model/tag';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {EntityMoveDialogComponent} from 'app/main/components/entity-move-dialog/entity-move-dialog.component';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 interface EntityNode {
   uid: number;
@@ -45,7 +44,8 @@ export class BrowseComponent implements OnInit {
       private fileUploadService: FileUploadService,
       public filesUploadDialog: MatDialog,
       public entityMoveDialog: MatDialog,
-      private location: Location
+      private location: Location,
+      private entityCacheService: EntityCacheService
   ) {
     this.explorerMode = EXPLORER_MODE.BROWSE;
   }
@@ -133,7 +133,7 @@ export class BrowseComponent implements OnInit {
             }
             console.log(dataSplitted.join(' : '));
             this.openEntityMoveConfirmDialog(
-                this.browseEntityService.entities.get(Number(dataSplitted[1])),
+                this.entityCacheService.getEntity(Number(dataSplitted[1])),
                 event['droppedInDir']
             );
             return;
