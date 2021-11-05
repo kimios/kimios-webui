@@ -300,32 +300,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         return this.findEntitiesAtPathFromId((parent === null || parent === undefined) ? null : parent.uid);
     }*/
 
-  // todo: move it to EntityCacheService
-    findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
-        if (parentUid === null
-            || parentUid === undefined) {
-            return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
-        } else {
-            return this.retrieveContainerEntity(parentUid).pipe(
-              concatMap(
-                res => combineLatest(of(res), this.folderService.getFolders(this.sessionService.sessionToken, parentUid))
-              ),
-              concatMap(
-                ([parentEntity, folders]) => combineLatest(
-                  of(folders),
-                  DMEntityUtils.dmEntityIsWorkspace(parentEntity) ?
-                    of([]) :
-                    this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
-                )
-
-              ),
-              concatMap(
-                ([folders, documents]) => of(folders.concat(documents))
-              )
-            );
-        }
-    }
-
     findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
         return this.retrieveContainerEntity(uid).pipe(
             expand(
