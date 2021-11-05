@@ -6,6 +6,7 @@ import {concatMap, map} from 'rxjs/operators';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {combineLatest, of} from 'rxjs';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'entity-list-lock-button',
@@ -24,12 +25,13 @@ export class EntityListLockButtonComponent implements OnInit {
   constructor(
       private cacheSecurityService: CacheSecurityService,
       private documentDetailService: DocumentDetailService,
-      private browseEntityService: BrowseEntityService
+      private browseEntityService: BrowseEntityService,
+      private entityCacheService: EntityCacheService
   ) { }
 
   ngOnInit(): void {
     this.cacheSecurityService.getLockPossibility(this.docId).pipe(
-        concatMap(lockPossibility => combineLatest(of(lockPossibility), this.browseEntityService.getDocument(this.docId))),
+        concatMap(lockPossibility => combineLatest(of(lockPossibility), this.entityCacheService.findDocumentInCache(this.docId))),
         map(([lockPossibility, kimiosDocument]) => {
           this.lockPossibility = lockPossibility;
           this.computeLockMessage(lockPossibility, kimiosDocument);
