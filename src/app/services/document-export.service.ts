@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, from, Observable, of} from 'rxjs';
-import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
+import {DMEntity} from 'app/kimios-client-api';
 import {BrowseEntityService} from './browse-entity.service';
 import {TreeNode} from 'angular-tree-component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {concatMap, map, tap, toArray} from 'rxjs/operators';
+import {EntityCacheService} from './entity-cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class DocumentExportService {
   nodesModified$: BehaviorSubject<boolean>;
 
   constructor(
-      private browseEntityService: BrowseEntityService
+      private browseEntityService: BrowseEntityService,
+      private entityCacheService: EntityCacheService
   ) {
     this.nodesModified$ = new BehaviorSubject<boolean>(false);
     this.cartSize$ = new BehaviorSubject<number>(0);
@@ -64,7 +66,7 @@ export class DocumentExportService {
       entity: entity,
       isHover: false
     };
-    return this.browseEntityService.findEntitiesAtPath(entity).pipe(
+    return this.entityCacheService.findEntityChildrenInCache(entity.uid, false).pipe(
         concatMap(children => children),
         concatMap(child => this.makeNodeFromDMEntity(child)),
         tap(nodeChild => node.children.push(nodeChild)),

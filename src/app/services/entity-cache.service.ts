@@ -13,7 +13,7 @@ import {
 } from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
-import {iif, Observable, of} from 'rxjs';
+import {from, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {BrowseEntityService} from './browse-entity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -38,6 +38,7 @@ export class EntityCacheService {
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
+    this.entitiesHierarchyCache = new Map<number, Array<number>>();
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -80,16 +81,15 @@ export class EntityCacheService {
   }
 
   findDocumentVersionsInCache(uid: number): Observable<Array<DocumentVersion>> {
-    return iif(() => this.getDocumentCacheData(uid) == null,
-      this.initDocumentDataInCache(uid),
+    return (this.getDocumentCacheData(uid) == null ?
+      this.initDocumentDataInCache(uid) :
       of(this.getDocumentCacheData(uid))
     ).pipe(
       tap(documentCacheData => console.dir(documentCacheData)),
-      concatMap(documentCacheData => iif(
-        () => documentCacheData == null,
-        of(null),
+      concatMap(documentCacheData => documentCacheData == null ?
+        of(null) :
         this.getDocumentCacheDataWithVersions(documentCacheData)
-      )),
+      ),
       tap(() => console.log('after getDocumentCacheDataWithVersions()')),
       tap(documentCacheData => console.dir(documentCacheData)),
       map(documentCacheData => documentCacheData instanceof DocumentCacheData ? documentCacheData.versions : null)
@@ -98,7 +98,7 @@ export class EntityCacheService {
 
   private initDocumentDataInCache(uid: number): Observable<DocumentCacheData> {
     return this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
-      concatMap(doc => iif(() => doc == null, of(null), of(new DocumentCacheData(doc))))
+      concatMap(doc => doc == null ? of(null) : of(new DocumentCacheData(doc)))
     );
   }
 
@@ -113,19 +113,15 @@ export class EntityCacheService {
   }
 
   private getDocumentCacheDataWithVersions(documentCacheData: DocumentCacheData): Observable<DocumentCacheData> {
-    return iif(
-      () => documentCacheData.versions == null,
-      this.updateDocumentCacheDataVersions(documentCacheData),
-      of(documentCacheData)
-    );
+    return documentCacheData.versions == null ?
+      this.updateDocumentCacheDataVersions(documentCacheData) :
+      of(documentCacheData);
   }
 
   findAllTags(): Observable<Map<string, number>> {
-    return iif(
-      () => this.allTags == null,
-      this.initAllTags(),
-      of(this.allTags)
-    );
+    return this.allTags == null ?
+      this.initAllTags() :
+      of(this.allTags);
   }
 
   private initAllTags(): Observable<Map<string, number>> {
@@ -134,17 +130,19 @@ export class EntityCacheService {
     );
   }
 
-  public findEntityChildrenInCache(uid: number, onlyContainers: boolean): Observable<Array<DMEntity>> {
-    return iif(
-      () => this.entitiesHierarchyCache.get(uid == null ? 0 : uid) != null,
-      of(this.entitiesHierarchyCache.get(uid).map(entityUid => this.entitiesCache.get(entityUid).entity)),
-      this.initHierarchyCacheForEntity(uid)
-    ).pipe(
-      concatMap(entityList => iif(
-        () => onlyContainers === true,
-        of(entityList.filter(entity => DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity))),
+  public findEntityChildrenInCache(uidParam: number, onlyContainers: boolean): Observable<Array<DMEntity>> {
+    const idInHierarchy = uidParam == null ? 0 : uidParam;
+    return from(of(uidParam)).pipe(
+      concatMap(uid =>
+        (this.entitiesHierarchyCache.get(idInHierarchy) == null
+          || this.entitiesHierarchyCache.get(idInHierarchy) === undefined) ?
+          this.initHierarchyCacheForEntity(uid) :
+          of(this.entitiesHierarchyCache.get(idInHierarchy).map(entityUid => this.entitiesCache.get(entityUid).entity))
+      ),
+      concatMap(entityList => onlyContainers === true ?
+        of(entityList.filter(entity => DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity))) :
         of(entityList)
-      ))
+      )
     );
   }
 
@@ -160,11 +158,9 @@ export class EntityCacheService {
   }
 
   public findEntityInCache(entityUid: number): Observable<DMEntity> {
-    return iif(
-      () => this.entitiesCache.get(entityUid) != null,
-      of(this.entitiesCache.get(entityUid).entity),
-      this.initEntityInCache(entityUid)
-    );
+    return this.entitiesCache.get(entityUid) != null ?
+      of(this.entitiesCache.get(entityUid).entity) :
+      this.initEntityInCache(entityUid);
   }
 
   private initEntityInCache(entityUid: number): Observable<DMEntity> {
@@ -183,20 +179,17 @@ export class EntityCacheService {
   }
 
   public findContainerEntityInCache(entityUid): Observable<DMEntity> {
-    return iif(
-      () => this.entitiesCache.get(entityUid) != null,
-      of(this.entitiesCache.get(entityUid).entity),
-      this.initContainerEntityInCache(entityUid)
-    );
+    return this.entitiesCache.get(entityUid) != null ?
+      of(this.entitiesCache.get(entityUid).entity) :
+      this.initContainerEntityInCache(entityUid);
   }
 
   private retrieveEntity(uid: number): Observable<DMEntity> {
     return this.retrieveContainerEntity(uid).pipe(
-      concatMap(res => iif(
-        () => res == null || res === undefined || res === '',
-        this.documentService.getDocument(this.sessionService.sessionToken, uid),
+      concatMap(res => res == null || res === undefined || res === '' ?
+        this.documentService.getDocument(this.sessionService.sessionToken, uid) :
         of(res)
-      )));
+      ));
   }
 
   private retrieveContainerEntity(uid: number): Observable<DMEntity> {
@@ -246,16 +239,14 @@ export class EntityCacheService {
   }
 
   public findWorkspaceInCache(uid: number): Observable<Workspace> {
-    return iif(
-      () => this.getWorkspaceInCache(uid) == null,
-      this.initContainerEntityInCache(uid),
+    return (this.getWorkspaceInCache(uid) == null ?
+      this.initContainerEntityInCache(uid) :
       of(this.getWorkspaceInCache(uid))
     ).pipe(
-      concatMap(entity => iif(
-        () => entity != null && DMEntityUtils.dmEntityIsWorkspace(entity),
-        of(entity),
+      concatMap(entity => entity != null && DMEntityUtils.dmEntityIsWorkspace(entity) ?
+        of(entity) :
         of(null)
-      ))
+      )
     );
   }
 
