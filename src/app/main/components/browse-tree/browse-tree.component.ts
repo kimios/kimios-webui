@@ -13,6 +13,7 @@ import {ContainerEntityCreationDialogComponent} from 'app/main/components/contai
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
 import {IconService} from 'app/services/icon.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'browse-tree',
@@ -64,7 +65,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
       private entityCreationService: EntityCreationService,
       public containerEntityDialog: MatDialog,
       public createContainerEntityDialog: MatDialog,
-      private iconService: IconService
+      private iconService: IconService,
+      private entityCacheService: EntityCacheService
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -100,7 +102,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         } else {
             this.retrieveEntitiesToExpand().pipe(
                 tap(res => this.entitiesToExpand$.next(res)),
-                concatMap(res => this.browseEntityService.findContainerEntitiesAtPath()),
+                concatMap(res => this.entityCacheService.findEntityChildrenInCache(null, true)),
                 take(1),
                 flatMap(
                     res => res
@@ -262,7 +264,6 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             this.nodes.push(newNode);
             this.tree.treeModel.update();
             this.entitiesLoaded.set(entity.uid, entity);
-            this.browseEntityService.entities.set(entity.uid, entity);
             this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
         })
     ).subscribe(
@@ -270,9 +271,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
     );
 
         this.browseEntityService.onAddedChildToEntity$.pipe(
-            concatMap(
-                entityUid => combineLatest(of(entityUid), this.browseEntityService.findContainerEntitiesAtPath(entityUid))
-            ),
+            concatMap(entityUid => combineLatest(
+              of(entityUid),
+              this.entityCacheService.findEntityChildrenInCache(entityUid, true)
+            )),
             tap(([entityUid, childrenEntities]) => {
                 const currentChildrenTmp = this.tree.treeModel.getNodeById(entityUid).data.children.slice();
                 const currentChildren = currentChildrenTmp === null || currentChildrenTmp === undefined ?
@@ -348,15 +350,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
               return entityRet;
             }
         ),
-        concatMap(
-            entityRet => combineLatest(of(entityRet),
-              iif(
-                () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
-                this.browseEntityService.findEntitiesAtPath(entityRet),
-                this.browseEntityService.findContainerEntitiesAtPath(entityRet.uid)
-              )
-            )
-        ),
+        concatMap(entityRet => combineLatest(
+              of(entityRet),
+              this.entityCacheService.findEntityChildrenInCache(entityRet.uid, this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
+        )),
         tap(
             ([entityRet, entities]) => this.tree.treeModel.getNodeById(entityRet.uid).data.children = entities.map(entityChild => {
               return {
@@ -386,12 +383,9 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
   loadChildren(entityUid: number): Observable<number> {
     this.tree.treeModel.getNodeById(entityUid.toString()).data.isLoading = true;
-    return combineLatest(of(entityUid),
-      iif(
-        () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
-        this.browseEntityService.findEntitiesAtPathFromId(entityUid),
-        this.browseEntityService.findContainerEntitiesAtPath(entityUid)
-      )
+    return combineLatest(
+      of(entityUid),
+      this.entityCacheService.findEntityChildrenInCache(entityUid, this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
     ).pipe(
         tap(
             ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityChild => {
@@ -440,7 +434,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   selectNode(node: ITreeNode): void {
       if (this.mode === BROWSE_TREE_MODE.BROWSE) {
           this.browseEntityService.selectedEntityFromGridOrTree$.next(
-              this.browseEntityService.entities.get(Number(node.id))
+              this.entityCacheService.getEntity(Number(node.id))
           );
           node.expand();
       } else {
@@ -462,13 +456,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
             }
         ),
         mergeMap(
-            child => combineLatest(of(child['id']),
-              iif(
-                () => this.mode === BROWSE_TREE_MODE.WITH_DOCUMENTS,
-                this.browseEntityService.findEntitiesAtPathFromId(child['id']),
-                this.browseEntityService.findContainerEntitiesAtPath(child['id']))
-              )
-        ),
+            child => combineLatest(
+              of(child['id']),
+              this.entityCacheService.findEntityChildrenInCache(child['id'], this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
+        )),
         tap(
             ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.length === 0 ?
                 [] :
@@ -512,7 +503,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   }
 
     onFocus($event): void {
-        this.browseEntityService.selectedEntityFromGridOrTree$.next(this.browseEntityService.entities.get(Number($event.node.data.id)));
+        this.browseEntityService.selectedEntityFromGridOrTree$.next(this.entityCacheService.getEntity(Number($event.node.data.id)));
     }
 
     openEntityData(uid: number): void {
@@ -527,7 +518,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
     handleDrop($event: DragEvent): void {
         if ($event['droppedInDir']) {
-            $event['droppedInDir'] = this.browseEntityService.entities.get(Number($event['droppedInDir']));
+            $event['droppedInDir'] = this.entityCacheService.getEntity(Number($event['droppedInDir']));
         }
     }
 
@@ -553,7 +544,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   retrieveDocumentIcon(documentId: number, iconPrefix: string): string {
     return DMEntityUtils.retrieveEntityIconName(
       this.iconService,
-      this.browseEntityService.entities.get(documentId),
+      this.entityCacheService.getEntity(documentId),
       iconPrefix
     );
   }

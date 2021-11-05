@@ -13,7 +13,7 @@ import {
 } from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
-import {from, Observable, of} from 'rxjs';
+import {combineLatest, from, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {BrowseEntityService} from './browse-entity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -32,7 +32,6 @@ export class EntityCacheService {
       private documentVersionService: DocumentVersionService,
       private documentService: DocumentService,
       private searchEntityService: SearchEntityService,
-      private browseEntityService: BrowseEntityService,
       private workspaceService: WorkspaceService,
       private folderService: FolderService
   ) {
@@ -151,7 +150,7 @@ export class EntityCacheService {
   }
 
   private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntity>> {
-    return this.browseEntityService.findEntitiesAtPathFromId(uid).pipe(
+    return this.findEntitiesAtPathFromId(uid).pipe(
       tap(entityList => entityList.forEach(entity => this.entitiesCache.set(entity.uid, new EntityCacheData(entity)))),
       tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
     );
@@ -302,6 +301,30 @@ export class EntityCacheService {
           })
         );
       }
+    }
+  }
+
+  findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
+    if (parentUid === null
+      || parentUid === undefined) {
+      return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
+    } else {
+      return this.retrieveContainerEntity(parentUid).pipe(
+        concatMap(
+          res => combineLatest(of(res), this.folderService.getFolders(this.sessionService.sessionToken, parentUid))
+        ),
+        concatMap(
+          ([parentEntity, folders]) => combineLatest(
+            of(folders),
+            DMEntityUtils.dmEntityIsWorkspace(parentEntity) ?
+              of([]) :
+              this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
+          )
+        ),
+        concatMap(
+          ([folders, documents]) => of(folders.concat(documents))
+        )
+      );
     }
   }
 }
