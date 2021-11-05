@@ -7,6 +7,7 @@ import {LockPossibility} from 'app/main/model/lock-possibility';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {User} from 'app/kimios-client-api/model/user';
+import {EntityCacheService} from './entity-cache.service';
 
 export interface SecurityEnt {
   read: boolean;
@@ -25,7 +26,8 @@ export class CacheSecurityService {
   constructor(
       private sessionService: SessionService,
       private securityService: SecurityService,
-      private browseEntityService: BrowseEntityService
+      private browseEntityService: BrowseEntityService,
+      private entityCacheService: EntityCacheService
   ) {
     this._securitiesMap = new Map<number, SecurityEnt>();
     this._lockPossibilityMap = new Map<number, LockPossibility>();
@@ -63,7 +65,7 @@ export class CacheSecurityService {
 
   private computeLockPossibility(docId: number): Observable<LockPossibility> {
     return this.sessionService.getCurrentUserObs().pipe(
-        concatMap(currentUser => combineLatest(of(currentUser), this.browseEntityService.getDocument(docId))),
+        concatMap(currentUser => combineLatest(of(currentUser), this.entityCacheService.findDocumentInCache(docId))),
         concatMap(([currentUser, doc]) => combineLatest(of(currentUser), of(doc), this.getSecurityEnt(doc.uid))),
         concatMap(([currentUser, doc, secEnt]) => {
           let lockPossibility: LockPossibility = null;
@@ -95,7 +97,7 @@ export class CacheSecurityService {
 
   invalidLockEntry(entityId: number): void {
     this._lockPossibilityMap.delete(entityId);
-    this.browseEntityService.deleteCacheDocumentEntry(entityId);
+    this.entityCacheService.reloadEntity(entityId);
   }
 
   public retrieveUsersAndGroups(searchTerm: string): Observable<Array<UserOrGroup>> {
