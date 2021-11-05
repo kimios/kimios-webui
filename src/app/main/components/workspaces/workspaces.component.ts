@@ -16,6 +16,7 @@ import {AdminService} from 'app/services/admin.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {IconService} from 'app/services/icon.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'app-workspaces',
@@ -55,7 +56,8 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       private errorDialog: MatDialog,
       private adminService: AdminService,
       private route: ActivatedRoute,
-      private iconService: IconService
+      private iconService: IconService,
+      private entityCacheService: EntityCacheService
   ) {
     this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
     this.pageSize = PAGE_SIZE_DEFAULT;
@@ -234,7 +236,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           || Number(dataSplitted[1]) === NaN) {
         return false;
       }
-      const entityMoved = this.browseEntityService.entities.get(Number(dataSplitted[1]));
+      const entityMoved = this.entityCacheService.getEntity(Number(dataSplitted[1]));
       const entityTarget = event['droppedInDir'];
       if (DMEntityUtils.dmEntityIsDocument(entityMoved)
         || this.browseEntityService.checkMoveIsPossible(entityMoved, entityTarget)) {
@@ -376,7 +378,7 @@ loading.pipe(
       }
       const movedEntityInitialParentUid = entityMoved.uid;
       this.browseEntityService.moveEntity(entityMoved, entityTarget).pipe(
-          concatMap(() => this.browseEntityService.reloadEntity(entityMoved.uid))
+          concatMap(() => this.entityCacheService.reloadEntity(entityMoved.uid))
       ).subscribe(
           reloadedEntity => {
             if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
