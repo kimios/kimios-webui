@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
-import {DMEntity} from 'app/kimios-client-api';
+import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
 import {concatMap, filter, flatMap, map, mergeMap, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -8,7 +8,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {ActivatedRoute} from '@angular/router';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
-import {MatDialog} from '@angular/material';
+import {MatCheckboxChange, MatDialog} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
@@ -117,7 +117,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                                 isLoading: true,
                                 allowDrop: true,
                                 svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
+                                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+                                documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                                  (entity as KimiosDocument).extension ?
+                                    (entity as KimiosDocument).extension :
+                                    '' :
+                                  '',
+                              selected: false
                             };
                             this.nodes.push(newNode);
                             this.tree.treeModel.update();
@@ -259,7 +265,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 children: null,
                 isLoading: false,
                 svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                  (entity as KimiosDocument).extension ?
+                    (entity as KimiosDocument).extension :
+                    '' :
+                  '',
+              selected: false
             };
             this.nodes.push(newNode);
             this.tree.treeModel.update();
@@ -290,7 +302,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                             children: null,
                             isLoading: false,
                             svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                            dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
+                            dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+                            documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                              (entity as KimiosDocument).extension ?
+                                (entity as KimiosDocument).extension :
+                                '' :
+                              '',
+                          selected: false
                         });
                     });
                 this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
@@ -342,7 +360,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 children: null,
                 isLoading: true,
                 svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                  (entity as KimiosDocument).extension ?
+                    (entity as KimiosDocument).extension :
+                    '' :
+                  '',
+                selected: false
               };
               this.nodes.push(newNode);
               this.tree.treeModel.update();
@@ -362,7 +386,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 children: null,
                 isLoading: false,
                 svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document')
+                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                  (entity as KimiosDocument).extension ?
+                    (entity as KimiosDocument).extension :
+                    '' :
+                  '',
+                selected: false
               };
             })
         ),
@@ -395,7 +425,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                 children: null,
                 isLoading: false,
                 svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document')
+                dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entityChild) ?
+                  (entityChild as KimiosDocument).extension ?
+                    (entityChild as KimiosDocument).extension :
+                    '' :
+                  '',
+                selected: false
               };
             })
         ),
@@ -470,7 +506,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                     children: null,
                     isLoading: false,
                     svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
-                    dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document')
+                    dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document'),
+                    documentExtension: DMEntityUtils.dmEntityIsDocument(entityChild) ?
+                      (entityChild as KimiosDocument).extension ?
+                        (entityChild as KimiosDocument).extension :
+                        '' :
+                      '',
+                    selected: false
                   };
                 })
         ),
@@ -541,11 +583,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         });
     }
 
-  retrieveDocumentIcon(documentId: number, iconPrefix: string): string {
-    return DMEntityUtils.retrieveEntityIconName(
+  retrieveDocumentIcon(fileExtension: string, iconPrefix: string): string {
+    return DMEntityUtils.retrieveEntityIconNameFromFileExtension(
       this.iconService,
-      this.entityCacheService.getEntity(documentId),
+      fileExtension,
       iconPrefix
     );
+  }
+
+  selectionChange($event: MatCheckboxChange, id: number): void {
+    if (this.tree.treeModel.getNodeById(id)) {
+      this.tree.treeModel.getNodeById(id).data.kimiosChecked = $event.checked;
+      this.tree.treeModel.update();
+    }
   }
 }
