@@ -45,7 +45,7 @@
         <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
           <mat-checkbox *ngIf="mode === 'with-documents' && node.data.dmEntityType === 'document'"
                         (change)="selectionChange($event, node.data.id)"
-                        [checked]="node.data.kimiosChecked"
+                        [checked]="selectedEntity(node.id)"
           >
           </mat-checkbox>
           <mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>

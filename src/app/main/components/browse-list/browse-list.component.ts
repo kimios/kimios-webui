@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {BehaviorSubject, combineLatest, of, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
@@ -81,16 +81,17 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         entities => this.dataSource.setData(entities)
     );
 
-    this.deleteDocument$.pipe(
-        filter(res => res != null),
+    this.bes.removedFolder$.pipe(
+        /*filter(res => res != null),
         concatMap(uid => combineLatest(of(uid), this.bes.deleteDocument(uid))),
         concatMap(([uid, res]) => this.entityCacheService.findDocumentInCache(uid)),
         tap(doc => this.bes.deleteCacheEntry(doc.folderUid)),
-        concatMap(doc => this.bes.getEntity(doc.folderUid)),
+        concatMap(doc => this.bes.getEntity(doc.folderUid)),*/
         tap(parentFolder => {
-          const currentPath = this.bes.currentPath.getValue();
-          const currentDir = currentPath[currentPath.length - 1];
-          this.bes.selectedEntity$.next(currentDir);
+          // const currentPath = this.bes.currentPath.getValue();
+          // const currentDir = currentPath[currentPath.length - 1];
+          // this.bes.selectedEntity$.next(currentDir);
+          this.bes.loading$.next(false);
         })
     ).subscribe();
 
@@ -253,20 +254,25 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   delete(uid: number, name: string): void {
+    const entityToDelete = this.bes.entitiesToDisplay$.getValue().filter(element => element.uid === uid)[0];
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        'message': 'Delete document ' + name + ' ?'
-      },
+        dialogTitle: this.makeDialogTitle(entityToDelete),
+        iconLine1: DMEntityUtils.dmEntityIsDocument(entityToDelete) ?
+          DMEntityUtils.retrieveEntityIconName(this.iconService, entityToDelete, 'far') :
+          null,
+        messageLine1: entityToDelete.name,
+      }/*,
       width: '400px',
-      height: '400px'
+      height: '400px'*/
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.bes.loading$.next(true);
-        this.deleteDocument$.next(uid);
-      }
-    });
+    dialogRef.afterClosed().pipe(
+      filter(result => result === true),
+      concatMap(() => this.deleteEntity(entityToDelete)),
+      tap(() => this.bes.loading$.next(false))
+    ).subscribe();
   }
 
   retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
@@ -275,5 +281,17 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   addToShoppingCart(entity: DMEntity): void {
     this.documentExportService.addToCart(entity);
+  }
+
+  deleteEntity(entity: DMEntity): Observable<boolean> {
+    return this.bes.deleteEntity(entity);
+  }
+
+  private makeDialogTitle(entityToDelete: DMEntity): string {
+    return 'Delete '
+      + (DMEntityUtils.dmEntityIsDocument(entityToDelete) ?
+        'document' :
+        'folder')
+      + '?';
   }
 }

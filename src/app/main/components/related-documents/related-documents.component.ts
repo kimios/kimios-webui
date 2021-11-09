@@ -12,6 +12,9 @@ import {BehaviorSubject} from 'rxjs';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {IconService} from 'app/services/icon.service';
 
 const sortTypeMapping = {
   'name': 'string',
@@ -45,7 +48,8 @@ export class RelatedDocumentsComponent implements OnInit {
       private documentService: DocumentService,
       private router: Router,
       private documentDetailService: DocumentDetailService,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private iconService: IconService
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.documentId$ = new BehaviorSubject<number>(null);
@@ -92,20 +96,58 @@ export class RelatedDocumentsComponent implements OnInit {
   }
 
   add(): void {
-    const dialog = this.dialog.open(BrowseTreeDialogComponent, {
+    const dialogAdd = this.dialog.open(BrowseTreeDialogComponent, {
       data: {
         browseTreeMode: BROWSE_TREE_MODE.WITH_DOCUMENTS
       }
     });
+
+    dialogAdd.afterClosed().pipe(
+      filter(res => res === true),
+      concatMap(() => this.documentDetailService.selectedEntityIdList$),
+      filter(list => list != null),
+      tap(() => this.documentDetailService.selectedEntityIdList$.next(null)),
+      concatMap(list => list),
+      concatMap(id => this.documentService.addRelatedDocument(
+        this.sessionService.sessionToken,
+        this.documentId,
+        id
+      ))
+    ).subscribe();
   }
 
-  deleteRow(i: any, $event: MouseEvent): void {
+  delete(entityUid: number): void {
+    const entity = this.relatedDocuments.filter(element => element.uid === entityUid)[0];
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        dialogTitle: 'Delete relation with document?',
+        iconLine1: DMEntityUtils.retrieveEntityIconName(this.iconService, entity, 'far'),
+        messageLine1: entity.name
+      }/*,
+      width: '400px',
+      height: '400px'*/
+    });
 
+    dialogRef.afterClosed().pipe(
+      filter(res => res === true),
+      concatMap(() => this.documentService.removeRelatedDocument(
+        this.sessionService.sessionToken,
+        this.documentId,
+        entityUid
+      )),
+    ).subscribe(
+      res => this.removeInDataSource(entityUid)
+    );
   }
 
   goToDocument($event: MouseEvent, uid: number, colId: string): void {
     if (colId !== 'actionRemove') {
       DocumentUtils.navigateToFile(this.router, uid);
     }
+  }
+
+  private removeInDataSource(entityUid: number): void {
+    this.relatedDocuments = this.relatedDocuments.filter(element => element.uid !== entityUid);
+    this.dataSource.setData(this.relatedDocuments);
   }
 }

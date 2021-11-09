@@ -66,6 +66,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     public browseMode$: BehaviorSubject<BROWSE_TREE_MODE>;
     public chosenContainerEntityUid$: BehaviorSubject<number>;
+    removedFolder$: BehaviorSubject<number>;
+    removedWorkspace$: BehaviorSubject<number>;
+    removedDocument$: BehaviorSubject<number>;
 
   constructor(
       // Set the defaults
@@ -120,6 +123,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.browseMode$ = new BehaviorSubject<BROWSE_TREE_MODE>(null);
 
       this.chosenContainerEntityUid$ = new BehaviorSubject<number>(null);
+
+      this.removedFolder$ = new BehaviorSubject<number>(null);
+      this.removedWorkspace$ = new BehaviorSubject<number>(null);
+      this.removedDocument$ = new BehaviorSubject<number>(null);
 
       this.ngOnInit();
   }
@@ -444,34 +451,29 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         this.entities.delete(uid);
     }*/
 
-    deleteEntity(entity: DMEntity): void {
-        if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
-            this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).subscribe(
-                () => console.log('TODO: delete workspace tree node')
-            );
-        } else {
-            if (DMEntityUtils.dmEntityIsFolder(entity)) {
-                this.folderService.deleteFolder(this.sessionService.sessionToken, entity.uid).subscribe(
-                    () => {
-                        console.log('TODO: delete folder tree node');
-                        this.updateListAfterDelete(entity);
-                    }
-                );
-            } else {
-                if (DMEntityUtils.dmEntityIsDocument(entity)) {
-                    this.documentService.deleteDocument(this.sessionService.sessionToken, entity.uid).subscribe(
-                        () => this.updateListAfterDelete(entity)
-                    );
-                }
-            }
-        }
+    deleteEntity(entity: DMEntity): Observable<any> {
+      return DMEntityUtils.dmEntityIsWorkspace(entity) ?
+        this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
+          tap(() => this.removedWorkspace$.next(entity.uid))
+        ) :
+        DMEntityUtils.dmEntityIsFolder(entity) ?
+          this.folderService.deleteFolder(this.sessionService.sessionToken, entity.uid).pipe(
+            // concatMap(() => this.entityCacheService.findDocumentInCache(entity.uid)),
+            concatMap(() => this.updateListAfterDelete(entity)),
+            // concatMap(() => this.getEntity(doc.folderUid)),
+            tap(() => this.removedFolder$.next(entity.uid))
+          ) :
+          this.documentService.deleteDocument(this.sessionService.sessionToken, entity.uid).pipe(
+            concatMap(() => this.updateListAfterDelete(entity)),
+            tap(() => this.removedDocument$.next(entity.uid))
+          );
     }
 
     deleteDocument(uid: number): Observable<any> {
       return this.documentService.deleteDocument(this.sessionService.sessionToken, uid);
     }
 
-    updateListAfterDelete(entity: DMEntity): void {
+    updateListAfterDelete(entity: DMEntity): Observable<Array<DMEntity>> {
         let parentUid: number;
         if (entity['parentUid']) {
             parentUid = entity['parentUid'];
@@ -481,19 +483,22 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         }
 
-        this.deleteCacheEntry(parentUid);
-        // this.selectedEntity$.next(this.entities.get(parentUid));
-        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-        const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
-        if (idx !== -1) {
-            totalEntities.splice(idx, 1);
-            this.totalEntitiesToDisplay$.next(totalEntities);
-        }
-        if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
-            this.pageIndex.next(this.pageIndex.getValue() - 1);
-        }
-        this.makePage(this.pageIndex.getValue(), this.pageSize);
-        this.nodeToRemoveFromTree.next(entity);
+        return this.entityCacheService.reloadEntityChildren(parentUid).pipe(
+          tap(() => {
+            // this.selectedEntity$.next(this.entities.get(parentUid));
+            const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+            const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
+            if (idx !== -1) {
+              totalEntities.splice(idx, 1);
+              this.totalEntitiesToDisplay$.next(totalEntities);
+            }
+            if (this.pageIndex.getValue() > Math.floor(totalEntities.length / this.pageSize)) {
+              this.pageIndex.next(this.pageIndex.getValue() - 1);
+            }
+            this.makePage(this.pageIndex.getValue(), this.pageSize);
+            this.nodeToRemoveFromTree.next(entity);
+          })
+        );
     }
 
     updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity): void {

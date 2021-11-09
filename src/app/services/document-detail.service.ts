@@ -16,6 +16,7 @@ export class DocumentDetailService {
   currentVersionId: BehaviorSubject<number>;
   currentDocumentId$: BehaviorSubject<number>;
   currentPath$: BehaviorSubject<string>;
+  selectedEntityIdList$: BehaviorSubject<Array<number>>;
 
   constructor(
       private documentService: DocumentService,
@@ -28,6 +29,7 @@ export class DocumentDetailService {
       this.currentVersionId = new BehaviorSubject<number>(null);
       this.currentDocumentId$ = new BehaviorSubject<number>(null);
       this.currentPath$ = new BehaviorSubject<string>('');
+      this.selectedEntityIdList$ = new BehaviorSubject<Array<number>>(null);
   }
 
   retrieveDocumentFromId(docId: number): Observable<KimiosDocument> {

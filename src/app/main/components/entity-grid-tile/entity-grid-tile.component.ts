@@ -63,7 +63,7 @@ export class EntityGridTileComponent implements OnInit {
   }
 
   sendDelete(entity: DMEntity): void {
-    this.browseEntityService.deleteEntity(entity);
+    // this.browseEntityService.deleteEntity(entity);
   }
 
     dragStart($event: DragEvent, entityUid: number): void {

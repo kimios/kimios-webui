@@ -14,6 +14,7 @@ import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
 import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {DocumentDetailService} from 'app/services/document-detail.service';
 
 @Component({
   selector: 'browse-tree',
@@ -31,6 +32,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   nodeUidsToExpand: Array<number>;
   initDataDone$: BehaviorSubject<boolean>;
   entitiesLoaded: Map<number, DMEntity>;
+  selectedEntityIdList: Array<number>;
 
   @ViewChild('tree') tree;
 
@@ -66,12 +68,14 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
       public containerEntityDialog: MatDialog,
       public createContainerEntityDialog: MatDialog,
       private iconService: IconService,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private documentDetailService: DocumentDetailService
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
     this.nodeUidsToExpand = new Array<number>();
     this.entitiesLoaded = new Map<number, DMEntity>();
+    this.selectedEntityIdList = new Array<number>();
   }
 
   ngOnInit(): void {
@@ -592,9 +596,20 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   }
 
   selectionChange($event: MatCheckboxChange, id: number): void {
-    if (this.tree.treeModel.getNodeById(id)) {
-      this.tree.treeModel.getNodeById(id).data.kimiosChecked = $event.checked;
-      this.tree.treeModel.update();
+    if ($event.checked === true) {
+      this.selectedEntityIdList.push(id);
+    } else {
+      const idx = this.selectedEntityIdList.findIndex(element => element === id);
+      if (idx !== -1) {
+        this.selectedEntityIdList.splice(idx, 1);
+      }
     }
+    this.documentDetailService.selectedEntityIdList$.next(this.selectedEntityIdList);
+
+    return;
+  }
+
+  selectedEntity(id: number): boolean {
+    return this.selectedEntityIdList.includes(id);
   }
 }
