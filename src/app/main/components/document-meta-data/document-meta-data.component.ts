@@ -177,11 +177,10 @@ export class DocumentMetaDataComponent implements OnInit {
   }
 
   submit($event: MouseEvent): void {
-    let documentTypeUid = this.documentType.uid;
     // handle document type property removed from document
-    if (this.documentType == null) {
-      documentTypeUid = -1;
-    }
+    const documentTypeUid = this.documentType == null ?
+      -1 :
+      this.documentType.uid;
     const metaValues = {};
     Object.keys((this.formGroup.get('metas') as FormGroup).controls).forEach(metaUidStr =>
         metaValues[metaUidStr] = this.formGroup.get('metas').get(metaUidStr).value);
