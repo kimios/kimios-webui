@@ -199,4 +199,8 @@ export class DocumentMetaDataComponent implements OnInit {
   cancel($event: MouseEvent): void {
 
   }
+
+  metaDataFieldTitle(meta: Meta): string {
+    return meta.name + (meta.mandatory && meta.mandatory === true ? ' *' : '');
+  }
 }

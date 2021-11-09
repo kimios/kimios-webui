@@ -8,6 +8,7 @@
 
   <mat-form-field>
     <input type="text" aria-label="document type" matInput [formControlName]="'documentType'"
+           placeholder="Document type"
            [matAutocomplete]="autoCompleteDocumentType"
            (click)="handleClick()"
            #trigger="matAutocompleteTrigger"
@@ -33,7 +34,7 @@
             <ng-container *ngIf="documentTypeMetaDataValuesMap.get(meta.uid) != null
               && !([2, 3].includes(meta.metaType)) else noValueList;" >
               <mat-select
-                      placeholder="{{meta.name}}"
+                      placeholder="{{metaDataFieldTitle(meta)}}"
                       [formControlName]="meta.uid"
               >
                 <mat-option *ngFor="let value of documentTypeMetaDataValuesMap.get(meta.uid)"
@@ -44,7 +45,7 @@
             </ng-container>
             <ng-template #noValueList>
               <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;" >
-                <input type="text" placeholder="{{meta.name}}" matInput
+                <input type="text" placeholder="{{metaDataFieldTitle(meta)}}" matInput
                        [formControlName]="meta.uid" >
               </ng-container>
             </ng-template>
@@ -56,21 +57,21 @@
         </ng-container>
 
         <ng-container *ngIf="meta.metaType === 4">
-          <mat-checkbox [formControlName]="meta.uid" >{{meta.name}}</mat-checkbox>
+          <mat-checkbox [formControlName]="meta.uid" >{{metaDataFieldTitle(meta)}}</mat-checkbox>
         </ng-container>
 
       </ng-container>
 
       <ng-template #metaWithRange>
         <div fxLayout="column" fxFill>
-          <div>{{meta.name}}</div>
+
           <div fxLayout="row" fxLayoutAlign="space-between start" fxFill>
             <div fxFlex="48">
 
               <ng-container *ngIf="meta.metaType === 3" >
                 <ng-container *ngFor="let datePickerBind of [meta.uid]" >
                   <mat-form-field fxFill>
-                    <input matInput placeholder="min" [formControlName]="meta.uid" [matDatepicker]="datePickerBind">
+                    <input matInput placeholder="{{metaDataFieldTitle(meta)}}" [formControlName]="meta.uid" [matDatepicker]="datePickerBind">
                     <mat-datepicker-toggle matSuffix [for]="datePickerBind"></mat-datepicker-toggle>
                     <mat-datepicker #datePickerBind></mat-datepicker>
                     <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
@@ -83,7 +84,7 @@
               </ng-container>
               <ng-container *ngIf="meta.metaType!= 3" >
                 <mat-form-field fxFill>
-                  <input type="text" placeholder="min" matInput [formControlName]="meta.uid">
+                  <input type="text" placeholder="{{metaDataFieldTitle(meta)}}" matInput [formControlName]="meta.uid">
                   <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
                           matSuffix mat-icon-button aria-label="Clear"
                           (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
