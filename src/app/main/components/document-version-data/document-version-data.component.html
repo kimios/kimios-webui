@@ -1,0 +1,9 @@
+<ng-container *ngIf="documentVersionWithMetaDataValues$ | async as documentVersionWithMetaValuesReceived">
+Document type: {{documentVersionWithMetaValuesReceived.documentVersion.documentTypeName}}
+    <mat-list *ngIf="documentVersionWithMetaValuesReceived.documentVersion.documentTypeUid != null
+&& documentVersionWithMetaValuesReceived.documentVersion.documentTypeUid != -1">
+        <mat-list-item *ngFor="let metaValue of documentVersionWithMetaValuesReceived.metaValues">
+            {{metaValue.meta.name}} : {{metaValue.value == null ? '-' : metaValue.value}}
+        </mat-list-item>
+    </mat-list>
+</ng-container>

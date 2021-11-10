@@ -1,11 +1,11 @@
-import {Component, Inject, Input, LOCALE_ID, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Inject, Input, LOCALE_ID, OnInit, ViewChild} from '@angular/core';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {Direction} from 'app/main/components/file-detail/file-detail.component';
 import {Document as KimiosDocument, DocumentVersion} from 'app/kimios-client-api';
 import {formatDate} from '@angular/common';
 import {Observable, of, Subject} from 'rxjs';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, map, switchMap, tap} from 'rxjs/operators';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {ActivatedRoute} from '@angular/router';
 
@@ -14,7 +14,7 @@ import {ActivatedRoute} from '@angular/router';
   templateUrl: './file-preview-wrapper.component.html',
   styleUrls: ['./file-preview-wrapper.component.scss']
 })
-export class FilePreviewWrapperComponent implements OnInit {
+export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
 
   @Input()
   documentId: number;
@@ -42,6 +42,8 @@ export class FilePreviewWrapperComponent implements OnInit {
   spinnerColor = 'primary';
   spinnerMode = 'indeterminate';
 
+  @ViewChild('divWrapper') divWrapper: ElementRef;
+
   constructor(
       private documentDetailService: DocumentDetailService,
       @Inject(LOCALE_ID) private locale: string,
@@ -63,6 +65,8 @@ export class FilePreviewWrapperComponent implements OnInit {
     this.document$.pipe(
       tap(doc => this.document = doc),
       concatMap(doc => this.entityCacheService.findDocumentVersionsInCache(doc.uid)),
+      map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+        .map(v => v.documentVersion)),
       tap(documentVersions => this.documentVersions = documentVersions),
       tap(res => this.previewTitle = this.makePreviewTitle(this.currentVersionId, res)),
       tap(
@@ -154,5 +158,11 @@ export class FilePreviewWrapperComponent implements OnInit {
     }
 
     return title;
+  }
+
+  ngAfterViewChecked(): void {
+    const windowTotalScreen = window.innerHeight;
+    // toolbar and browse path are always visible
+    this.divWrapper.nativeElement.style.height = windowTotalScreen - 64 - 60  + 'px';
   }
 }

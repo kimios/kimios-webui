@@ -1,4 +1,4 @@
-<div  style="max-width: 900px" *ngIf="versionList$ | async">
+<div  style="max-width: 900px" *ngIf="versionList$ | async" class="file-tab-content">
   <mat-table [dataSource]="dataSource"
            matSort
            matSortActive="{{sort.name}}"
@@ -15,11 +15,15 @@
               mat-sort-header="{{col.matColumnDef}}"
       > {{col.displayName}} </mat-header-cell>
       <mat-cell *matCellDef="let element" [class.cursor-pointer]="true">
-        <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">
+        <span *ngIf="col.id === 'length' else dateTemplate;">
           {{ element[col.matColumnDef] | fileSize }}
         </span>
         <ng-template #dateTemplate>
-          <span *ngIf="col.id.endsWith('Date') else otherColumnTemplate">{{ element[col.matColumnDef] | date : 'short'}}</span>
+          <span *ngIf="col.id.endsWith('Date') else iconColumnTemplate">{{ element[col.matColumnDef] | date : 'short'}}</span>
+        </ng-template>
+        <ng-template #iconColumnTemplate>
+          <mat-icon *ngIf="col.element && col.element === 'iconName' else otherColumnTemplate;"
+                    class="cursor-pointer" (click)="showVersionData(element)"> {{ col.cell }} </mat-icon>
         </ng-template>
         <ng-template #otherColumnTemplate>
           <span>{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
@@ -29,7 +33,7 @@
 
     <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
-    <mat-row *matRowDef="let row; columns: displayedColumns;">
+    <mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="showVersionData(row)">
     </mat-row>
 
   </mat-table>

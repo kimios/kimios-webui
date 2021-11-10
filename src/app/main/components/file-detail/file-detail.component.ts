@@ -188,6 +188,8 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     initDocumentVersions(): Observable<Array<DocumentVersion>> {
         return this.entityCacheService.findDocumentVersionsInCache(this.documentId)
             .pipe(
+                map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+                  .map(v => v.documentVersion)),
                 map(
                     res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
                 ),
@@ -424,12 +426,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngAfterViewChecked(): void {
-        if (this.filePreviewElement
+        /*if (this.filePreviewElement
             && this.filePreviewElement.nativeElement
             && this.filePreviewElement.nativeElement.offsetHeight != null
             && this.filePreviewElement.nativeElement.offsetHeight !== undefined
         ) {
             this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
-        }
+        }*/
     }
 }

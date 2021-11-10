@@ -1,5 +1,5 @@
-<div>
-<form [ngClass]="'full-width'" #form
+<div class="file-tab-content">
+<form #form
       [formGroup]="formGroup"
       (ngSubmit)="onSubmit()"
       (keyup)="$event.key === 'Enter' ? onSubmit():1">

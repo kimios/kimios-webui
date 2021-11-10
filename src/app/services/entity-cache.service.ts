@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {DocumentCacheData, EntityCacheData} from 'app/main/model/entity-cache-data';
+import {DocumentCacheData, DocumentVersionWithMetaValues, EntityCacheData} from 'app/main/model/entity-cache-data';
 import {
   DMEntity,
   Document as KimiosDocument,
@@ -7,7 +7,7 @@ import {
   DocumentVersion,
   DocumentVersionService,
   Folder,
-  FolderService,
+  FolderService, MetaValue,
   Workspace,
   WorkspaceService
 } from 'app/kimios-client-api';
@@ -51,19 +51,20 @@ export class EntityCacheService {
         null;
   }
 
-  findDocumentVersions(uid: number): Array<DocumentVersion> {
+  findDocumentVersions(uid: number): Array<DocumentVersionWithMetaValues> {
     const documentCacheData = this.getDocumentCacheData(uid);
     if (documentCacheData == null) {
       return null;
     }
     if (documentCacheData.versions == null) {
       this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, uid).pipe(
-          tap(documentVersions => this.updateDocumentVersions(uid, documentVersions))
+        map(documentVersions => documentVersions.map(version => new DocumentVersionWithMetaValues(version, null))),
+        tap(documentVersions => this.updateDocumentVersions(uid, documentVersions))
       ).subscribe();
     }
   }
 
-  private updateDocumentVersions(uid: number, versions: Array<DocumentVersion>): void {
+  private updateDocumentVersions(uid: number, versions: Array<DocumentVersionWithMetaValues>): void {
     const documentCacheData = this.getDocumentCacheData(uid);
     documentCacheData.versions = versions;
     this.entitiesCache.set(uid, documentCacheData);
@@ -79,7 +80,7 @@ export class EntityCacheService {
         of(documentInCache.entity);
   }
 
-  findDocumentVersionsInCache(uid: number): Observable<Array<DocumentVersion>> {
+  findDocumentVersionsInCache(uid: number): Observable<Array<DocumentVersionWithMetaValues>> {
     return (this.getDocumentCacheData(uid) == null ?
       this.initDocumentDataInCache(uid) :
       of(this.getDocumentCacheData(uid))
@@ -104,7 +105,7 @@ export class EntityCacheService {
   private updateDocumentCacheDataVersions(documentCacheData: DocumentCacheData): Observable<DocumentCacheData> {
     return this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, documentCacheData.entity.uid).pipe(
       map(documentVersions => {
-        documentCacheData.versions = documentVersions;
+        documentCacheData.versions = documentVersions.map(version => new DocumentVersionWithMetaValues(version, null));
         this.entitiesCache.set(documentCacheData.entity.uid, documentCacheData);
         return this.getDocumentCacheData(documentCacheData.entity.uid);
       })
@@ -326,5 +327,72 @@ export class EntityCacheService {
         )
       );
     }
+  }
+
+  public findDocumentVersionWithMetaDataValues(documentUid: number, documentVersionUid: number):
+    Observable<DocumentVersionWithMetaValues> {
+      const documentCacheData = this.getDocumentCacheData(documentUid);
+      if (documentCacheData == null) {
+      return null;
+    }
+    return of(
+      documentCacheData.versions != null ?
+        documentCacheData.versions :
+        this.findDocumentVersions(documentUid)
+    ).pipe(
+      map(versions => versions.filter(v => v.documentVersion.uid === documentVersionUid)[0]),
+      concatMap(versionWithMetaDataValues =>
+        versionWithMetaDataValues.metaValues == null ?
+          this.initDocumentVersionMetaDataValues(documentUid, documentVersionUid) :
+          of(versionWithMetaDataValues)
+      )
+    );
+  }
+
+  private initDocumentVersionMetaDataValues(documentUid: number, documentVersionUid: number):
+    Observable<DocumentVersionWithMetaValues> {
+    const documentCacheData = this.getDocumentCacheData(documentUid);
+    if (documentCacheData == null) {
+      return null;
+    }
+    return of(
+      documentCacheData.versions != null ?
+        documentCacheData.versions :
+        this.findDocumentVersions(documentUid)
+    ).pipe(
+      concatMap(versions => combineLatest(
+        of(this.getDocumentCacheData(documentUid).versions
+          .filter(v => v.documentVersion.uid === documentVersionUid)[0]),
+        this.documentVersionService.getMetaValues(this.sessionService.sessionToken, documentVersionUid),
+        this.documentVersionService.getMetas(
+          this.sessionService.sessionToken,
+          this.getDocumentCacheData(documentUid).versions
+            .filter(v => v.documentVersion.uid === documentVersionUid)[0].documentVersion.documentTypeUid
+        ))
+      ),
+      map(([version, metaValues, metas]) => new DocumentVersionWithMetaValues(
+        version.documentVersion,
+        metas.map(meta => {
+          const idx = metaValues.findIndex(mv => mv.metaId === meta.uid);
+          const metaValue = idx !== -1 ?
+            metaValues[idx] :
+            <MetaValue> {
+              metaId: meta.uid,
+              meta: meta,
+              documentVersionId: documentVersionUid,
+              value: null
+            };
+          return metaValue;
+        })
+      )),
+      tap(documentVersionWithMetaValues => {
+        const idx = documentCacheData.versions
+          .findIndex(v => v.documentVersion.uid === documentVersionWithMetaValues.documentVersion.uid);
+        if (idx !== -1) {
+          documentCacheData.versions[idx] = documentVersionWithMetaValues;
+          this.entitiesCache.set(documentCacheData.entity.uid, documentCacheData);
+        }
+      })
+    );
   }
 }

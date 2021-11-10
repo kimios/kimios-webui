@@ -1,4 +1,4 @@
-<div [ngClass]="'data-tab-content'" *ngIf="document$ | async as document">
+<div [ngClass]="'data-tab-content'" *ngIf="document$ | async as document" class="file-tab-content">
 
   <!-- file properties : name, type, size, author, creation date -->
   <file-detail-data [document]="document"></file-detail-data>

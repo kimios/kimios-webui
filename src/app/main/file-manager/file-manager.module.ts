@@ -135,6 +135,8 @@ import {RelatedDocumentsComponent} from 'app/main/components/related-documents/r
 import {FilePreviewWrapperComponent} from 'app/main/components/file-preview-wrapper/file-preview-wrapper.component';
 import {FileDetailTagsComponent} from 'app/main/components/file-detail-tags/file-detail-tags.component';
 import {FileDetailDataAndTagsComponent} from 'app/main/components/file-detail-data-and-tags/file-detail-data-and-tags.component';
+import {DocumentVersionDataDialogComponent} from 'app/main/components/document-version-data-dialog/document-version-data-dialog.component';
+import {DocumentVersionDataComponent} from 'app/main/components/document-version-data/document-version-data.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -232,7 +234,9 @@ library.add(far, fas);
         RelatedDocumentsComponent,
         FilePreviewWrapperComponent,
         FileDetailTagsComponent,
-        FileDetailDataAndTagsComponent
+        FileDetailDataAndTagsComponent,
+        DocumentVersionDataDialogComponent,
+        DocumentVersionDataComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -297,7 +301,8 @@ library.add(far, fas);
         DocumentUploadProgressComponent,
         ConfirmDialogComponent,
         ShareEditDialogComponent,
-        BrowseTreeDialogComponent
+        BrowseTreeDialogComponent,
+        DocumentVersionDataDialogComponent
     ],
     exports: [
         FileUploadListComponent,

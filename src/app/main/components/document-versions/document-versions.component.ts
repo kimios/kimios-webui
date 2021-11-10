@@ -1,15 +1,16 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DocumentVersion} from 'app/kimios-client-api';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {concatMap, filter, switchMap, tap} from 'rxjs/operators';
-import {Sort} from '@angular/material';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
+import {MatDialog, Sort} from '@angular/material';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DocumentVersionDataSource} from './document-version-data-source';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {ActivatedRoute} from '@angular/router';
+import {DocumentVersionDataDialogComponent} from 'app/main/components/document-version-data-dialog/document-version-data-dialog.component';
+import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
 
 const sortTypeMapping = {
       'uid': 'number',
@@ -46,7 +47,8 @@ export class DocumentVersionsComponent implements OnInit {
 
   constructor(
       private documentDetailService: DocumentDetailService,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      public dialog: MatDialog
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.versionList = new Array<DocumentVersion>();
@@ -58,6 +60,8 @@ export class DocumentVersionsComponent implements OnInit {
     this.versionList$ = this.documentId$.pipe(
       filter(docId => docId != null),
       concatMap(docId => this.entityCacheService.findDocumentVersionsInCache(docId)),
+      map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+        .map(v => v.documentVersion)),
       tap(versionList => this.dataSource.setData(versionList)),
     );
 
@@ -104,9 +108,18 @@ export class DocumentVersionsComponent implements OnInit {
     });
     this.dataSource.setData(sortedData);
   }
+
+  showVersionData(documentVersion: DocumentVersion): void {
+    // show dialog with version data
+    this.dialog.open(DocumentVersionDataDialogComponent, {
+      data: {
+        documentVersion: documentVersion
+      }
+    });
+  }
 }
 
-export const VERSIONS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
+export const VERSIONS_DEFAULT_DISPLAYED_COLUMNS: Array<ColumnDescriptionWithElement | ColumnDescription> = [
   {
     id: 'uid',
     matColumnDef: 'uid',
@@ -169,5 +182,19 @@ export const VERSIONS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     sticky: false,
     displayName: 'Custom version',
     cell: (row: DocumentVersion) => row.customVersion
+  },
+  {
+    // to delete this row
+    id: 'actionOpenDetails',
+    matColumnDef: 'actionOpenDetails',
+    position: 1,
+    matHeaderCellDef: 'actionOpenDetails',
+    sticky: false,
+    displayName: '',
+    cell: 'visibility',
+    element: 'iconName',
+    class: 'mat-column-width50',
+    noSortHeader: true,
+    cellHeaderIcon: ''
   }
 ];
