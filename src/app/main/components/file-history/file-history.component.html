@@ -1,35 +1,37 @@
-<div style="max-width: 500px" class="file-tab-content">
-    <mat-table [dataSource]="dataSource"
-               matSort
-               matSortActive="{{sort.name}}"
-               matSortDirection="{{sort.direction}}"
-               matSortDisableClear
-               (matSortChange)="sortData($event)">
+<div class="file-tab-content-wrapper">
+    <div style="max-width: 500px" class="file-tab-content with-list">
+        <mat-table [dataSource]="dataSource"
+                   matSort
+                   matSortActive="{{sort.name}}"
+                   matSortDirection="{{sort.direction}}"
+                   matSortDisableClear
+                   (matSortChange)="sortData($event)">
 
-        <ng-container
-                *ngFor="let col of columnsDescription"
-                matColumnDef="{{col.matColumnDef}}"
-                sticky="{{col.sticky}}">
-            <mat-header-cell
-                    *matHeaderCellDef
-                    mat-sort-header="{{col.matColumnDef}}"
-            > {{col.displayName}} </mat-header-cell>
-            <mat-cell *matCellDef="let element">
-                <span *ngIf="col.id === 'date' else notADateTemplate;" title="{{element[col.matColumnDef] | date : 'short'}}">
-                    {{element[col.matColumnDef] | date : 'short'}}
-                </span>
-                <ng-template #notADateTemplate>
-                    <span title="{{col.cell ? col.cell(element) : element[col.matColumnDef]}}">
-                        {{col.cell ? col.cell(element) : element[col.matColumnDef]}}
+            <ng-container
+                    *ngFor="let col of columnsDescription"
+                    matColumnDef="{{col.matColumnDef}}"
+                    sticky="{{col.sticky}}">
+                <mat-header-cell
+                        *matHeaderCellDef
+                        mat-sort-header="{{col.matColumnDef}}"
+                > {{col.displayName}} </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span *ngIf="col.id === 'date' else notADateTemplate;" title="{{element[col.matColumnDef] | date : 'short'}}">
+                        {{element[col.matColumnDef] | date : 'short'}}
                     </span>
-                </ng-template>
-            </mat-cell>
-        </ng-container>
+                    <ng-template #notADateTemplate>
+                        <span title="{{col.cell ? col.cell(element) : element[col.matColumnDef]}}">
+                            {{col.cell ? col.cell(element) : element[col.matColumnDef]}}
+                        </span>
+                    </ng-template>
+                </mat-cell>
+            </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
-        <mat-row *matRowDef="let row; columns: displayedColumns;" >
-        </mat-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" >
+            </mat-row>
 
-    </mat-table>
+        </mat-table>
+    </div>
 </div>

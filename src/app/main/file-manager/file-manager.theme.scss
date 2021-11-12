@@ -321,10 +321,40 @@
         background: mat-color($background, 'card');
     }
 
+    .file-tab-content-wrapper {
+        padding: 20px;
+    }
+
     .file-tab-content {
+        background: mat-color($background, 'card');
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .file-tab-content.fit {
+        width: fit-content;
+    }
+
+    .file-tab-content.with-list {
+        width: available;
+    }
+
+    .file-preview-tab-content {
         background: mat-color($background, 'card');
         padding-left: 20px;
         padding-right: 20px;
         padding-bottom: 20px;
+    }
+
+    .mat-column-width100 {
+        max-width: 100px !important;
+    }
+
+    .mat-column-width50 {
+        max-width: 50px !important;
+    }
+
+    .mat-column-width200 {
+        min-width: 200px !important;
     }
 }

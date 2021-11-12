@@ -127,6 +127,7 @@ export const VERSIONS_DEFAULT_DISPLAYED_COLUMNS: Array<ColumnDescriptionWithElem
     matHeaderCellDef: 'uid',
     sticky: false,
     displayName: '#id',
+    class: 'mat-column-width100',
     cell: (row: DocumentVersion) => row.uid
   },
   {
@@ -145,7 +146,8 @@ export const VERSIONS_DEFAULT_DISPLAYED_COLUMNS: Array<ColumnDescriptionWithElem
     matHeaderCellDef: 'length',
     sticky: false,
     displayName: 'Size',
-    cell: (row: DocumentVersion) => row.length
+    cell: (row: DocumentVersion) => row.length,
+    class: 'mat-column-width100',
   },
   {
     id: 'author',

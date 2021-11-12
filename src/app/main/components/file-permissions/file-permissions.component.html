@@ -1,101 +1,103 @@
-<div class="wrapper" id="wrapper" #wrapper>
-    <div class="overlay" *ngIf="showSpinner" id="overlay" #overlay>
-        <div class="spinner-wrapper">
-            <mat-spinner
-                    color="primary"
-            ></mat-spinner>
+<div class="file-tab-content-wrapper">
+    <div class="wrapper" id="wrapper" #wrapper>
+        <div class="overlay" *ngIf="showSpinner" id="overlay" #overlay>
+            <div class="spinner-wrapper">
+                <mat-spinner
+                        color="primary"
+                ></mat-spinner>
+            </div>
         </div>
-    </div>
 
-<form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
+    <form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
 
-<div *ngIf="updateSecuritiesScreen" fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
-    <div fxLayout="row" fxLayoutAlign="start" >
-        <div fxFlex>
-            <span style="font-weight: bolder">
-                Permissions
-            </span>
+    <div *ngIf="updateSecuritiesScreen" fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+        <div fxLayout="row" fxLayoutAlign="start" >
+            <div fxFlex>
+                <span style="font-weight: bolder">
+                    Permissions
+                </span>
+            </div>
         </div>
-    </div>
-    <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <span>Read</span>
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <span>Read</span>
+            </div>
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <span>Write</span>
+            </div>
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <span>Full</span>
+            </div>
         </div>
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <span>Write</span>
-        </div>
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <span>Full</span>
-        </div>
-    </div>
-    <div
-            *ngFor="let permission of permissions; let i = index"
-            fxLayout="row"
-            fxLayoutAlign="start center"
-            fxLayoutGap="15px"
-            [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())">
-        <div fxFlex>
-            <div fxLayout="column" >
-                <div>
-                    <span style="font-weight: bolder">{{permission.fullName}}</span>
+        <div
+                *ngFor="let permission of permissions; let i = index"
+                fxLayout="row"
+                fxLayoutAlign="start center"
+                fxLayoutGap="15px"
+                [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(i.toString())">
+            <div fxFlex>
+                <div fxLayout="column" >
+                    <div>
+                        <span style="font-weight: bolder">{{permission.fullName}}</span>
+                    </div>
+                    <div>
+                        <span>{{permission.name + '@' + permission.source}}</span>
+                    </div>
                 </div>
-                <div>
-                    <span>{{permission.name + '@' + permission.source}}</span>
+            </div>
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <div><mat-checkbox [formControlName]="'read'"></mat-checkbox></div>
+            </div>
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <div><mat-checkbox [formControlName]="'write'"></mat-checkbox></div>
+            </div>
+            <div [class.permission-cell-header]="true"
+                 fxLayout="row" fxLayoutAlign="center center">
+                <div><mat-checkbox [formControlName]="'fullAccess'"></mat-checkbox></div>
+            </div>
+        </div>
+        <div [class.div-button-add-user]="true">
+            <div class="button-add-user kimios-button"
+                 fxFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px;"
+                 (click)="showAddUserScreen()" >
+                <span>Add user</span>
+                <mat-icon>add</mat-icon>
+            </div>
+        </div>
+        <div >
+            <div fxLayout="row"
+                 fxLayoutAlign="center center"
+                 fxLayoutGap="20px">
+                <div [class.kimios-button]="true"
+                     [class.kimios-green]="true"
+                     [class.inactive]="true"
+                     fxLayout="row"
+                     fxLayoutAlign="center center"
+                     (click)="cancel($event)">
+                    <span [class.kimios-button-text]="true">CANCEL</span>
+                </div>
+                <div [class.kimios-button]="true"
+                     [class.kimios-green]="true"
+                     [class.active]="true"
+                     fxLayout="row"
+                     fxLayoutAlign="center center"
+                     (click)="submit($event)">
+                    <span class="kimios-button-text">SAVE CHANGES</span>
                 </div>
             </div>
         </div>
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <div><mat-checkbox [formControlName]="'read'"></mat-checkbox></div>
-        </div>
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <div><mat-checkbox [formControlName]="'write'"></mat-checkbox></div>
-        </div>
-        <div [class.permission-cell-header]="true"
-             fxLayout="row" fxLayoutAlign="center center">
-            <div><mat-checkbox [formControlName]="'fullAccess'"></mat-checkbox></div>
-        </div>
-    </div>
-    <div [class.div-button-add-user]="true">
-        <div class="button-add-user kimios-button"
-             fxFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px;"
-             (click)="showAddUserScreen()" >
-            <span>Add user</span>
-            <mat-icon>add</mat-icon>
-        </div>
-    </div>
-    <div >
-        <div fxLayout="row"
-             fxLayoutAlign="center center"
-             fxLayoutGap="20px">
-            <div [class.kimios-button]="true"
-                 [class.kimios-green]="true"
-                 [class.inactive]="true"
-                 fxLayout="row"
-                 fxLayoutAlign="center center"
-                 (click)="cancel($event)">
-                <span [class.kimios-button-text]="true">CANCEL</span>
-            </div>
-            <div [class.kimios-button]="true"
-                 [class.kimios-green]="true"
-                 [class.active]="true"
-                 fxLayout="row"
-                 fxLayoutAlign="center center"
-                 (click)="submit($event)">
-                <span class="kimios-button-text">SAVE CHANGES</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <div *ngIf="!updateSecuritiesScreen" style="width: 100%;" >
-        <permissions-users-groups-add [documentId]="documentId" [existingSecurities]="permissions" ></permissions-users-groups-add>
     </div>
 
-</form>
+        <div *ngIf="!updateSecuritiesScreen" style="width: 100%;" >
+            <permissions-users-groups-add [documentId]="documentId" [existingSecurities]="permissions" ></permissions-users-groups-add>
+        </div>
 
+    </form>
+
+    </div>
 </div>

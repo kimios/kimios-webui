@@ -4,13 +4,16 @@ import {DMEntitySecurity, SecurityService, TaskInfo, UpdateSecurityCommand} from
 import {SessionService} from 'app/services/session.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ColumnDescriptionWithElement} from 'app/main/model/column-description-with-element';
-import {MatDialog, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatTableDataSource, Sort} from '@angular/material';
 import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {UsersAndGroupsSelectionDialogComponent} from 'app/main/components/users-and-groups-selection-dialog/users-and-groups-selection-dialog.component';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AdminService} from 'app/services/admin.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {DMEntitySort} from '../../model/dmentity-sort';
+import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
+import {el} from '@angular/platform-browser/testing/src/browser_util';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -47,6 +50,10 @@ export class FileSecurityComponent implements OnInit {
   columnsDescription: ColumnDescriptionWithElement[] = DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns = [];
   showSpinner = true;
+  sort = <DMEntitySort> {
+    name: 'name',
+    direction: 'asc'
+  };
 
   constructor(
       private fb: FormBuilder,
@@ -189,7 +196,7 @@ export class FileSecurityComponent implements OnInit {
         const fg = this.fb.group([]);
         dmSecurityRules.forEach( (security, index) =>
             fg.addControl(
-                index.toString(),
+              security.name + '_' + security.source + '_' + security.type,
                 this.createSecurityFormGroup(security)
             )
         );
@@ -202,7 +209,7 @@ export class FileSecurityComponent implements OnInit {
           // not in form group yet => add it
           if (! this.formGroupContainsDmSecurityEntity(formGroup, security)) {
               formGroup.addControl(
-                  Object.keys(formGroup.controls).length.toString(),
+                security.name + '_' + security.source + '_' + security.type,
                   this.createSecurityFormGroup(security)
               );
               nbAdd++;
@@ -215,10 +222,12 @@ export class FileSecurityComponent implements OnInit {
         return Object.keys(formGroup.controls).filter(controlKey => {
             const name = formGroup.get(controlKey).get('name');
             const source = formGroup.get(controlKey).get('source');
+            const type = formGroup.get(controlKey).get('type');
             return name !== null
                 && source !== null
                 && name.value === security.name
-                && source.value === security.source;
+                && source.value === security.source
+                && type.value === security.type ;
         }).length > 0;
     }
 
@@ -355,6 +364,53 @@ export class FileSecurityComponent implements OnInit {
 
         return idx !== -1;
     }
+
+  sortData($event: Sort): void {
+    this.sort.name = $event.active;
+    this.sort.direction =
+      $event.direction.toString() === 'desc' ?
+        'desc' :
+        'asc';
+    const unsortedData = this.dataSource.connect().getValue();
+    // const sortType = sortTypeMapping[this.sort.name] ? sortTypeMapping[this.sort.name] : 'string';
+    const sort = this.sort;
+    const sortedData = unsortedData.sort((elem1, elem2) => {
+      const dir = sort.direction === 'asc' ? 1 : -1;
+      const cmp = this.compareValuesInFormGroup(
+        this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup,
+        elem1.name + '_' + elem1.source + '_' + elem1.type,
+        elem2.name + '_' + elem2.source + '_' + elem2.type,
+        sort.name
+      );
+      return dir * cmp;
+    });
+    this.dataSource.data = sortedData;
+  }
+
+  compareValuesInFormGroup(formGroup: FormGroup, formGroupName1: string,
+                           formGroupName2: string, formControlName: string): number {
+    const value1 = formGroup.get(formGroupName1) ?
+      formGroup.get(formGroupName1).get(formControlName) ?
+        formGroup.get(formGroupName1).get(formControlName).value :
+        null :
+      null;
+    const value2 = formGroup.get(formGroupName1) ?
+      formGroup.get(formGroupName2).get(formControlName) ?
+        formGroup.get(formGroupName2).get(formControlName).value :
+        null :
+      null;
+    if (value1 === null || value2 === null) {
+      return 0;
+    }
+
+    return ['type', 'name'].includes(formControlName) ?
+      value1.localeCompare(value2) :
+      value1 === true && value2 === false ?
+        -1 :
+        value1 === false && value2 === true ?
+          1 :
+          0;
+  }
 }
 
 const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
@@ -369,8 +425,8 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     cell: 'remove',
     element: 'iconName',
     class: 'mat-column-width50',
-      noSortHeader: true,
-      cellHeaderIcon: 'add_circle'
+    noSortHeader: true,
+    cellHeaderIcon: 'add_circle'
   },
   {
     // group or person
@@ -404,7 +460,7 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     displayName: 'read',
     cell: null,
     element: 'checkbox',
-    class: 'mat-column-width100'
+    class: 'mat-column-width50'
   },
   {
     id: 'write',
@@ -415,7 +471,7 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     displayName: 'write',
     cell: null,
     element: 'checkbox',
-    class: 'mat-column-width100'
+    class: 'mat-column-width50'
   },
   {
     id: 'fullAccess',
@@ -426,6 +482,6 @@ const DEFAULT_DISPLAYED_COLUMNS: ColumnDescriptionWithElement[] = [
     displayName: 'full',
     cell: null,
     element: 'checkbox',
-    class: 'mat-column-width100'
+    class: 'mat-column-width50'
   }
 ];
