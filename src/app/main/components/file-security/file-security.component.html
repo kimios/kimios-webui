@@ -33,7 +33,10 @@
                       [disabled]="col.noSortHeader"
                       [ngClass]="[col.class ? col.class : '', 'mat-header-cell-custom']"
               >
-                  <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()">
+                  <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()"
+                            [ngClass]="'cursor-pointer'"
+                            title="Add a user or group"
+                  >
                       {{col.cellHeaderIcon}}
                   </mat-icon>{{col.displayName}}
               </mat-header-cell>
