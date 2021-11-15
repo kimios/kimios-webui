@@ -1,6 +1,7 @@
-<div fxLayout="row" fxLayoutAlign="start start"
-     [ngClass]="{'kimios-content-area' : true, 'kimios-section-content': true,
-     'kimios-width-max-content': true}">
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content">
+
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="10px">
 
   <div fxLayout="column" fxLayoutAlign="start">
     <button mat-button mat-icon-button aria-label="Create document type"
@@ -32,8 +33,11 @@
     </div>
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
-  <div>
+  <div fxFlex>
     <studio-document-type-admin></studio-document-type-admin>
   </div>
 
+</div>
+
+  </div>
 </div>
