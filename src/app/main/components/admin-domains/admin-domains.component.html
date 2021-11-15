@@ -1,47 +1,61 @@
-<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+<div class="file-tab-content-wrapper">
+    <div class="file-tab-content fit">
 
-    <div fxFlex="30" fxLayout="column">
-        <div>
-        <mat-list>
-            <mat-list-item *ngFor="let domain of domains$ | async"
-                           (click)="selectDomain(domain.name)"
-                           [ngClass]="{'cursor-pointer' : true,
-                           'selected-item' : domain.name === adminService.selectedDomain$.getValue()}"
-            >
-                <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectDomain(domain.name)"
-                     fxLayoutGap="10px" >
-                    <div fxLayout="row" fxLayoutAlign="start center">
-                        <button mat-button mat-icon-button aria-label="Remove domain"
-                                (click)="removeDomain(domain.name)"
-                                [ngClass]="{'kimios-remove' : true}" >
-                            <mat-icon>remove</mat-icon>
-                        </button>
-                    </div>
-                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
-                        <div>{{domain.name}}</div>
-                    </div>
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+
+            <div fxLayout="column">
+                <div>
+                <mat-list>
+                    <mat-list-item *ngFor="let domain of domains$ | async"
+                                   (click)="selectDomain(domain.name)"
+                                   [ngClass]="{'cursor-pointer' : true,
+                                   'selected-item' : domain.name === adminService.selectedDomain$.getValue()}"
+                    >
+                        <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectDomain(domain.name)"
+                             fxLayoutGap="10px" >
+                            <div fxLayout="row" fxLayoutAlign="start center">
+                                <button mat-button mat-icon-button aria-label="Remove domain"
+                                        (click)="removeDomain(domain.name)"
+                                        [ngClass]="{'kimios-remove' : true}" >
+                                    <mat-icon>remove</mat-icon>
+                                </button>
+                            </div>
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+                                <div>{{domain.name}}</div>
+                            </div>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
                 </div>
-            </mat-list-item>
-        </mat-list>
+            </div>
+
+            <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
+
+            <div fxLayout="column" fxLayoutGap="10px" >
+
+                <mat-tab-group *ngIf="adminService.selectedDomain$.getValue() !== '' else noSelectedDomain;">
+                    <mat-tab label="Parameters">
+                        <admin-domains-parameters></admin-domains-parameters>
+                    </mat-tab>
+
+                    <mat-tab label="Users">
+                        <admin-domains-users></admin-domains-users>
+                    </mat-tab>
+
+                    <mat-tab label="Groups">
+                        <admin-domains-groups></admin-domains-groups>
+                    </mat-tab>
+
+                </mat-tab-group>
+
+                <ng-template #noSelectedDomain>
+                    <div style="width: 100%; min-width: 300px" fxLayout="row" fxLayoutAlign="center">
+                        <p style="font-style: italic;">Choose a domain</p>
+                    </div>
+                </ng-template>
+
+            </div>
         </div>
-    </div>
-
-    <div fxLayout="column" fxLayoutGap="10px" >
-
-        <mat-tab-group>
-            <mat-tab label="Parameters">
-                <admin-domains-parameters></admin-domains-parameters>
-            </mat-tab>
-
-            <mat-tab label="Users">
-                <admin-domains-users></admin-domains-users>
-            </mat-tab>
-
-            <mat-tab label="Groups">
-                <admin-domains-groups></admin-domains-groups>
-            </mat-tab>
-
-        </mat-tab-group>
 
     </div>
 </div>
