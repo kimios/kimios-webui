@@ -1,5 +1,5 @@
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {SessionService} from 'app/services/session.service';
 import {SecurityService} from 'app/kimios-client-api';
@@ -67,18 +67,19 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         this.loadingSubject.complete();
     }
 
-    loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize, refresh?): void {
+    loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize, refresh?): Observable<Array<KimiosUser>> {
         this.loadingSubject.next(true);
         if (this.usersCacheByDomain.get(source) == null
             || this.usersCacheByDomain.get(source) === undefined
             || refresh) {
-            this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
+            return this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
                 catchError(() => of([])),
                 tap(users => this._setCacheForDomain(source, users)),
+                tap(users => this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize)),
                 finalize(() => this.loadingSubject.next(false))
-            ).subscribe(users => this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize));
+            );
         } else {
-            this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize);
+            return of(this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize));
         }
     }
 
@@ -86,7 +87,7 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         this.usersCacheByDomain.set(domainName, data);
     }
 
-    _loadUsersFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): void {
+    _loadUsersFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): Array<KimiosUser> {
         let usersToReturn = new Array<KimiosUser>();
         if (this.usersCacheByDomain.get(source).length !== 0) {
             usersToReturn = this.usersCacheByDomain.get(source);
@@ -98,6 +99,7 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
             usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize * (pageIndex + 1));
         }
         this.usersSubject.next(usersToReturn);
+        return usersToReturn;
     }
 
     filterUsers(value: string, source): Array<KimiosUser> {
@@ -130,12 +132,11 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
         this.usersSubject.next(sortedData);
     }
 
-    loadUsersForRoleId(roleId: number, sort: DMEntitySort): void {
-        this.adminService.findUsersWithRole(roleId).pipe(
+    loadUsersForRoleId(roleId: number, sort: DMEntitySort): Observable<Array<KimiosUser>> {
+        return this.adminService.findUsersWithRole(roleId).pipe(
             concatMap(roles => this.adminService.loadUsersFromUsersRole(roles)),
-            map(users => this._sortUsers(users, sort))
-        ).subscribe(
-            usersSorted => this.usersSubject.next(usersSorted)
+            map(users => this._sortUsers(users, sort)),
+            tap(usersSorted => this.usersSubject.next(usersSorted))
         );
     }
 }

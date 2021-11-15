@@ -1,25 +1,33 @@
-<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content">
 
-  <div>
-    <mat-list>
-      <mat-list-item *ngFor="let possibleTaskId of possibleTasksId"
-                     [ngClass]="{'cursor-pointer' : true}" >
-        <!--,
-                           'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
-      >-->
-        <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectTask(possibleTaskId)"
-             fxLayoutGap="10px" >
-          <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
-            <div>{{_possibleTasks.get(possibleTaskId)}}</div>
-          </div>
-        </div>
-      </mat-list-item>
-    </mat-list>
-  </div>
+    <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
 
-  <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+      <div>
+        <mat-list>
+          <mat-list-item *ngFor="let possibleTaskId of possibleTasksId"
+                         [ngClass]="{'cursor-pointer' : true}" >
+            <!--,
+                               'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
+          >-->
+            <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectTask(possibleTaskId)"
+                 fxLayoutGap="10px" >
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+                <div>{{_possibleTasks.get(possibleTaskId)}}</div>
+              </div>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
 
-    <ad-task></ad-task>
+      <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
+
+      <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+
+        <ad-task></ad-task>
+
+      </div>
+    </div>
 
   </div>
 </div>

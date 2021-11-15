@@ -137,6 +137,7 @@ import {FileDetailTagsComponent} from 'app/main/components/file-detail-tags/file
 import {FileDetailDataAndTagsComponent} from 'app/main/components/file-detail-data-and-tags/file-detail-data-and-tags.component';
 import {DocumentVersionDataDialogComponent} from 'app/main/components/document-version-data-dialog/document-version-data-dialog.component';
 import {DocumentVersionDataComponent} from 'app/main/components/document-version-data/document-version-data.component';
+import {AdminSpecialTasksDefaultTaskComponent} from 'app/main/components/admin-special-tasks-default-task/admin-special-tasks-default-task.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -236,7 +237,8 @@ library.add(far, fas);
         FileDetailTagsComponent,
         FileDetailDataAndTagsComponent,
         DocumentVersionDataDialogComponent,
-        DocumentVersionDataComponent
+        DocumentVersionDataComponent,
+        AdminSpecialTasksDefaultTaskComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -302,7 +304,8 @@ library.add(far, fas);
         ConfirmDialogComponent,
         ShareEditDialogComponent,
         BrowseTreeDialogComponent,
-        DocumentVersionDataDialogComponent
+        DocumentVersionDataDialogComponent,
+        AdminSpecialTasksDefaultTaskComponent
     ],
     exports: [
         FileUploadListComponent,

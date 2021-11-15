@@ -1,9 +1,9 @@
 import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AdDirective} from '../../file-manager/ad-directive';
-import {AdminService} from '../../../services/admin.service';
-import {filter} from 'rxjs/operators';
-import {AdminSpecialTasksSessionsComponent} from '../admin-special-tasks-sessions/admin-special-tasks-sessions.component';
-import {AdminSpecialTasksReindexComponent} from '../admin-special-tasks-reindex/admin-special-tasks-reindex.component';
+import {AdDirective} from 'app/main/file-manager/ad-directive';
+import {AdminService} from 'app/services/admin.service';
+import {AdminSpecialTasksSessionsComponent} from 'app/main/components/admin-special-tasks-sessions/admin-special-tasks-sessions.component';
+import {AdminSpecialTasksReindexComponent} from 'app/main/components/admin-special-tasks-reindex/admin-special-tasks-reindex.component';
+import {AdminSpecialTasksDefaultTaskComponent} from 'app/main/components/admin-special-tasks-default-task/admin-special-tasks-default-task.component';
 
 @Component({
   selector: 'ad-task',
@@ -14,6 +14,7 @@ export class AdTaskComponent implements OnInit, OnDestroy {
   @ViewChild(AdDirective) AdDirectiveSelector: AdDirective;
 
   components = {
+    0: AdminSpecialTasksDefaultTaskComponent,
     1: AdminSpecialTasksSessionsComponent,
     2: AdminSpecialTasksReindexComponent
   };
@@ -25,7 +26,7 @@ export class AdTaskComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.adminService.selectedTask$.pipe(
-        filter(taskId => taskId !== 0)
+        // filter(taskId => taskId !== 0)
     ).subscribe(
         taskId => this.loadComponent(taskId)
     );

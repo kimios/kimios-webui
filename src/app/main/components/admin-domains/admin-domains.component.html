@@ -31,7 +31,7 @@
 
             <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
 
-            <div fxLayout="column" fxLayoutGap="10px" >
+            <div fxLayout="column" fxLayoutGap="10px" fxFlex>
 
                 <mat-tab-group *ngIf="adminService.selectedDomain$.getValue() !== '' else noSelectedDomain;">
                     <mat-tab label="Parameters">
