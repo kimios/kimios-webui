@@ -33,9 +33,16 @@
     </div>
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
-  <div fxFlex>
+  <div fxFlex *ngIf="adminService.selectedDocumentType$.getValue() !== 0
+  && adminService.newDocumentType$.getValue() === true else noDocTypeSelectedOrInCreation;">
     <studio-document-type-admin></studio-document-type-admin>
   </div>
+  <ng-template #noDocTypeSelectedOrInCreation>
+    <div style="width: 100%; min-width: 300px" fxLayout="row" fxLayoutAlign="center">
+      <p style="font-style: italic;">Choose a document type or create one</p>
+    </div>
+  </ng-template>
+
 
 </div>
 

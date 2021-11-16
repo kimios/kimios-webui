@@ -1,6 +1,7 @@
-<div fxLayout="row" fxLayoutAlign="start start"
-     [ngClass]="{'kimios-content-area' : true, 'kimios-section-content': true,
-     'kimios-width-max-content': true}">
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content">
+
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="10px">
 
   <div fxLayout="column" fxLayoutAlign="start start">
     <button mat-button mat-icon-button aria-label="Create meta feed"
@@ -25,8 +26,17 @@
     </div>
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
-  <div>
+  <div *ngIf="adminService.selectedMetaFeed$.getValue() != null
+  || adminService.newMetaFeed$.getValue() === true else noMetaFeedSelectedOrInCreation;">
     <studio-meta-feed-admin></studio-meta-feed-admin>
   </div>
+  <ng-template #noMetaFeedSelectedOrInCreation>
+    <div style="width: 100%; min-width: 300px" fxLayout="row" fxLayoutAlign="center">
+      <p style="font-style: italic;">Choose a metafeed or create one</p>
+    </div>
+  </ng-template>
 
+</div>
+
+  </div>
 </div>
