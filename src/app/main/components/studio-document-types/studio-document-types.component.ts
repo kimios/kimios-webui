@@ -37,8 +37,8 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
   }
 
   selectDocType(docType: DocumentType): void {
-    this.adminService.selectedDocumentType$.next(docType.uid);
     this.adminService.newDocumentType$.next(false);
+    this.adminService.selectedDocumentType$.next(docType.uid);
   }
 
   handleCreateDocumentType(): void {

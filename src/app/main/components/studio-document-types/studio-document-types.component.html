@@ -34,7 +34,7 @@
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
   <div fxFlex *ngIf="adminService.selectedDocumentType$.getValue() !== 0
-  && adminService.newDocumentType$.getValue() === true else noDocTypeSelectedOrInCreation;">
+  || adminService.newDocumentType$.getValue() === true else noDocTypeSelectedOrInCreation;">
     <studio-document-type-admin></studio-document-type-admin>
   </div>
   <ng-template #noDocTypeSelectedOrInCreation>
