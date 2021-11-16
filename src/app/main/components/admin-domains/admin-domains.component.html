@@ -8,8 +8,7 @@
                 <mat-list>
                     <mat-list-item *ngFor="let domain of domains$ | async"
                                    (click)="selectDomain(domain.name)"
-                                   [ngClass]="{'cursor-pointer' : true,
-                                   'selected-item' : domain.name === adminService.selectedDomain$.getValue()}"
+                                   [ngClass]="{'cursor-pointer' : true}"
                     >
                         <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectDomain(domain.name)"
                              fxLayoutGap="10px" >
@@ -20,7 +19,8 @@
                                     <mat-icon>remove</mat-icon>
                                 </button>
                             </div>
-                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
+                                   'selected-item' : domain.name === adminService.selectedDomain$.getValue()}">
                                 <div>{{domain.name}}</div>
                             </div>
                         </div>

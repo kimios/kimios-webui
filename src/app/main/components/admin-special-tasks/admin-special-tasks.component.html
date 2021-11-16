@@ -12,7 +12,8 @@
           >-->
             <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectTask(possibleTaskId)"
                  fxLayoutGap="10px" >
-              <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
+                                   'selected-item' : possibleTaskId === adminService.selectedTask$.getValue()}">
                 <div>{{_possibleTasks.get(possibleTaskId)}}</div>
               </div>
             </div>

@@ -76,7 +76,7 @@
     <ng-container matColumnDef="value">
       <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
       <mat-cell *matCellDef="let element;" >
-        <mat-form-field>
+        <mat-form-field [ngClass]="'metafeed-mat-form-field'">
           <input #metaFeedValueInput="matInput"
                  id="{{element.id}}"
                   matInput

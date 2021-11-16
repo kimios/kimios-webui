@@ -128,11 +128,12 @@
     }
 
     .selected-item {
-        color: $kimios-green;
+        /*color: $kimios-green;
         div {
             color: $kimios-green;
         }
-        background: mat-color($background, 'card');
+        background: mat-color($background, 'card');*/
+        background-color: map-get($accent, 500);
     }
 
     mat-row.selected {
@@ -257,6 +258,11 @@
         &.kimios-green {
             background-color: map-get($accent, 500);
         }
+    }
+
+    .kimios-selection-item {
+        border-radius: 10px;
+        padding: 10px;
     }
 
     .kimios-selection-item:hover {

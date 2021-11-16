@@ -11,15 +11,18 @@
     <div>
       <mat-list>
         <mat-list-item *ngFor="let metaFeed of metaFeeds$ | async"
-                       [ngClass]="{'cursor-pointer' : true,
-                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
+                       [ngClass]="{'cursor-pointer' : true}"
+                       (click)="selectMetaFeed(metaFeed)"
         >
           <button mat-icon-button aria-label="Remove meta feed"
                   (click)="removeMetaFeed(metaFeed.uid)"
                   [ngClass]="{'kimios-remove' : true}" >
             <mat-icon>remove</mat-icon>
           </button>
-          <span (click)="selectMetaFeed(metaFeed)">{{metaFeed.name}}</span>
+          <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
+                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}">
+            <div>{{metaFeed.name}}</div>
+          </div>
         </mat-list-item>
       </mat-list>
 
