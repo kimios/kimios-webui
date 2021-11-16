@@ -4,6 +4,10 @@
         <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
 
             <div fxLayout="column">
+                <button mat-button mat-icon-button aria-label="Create document type"
+                        (click)="handleDomainCreation()">
+                    <mat-icon>add</mat-icon>
+                </button>
                 <div>
                 <mat-list>
                     <mat-list-item *ngFor="let domain of domains$ | async"
@@ -14,7 +18,7 @@
                              fxLayoutGap="10px" >
                             <div fxLayout="row" fxLayoutAlign="start center">
                                 <button mat-button mat-icon-button aria-label="Remove domain"
-                                        (click)="removeDomain(domain.name)"
+                                        (click)="removeDomain(domain)"
                                         [ngClass]="{'kimios-remove' : true}" >
                                     <mat-icon>remove</mat-icon>
                                 </button>
@@ -33,7 +37,8 @@
 
             <div fxLayout="column" fxLayoutGap="10px" fxFlex>
 
-                <mat-tab-group *ngIf="adminService.selectedDomain$.getValue() !== '' else noSelectedDomain;">
+                <mat-tab-group *ngIf="adminService.selectedDomain$.getValue() !== ''
+                || adminService.newDomain$.getValue() === true else noSelectedDomain;">
                     <mat-tab label="Parameters">
                         <admin-domains-parameters></admin-domains-parameters>
                     </mat-tab>

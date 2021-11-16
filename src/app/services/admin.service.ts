@@ -16,8 +16,10 @@ export interface GroupIdSource {
 })
 export class AdminService {
 
-  domains$: Observable<Array<AuthenticationSource>>;
+  domains$: BehaviorSubject<Array<AuthenticationSource>>;
   selectedDomain$: BehaviorSubject<string>;
+  newDomain$: BehaviorSubject<boolean>;
+  newDomainCreated$: BehaviorSubject<boolean>;
   selectedRole$: BehaviorSubject<number>;
   selectedTask$: BehaviorSubject<number>;
   selectedUser$: BehaviorSubject<KimiosUser>;
@@ -41,7 +43,7 @@ export class AdminService {
       private securityService: SecurityService,
       private administrationService: AdministrationService
   ) {
-    this.domains$ = this.securityService.getAuthenticationSources();
+    this.domains$ = new BehaviorSubject<Array<AuthenticationSource>>(null);
     this.selectedDomain$ = new BehaviorSubject<string>('');
     this.selectedRole$ = new BehaviorSubject<number>(0);
     this.selectedTask$ = new BehaviorSubject<number>(0);
@@ -58,6 +60,8 @@ export class AdminService {
     this.addUserOrGroupToPermissions$ = new BehaviorSubject<UserOrGroup>(null);
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>(null);
     this.newUserCreated$ = new BehaviorSubject<boolean>(false);
+    this.newDomain$ = new BehaviorSubject<boolean>(false);
+    this.newDomainCreated$ = new BehaviorSubject<boolean>(false);
   }
 
     saveUserGroups(userId: string, mapGroups: Map<string, boolean>): Observable<boolean> {
@@ -111,5 +115,11 @@ export class AdminService {
                 role.userName === this.sessionService.currentUser.uid
             && role.userSource === this.sessionService.currentUser.source).length > 0
         ));
+    }
+
+    retrieveDomains(): void {
+      this.securityService.getAuthenticationSources().pipe(
+        tap(sources => this.domains$.next(sources))
+      ).subscribe();
     }
 }

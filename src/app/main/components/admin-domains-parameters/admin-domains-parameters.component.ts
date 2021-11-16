@@ -5,6 +5,7 @@ import {AdminService} from 'app/services/admin.service';
 import {concatMap, filter, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {DomainEditionType} from '../../model/domain-edition-type.enum';
 
 @Component({
   selector: 'admin-domains-parameters',
@@ -19,6 +20,7 @@ export class AdminDomainsParametersComponent implements OnInit {
   formGroupCreated$: Subject<boolean>;
   formGroup: FormGroup;
   availableTypes$: Observable<Array<string>>;
+  actionType: DomainEditionType;
 
   constructor(
       private adminService: AdminService,
@@ -33,8 +35,17 @@ export class AdminDomainsParametersComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.adminService.newDomain$.pipe(
+      tap(() => {
+        this.actionType = DomainEditionType.CREATION;
+        this.initForm(null, null);
+        this.formGroupCreated$.next(true);
+      })
+    ).subscribe();
+
     this.adminService.selectedDomain$.pipe(
         filter(domainName => domainName !== ''),
+        tap(() => this.actionType = DomainEditionType.UPDATE),
         concatMap(
         domainName => this.administrationService.getAuthenticationSource(this.sessionService.sessionToken, domainName)
         ),
@@ -58,15 +69,17 @@ export class AdminDomainsParametersComponent implements OnInit {
 
   private initForm(authSource: AuthenticationSource, authSourceParams: { [key: string]: string; }): void {
     const paramsControl = this.fb.group({});
-    Object.keys(authSourceParams).forEach((key) => {
-      paramsControl.addControl(key, this.fb.control(authSourceParams[key]));
-    });
+    if (authSourceParams != null) {
+      Object.keys(authSourceParams).forEach((key) => {
+        paramsControl.addControl(key, this.fb.control(authSourceParams[key]));
+      });
+    }
 
     this.formGroup = this.fb.group({
-      name: this.fb.control(authSource.name),
-      className: this.fb.control(authSource.className),
-      enableSso: this.fb.control(authSource.enableSso),
-      enableMailCheck: this.fb.control(authSource.enableMailCheck),
+      name: this.fb.control(authSource ? authSource.name : ''),
+      className: this.fb.control(authSource ? authSource.className : ''),
+      enableSso: this.fb.control(authSource ? authSource.enableSso : false),
+      enableMailCheck: this.fb.control(authSource ? authSource.enableMailCheck : false),
       params: paramsControl
     });
   }
@@ -89,8 +102,9 @@ export class AdminDomainsParametersComponent implements OnInit {
 
   onSubmit(): void {
     if (this.formGroup.dirty) {
-      this.administrationService.updateAuthenticationSource_2(
-          <AuthenticationSourceParam> {
+      if (this.adminService.newDomain$.getValue() === true) {
+        this.administrationService.createAuthenticationSourceFromObj(
+          <AuthenticationSourceParam>{
             'sessionId': this.sessionService.sessionToken,
             'name': this.formGroup.get('name').value,
             'className': this.formGroup.get('className').value,
@@ -98,15 +112,38 @@ export class AdminDomainsParametersComponent implements OnInit {
             'enableMailCheck': this.formGroup.get('enableMailCheck').value,
             'parameters': this.getParamsControlAsObject()
           }
-      ).subscribe(
+        ).subscribe(
+          next => {
+            this.adminService.newDomainCreated$.next(true);
+            this.adminService.selectedDomain$.next(this.formGroup.get('name').value);
+          },
+          error => null,
+          () => console.log('authentication source saved: ' + this.formGroup.get('name').value)
+        );
+      } else {
+        this.administrationService.updateAuthenticationSource_2(
+          <AuthenticationSourceParam>{
+            'sessionId': this.sessionService.sessionToken,
+            'name': this.formGroup.get('name').value,
+            'className': this.formGroup.get('className').value,
+            'enableSso': this.formGroup.get('enableSso').value,
+            'enableMailCheck': this.formGroup.get('enableMailCheck').value,
+            'parameters': this.getParamsControlAsObject()
+          }
+        ).subscribe(
           null,
           error => this.adminService.selectedDomain$.next(this.formGroup.get('name').value),
           () => console.log('authentication source saved: ' + this.formGroup.get('name').value)
-      );
+        );
+      }
     }
   }
 
   cancel(): void {
     this.adminService.selectedDomain$.next(this.formGroup.get('name').value);
+  }
+
+  actionTypeIsCreation(): boolean {
+    return this.actionType === DomainEditionType.CREATION;
   }
 }
