@@ -546,6 +546,9 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
           }, {
               parent: nodeFrom
           });
+      const children = this.tree.treeModel.getNodeById(nodeTarget.id).data.children.slice();
+      const childrenSorted = children.sort((n1, n2) => n1.name.localeCompare(n2.name));
+      this.tree.treeModel.getNodeById(nodeTarget.id).data.children = childrenSorted;
       this.tree.treeModel.update();
   }
 
