@@ -11,7 +11,7 @@ import {ContainerEntityDialogComponent} from 'app/main/components/container-enti
 import {MatCheckboxChange, MatDialog} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
-import {ITreeNode} from 'angular-tree-component/dist/defs/api';
+import {ITreeModel, ITreeNode} from 'angular-tree-component/dist/defs/api';
 import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
@@ -315,7 +315,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
                           selected: false
                         });
                     });
-                this.tree.treeModel.getNodeById(entityUid).data.children = currentChildren;
+                this.tree.treeModel.getNodeById(entityUid).data.children = (currentChildren as Array<any>)
+                  .sort((n1, n2) => n1.name.localeCompare(n2.name));
                 this.tree.treeModel.update();
                 childrenEntities
                     .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
@@ -611,5 +612,36 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
 
   selectedEntity(id: number): boolean {
     return this.selectedEntityIdList.includes(id);
+  }
+
+  setChildrenForNode(nodes: Array<any>, node: ITreeNode, children: Array<any>): Array<any> {
+    const nodesUpdated = nodes.slice();
+
+    node.data.children = children;
+    const path = node.path;
+    if (path[path.length - 1] === node.id) {
+      path.pop();
+    }
+    const updatedRootNode = this.updateNodeRec(path.map(elem => Number(elem)), node, this.tree.treeModel);
+    const idxToReplace = nodes.findIndex(n => n.id === updatedRootNode.id);
+    if (idxToReplace !== -1) {
+      nodesUpdated[idxToReplace] = updatedRootNode;
+    }
+
+    return nodesUpdated;
+  }
+
+  updateNodeRec(path: Array<number>, node: ITreeNode, treeModel: ITreeModel): ITreeNode {
+    if (path.length === 0) {
+      return node;
+    } else {
+      const id = path.pop();
+      const nodeToUpdate = treeModel.getNodeById(id);
+      const idxToReplace = nodeToUpdate.data.children.findIndex(n => n.id === node.id);
+      if (idxToReplace !== -1) {
+        nodeToUpdate.data.children[idxToReplace] = node;
+      }
+      return this.updateNodeRec(path, nodeToUpdate, treeModel);
+    }
   }
 }
