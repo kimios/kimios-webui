@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
@@ -21,7 +21,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
   templateUrl: './browse-tree.component.html',
   styleUrls: ['./browse-tree.component.scss']
 })
-export class BrowseTreeComponent implements OnInit, AfterViewInit {
+export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
   @Input()
   entityId: number;
@@ -35,6 +35,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
   selectedEntityIdList: Array<number>;
 
   @ViewChild('tree') tree;
+  @ViewChild('tree') treeElement: ElementRef;
 
   nodes = [];
   treeOptions = {
@@ -645,6 +646,17 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit {
         nodeToUpdate.data.children[idxToReplace] = node;
       }
       return this.updateNodeRec(path, nodeToUpdate, treeModel);
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    if (
+      this.treeElement
+      && this.treeElement['viewportComponent']
+      && this.treeElement['viewportComponent'].elementRef
+      && this.treeElement['viewportComponent'].elementRef.nativeElement
+    ) {
+      this.treeElement['viewportComponent'].elementRef.nativeElement.style.overflow = 'unset';
     }
   }
 }
