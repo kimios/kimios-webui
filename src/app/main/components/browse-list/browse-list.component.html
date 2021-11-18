@@ -51,26 +51,11 @@
             {{entityStarIcon(element)}}
           </mat-icon>
         </div>
-        <div>
-          <mat-icon title="Add to export"
-                    (click)="addToShoppingCart(element)"
-                    [class.cursor-pointer]="true">
-            add_shopping_cart
-          </mat-icon>
-        </div>
         <!-- only for documents -->
         <ng-container *ngIf="element.type === 3 else folderTemplate;">
-          <div><mat-icon
-                  title="Download document"
-                  (click)="handleFileDownload(element.lastVersionId)"
-                  [class.cursor-pointer]="true">
-            get_app
-          </mat-icon></div>
           <div>
             <entity-list-lock-button [docId]="element.uid"></entity-list-lock-button>
           </div>
-          <div><mat-icon title="View document" [class.cursor-pointer]="true"
-                         (click)="goToDocument(element)">visibility</mat-icon></div>
           <div><mat-icon [matMenuTriggerFor]="docMenu"
                          [matMenuTriggerData]="{uid: element.uid, name: element.name, entity: element}"
                          title="See more available actions" [class.cursor-pointer]="true">more_horiz</mat-icon></div>
@@ -114,6 +99,20 @@
     <ng-template matMenuContent let-uid="uid" let-name="name" let-entity="entity">
       <button mat-menu-item><mat-icon>create_new_folder</mat-icon> Properties</button>
       <button mat-menu-item><mat-icon>history</mat-icon> Versions</button>
+      <button mat-menu-item>
+        <mat-icon title="View document" [class.cursor-pointer]="true"
+                  (click)="goToDocument(entity)">
+          visibility
+        </mat-icon>
+      </button>
+      <button mat-menu-item>
+        <mat-icon
+                title="Download document"
+                (click)="handleFileDownload(entity.lastVersionId)"
+                [class.cursor-pointer]="true">
+          get_app
+        </mat-icon>
+      </button>
       <button mat-menu-item (click)="openShareDialog(uid, name)" ><mat-icon>share</mat-icon> Share</button>
       <button mat-menu-item (click)="openPermissionsDialog(uid)" ><mat-icon>warning</mat-icon> Permissions</button>
       <button mat-menu-item (click)="addToShoppingCart(entity)" ><mat-icon>add_shopping_cart</mat-icon></button>
