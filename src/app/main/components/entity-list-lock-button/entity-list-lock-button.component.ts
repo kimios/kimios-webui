@@ -44,7 +44,7 @@ export class EntityListLockButtonComponent implements OnInit {
       case LockPossibility.CAN_UNLOCK: {
         this.lockMessage = 'Unlock document';
         this.disableButton = false;
-        this.iconName = 'lock_close';
+        this.iconName = 'lock';
         break;
       }
       case LockPossibility.CANNOT_UNLOCK: {
@@ -53,7 +53,7 @@ export class EntityListLockButtonComponent implements OnInit {
             + '@'
             + doc.checkoutUserSource;
         this.disableButton = true;
-        this.iconName = 'lock_close';
+        this.iconName = 'lock';
         break;
       }
       case LockPossibility.CAN_LOCK: {
