@@ -23,8 +23,12 @@ export class DocumentUtils {
         return this.imgExtensions.includes(extension.toLowerCase());
     }
 
-    public static navigateToFile(router: Router, docUid: number): void {
-        router.navigate(['/document', docUid]);
+    public static navigateToFile(router: Router, docUid: number, section?: string): void {
+        const commands = ['/document', docUid];
+        if (section != null) {
+            commands.push(section);
+        }
+        router.navigate(commands);
     }
 
     public static navigateToFolderOrWorkspace(router: Router, folderUid: number): void {

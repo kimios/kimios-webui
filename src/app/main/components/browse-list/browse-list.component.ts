@@ -114,11 +114,15 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     this.selected = row;
   }
 
-  goToDocument(entityFromList: any): void {
+  goToDocument(entityFromList: any, section?: string): void {
     if (DMEntityUtils.dmEntityIsFolder(entityFromList) || DMEntityUtils.dmEntityIsWorkspace(entityFromList)) {
       this.bes.goInContainerEntity(entityFromList);
     } else {
-      DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+      if (section != null && section !== '') {
+        DocumentUtils.navigateToFile(this.router, entityFromList.uid, section);
+      } else {
+        DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+      }
     }
   }
 
