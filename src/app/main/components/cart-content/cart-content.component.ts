@@ -122,7 +122,9 @@ export class CartContentComponent implements OnInit, AfterViewChecked {
   }
 
   emptyCart(): void {
-
+    this.nodes = [];
+    this.tree.treeModel.update();
+    this.documentExportService.setNodes(this.nodes);
   }
 
   makeDmEntityTreeFromTreeNodes(nodes: Array<any>): DMEntityTree {
