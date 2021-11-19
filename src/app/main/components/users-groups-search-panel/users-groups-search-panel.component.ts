@@ -81,10 +81,10 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
           }
         }),
         tap(
-            users => this.allUsers = users
+            users => this.allUsers = this.allUsers.concat(users)
         ),
-        tap(users => this.length = users.length),
-        tap(users => this.filteredUsers$.next(this.makePage(users, this.pageSize, this.pageIndex)))
+        tap(users => this.length = this.allUsers.length),
+        tap(users => this.filteredUsers$.next(this.makePage(this.allUsers, this.pageSize, this.pageIndex)))
     ).subscribe();
 
     source$.pipe(
@@ -101,10 +101,10 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
               return groups;
             }
           }),
-          tap(groups => this.allGroups = groups),
+          tap(groups => this.allGroups = this.allGroups.concat(groups)),
           // tap(groups => this.length = groups.length),
           tap(
-              groups => this.filteredGroups$.next(this.makePage(groups, this.pageSize, this.pageIndex))
+              groups => this.filteredGroups$.next(this.makePage(this.allGroups, this.pageSize, this.pageIndex))
           )
       ).subscribe();
 
