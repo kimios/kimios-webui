@@ -91,6 +91,9 @@
 
 <mat-menu #folderMenu="matMenu">
   <ng-template matMenuContent let-uid="uid" let-name="name" let-entity="entity">
+    <button mat-menu-item (click)="addToShoppingCart(entity)" >
+      <mat-icon>add_shopping_cart</mat-icon> Add to export
+    </button>
     <button mat-menu-item (click)="delete(uid, name)" ><mat-icon>delete</mat-icon> Delete</button>
   </ng-template>
 </mat-menu>
