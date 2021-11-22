@@ -362,7 +362,9 @@ loading.pipe(
       // width: '250px',
       data: {
         dialogTitle: 'Confirm move?',
-        iconLine1: DMEntityUtils.retrieveEntityIconName(this.iconService, entityMoved, 'far'),
+        iconLine1: DMEntityUtils.dmEntityIsDocument(entityMoved) ?
+          DMEntityUtils.retrieveEntityIconName(this.iconService, entityMoved, 'far') :
+        null,
         messageLine1: entityMoved.name,
         messageLine2: 'to ' + entityTarget.path
             /* this.browseEntityService.computeEntityPath(
