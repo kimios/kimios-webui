@@ -542,7 +542,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       this.tree.treeModel.moveNode(
           nodeToMove, {
               dropOnNode: false,
-              index: nodeToMove.data.children.length,
+              // index: nodeToMove.data.children.length,
               parent: nodeTarget
           }, {
               parent: nodeFrom

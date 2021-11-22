@@ -444,7 +444,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     public deleteCacheEntry(uid: number): void {
-      this.entityCacheService.reloadEntityChildren(uid);
+      this.entityCacheService.removeEntityInCache(uid);
     }
 
     /*public deleteCacheDocumentEntry(uid: number): void {
@@ -501,7 +501,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         );
     }
 
-    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity): void {
+    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity, movedEntityInitialParentUid?: number): Observable<Array<DMEntity>> {
         let parentUid: number;
         if (entityMoved['parentUid']) {
             parentUid = entityMoved['parentUid'];
@@ -511,18 +511,27 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         }
 
-        this.deleteCacheEntry(parentUid);
-        this.deleteCacheEntry(entityTarget.uid);
-        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-        const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
-        if (idx !== -1) {
-            totalEntities.splice(idx, 1);
-            this.totalEntitiesToDisplay$.next(totalEntities);
-        }
-        /*if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
-            this.pageIndex.next(this.pageIndex.getValue() - 1);
-        }*/
-        this.makePage(this.pageIndex.getValue(), this.pageSize);
+      return this.entityCacheService.reloadEntityChildren(parentUid).pipe(
+        tap(() => {
+          const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+          const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
+          const currentPathValue = this.currentPath.getValue();
+          if (movedEntityInitialParentUid === currentPathValue[currentPathValue.length - 1].uid) {
+            if (idx !== -1) {
+              totalEntities.splice(idx, 1);
+            }
+          } else {
+            if (entityTarget.uid === currentPathValue[currentPathValue.length - 1].uid) {
+              totalEntities.push(entityMoved);
+            }
+          }
+          this.totalEntitiesToDisplay$.next(totalEntities);
+          /*if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
+                this.pageIndex.next(this.pageIndex.getValue() - 1);
+            }*/
+          this.makePage(this.pageIndex.getValue(), this.pageSize);
+        })
+      );
     }
 
     moveEntity(entity: DMEntity, targetEntity: DMEntity): Observable<any> {

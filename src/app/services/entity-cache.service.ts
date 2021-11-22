@@ -1,21 +1,10 @@
 import {Injectable} from '@angular/core';
 import {DocumentCacheData, DocumentVersionWithMetaValues, EntityCacheData} from 'app/main/model/entity-cache-data';
-import {
-  DMEntity,
-  Document as KimiosDocument,
-  DocumentService,
-  DocumentVersion,
-  DocumentVersionService,
-  Folder,
-  FolderService, MetaValue,
-  Workspace,
-  WorkspaceService
-} from 'app/kimios-client-api';
+import {DMEntity, Document as KimiosDocument, DocumentService, DocumentVersionService, Folder, FolderService, MetaValue, Workspace, WorkspaceService} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {combineLatest, from, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
-import {BrowseEntityService} from './browse-entity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
 @Injectable({
@@ -148,6 +137,29 @@ export class EntityCacheService {
 
   public reloadEntityChildren(uid: number): Observable<Array<DMEntity>> {
     return this.initHierarchyCacheForEntity(uid);
+  }
+
+  public removeEntityInCache(uid: number): void {
+    const entityCacheData = this.entitiesCache.get(uid);
+    if (entityCacheData == null) {
+      return;
+    }
+    const entity = entityCacheData.entity;
+    let parentUid = 0;
+    if (DMEntityUtils.dmEntityIsDocument(entity)) {
+      parentUid = (entity as KimiosDocument).folderUid;
+    } else {
+      if (DMEntityUtils.dmEntityIsFolder(entity)) {
+        parentUid = (entity as Folder).parentUid;
+      }
+    }
+    const brothersAndSisters = this.entitiesHierarchyCache.get(parentUid);
+    const idx = brothersAndSisters.findIndex(elem => elem === uid);
+    if (idx !== -1) {
+      brothersAndSisters.splice(idx, 1);
+      this.entitiesHierarchyCache.set(parentUid, brothersAndSisters);
+    }
+    this.entitiesCache.delete(uid);
   }
 
   private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntity>> {

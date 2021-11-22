@@ -4,7 +4,7 @@ import {BrowseEntityService, PAGE_SIZE_DEFAULT} from 'app/services/browse-entity
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
-import {DMEntity} from 'app/kimios-client-api';
+import {DMEntity, Folder} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {BehaviorSubject, Observable, of} from 'rxjs';
@@ -17,6 +17,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 
 @Component({
   selector: 'app-workspaces',
@@ -378,16 +379,20 @@ loading.pipe(
       if (next !== true) {
         return;
       }
-      const movedEntityInitialParentUid = entityMoved.uid;
+      const movedEntityInitialUid = entityMoved.uid;
+      const movedEntityInitialParentUid = DMEntityUtils.dmEntityIsDocument(entityMoved) ?
+        (entityMoved as KimiosDocument).folderUid :
+        (entityMoved as Folder).parentUid;
       this.browseEntityService.moveEntity(entityMoved, entityTarget).pipe(
-          concatMap(() => this.entityCacheService.reloadEntity(entityMoved.uid))
+          concatMap(() => this.entityCacheService.reloadEntity(entityMoved.uid)),
+        tap(reloadedEntity => {
+          if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
+            this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialUid));
+          }
+        }),
+        concatMap(reloadedEntity => this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget, movedEntityInitialParentUid))
       ).subscribe(
-          reloadedEntity => {
-            if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
-              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialParentUid));
-            }
-            this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget);
-          },
+          null,
           // TODO : enhance dialog and message
           error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
       );
