@@ -8,6 +8,8 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {concatMap, tap} from 'rxjs/operators';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {Folder, Workspace} from 'app/kimios-client-api';
+import {AdminService} from 'app/services/admin.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -39,7 +41,9 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       @Inject(MAT_DIALOG_DATA) public data: ContainerEntityCreationDialogData,
       private entityCreationService: EntityCreationService,
       private browseEntityService: BrowseEntityService,
-      private fb: FormBuilder
+      private adminService: AdminService,
+      private fb: FormBuilder,
+      private entityCacheService: EntityCacheService
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
     this.selectedUsersAndGroups = new Array<UserOrGroup>();
@@ -94,26 +98,25 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
               this.parentEntity.uid :
               null
       )).pipe(
-          // make securities form submit securities
-          concatMap(([entityType, uidCreated]) => {
-            this.documentId = uidCreated;
-            this.entityCreationService.onFormSubmitted$.next(uidCreated);
-            return combineLatest(of(entityType), this.entityCreationService.onFormSecuritiesSubmitted$.asObservable(), of(uidCreated));
-          }),
-          tap(([entityType, res, uidCreated]) => {
-            if (entityType === 'folder') {
-              //
-              this.browseEntityService.deleteCacheEntry(this.parentEntity.uid);
-              if (this.parentEntityIsCurrentPath()) {
-                this.browseEntityService.selectedEntity$.next(this.parentEntity);
-              }
-              this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
-            } else {
-              this.browseEntityService.onNewWorkspace.next(uidCreated);
-            }
-          })
+        // make securities form submit securities
+        concatMap(([entityType, uidCreated]) => {
+          this.documentId = uidCreated;
+          this.entityCreationService.onFormSubmitted$.next(uidCreated);
+          return combineLatest(of(entityType), this.entityCreationService.onFormSecuritiesSubmitted$.asObservable(), of(uidCreated));
+        }),
+        tap(([entityType, res, uidCreated]) => this.browseEntityService.onNewWorkspace.next(uidCreated)),
+        concatMap(([entityType, res, uidCreated]) => entityType === 'folder' ?
+          this.entityCacheService.reloadEntityChildren(this.parentEntity.uid) :
+          of(null)
+        ),
+        tap(() => {
+          if (this.parentEntityIsCurrentPath()) {
+            this.browseEntityService.selectedEntity$.next(this.parentEntity);
+          }
+          this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
+        })
       ).subscribe(
-          next => // this.dialogRef.close(),
+        next => // this.dialogRef.close(),
           error => console.log('error when creating entity: ' + error.error.message)
       );
     }

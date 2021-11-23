@@ -1,8 +1,8 @@
-<div class="" style="overflow: auto;">
+<div class="" style="overflow: auto; height: 100%;">
 
 <ng-container *ngIf="docIsTextFormat(documentExtension); else docPdf">
-    <pre style="display:block; width: 100%; height:100%;/">
-<ng-container *ngIf="fileCompleteContent$ | async as fileContent">{{fileContent}}</ng-container>
+    <pre style="display:block; width: 100%; height:100%;">
+        <ng-container *ngIf="fileCompleteContent$ | async as fileContent">{{fileContent}}</ng-container>
     </pre>
 </ng-container>
 <ng-template #docPdf>
@@ -10,7 +10,7 @@
         <ng-container *ngIf="link$ | async as link">
             <object  type="application/pdf"
                      [data]="link"
-                     style="width: 100%; min-height: 29.7cm; display: block;"
+                     style="width: 100%; display: block; height: 100%;"
                      class="embed-responsive-item"
             >
             </object>

@@ -46,6 +46,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   showSpinnerFormSubmit = false;
   nbUsersToAdd = 0;
   currentUserIsAdmin$: Observable<boolean>;
+  usersLoaded$: Observable<Array<KimiosUser>>;
 
   constructor(
       private adminService: AdminService,
@@ -66,10 +67,9 @@ export class AdminDomainsUsersComponent implements OnInit {
 
     if (this.modeIsAdmin()
         || this._mode === 'addToRole') {
-      this.adminService.selectedDomain$.pipe(
-          filter(domainName => domainName !== '')
-      ).subscribe(
-          domainName => this.dataSource.loadUsers(domainName, this.sort, this.userSearch.value, this.page, this.pageSize)
+      this.usersLoaded$ = this.adminService.selectedDomain$.pipe(
+        filter(domainName => domainName !== ''),
+        concatMap(domainName => this.dataSource.loadUsers(domainName, this.sort, this.userSearch.value, this.page, this.pageSize)),
       );
 
       this.filteredUsers$ = this.userSearch.valueChanges.pipe(
@@ -90,10 +90,9 @@ export class AdminDomainsUsersComponent implements OnInit {
 
     if (this._mode === 'roles') {
       this.displayedColumns = [ 'remove', 'uid', 'lastName', 'firstName' ];
-      this.adminService.selectedRole$.pipe(
+      this.usersLoaded$ = this.adminService.selectedRole$.pipe(
           filter(roleId => roleId !== 0),
-      ).subscribe(
-          roleId => this.dataSource.loadUsersForRoleId(roleId, this.sort)
+          concatMap(roleId => this.dataSource.loadUsersForRoleId(roleId, this.sort))
       );
     }
 
@@ -102,9 +101,8 @@ export class AdminDomainsUsersComponent implements OnInit {
       this.domains$ = this.securityService.getAuthenticationSources();
 
       this.selectDomain.valueChanges.pipe(
-          map(domain => { if (typeof domain === 'string') {
-            this.dataSource.loadUsers(domain, this.sort, this.userSearch.value, this.page, this.pageSize);
-          }})
+        filter(domain => typeof domain === 'string'),
+        concatMap(domain => this.dataSource.loadUsers(domain, this.sort, this.userSearch.value, this.page, this.pageSize))
       ).subscribe();
       this.dataSource.connect().pipe(
           map(users => users.forEach(user => this.usersToAddToRole.addControl(user.uid, this.fb.control(false))))
@@ -128,6 +126,18 @@ export class AdminDomainsUsersComponent implements OnInit {
     }
 
     this.currentUserIsAdmin$ = this.securityService.isAdmin(this.sessionService.sessionToken);
+
+    this.adminService.newUserCreated$.pipe(
+        filter(res => res === true),
+        filter(res => this.adminService.selectedDomain$.getValue() !== ''),
+        concatMap(() => this.dataSource.loadUsers(
+            this.adminService.selectedDomain$.getValue(),
+            this.sort,
+            this.userSearch.value,
+            this.page,
+            this.pageSize,
+            true))
+    ).subscribe();
   }
 
   public modeIsAdmin(): boolean {
@@ -159,7 +169,7 @@ export class AdminDomainsUsersComponent implements OnInit {
           this.userSearch.value,
           this.page,
           this.pageSize
-      );
+      ).subscribe();
     } else {
       this.dataSource.sortLoadedData(this.sort);
     }
@@ -168,8 +178,9 @@ export class AdminDomainsUsersComponent implements OnInit {
   filterUsers(): void {
     if (this._mode === 'admin'
         || this._mode === 'addToRole') {
-      this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize);
-      this.inputUserSearch.closePanel();
+      this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize).pipe(
+        tap(() => this.inputUserSearch.closePanel())
+      ).subscribe();
     }
   }
 
@@ -192,7 +203,7 @@ export class AdminDomainsUsersComponent implements OnInit {
 
   _updatePage(): void {
     this.dataSource.loadUsers(this.adminService.selectedDomain$.getValue(), this.sort,
-        this.userSearch.value, this.page, this.pageSize);
+        this.userSearch.value, this.page, this.pageSize).subscribe();
   }
 
   openNewUserDialog(): void {
@@ -222,9 +233,9 @@ export class AdminDomainsUsersComponent implements OnInit {
         this.adminService.selectedRole$.getValue(),
         row.uid,
         row.source
-    ).subscribe(
+    ).pipe(
         () => this.dataSource.loadUsersForRoleId(this.adminService.selectedRole$.getValue(), this.sort)
-    );
+    ).subscribe();
   }
 
   close(): void {

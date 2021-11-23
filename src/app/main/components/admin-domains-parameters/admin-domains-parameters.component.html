@@ -1,4 +1,4 @@
-<ng-container *ngIf="authenticationSource$ | async as authenticationSource">
+
   <ng-container *ngIf="formGroupCreated$ | async as formGroupCreated">
     <ng-container *ngIf="formGroupCreated === true">
 
@@ -8,18 +8,18 @@
         <mat-form-field>
           <mat-label>Domain name</mat-label>
           <input
-                  readonly="true"
+                  [readonly]="!actionTypeIsCreation()"
                   matInput
                   type="text"
                   aria-label="Domain name"
-                  value="{{authenticationSource$.getValue().name}}"
+                  [formControlName]="'name'"
           >
         </mat-form-field>
 
         <mat-form-field>
           <mat-select
+                  [disabled]="!actionTypeIsCreation()"
                   placeholder="Java class name"
-                  [(value)]="authenticationSource.className"
                   [formControlName]="'className'"
           >
             <mat-option
@@ -31,13 +31,11 @@
           </mat-select>
         </mat-form-field>
         <mat-checkbox
-                [value]="authenticationSource.enableMailCheck"
                 name="enableMailCheck"
                 [formControlName]="'enableMailCheck'"
         >Enable mail check
         </mat-checkbox>
           <mat-checkbox
-                  [value]="authenticationSource.enableSso"
                   name="enableSso"
                   [formControlName]="'enableSso'"
           >Enable SSO
@@ -97,4 +95,4 @@
 
     </ng-container>
   </ng-container>
-</ng-container>
+

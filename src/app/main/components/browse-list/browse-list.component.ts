@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {BehaviorSubject, combineLatest, of, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {DEFAULT_DISPLAYED_COLUMNS, EntityDataSource} from 'app/main/file-manager/entity-data-source';
 import {ColumnDescription} from 'app/main/model/column-description';
@@ -16,6 +16,8 @@ import {FilePermissionsDialogComponent} from 'app/main/components/file-permissio
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {IconService} from 'app/services/icon.service';
+import {DocumentExportService} from 'app/services/document-export.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 const sortMapping = {
   'name': 'name',
@@ -49,7 +51,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       private workspaceSessionService: WorkspaceSessionService,
       public dialog: MatDialog,
       public entityMoveDialog: MatDialog,
-      private iconService: IconService
+      private iconService: IconService,
+      private documentExportService: DocumentExportService,
+      private entityCacheService: EntityCacheService
   ) {
     this.columnsDescription.forEach((elem) => {
       this.displayedColumns.push(elem.matHeaderCellDef);
@@ -77,16 +81,17 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         entities => this.dataSource.setData(entities)
     );
 
-    this.deleteDocument$.pipe(
-        filter(res => res != null),
+    this.bes.removedFolder$.pipe(
+        /*filter(res => res != null),
         concatMap(uid => combineLatest(of(uid), this.bes.deleteDocument(uid))),
-        concatMap(([uid, res]) => this.bes.getDocument(uid)),
+        concatMap(([uid, res]) => this.entityCacheService.findDocumentInCache(uid)),
         tap(doc => this.bes.deleteCacheEntry(doc.folderUid)),
-        concatMap(doc => this.bes.getEntity(doc.folderUid)),
+        concatMap(doc => this.bes.getEntity(doc.folderUid)),*/
         tap(parentFolder => {
-          const currentPath = this.bes.currentPath.getValue();
-          const currentDir = currentPath[currentPath.length - 1];
-          this.bes.selectedEntity$.next(currentDir);
+          // const currentPath = this.bes.currentPath.getValue();
+          // const currentDir = currentPath[currentPath.length - 1];
+          // this.bes.selectedEntity$.next(currentDir);
+          this.bes.loading$.next(false);
         })
     ).subscribe();
 
@@ -109,11 +114,15 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     this.selected = row;
   }
 
-  goToDocument(entityFromList: any): void {
+  goToDocument(entityFromList: any, section?: string): void {
     if (DMEntityUtils.dmEntityIsFolder(entityFromList) || DMEntityUtils.dmEntityIsWorkspace(entityFromList)) {
       this.bes.goInContainerEntity(entityFromList);
     } else {
-      DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+      if (section != null && section !== '') {
+        DocumentUtils.navigateToFile(this.router, entityFromList.uid, section);
+      } else {
+        DocumentUtils.navigateToFile(this.router, entityFromList.uid);
+      }
     }
   }
 
@@ -249,23 +258,44 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   delete(uid: number, name: string): void {
+    const entityToDelete = this.bes.entitiesToDisplay$.getValue().filter(element => element.uid === uid)[0];
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        'message': 'Delete document ' + name + ' ?'
-      },
+        dialogTitle: this.makeDialogTitle(entityToDelete),
+        iconLine1: DMEntityUtils.dmEntityIsDocument(entityToDelete) ?
+          DMEntityUtils.retrieveEntityIconName(this.iconService, entityToDelete, 'far') :
+          null,
+        messageLine1: entityToDelete.name,
+      }/*,
       width: '400px',
-      height: '400px'
+      height: '400px'*/
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.bes.loading$.next(true);
-        this.deleteDocument$.next(uid);
-      }
-    });
+    dialogRef.afterClosed().pipe(
+      filter(result => result === true),
+      concatMap(() => this.deleteEntity(entityToDelete)),
+      tap(() => this.bes.loading$.next(false))
+    ).subscribe();
   }
 
   retrieveDocumentIcon(element: DMEntity, iconPrefix: string): string {
     return DMEntityUtils.retrieveEntityIconName(this.iconService, element, iconPrefix);
+  }
+
+  addToShoppingCart(entity: DMEntity): void {
+    this.documentExportService.addToCart(entity);
+  }
+
+  deleteEntity(entity: DMEntity): Observable<boolean> {
+    return this.bes.deleteEntity(entity);
+  }
+
+  private makeDialogTitle(entityToDelete: DMEntity): string {
+    return 'Delete '
+      + (DMEntityUtils.dmEntityIsDocument(entityToDelete) ?
+        'document' :
+        'folder')
+      + '?';
   }
 }

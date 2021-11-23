@@ -1,10 +1,10 @@
-import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
-import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {BrowseEntityService, PAGE_SIZE_DEFAULT} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
-import {DMEntity} from 'app/kimios-client-api';
+import {DMEntity, Folder} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {BehaviorSubject, Observable, of} from 'rxjs';
@@ -16,6 +16,8 @@ import {AdminService} from 'app/services/admin.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {IconService} from 'app/services/icon.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
+import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 
 @Component({
   selector: 'app-workspaces',
@@ -55,9 +57,11 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       private errorDialog: MatDialog,
       private adminService: AdminService,
       private route: ActivatedRoute,
-      private iconService: IconService
+      private iconService: IconService,
+      private entityCacheService: EntityCacheService
   ) {
     this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
+    this.pageSize = PAGE_SIZE_DEFAULT;
   }
 
   ngOnInit(): void {
@@ -134,7 +138,8 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       data: {
         filesList: filesMap,
         filesTags: new Map<string, Map<number, Tag>>()
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -232,7 +237,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           || Number(dataSplitted[1]) === NaN) {
         return false;
       }
-      const entityMoved = this.browseEntityService.entities.get(Number(dataSplitted[1]));
+      const entityMoved = this.entityCacheService.getEntity(Number(dataSplitted[1]));
       const entityTarget = event['droppedInDir'];
       if (DMEntityUtils.dmEntityIsDocument(entityMoved)
         || this.browseEntityService.checkMoveIsPossible(entityMoved, entityTarget)) {
@@ -358,7 +363,9 @@ loading.pipe(
       // width: '250px',
       data: {
         dialogTitle: 'Confirm move?',
-        iconLine1: DMEntityUtils.retrieveEntityIconName(this.iconService, entityMoved, 'far'),
+        iconLine1: DMEntityUtils.dmEntityIsDocument(entityMoved) ?
+          DMEntityUtils.retrieveEntityIconName(this.iconService, entityMoved, 'far') :
+        null,
         messageLine1: entityMoved.name,
         messageLine2: 'to ' + entityTarget.path
             /* this.browseEntityService.computeEntityPath(
@@ -372,16 +379,20 @@ loading.pipe(
       if (next !== true) {
         return;
       }
-      const movedEntityInitialParentUid = entityMoved.uid;
+      const movedEntityInitialUid = entityMoved.uid;
+      const movedEntityInitialParentUid = DMEntityUtils.dmEntityIsDocument(entityMoved) ?
+        (entityMoved as KimiosDocument).folderUid :
+        (entityMoved as Folder).parentUid;
       this.browseEntityService.moveEntity(entityMoved, entityTarget).pipe(
-          concatMap(() => this.browseEntityService.reloadEntity(entityMoved.uid))
+          concatMap(() => this.entityCacheService.reloadEntity(entityMoved.uid)),
+        tap(reloadedEntity => {
+          if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
+            this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialUid));
+          }
+        }),
+        concatMap(reloadedEntity => this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget, movedEntityInitialParentUid))
       ).subscribe(
-          reloadedEntity => {
-            if (DMEntityUtils.dmEntityIsFolder(reloadedEntity)) {
-              this.browseEntityService.updateMoveTreeNode$.next(new TreeNodeMoveUpdate(reloadedEntity, entityTarget, movedEntityInitialParentUid));
-            }
-            this.browseEntityService.updateListAfterMove(reloadedEntity, entityTarget);
-          },
+          null,
           // TODO : enhance dialog and message
           error => alert(error.error && error.error.message ? error.error.message : 'an error occured, the move has not been done'),
       );

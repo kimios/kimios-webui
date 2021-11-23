@@ -12,6 +12,14 @@ import {SearchQueriesComponent} from 'app/main/components/search-queries/search-
 import {SettingsComponent} from 'app/main/components/settings/settings.component';
 import {OverviewComponent} from 'app/main/components/overview/overview.component';
 import {WorkspacesComponent} from 'app/main/components/workspaces/workspaces.component';
+import {CartContentComponent} from 'app/main/components/cart-content/cart-content.component';
+import {FilePreviewWrapperComponent} from 'app/main/components/file-preview-wrapper/file-preview-wrapper.component';
+import {FileDetailDataAndTagsComponent} from 'app/main/components/file-detail-data-and-tags/file-detail-data-and-tags.component';
+import {DocumentMetaDataComponent} from 'app/main/components/document-meta-data/document-meta-data.component';
+import {DocumentVersionsComponent} from 'app/main/components/document-versions/document-versions.component';
+import {RelatedDocumentsComponent} from 'app/main/components/related-documents/related-documents.component';
+import {FileSecurityComponent} from 'app/main/components/file-security/file-security.component';
+import {FileHistoryComponent} from 'app/main/components/file-history/file-history.component';
 
 const fileManagerRoutes: Routes = [
     {
@@ -42,7 +50,42 @@ const fileManagerRoutes: Routes = [
   {
     path: 'document/:documentId',
     component: FileDetailComponent,
-    canActivate: [ LoggedInGuard ]
+    canActivate: [LoggedInGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'preview',
+        pathMatch: 'full'
+      },
+      {
+        path: 'preview',
+        component: FilePreviewWrapperComponent
+      },
+      {
+        path: 'data',
+        component: FileDetailDataAndTagsComponent
+      },
+      {
+        path: 'metadata',
+        component: DocumentMetaDataComponent
+      },
+      {
+        path: 'version',
+        component: DocumentVersionsComponent
+      },
+      {
+        path: 'related',
+        component: RelatedDocumentsComponent
+      },
+      {
+        path: 'security',
+        component: FileSecurityComponent
+      },
+      {
+        path: 'history',
+        component: FileHistoryComponent
+      }
+    ]
   },
   {
     path: 'browse',
@@ -93,6 +136,11 @@ const fileManagerRoutes: Routes = [
     {
         path: 'overview',
         component: OverviewComponent,
+        canActivate: [ LoggedInGuard ]
+    },
+    {
+        path: 'cart',
+        component: CartContentComponent,
         canActivate: [ LoggedInGuard ]
     }
 

@@ -1,7 +1,8 @@
 <form [formGroup]="formGroup" *ngIf="formGroup.get('metaFeedName') != null" [ngClass]="'kimios-section-content'">
 
+  <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
 
-  <mat-form-field [ngClass]="'center'">
+  <mat-form-field [ngClass]="'studio-meta-feed-form-field'">
     <mat-label>Document type name</mat-label>
     <input
             matInput
@@ -11,7 +12,7 @@
             aria-label="Meta feed name" >
   </mat-form-field>
 
-  <mat-form-field [ngClass]="'center'">
+  <mat-form-field [ngClass]="'studio-meta-feed-form-field'">
     <mat-select
             placeholder="Java class name"
             [formControlName]="'metaFeedJavaClassName'"
@@ -42,14 +43,14 @@
 
     <!-- remove Column -->
     <ng-container matColumnDef="remove">
-      <mat-header-cell *matHeaderCellDef>
+      <mat-header-cell *matHeaderCellDef [ngClass]="'mat-column-width50'">
         <button mat-icon-button aria-label="add enumeration value"
                 (click)="addValue()"
                 [ngClass]="{'kimios-remove' : true}" >
           <mat-icon [ngClass]="'cursor-pointer'"  >add</mat-icon>
         </button>
       </mat-header-cell>
-      <mat-cell *matCellDef="let row">
+      <mat-cell *matCellDef="let row" [ngClass]="'mat-column-width50'">
         <button mat-icon-button aria-label="Remove meta feed enumeration value"
                 (click)="removeValue(row)"
                 [ngClass]="{'kimios-remove' : true}" >
@@ -75,7 +76,7 @@
     <ng-container matColumnDef="value">
       <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
       <mat-cell *matCellDef="let element;" >
-        <mat-form-field>
+        <mat-form-field [ngClass]="'metafeed-mat-form-field'">
           <input #metaFeedValueInput="matInput"
                  id="{{element.id}}"
                   matInput
@@ -103,6 +104,8 @@
   <div  fxLayout="row" fxLayoutAlign="center center">
     <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
     <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
+  </div>
+
   </div>
 
 </form>

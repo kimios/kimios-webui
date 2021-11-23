@@ -52,6 +52,7 @@ export class SearchFormComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   addOnBlur = false;
   selectedDocumentType: KimiosDocumentType = null;
+  showForm: boolean;
 
   constructor(
       private fb: FormBuilder,
@@ -87,6 +88,8 @@ export class SearchFormComponent implements OnInit {
       'documentType': this.fb.control(''),
       'metas': this.fb.group({})
     });
+
+    this.showForm = true;
   }
 
   ngOnInit(): void {
@@ -449,5 +452,11 @@ export class SearchFormComponent implements OnInit {
   resetForm(): void {
     this.deselectDocumentType();
     this.searchFormGroup.reset();
+  }
+
+  toggleShowForm($event): void {
+    $event.stopPropagation();
+    $event.preventDefault();
+    this.showForm = ! this.showForm;
   }
 }

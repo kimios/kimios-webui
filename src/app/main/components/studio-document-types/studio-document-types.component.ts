@@ -37,6 +37,7 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
   }
 
   selectDocType(docType: DocumentType): void {
+    this.adminService.newDocumentType$.next(false);
     this.adminService.selectedDocumentType$.next(docType.uid);
   }
 
@@ -53,7 +54,9 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked(): void {
     const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
-    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight ?
+      this.divider.nativeElement.nextSibling.clientHeight :
+      0;
     const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
     this.divider.nativeElement.style.height = dividerHeight + 'px';
   }

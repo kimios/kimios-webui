@@ -22,6 +22,38 @@ export class DMEntityUtils {
     }
 
     public static retrieveEntityIconName(iconService: IconService, dmEntity: DMEntity, iconPrefix: string): string {
+        let iconName = '';
+        if (this.dmEntityIsDocument(dmEntity)) {
+            iconName = this.retrieveEntityIconNameFromFileExtension(iconService, (dmEntity as KimiosDocument).extension, iconPrefix);
+        }
+
+        return iconName;
+    }
+
+    public static retrieveEntityIconNameFromFileExtension(iconService: IconService, fileExtension: string, iconPrefix: string): string {
+        let iconName = 'file';
+        const iconNameWanted = fileExtension ?
+            'file-' + (fileExtensionIconNameMapping[fileExtension] != null
+            && fileExtensionIconNameMapping[fileExtension] !== undefined ?
+            fileExtensionIconNameMapping[fileExtension] :
+            fileExtension) :
+            '';
+        if (iconNameWanted !== '' && iconService.iconIsAvailableWithPrefix(iconPrefix, iconNameWanted)) {
+            iconName = iconNameWanted;
+        }
+
+        return iconName;
+    }
+
+    public static determinePropertyValue(entity: DMEntity, workspaceValue: string, folderValue: string, documentValue: string): string {
+        return DMEntityUtils.dmEntityIsWorkspace(entity) ?
+          workspaceValue :
+          DMEntityUtils.dmEntityIsFolder(entity) ?
+            folderValue :
+            documentValue;
+    }
+
+    /*public static retrieveEntityIconName(iconService: IconService, dmEntity: DMEntity, iconPrefix: string): string {
         let iconName = 'file';
         if (this.dmEntityIsDocument(dmEntity)) {
             const iconNameWanted = (dmEntity as KimiosDocument).extension ?
@@ -36,7 +68,7 @@ export class DMEntityUtils {
         }
 
         return iconName;
-    }
+    }*/
 }
 
 export const fileExtensionIconNameMapping = {

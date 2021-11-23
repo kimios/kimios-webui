@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {PAGE_SIZE_DEFAULT, SearchEntityService} from 'app/services/searchentity.service';
 import {BehaviorSubject} from 'rxjs';
 import {PageEvent} from '@angular/material';
@@ -20,11 +20,15 @@ export class SearchQueriesComponent implements OnInit {
   pageIndex: number;
   pageSizeOptions = [5, 10, 20];
 
+  @ViewChild('kimiosContentArea') kimiosContentArea: ElementRef;
+  @ViewChild('paginator') paginator: ElementRef;
+  @ViewChild('fileListContainer') fileListContainer: ElementRef;
+
   constructor(
       private searchEntityService: SearchEntityService
   ) {
     this.totalFilesFound$ = new BehaviorSubject<number>(undefined);
-    this.pageSize = PAGE_SIZE_DEFAULT;
+    this.pageSize = this.searchEntityService.pageSize;
   }
 
   ngOnInit(): void {

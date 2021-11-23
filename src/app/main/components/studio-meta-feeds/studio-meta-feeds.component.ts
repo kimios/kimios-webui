@@ -36,11 +36,13 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
   }
 
   handleCreateMetaFeed(): void {
+    this.adminService.selectedMetaFeed$.next(0);
     this.adminService.newMetaFeed$.next(true);
   }
 
   selectMetaFeed(metaFeed: MetaFeed): void {
     this.adminService.selectedMetaFeed$.next(metaFeed.uid);
+    this.adminService.newMetaFeed$.next(false);
   }
 
   removeMetaFeed(uid: number): void {
@@ -51,7 +53,9 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked(): void {
     const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
-    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight ?
+      this.divider.nativeElement.nextSibling.clientHeight :
+      0;
     const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
     this.divider.nativeElement.style.height = dividerHeight + 'px';
   }

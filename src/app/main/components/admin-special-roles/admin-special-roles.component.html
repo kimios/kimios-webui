@@ -1,25 +1,42 @@
-<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+<div class="file-tab-content-wrapper" style="width: available;">
+  <div class="file-tab-content">
 
-  <div>
-    <mat-list>
-      <mat-list-item *ngFor="let possibleRoleId of possibleRolesId"
-                     [ngClass]="{'cursor-pointer' : true}" >
-        <!--,
-                           'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
-      >-->
-        <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectRole(possibleRoleId)"
-             fxLayoutGap="10px" >
-          <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true}">
-            <div>{{_possibleRoles.get(possibleRoleId)}}</div>
-          </div>
+    <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
+
+      <div>
+        <mat-list>
+          <mat-list-item *ngFor="let possibleRoleId of possibleRolesId"
+                         [ngClass]="{'cursor-pointer' : true}" >
+            <!--,
+                               'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
+          >-->
+            <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectRole(possibleRoleId)"
+                 fxLayoutGap="10px" >
+              <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
+                                   'selected-item' : possibleRoleId === adminService.selectedRole$.getValue()}">
+                <div>{{_possibleRoles.get(possibleRoleId)}}</div>
+              </div>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
+
+      <div fxFlex>
+        <div  *ngIf="adminService.selectedRole$.getValue() !== 0 else noSelectedRole;" fxFlex>
+          <admin-domains-users [_mode]="'roles'">
+          </admin-domains-users>
         </div>
-      </mat-list-item>
-    </mat-list>
-  </div>
 
-  <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+        <ng-template #noSelectedRole>
+          <div style="width: 100%; min-width: 300px" fxLayout="row" fxLayoutAlign="center">
+            <p style="font-style: italic;">Choose a role</p>
+          </div>
+        </ng-template>
 
-    <admin-domains-users [_mode]="'roles'"></admin-domains-users>
+      </div>
+    </div>
 
   </div>
 </div>

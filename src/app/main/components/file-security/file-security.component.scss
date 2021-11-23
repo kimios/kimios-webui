@@ -1,17 +1,13 @@
-.mat-column-width100 {
-  max-width: 100px !important;
-}
-
-.mat-column-width50 {
-  max-width: 50px !important;
-}
-
-.mat-column-width200 {
-  min-width: 200px !important;
-}
-
 .w100pc {
   width: 100%;
 }
 
+.mat-header-cell-custom {
+  min-width: max-content;
+}
+
+.data-tab-content {
+  width: available;
+  max-width: 600px;
+}
 

@@ -5,7 +5,7 @@ table {
 
 td {
   padding: 5px;
-  border: 1px solid #e1d8df;
+  border: 1px solid;
   width: 1px;
   white-space:nowrap;
 }
@@ -19,5 +19,5 @@ td:last-child {
 }
 
 .data-title {
-  // background-color: #ececec;
+  color: rgba(255, 255, 255, 0.5);
 }

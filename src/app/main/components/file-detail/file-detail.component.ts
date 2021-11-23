@@ -3,15 +3,16 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
-import {concatMap, map, startWith, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, switchMap, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormBuilder, FormControl} from '@angular/forms';
-import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatChipInputEvent} from '@angular/material';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
 import {formatDate, Location} from '@angular/common';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 export enum Direction {
     NEXT = 1,
@@ -56,11 +57,21 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     spinnerColor = 'primary';
     spinnerMode = 'indeterminate';
 
-
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
     @ViewChild('filePreviewDiv') filePreviewDivElement: ElementRef;
     @ViewChild('filePreview') filePreviewElement: ElementRef;
+
+    navLinks = [
+      {path: 'preview', label: 'Preview'},
+      {path: 'data', label: 'Data'},
+      {path: 'metadata', label: 'Meta data'},
+      {path: 'version', label: 'Versions'},
+      {path: 'related', label: 'Related documents'},
+      {path: 'security', label: 'Security'},
+      {path: 'history', label: 'History'}
+    ];
+    activePath = 'preview';
 
     constructor(
         private route: ActivatedRoute,
@@ -74,9 +85,10 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         private securityService: SecurityService,
         private location: Location,
         private fb: FormBuilder,
-        @Inject(LOCALE_ID) private locale: string
+        @Inject(LOCALE_ID) private locale: string,
+        private entityCacheService: EntityCacheService
     ) {
-        this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
+        this.allTagsKey$ = this.entityCacheService.findAllTags()
             .pipe(
                 tap(res => this.allTags = res),
                 map(res => Array.from(res.keys()))
@@ -94,7 +106,17 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngOnInit(): void {
-        this.documentId = Number(this.route.snapshot.paramMap.get('documentId'));
+        this.route.paramMap.pipe(
+            switchMap(params => {
+                this.documentId = Number(params.get('documentId'));
+                this.documentDetailService.currentDocumentId$.next(this.documentId);
+                this.initDocumentDetail();
+                return of(true);
+            })
+        ).subscribe();
+    }
+
+    initDocumentDetail(): void {
         this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
         this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
 
@@ -102,8 +124,8 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
             .pipe(
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
-                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
-                tap(res => this.currentVersionId = res.lastVersionId),
+                concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
+                tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
                 tap(res => this.document = res),
                 tap(res => this.loading$ = of(false)),
                 tap(res => this.documentTags$.next(res.tags)),
@@ -149,18 +171,25 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 }
             );
 
-       /* this.documentTags$.pipe(
-            tap(res => this.searchEntityService.reloadTags())
-        ).subscribe();*/
+        /* this.documentTags$.pipe(
+             tap(res => this.searchEntityService.reloadTags())
+         ).subscribe();*/
 
         this.documentRefreshService.needRefresh.subscribe(
             res => res && res === this.documentId ? this.reloadDocument() : console.log('no need to refresh')
         );
+
+        this.documentDetailService.currentVersionId.pipe(
+            filter(currentVersionId => currentVersionId != null),
+            tap(currentVersionId => this.currentVersionId = currentVersionId)
+        ).subscribe();
     }
 
     initDocumentVersions(): Observable<Array<DocumentVersion>> {
-        return this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, this.documentId)
+        return this.entityCacheService.findDocumentVersionsInCache(this.documentId)
             .pipe(
+                map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+                  .map(v => v.documentVersion)),
                 map(
                     res => res.sort((a, b) => a.creationDate < b.creationDate ? 1 : -1)
                 ),
@@ -169,7 +198,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                         (res instanceof Array) ?
                             (res.length === 0) ?
                                 'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
-                                this.makePreviewTitle(this.currentVersionId, res) :
+                                this.makePreviewTitle(this.documentDetailService.currentVersionId.getValue(), res) :
                             'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
                 ),
                 tap(
@@ -327,7 +356,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     handleVersionPreview(uid: number): void {
         this.previewTitle = this.makePreviewTitle(uid, this.documentVersions);
-        this.currentVersionId = uid;
+        this.documentDetailService.currentVersionId.next(uid);
     }
 
     handleVersionPreviewNextOrPrev(direction: Direction): void {
@@ -337,7 +366,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         ) {
             return;
         }
-        const uid = this.computeVersionUidToDisplay(this.currentVersionId, this.documentVersions, direction);
+        const uid = this.computeVersionUidToDisplay(this.documentDetailService.currentVersionId.getValue(), this.documentVersions, direction);
         this.handleVersionPreview(uid);
     }
 
@@ -364,11 +393,11 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     currentVersionIsLast(): boolean {
-        return (this.documentVersionIds.indexOf(this.currentVersionId) === this.documentVersionIds.length - 1);
+        return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) === this.documentVersionIds.length - 1);
     }
 
     currentVersionIsFirst(): boolean {
-        return (this.documentVersionIds.indexOf(this.currentVersionId) === 0);
+        return (this.documentVersionIds.indexOf(this.documentDetailService.currentVersionId.getValue()) == null);
     }
 
     addTag(tag: string): void {
@@ -397,6 +426,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     ngAfterViewChecked(): void {
-        this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
+        /*if (this.filePreviewElement
+            && this.filePreviewElement.nativeElement
+            && this.filePreviewElement.nativeElement.offsetHeight != null
+            && this.filePreviewElement.nativeElement.offsetHeight !== undefined
+        ) {
+            this.filePreviewDivElement.nativeElement.style.height = this.filePreviewElement.nativeElement.offsetHeight + 'px';
+        }*/
     }
 }

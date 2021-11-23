@@ -19,7 +19,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {Router} from '@angular/router';
 import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
-import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',

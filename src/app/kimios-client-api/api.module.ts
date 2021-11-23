@@ -8,6 +8,7 @@ import { ConverterService } from './api/converter.service';
 import { DefaultService } from './api/default.service';
 import { DocumentService } from './api/document.service';
 import { DocumentVersionService } from './api/documentVersion.service';
+import { DocumentVersionRestOnlyService } from './api/documentVersionRestOnly.service';
 import { EditorsService } from './api/editors.service';
 import { FiletransferService } from './api/filetransfer.service';
 import { FolderService } from './api/folder.service';
@@ -21,6 +22,8 @@ import { SecurityService } from './api/security.service';
 import { ShareService } from './api/share.service';
 import { StudioService } from './api/studio.service';
 import { WorkspaceService } from './api/workspace.service';
+import { ZipService } from './api/zip.service';
+import { ZipRestOnlyService } from './api/zipRestOnly.service';
 
 @NgModule({
   imports:      [],
@@ -32,6 +35,7 @@ import { WorkspaceService } from './api/workspace.service';
     DefaultService,
     DocumentService,
     DocumentVersionService,
+    DocumentVersionRestOnlyService,
     EditorsService,
     FiletransferService,
     FolderService,
@@ -44,7 +48,9 @@ import { WorkspaceService } from './api/workspace.service';
     SecurityService,
     ShareService,
     StudioService,
-    WorkspaceService ]
+    WorkspaceService,
+    ZipService,
+    ZipRestOnlyService ]
 })
 export class ApiModule {
     public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders {

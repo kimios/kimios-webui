@@ -90,6 +90,14 @@
             margin-right: 20px;
             font-weight: bold;
         }
+
+        &:hover {
+            background-color: $kimios-green;
+
+            span.kimios-button-text {
+                color: #F5F5F5;
+            }
+        }
     }
 
     .kimios-dialog .mat-dialog-container {
@@ -120,11 +128,12 @@
     }
 
     .selected-item {
-        color: $kimios-green;
+        /*color: $kimios-green;
         div {
             color: $kimios-green;
         }
-        background: mat-color($background, 'card');
+        background: mat-color($background, 'card');*/
+        background-color: map-get($accent, 500);
     }
 
     mat-row.selected {
@@ -183,6 +192,19 @@
         background-color: map-get($background, card);
     }
 
+    .cartContainer {
+        background-color: map-get($background, card);
+        padding-top: 20px;
+        height: 100%;
+        border-radius: 10px;
+        padding-bottom: 10px;
+    }
+
+    .cartContainerWrapper {
+        padding-right: 20px;
+        padding-bottom: 20px;
+    }
+
     .kimios-section-content {
         background: mat-color($background, 'card');
     }
@@ -231,11 +253,16 @@
 
     button:hover {
         &.kimios-remove {
-            background-color: map-get($warn, 400);
+            color: map-get($warn, 400);
         }
         &.kimios-green {
             background-color: map-get($accent, 500);
         }
+    }
+
+    .kimios-selection-item {
+        border-radius: 10px;
+        padding: 10px;
     }
 
     .kimios-selection-item:hover {
@@ -289,5 +316,51 @@
 
     button.add-to-selection-list.visible {
         visibility: visible;
+    }
+
+    table, tr, td {
+        // border-color: rgba(255, 255, 255, 0.4);
+        border-color: rgba(map-get($foreground, text), 0.12);
+    }
+
+    .data-tab-content {
+        background: mat-color($background, 'card');
+    }
+
+    .file-tab-content-wrapper {
+        padding: 20px;
+    }
+
+    .file-tab-content {
+        background: mat-color($background, 'card');
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .file-tab-content.fit {
+        width: fit-content;
+    }
+
+    .file-tab-content.with-list {
+        width: available;
+    }
+
+    .file-preview-tab-content {
+        background: mat-color($background, 'card');
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 20px;
+    }
+
+    .mat-column-width100 {
+        max-width: 100px !important;
+    }
+
+    .mat-column-width50 {
+        max-width: 50px !important;
+    }
+
+    .mat-column-width200 {
+        min-width: 200px !important;
     }
 }

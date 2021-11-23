@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
 
 @Component({
@@ -6,7 +6,7 @@ import {AdminService} from 'app/services/admin.service';
   templateUrl: './admin-special-roles.component.html',
   styleUrls: ['./admin-special-roles.component.scss']
 })
-export class AdminSpecialRolesComponent implements OnInit {
+export class AdminSpecialRolesComponent implements OnInit, AfterViewChecked {
 
   private _possibleRoles: Map<number, string> = new Map<number, string>([
     [3, 'Administrator'],
@@ -16,6 +16,7 @@ export class AdminSpecialRolesComponent implements OnInit {
     [4, 'Meta feed access denied']
   ]);
   public possibleRolesId: Array<number>;
+  @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
 
   constructor(
       private adminService: AdminService,
@@ -28,5 +29,12 @@ export class AdminSpecialRolesComponent implements OnInit {
 
   selectRole(possibleRoleId: number): void {
     this.adminService.selectedRole$.next(possibleRoleId);
+  }
+
+  ngAfterViewChecked(): void {
+    const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
+    this.divider.nativeElement.style.height = dividerHeight + 'px';
   }
 }

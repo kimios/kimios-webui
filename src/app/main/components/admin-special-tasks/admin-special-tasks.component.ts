@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
 
 @Component({
@@ -13,6 +13,7 @@ export class AdminSpecialTasksComponent implements OnInit {
     [2, 'Reindex']
   ]);
   public possibleTasksId: Array<number>;
+  @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
 
   constructor(
       private adminService: AdminService,
@@ -28,5 +29,12 @@ export class AdminSpecialTasksComponent implements OnInit {
 
   selectTask(possibleTaskId: number): void {
     this.adminService.selectedTask$.next(possibleTaskId);
+  }
+
+  ngAfterViewChecked(): void {
+    const previousSiblingHeight = this.divider.nativeElement.previousSibling.clientHeight;
+    const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
+    const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
+    this.divider.nativeElement.style.height = dividerHeight + 'px';
   }
 }

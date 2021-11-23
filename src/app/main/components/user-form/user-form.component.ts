@@ -127,6 +127,7 @@ export class UserFormComponent implements OnInit {
             () => {
                 this.showSpinnerFormSubmit = false;
                 // this.adminService.closeUserDialog$.next(true);
+                this.adminService.newUserCreated$.next(true);
             }
         );
     }

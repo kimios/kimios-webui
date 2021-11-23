@@ -1,0 +1,112 @@
+<div #sectionContainer
+        fxFlex fxLayout="column" fxLayoutAlign="start stretch" fxFlexOffset="20px" fxLayoutGap="20px">
+    <div #sectionTitle>
+        <h1 class="no-margin-bottom">Export to ZIP</h1>
+    </div>
+    <!--<tree-root [nodes]="nodes" #tree class="kimios-browse-tree"
+               [focused]="true"
+               (focus)="onFocus($event)"
+               [options]="treeOptions"
+               >
+    </tree-root>-->
+    <div #sectionButtons
+         fxLayout="row"
+         fxLayoutAlign="start start"
+         fxLayoutGap="20px">
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="doZip()" >
+            <span [class.kimios-button-text]="true">Export Documents</span>
+        </div>
+        <div [class.kimios-button]="true"
+             [class.kimios-green]="true"
+             [class.inactive]="true"
+             fxLayout="row"
+             fxLayoutAlign="center center"
+             (click)="emptyCart()">
+            <span class="kimios-button-text">Empty cart</span>
+        </div>
+    </div>
+    <div #cartContainerWrapper
+            [ngClass]="'cartContainerWrapper'" fxFlex>
+        <div [ngClass]="'cartContainer'" style="overflow: auto;" >
+            <tree-root *ngIf="nodes.length > 0 else noItemsTemplate;"
+                    [nodes]="nodes" #tree [options]="treeOptions" class="kimios-browse-tree" >
+                <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
+                    <div class="node-wrapper" [ngClass]="{'folder': node.data.isFolder === true}"
+                         [style.padding-left]="node.getNodePadding()"
+                         [attr.data-nodeuid]="node.uid"
+                    >
+                        <div style="margin-top: 0;" *ngIf="node.data.isFolder === true">
+                            <ng-container *ngIf="node.data.isLoading; else notLoading">
+                                <mat-progress-spinner
+                                        mode="indeterminate"
+                                        diameter="20"></mat-progress-spinner>
+                            </ng-container>
+                            <ng-template #notLoading>
+                                <div [ngClass]="{'disabled-tree-expander' : (node.data.children === null
+                            || node.data.children === undefined
+                            || node.data.children.length === 0)}" >
+                                    <button mat-icon-button
+                                            [attr.aria-label]="'toggle ' + node.name"
+                                            (click)="node.toggleExpanded()"
+                                            class="kimios-tree-button-expand">
+                                        <mat-icon class="mat-icon-rtl-mirror">
+                                            {{tree.treeModel.expandedNodeIds[node.id] !== null
+                                        && tree.treeModel.expandedNodeIds[node.id] !== undefined
+                                        && tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
+                                        </mat-icon>
+                                    </button>
+                                </div>
+                            </ng-template>
+                        </div>
+                        <div class="node-content-wrapper"
+                             [class.node-content-wrapper-active]="node.isActive"
+                             [class.node-content-wrapper-focused]="node.isFocused"
+                             (click)="node.mouseAction('click', $event)"
+                             (dblclick)="node.mouseAction('dblClick', $event)"
+                             (contextmenu)="node.mouseAction('contextMenu', $event)"
+                             (treeDrop)="node.onDrop($event)"
+                             [treeAllowDrop]="node.allowDrop"
+                             [treeDrag]="node"
+                             [treeDragEnabled]="true"
+                             (mouseenter)="node.data.isHover = true"
+                             (mouseleave)="node.data.isHover = false"
+                        >
+                            <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
+                                <!--<mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>-->
+                                <mat-icon *ngIf="node.data.isFolder != null && node.data.isFolder !== undefined
+                                && node.data.isFolder === true else iconDocument;">folder</mat-icon>
+                                <ng-template #iconDocument>
+                                    <fa-icon *ngIf="node.data.entity != null"
+                                             [icon]="['far', retrieveDocumentIcon(node.data.entity, 'far')]"
+                                             size="lg"
+                                             [ngClass]="'file-icon-browse-list'"></fa-icon>
+                                </ng-template>
+                                <div>
+                                    <tree-node-content [node]="node" [index]="index"></tree-node-content>
+                                </div>
+                                <mat-icon (click)="removeNode(node)"
+                                          [ngClass]="{'action' : !node.data.isHover}" >
+                                    cancel
+                                </mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                    <tree-node-children [node]="node" [templates]="templates">
+                    </tree-node-children>
+                </ng-template>
+            </tree-root>
+
+            <ng-template #noItemsTemplate>
+                <div style="width: 100%" fxLayout="row" fxLayoutAlign="center"
+                     [ngClass]="'kimios-section-content'">
+                    <p style="font-style: italic;">no items</p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

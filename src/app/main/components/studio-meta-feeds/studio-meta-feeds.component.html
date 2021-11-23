@@ -1,6 +1,7 @@
-<div fxLayout="row" fxLayoutAlign="start start"
-     [ngClass]="{'kimios-content-area' : true, 'kimios-section-content': true,
-     'kimios-width-max-content': true}">
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content">
+
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="10px">
 
   <div fxLayout="column" fxLayoutAlign="start start">
     <button mat-button mat-icon-button aria-label="Create meta feed"
@@ -10,23 +11,35 @@
     <div>
       <mat-list>
         <mat-list-item *ngFor="let metaFeed of metaFeeds$ | async"
-                       [ngClass]="{'cursor-pointer' : true,
-                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}"
+                       [ngClass]="{'cursor-pointer' : true}"
+                       (click)="selectMetaFeed(metaFeed)"
         >
           <button mat-icon-button aria-label="Remove meta feed"
                   (click)="removeMetaFeed(metaFeed.uid)"
                   [ngClass]="{'kimios-remove' : true}" >
             <mat-icon>remove</mat-icon>
           </button>
-          <span (click)="selectMetaFeed(metaFeed)">{{metaFeed.name}}</span>
+          <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
+                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}">
+            <div>{{metaFeed.name}}</div>
+          </div>
         </mat-list-item>
       </mat-list>
 
     </div>
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
-  <div>
+  <div *ngIf="adminService.selectedMetaFeed$.getValue() != null
+  || adminService.newMetaFeed$.getValue() === true else noMetaFeedSelectedOrInCreation;">
     <studio-meta-feed-admin></studio-meta-feed-admin>
   </div>
+  <ng-template #noMetaFeedSelectedOrInCreation>
+    <div style="width: 100%; min-width: 300px" fxLayout="row" fxLayoutAlign="center">
+      <p style="font-style: italic;">Choose a metafeed or create one</p>
+    </div>
+  </ng-template>
 
+</div>
+
+  </div>
 </div>

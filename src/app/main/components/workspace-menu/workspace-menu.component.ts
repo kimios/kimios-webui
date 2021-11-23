@@ -23,7 +23,7 @@ export class WorkspaceMenuComponent implements OnInit {
   private openDialog(entityType: 'workspace' | 'folder'): void {
     const dialogRef = this.createContainerEntityDialog.open(ContainerEntityCreationDialogComponent, {
       width: '60%',
-      height: '75%',
+      // height: '75%',
       data: {
         entityType: entityType
       }

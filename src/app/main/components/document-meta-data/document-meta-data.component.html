@@ -1,0 +1,115 @@
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content fit">
+  <form #form
+        [formGroup]="formGroup"
+        (ngSubmit)="onSubmit()"
+        (keyup)="$event.key === 'Enter' ? onSubmit():1">
+
+    <div fxFill fxLayout="column" fxLayoutAlign="space-between start">
+
+    <mat-form-field>
+      <input type="text" aria-label="document type" matInput [formControlName]="'documentType'"
+             placeholder="Document type"
+             [matAutocomplete]="autoCompleteDocumentType"
+             (click)="handleClick()"
+             #trigger="matAutocompleteTrigger"
+      >
+      <mat-autocomplete #autoCompleteDocumentType="matAutocomplete" (optionSelected)="selectDocumentType()"
+                        [displayWith]="displayAutoCompleteDocumentType">
+        <mat-option *ngFor="let documentType of filteredDocumentTypes$ | async" [value]="documentType">
+          {{documentType.name}}
+        </mat-option>
+      </mat-autocomplete>
+      <button mat-button *ngIf="formGroup.get('documentType').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="deselectDocumentType()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <ng-container *ngIf="documentType != null && metaValuesLoaded" [formGroupName]="'metas'">
+      <ng-container *ngFor="let meta of documentTypeMetas">
+        <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;">
+
+          <ng-container *ngIf="meta.metaType != 4">
+            <mat-form-field>
+              <ng-container *ngIf="documentTypeMetaDataValuesMap.get(meta.uid) != null
+                && !([2, 3].includes(meta.metaType)) else noValueList;" >
+                <mat-select
+                        placeholder="{{metaDataFieldTitle(meta)}}"
+                        [formControlName]="meta.uid"
+                >
+                  <mat-option *ngFor="let value of documentTypeMetaDataValuesMap.get(meta.uid)"
+                              [value]="value">
+                    {{value}}
+                  </mat-option>
+                </mat-select>
+              </ng-container>
+              <ng-template #noValueList>
+                <ng-container *ngIf="!([2, 3].includes(meta.metaType)) else metaWithRange;" >
+                  <input type="text" placeholder="{{metaDataFieldTitle(meta)}}" matInput
+                         [formControlName]="meta.uid" >
+                </ng-container>
+              </ng-template>
+              <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value" matSuffix mat-icon-button aria-label="Clear"
+                      (click)="resetMetaValue(meta.uid)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+          </ng-container>
+
+          <ng-container *ngIf="meta.metaType === 4">
+            <mat-checkbox [formControlName]="meta.uid" >{{metaDataFieldTitle(meta)}}</mat-checkbox>
+          </ng-container>
+
+        </ng-container>
+
+        <ng-template #metaWithRange>
+          <div fxLayout="column" fxFill>
+
+            <div fxLayout="row" fxLayoutAlign="space-between start" fxFill>
+              <div fxFlex="48">
+
+                <ng-container *ngIf="meta.metaType === 3" >
+                  <ng-container *ngFor="let datePickerBind of [meta.uid]" >
+                    <mat-form-field fxFill>
+                      <input matInput placeholder="{{metaDataFieldTitle(meta)}}" [formControlName]="meta.uid" [matDatepicker]="datePickerBind">
+                      <mat-datepicker-toggle matSuffix [for]="datePickerBind"></mat-datepicker-toggle>
+                      <mat-datepicker #datePickerBind></mat-datepicker>
+                      <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
+                              matSuffix mat-icon-button aria-label="Clear"
+                              (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="meta.metaType!= 3" >
+                  <mat-form-field fxFill>
+                    <input type="text" placeholder="{{metaDataFieldTitle(meta)}}" matInput [formControlName]="meta.uid">
+                    <button mat-button *ngIf="formGroup.get('metas').get(meta.uid.toString()).value"
+                            matSuffix mat-icon-button aria-label="Clear"
+                            (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </mat-form-field>
+                </ng-container>
+
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+      </ng-container>
+    </ng-container>
+
+      <div fxLayout="row" fxLayoutAlign="center center" >
+        <button mat-button (click)="submit($event)"><mat-icon>check</mat-icon></button>
+        <button mat-button (click)="cancel($event)"><mat-icon>cancel</mat-icon></button>
+      </div>
+
+
+    </div>
+
+  </form>
+  </div>
+</div>

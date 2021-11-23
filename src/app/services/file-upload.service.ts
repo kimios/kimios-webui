@@ -7,11 +7,11 @@ import {HttpEventType} from '@angular/common/http';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {TagService} from './tag.service';
 import {DocumentRefreshService} from './document-refresh.service';
-import {Tag} from 'app/main/model/tag';
 import {DocumentDetailService} from './document-detail.service';
 import {BrowseEntityService} from './browse-entity.service';
 import {NotificationService} from './notification.service';
 import {DocumentUploadStatus} from '../main/model/document-upload';
+import {EntityCacheService} from './entity-cache.service';
 
 interface TagJob {
     docId: number;
@@ -49,7 +49,8 @@ export class FileUploadService {
         private documentRefreshService: DocumentRefreshService,
         private documentDetailService: DocumentDetailService,
         private browseEntityService: BrowseEntityService,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private entityCacheService: EntityCacheService
     ) {
         this.filesProgress = new Map<string, BehaviorSubject<{ name: string, status: string, message: string }>>();
         this.filesUploaded = new Map<string, BehaviorSubject<string[]>>();
@@ -235,11 +236,10 @@ export class FileUploadService {
                 (res) => {
                     if (res['status'] === 'done') {
                         const newDocId = res['message'];
-                        this.documentDetailService.retrieveDocumentFromId(newDocId)
+                        this.entityCacheService.findDocumentInCache(newDocId)
                             .subscribe(
                                 kimiosDocument => {
                                     this.filesUploadedDocuments.get(uploadId).next(kimiosDocument);
-                                    this.browseEntityService.addNewEntityInCache(kimiosDocument);
                                 }
                             );
                         if (tags

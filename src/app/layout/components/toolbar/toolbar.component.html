@@ -59,6 +59,17 @@
 
             <div class="toolbar-separator"></div>
 
+            <a routerLink="/cart" routerLinkActive="active">
+            <button fxHide fxShow.gt-xs mat-icon-button>
+                <mat-icon class="secondary-text"
+                          matBadge="{{cartSize > 0 ? cartSize : ''}}"
+
+                >
+                    shopping_cart
+                </mat-icon>
+            </button>
+            </a>
+
             <button mat-button fxHide fxShow.gt-xs
                     class="language-button"
                     >

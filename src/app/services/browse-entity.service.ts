@@ -11,8 +11,9 @@ import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
+import {EntityCacheService} from './entity-cache.service';
 
-const PAGE_SIZE_DEFAULT = 20;
+export const PAGE_SIZE_DEFAULT = 20;
 
 export enum EXPLORER_MODE {
     BROWSE = 0,
@@ -31,13 +32,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public totalEntitiesToDisplay$: BehaviorSubject<DMEntity[]>;
     public entitiesToDisplay$: BehaviorSubject<DMEntity[]>;
 
-    public loadedEntities: Map<number, DMEntity[]>;
     public entitiesPath: Map<number, DMEntity[]>;
     public entitiesPathId: number[];
-    public entitiesPathValue: number[][];
     public entitiesPathIds: Map<number, number[]>;
-
-    public entities: Map<number, DMEntity>;
 
     public currentPath: BehaviorSubject<Array<DMEntity>>;
 
@@ -69,6 +66,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
     public browseMode$: BehaviorSubject<BROWSE_TREE_MODE>;
     public chosenContainerEntityUid$: BehaviorSubject<number>;
+    removedFolder$: BehaviorSubject<number>;
+    removedWorkspace$: BehaviorSubject<number>;
+    removedDocument$: BehaviorSubject<number>;
 
   constructor(
       // Set the defaults
@@ -78,20 +78,19 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       private workspaceService: WorkspaceService,
       private folderService: FolderService,
       private searchEntityService: SearchEntityService,
-      private workspaceSessionService: WorkspaceSessionService
+      private workspaceSessionService: WorkspaceSessionService,
+      private entityCacheService: EntityCacheService
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.selectedFolder$ = new BehaviorSubject<DMEntity>(undefined);
       this.selectedEntityFromGridOrTree$ = new BehaviorSubject<DMEntity>(undefined);
-      this.loadedEntities = new Map<number, DMEntity[]>();
       this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
       this.entitiesPath = new Map<number, DMEntity[]>();
       this.entitiesPathId = Array<number>();
-      this.entitiesPathValue = Array<Array<number>>();
+      // this.entitiesPathValue = Array<Array<number>>();
       this.entitiesPathIds = new Map<number, Array<number>>();
 
       this.history = new Array<number>();
-      this.entities = new Map<number, DMEntity>();
       this.historyCurrentIndex = new BehaviorSubject<number>(-1);
       this.historyBack = new Subject<number>();
       this.historyForward = new Subject<number>();
@@ -125,6 +124,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
       this.chosenContainerEntityUid$ = new BehaviorSubject<number>(null);
 
+      this.removedFolder$ = new BehaviorSubject<number>(null);
+      this.removedWorkspace$ = new BehaviorSubject<number>(null);
+      this.removedDocument$ = new BehaviorSubject<number>(null);
+
       this.ngOnInit();
   }
 
@@ -135,8 +138,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         }
         this.entitiesPathId.push(lastEntity.uid);
         const index = this.entitiesPathId.findIndex(elem => elem === lastEntity.uid);
-        next.forEach(elem => this.entities.set(elem.uid, elem));
-        this.entitiesPathValue[index] = next.map(elem => elem.uid);
+        // next.forEach(elem => this.entities.set(elem.uid, elem));
+        // todo : delete
+        // this.entitiesPathValue[index] = next.map(elem => elem.uid);
         if (! this.entitiesPathIds.has(lastEntity.uid)) {
         // if (this.entitiesPathIds.get(lastEntity.uid) === null || this.entitiesPath.get(lastEntity.uid) === undefined) {
             this.entitiesPathIds.set(lastEntity.uid, next.map(elem => elem.uid));
@@ -174,17 +178,20 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 console.log(this.history);
                 this.historyHasForward.next(this.history.length > 1 && next < this.history.length - 1);
                 this.historyHasBackward.next(this.history.length > 1 && next > 0);
-                this.selectedEntity$.next(this.entities.get(this.history[next]) ? this.entities.get(this.history[next]) : undefined);
+                this.selectedEntity$.next(this.entityCacheService.getEntity(this.history[next]) ?
+                  this.entityCacheService.getEntity(this.history[next]) :
+                  undefined);
                 if (this.history[next] === undefined) {
                     this.currentPath.next([]);
                 } else {
-                    if (this.entities.get(this.history[next]) !== null && this.entities.get(this.history[next]) !== undefined) {
-                        const entity = this.entities.get(this.history[next]);
+                    if (this.entityCacheService.getEntity(this.history[next]) !== null
+                      && this.entityCacheService.getEntity(this.history[next]) !== undefined) {
+                        const entity = this.entityCacheService.getEntity(this.history[next]);
                         if (this.entitiesPathIds.get(entity.uid) !== null && this.entitiesPathIds.get(entity.uid) !== undefined) {
                             // const idx = this.entitiesPathId.findIndex(elem => elem === entity.uid);
                             // if (idx !== -1) {
                             // this.currentPath.next(this.entitiesPathValue[entity.uid].map(elem => this.entities.get(elem)));
-                            this.currentPath.next(this.entitiesPathIds.get(entity.uid).map(elem => this.entities.get(elem)));
+                            this.currentPath.next(this.entitiesPathIds.get(entity.uid).map(elem => this.entityCacheService.getEntity(elem)));
                         }
                     }
                 }
@@ -219,7 +226,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 this.pageIndex.next(0);
             }),
             filter(entity => entity !== undefined),
-            concatMap(res => this.findEntitiesAtPath(res)),
+            concatMap(res => this.entityCacheService.findEntityChildrenInCache(res.uid, false)),
         ).subscribe(
             res => {
                 this.totalEntitiesToDisplay$.next(res);
@@ -251,7 +258,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             // const idx = this.browseEntityService.entitiesPathId.findIndex(elem => elem === Number(uid));
             // if (idx !== -1) {
             this.currentPath.next(this.entitiesPathIds.get(uid).map(elem =>
-                this.entities.get(elem)
+                this.entityCacheService.getEntity(elem)
             ));
         } else {
             this.findAllParents(uid, true).subscribe(
@@ -273,76 +280,32 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         this.subsOk = false;
     }
 
-    findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
-    if (parentUid === null
-        || parentUid === undefined) {
-      return this.workspaceService.getWorkspaces(this.sessionService.sessionToken).pipe(
+    /*findContainerEntitiesAtPath(parentUid?: number): Observable<DMEntity[]> {
+      if (parentUid === null
+          || parentUid === undefined) {
+        return this.workspaceService.getWorkspaces(this.sessionService.sessionToken).pipe(
           tap(next => next.forEach(entity => {
-              if (this.entities.get(entity.uid) === null
-                  || this.entities.get(entity.uid) === undefined) {
-                  this.entities.set(entity.uid, entity);
-              }
+            if (this.entities.get(entity.uid) === null
+              || this.entities.get(entity.uid) === undefined) {
+              this.entities.set(entity.uid, entity);
+            }
           }))
-      );
-    } else {
-      return this.folderService.getFolders(this.sessionService.sessionToken, parentUid).pipe(
+        );
+      } else {
+        return this.folderService.getFolders(this.sessionService.sessionToken, parentUid).pipe(
           tap(next => next.forEach(entity => {
-              if (this.entities.get(entity.uid) === null
-                  || this.entities.get(entity.uid) === undefined) {
-                  this.entities.set(entity.uid, entity);
-              }
+            if (this.entities.get(entity.uid) === null
+              || this.entities.get(entity.uid) === undefined) {
+              this.entities.set(entity.uid, entity);
+            }
           }))
-      );
-    }
-  }
+        );
+      }
+    }*/
 
-    findEntitiesAtPath(parent?: DMEntity): Observable<DMEntity[]> {
+    /*findEntitiesAtPath(parent?: DMEntity): Observable<DMEntity[]> {
         return this.findEntitiesAtPathFromId((parent === null || parent === undefined) ? null : parent.uid);
-    }
-
-    findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
-        if (parentUid === null
-            || parentUid === undefined) {
-            return this.workspaceService.getWorkspaces(this.sessionService.sessionToken).pipe(
-                tap(next => next.forEach(entity => {
-                    if (this.entities.get(entity.uid) === null
-                        || this.entities.get(entity.uid) === undefined) {
-                        this.entities.set(entity.uid, entity);
-                    }
-                }))
-            );
-        } else {
-            return (this.loadedEntities.get(parentUid) !== null
-                && this.loadedEntities.get(parentUid) !== undefined) ?
-                of(this.loadedEntities.get(parentUid)) :
-                this.retrieveContainerEntity(parentUid).pipe(
-                    concatMap(
-                        res => combineLatest(of(res), this.folderService.getFolders(this.sessionService.sessionToken, parentUid))
-                    ),
-                    concatMap(
-                        ([parentEntity, folders]) => combineLatest(
-                            of(folders),
-                            DMEntityUtils.dmEntityIsWorkspace(parentEntity) ?
-                                of([]) :
-                                this.documentService.getDocuments(this.sessionService.sessionToken, parentUid)
-                        )
-
-                    ),
-                    concatMap(
-                        ([folders, documents]) => of(folders.concat(documents))
-                    ),
-                    tap(
-                        entities => this.loadedEntities.set(parentUid, entities)
-                    ),
-                    tap(next => next.forEach(entity => {
-                        if (this.entities.get(entity.uid) === null
-                            || this.entities.get(entity.uid) === undefined) {
-                            this.entities.set(entity.uid, entity);
-                        }
-                    }))
-                );
-        }
-    }
+    }*/
 
     findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
         return this.retrieveContainerEntity(uid).pipe(
@@ -365,29 +328,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     retrieveContainerEntity(uid: number): Observable<DMEntity> {
-        const entity = this.entities.get(uid);
-        return entity !== null && entity !== undefined ?
-            of(this.entities.get(uid)) :
-            this.retrieveFolderEntity(uid).pipe(
-                concatMap(
-                    res => (res === null || res === undefined || res === '') ?
-                        this.retrieveWorkspaceEntity(uid) :
-                        of(res)
-                )
-            );
+      return this.entityCacheService.findContainerEntityInCache(uid);
     }
 
     retrieveWorkspaceEntity(uid: number): Observable<Workspace> {
-        return this.workspaceService.getWorkspace(this.sessionService.sessionToken, uid).pipe(
-            switchMap(
-                res => of(res).catch(error => of(error))
-            ),
-            catchError(error => {
-                console.log(error);
-                return of('');
-            }),
-            map(res => res)
-        );
+        return this.entityCacheService.findWorkspaceInCache(uid);
     }
 
     retrieveFolderEntity(uid: number): Observable<Folder> {
@@ -499,41 +444,36 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     public deleteCacheEntry(uid: number): void {
-      this.loadedEntities.delete(uid);
+      this.entityCacheService.removeEntityInCache(uid);
     }
 
-    public deleteCacheDocumentEntry(uid: number): void {
+    /*public deleteCacheDocumentEntry(uid: number): void {
         this.entities.delete(uid);
-    }
+    }*/
 
-    deleteEntity(entity: DMEntity): void {
-        if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
-            this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).subscribe(
-                () => console.log('TODO: delete workspace tree node')
-            );
-        } else {
-            if (DMEntityUtils.dmEntityIsFolder(entity)) {
-                this.folderService.deleteFolder(this.sessionService.sessionToken, entity.uid).subscribe(
-                    () => {
-                        console.log('TODO: delete folder tree node');
-                        this.updateListAfterDelete(entity);
-                    }
-                );
-            } else {
-                if (DMEntityUtils.dmEntityIsDocument(entity)) {
-                    this.documentService.deleteDocument(this.sessionService.sessionToken, entity.uid).subscribe(
-                        () => this.updateListAfterDelete(entity)
-                    );
-                }
-            }
-        }
+    deleteEntity(entity: DMEntity): Observable<any> {
+      return DMEntityUtils.dmEntityIsWorkspace(entity) ?
+        this.workspaceService.deleteWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
+          tap(() => this.removedWorkspace$.next(entity.uid))
+        ) :
+        DMEntityUtils.dmEntityIsFolder(entity) ?
+          this.folderService.deleteFolder(this.sessionService.sessionToken, entity.uid).pipe(
+            // concatMap(() => this.entityCacheService.findDocumentInCache(entity.uid)),
+            concatMap(() => this.updateListAfterDelete(entity)),
+            // concatMap(() => this.getEntity(doc.folderUid)),
+            tap(() => this.removedFolder$.next(entity.uid))
+          ) :
+          this.documentService.deleteDocument(this.sessionService.sessionToken, entity.uid).pipe(
+            concatMap(() => this.updateListAfterDelete(entity)),
+            tap(() => this.removedDocument$.next(entity.uid))
+          );
     }
 
     deleteDocument(uid: number): Observable<any> {
       return this.documentService.deleteDocument(this.sessionService.sessionToken, uid);
     }
 
-    updateListAfterDelete(entity: DMEntity): void {
+    updateListAfterDelete(entity: DMEntity): Observable<Array<DMEntity>> {
         let parentUid: number;
         if (entity['parentUid']) {
             parentUid = entity['parentUid'];
@@ -543,22 +483,25 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         }
 
-        this.deleteCacheEntry(parentUid);
-        // this.selectedEntity$.next(this.entities.get(parentUid));
-        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-        const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
-        if (idx !== -1) {
-            totalEntities.splice(idx, 1);
-            this.totalEntitiesToDisplay$.next(totalEntities);
-        }
-        if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
-            this.pageIndex.next(this.pageIndex.getValue() - 1);
-        }
-        this.makePage(this.pageIndex.getValue(), this.pageSize);
-        this.nodeToRemoveFromTree.next(entity);
+        return this.entityCacheService.reloadEntityChildren(parentUid).pipe(
+          tap(() => {
+            // this.selectedEntity$.next(this.entities.get(parentUid));
+            const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+            const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
+            if (idx !== -1) {
+              totalEntities.splice(idx, 1);
+              this.totalEntitiesToDisplay$.next(totalEntities);
+            }
+            if (this.pageIndex.getValue() > Math.floor(totalEntities.length / this.pageSize)) {
+              this.pageIndex.next(this.pageIndex.getValue() - 1);
+            }
+            this.makePage(this.pageIndex.getValue(), this.pageSize);
+            this.nodeToRemoveFromTree.next(entity);
+          })
+        );
     }
 
-    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity): void {
+    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity, movedEntityInitialParentUid?: number): Observable<Array<DMEntity>> {
         let parentUid: number;
         if (entityMoved['parentUid']) {
             parentUid = entityMoved['parentUid'];
@@ -568,18 +511,27 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         }
 
-        this.deleteCacheEntry(parentUid);
-        this.deleteCacheEntry(entityTarget.uid);
-        const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-        const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
-        if (idx !== -1) {
-            totalEntities.splice(idx, 1);
-            this.totalEntitiesToDisplay$.next(totalEntities);
-        }
-        /*if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
-            this.pageIndex.next(this.pageIndex.getValue() - 1);
-        }*/
-        this.makePage(this.pageIndex.getValue(), this.pageSize);
+      return this.entityCacheService.reloadEntityChildren(parentUid).pipe(
+        tap(() => {
+          const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
+          const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
+          const currentPathValue = this.currentPath.getValue();
+          if (movedEntityInitialParentUid === currentPathValue[currentPathValue.length - 1].uid) {
+            if (idx !== -1) {
+              totalEntities.splice(idx, 1);
+            }
+          } else {
+            if (entityTarget.uid === currentPathValue[currentPathValue.length - 1].uid) {
+              totalEntities.push(entityMoved);
+            }
+          }
+          this.totalEntitiesToDisplay$.next(totalEntities);
+          /*if ((this.pageIndex.getValue() + 1 - 1) * this.pageSize <= totalEntities.length) {
+                this.pageIndex.next(this.pageIndex.getValue() - 1);
+            }*/
+          this.makePage(this.pageIndex.getValue(), this.pageSize);
+        })
+      );
     }
 
     moveEntity(entity: DMEntity, targetEntity: DMEntity): Observable<any> {
@@ -600,11 +552,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             );
     }
 
-    addNewEntityInCache(entity: DMEntity): void {
+    /*addNewEntityInCache(entity: DMEntity): void {
       this.entities.set(entity.uid, entity);
-    }
+    }*/
 
-    updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
+    /*updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
       if (DMEntityUtils.dmEntityIsDocument(entity)) {
           return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
               tap(doc => this.entities.set(entity.uid, doc)),
@@ -623,11 +575,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
               );
           }
       }
-    }
+    }*/
 
-    checkEntityInCache(entityId: number): boolean {
+    /*checkEntityInCache(entityId: number): boolean {
       return this.entities.get(entityId) !== null && this.entities.get(entityId) !== undefined;
-    }
+    }*/
 
     goInContainerEntity(entity: DMEntity): void {
         this.selectedEntityFromGridOrTree$.next(entity);
@@ -638,24 +590,16 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         }
     }
 
-    getDocument(docId: number): Observable<KimiosDocument> {
+    /*getDocument(docId: number): Observable<KimiosDocument> {
         return this.entities.get(docId) != null ?
             of(this.entities.get(docId)) :
             this.documentService.getDocument(this.sessionService.sessionToken, docId).pipe(
                 tap(doc => this.entities.set(docId, doc))
             );
-    }
+    }*/
 
     getEntity(entityId: number): Observable<DMEntity> {
-        return this.entities.get(entityId) != null ?
-            of(this.entities.get(entityId)) :
-            this.retrieveContainerEntity(entityId).pipe(
-                concatMap(
-                    res => (res === null || res === undefined || res === '') ?
-                        this.getDocument(entityId) :
-                        of(res)
-                )
-            );
+        return this.entityCacheService.findEntityInCache(entityId);
     }
 
     computeEntityPath(entityId: number): string {
@@ -667,14 +611,14 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     appendEntityParentNameRec(entityId: number, path: string): string {
-      const entity = this.entities.get(entityId);
+      const entity = this.entityCacheService.getEntity(entityId);
       if (DMEntityUtils.dmEntityIsWorkspace(entity)) {
           return entity.name + '/' + path;
       } else {
           return this.appendEntityParentNameRec(
               DMEntityUtils.dmEntityIsDocument(entity) ?
-                  this.entities.get(entity['folderUid']).uid :
-                  this.entities.get(entity['parentUid']).uid,
+                  this.entityCacheService.getEntity(entity['folderUid']).uid :
+                  this.entityCacheService.getEntity(entity['parentUid']).uid,
               path === '' ?
                   entity.name :
                   entity.name + '/' + path
@@ -689,8 +633,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         } else {
             return this.appendEntityParentRec(
                 DMEntityUtils.dmEntityIsDocument(entity) ?
-                    this.entities.get(entity['folderUid']) :
-                    this.entities.get(entity['parentUid']),
+                    this.entityCacheService.getEntity(entity['folderUid']) :
+                    this.entityCacheService.getEntity(entity['parentUid']),
                 array.concat(entity)
             );
         }
@@ -705,11 +649,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         return this.computeFolderPathEntities(entityTarget).filter(entity => entity.uid === Number(entityMoved.uid)).length === 0;
     }
 
-    reloadEntity(uid: number): Observable<DMEntity> {
+    /*reloadEntity(uid: number): Observable<DMEntity> {
         return this.getEntity(uid).pipe(
             concatMap(entity => this.updateEntityInCache(entity))
         );
-    }
+    }*/
 
     goToEntity(entity: DMEntity, router: Router): void {
         if (DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity)) {

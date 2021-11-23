@@ -1,0 +1,52 @@
+<div class="file-tab-content-wrapper">
+  <div class="file-tab-content with-list">
+    <mat-table [dataSource]="dataSource"
+             matSort
+             matSortActive="{{sort.name}}"
+             matSortDirection="{{sort.direction}}"
+             matSortDisableClear
+             (matSortChange)="sortData($event)">
+
+      <ng-container
+              *ngFor="let col of columnsDescription"
+              matColumnDef="{{col.matColumnDef}}"
+              sticky="{{col.sticky}}">
+        <mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header="{{col.noSortHeader ? 'disabled' : col.matColumnDef}}"
+                [disabled]="col.noSortHeader"
+                [ngClass]="col.class ? col.class : ''"
+        >
+          <mat-icon *ngIf="col.cellHeaderIcon" (click)="add()" [ngClass]="'cursor-pointer'"
+                    title="Add a related document"
+          >
+            {{col.cellHeaderIcon}}
+          </mat-icon>
+          {{col.displayName}}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element" [class.cursor-pointer]="true" (dblclick)="goToDocument($event, element.uid, col.id)"
+                  [ngClass]="col.class ? col.class : ''"
+        >
+          <mat-icon *ngIf="col.element === 'iconName' else lengthTemplate;" class="cursor-pointer" (click)="delete(element.uid)"> {{ col.cell }} </mat-icon>
+          <ng-template #lengthTemplate>
+            <span *ngIf="col.id === 'length' else dateTemplate;" title="{{ element[col.matColumnDef] }}">
+              {{ element[col.matColumnDef] | fileSize }}
+            </span>
+          </ng-template>
+          <ng-template #dateTemplate>
+            <span *ngIf="col.id.endsWith('Date') else otherColumnTemplate">{{ element[col.matColumnDef] | date : 'short'}}</span>
+          </ng-template>
+          <ng-template #otherColumnTemplate>
+            <span>{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
+          </ng-template>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+
+      <mat-row *matRowDef="let row; columns: displayedColumns;">
+      </mat-row>
+
+    </mat-table>
+  </div>
+</div>

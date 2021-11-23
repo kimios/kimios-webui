@@ -1,5 +1,8 @@
-<form [formGroup]="formGroup" *ngIf="formGroup.get('documentTypeName') != null" [ngClass]="'kimios-section-content'">
-  <mat-form-field [ngClass]="'center'">
+<form [formGroup]="formGroup" *ngIf="formGroup.get('documentTypeName') != null">
+
+  <div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+
+  <mat-form-field [ngClass]="'studio-document-type-form-field'">
     <mat-label>Document type name</mat-label>
     <input
             matInput
@@ -9,12 +12,14 @@
             aria-label="Document type name" >
   </mat-form-field>
 
-  <mat-form-field [ngClass]="'center'">
+  <mat-form-field [ngClass]="'studio-document-type-form-field'">
     <mat-select
             placeholder="Inherited document type"
             [formControlName]="'inheritedDocumentType'"
             (selectionChange)="onSelectDocumentTypeInheritedChange($event.value)"
             (closed)="onPanelClose()"
+            title="{{this.formGroup.get('inheritedDocumentType').value ?
+            this.formGroup.get('inheritedDocumentType').value.name : ''}}"
     >
       <input matInput
              [formControlName]="'filterControl_inheritedDocumentType'"
@@ -45,10 +50,10 @@
 
     <!-- remove Column -->
     <ng-container matColumnDef="remove">
-      <mat-header-cell *matHeaderCellDef>
+      <mat-header-cell *matHeaderCellDef [ngClass]="'mat-column-width50'">
         <mat-icon [ngClass]="'cursor-pointer'" (click)="addMetaData()" >add</mat-icon>
       </mat-header-cell>
-      <mat-cell *matCellDef="let row">
+      <mat-cell *matCellDef="let row" [ngClass]="'mat-column-width50'">
         <mat-icon [ngClass]="'cursor-pointer'" (click)="removeMetaData(row)" >remove</mat-icon>
       </mat-cell>
     </ng-container>
@@ -142,8 +147,8 @@
     </ng-container>
 
     <ng-container matColumnDef="mandatory" *ngIf="columnsDescription[3]; let col">
-      <mat-header-cell *matHeaderCellDef> Mandatory </mat-header-cell>
-      <mat-cell *matCellDef="let element" [formGroupName]="element.uid.toString()">
+      <mat-header-cell *matHeaderCellDef [ngClass]="'mat-column-width100'"> Mandatory </mat-header-cell>
+      <mat-cell *matCellDef="let element" [formGroupName]="element.uid.toString()" [ngClass]="'mat-column-width100'">
         <mat-checkbox [formControlName]="'metaDataMandatory'" [value]="element.mandatory">
         </mat-checkbox>
       </mat-cell>
@@ -165,6 +170,8 @@
   <div  fxLayout="row" fxLayoutAlign="center center">
     <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
     <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
+  </div>
+
   </div>
 
 </form>

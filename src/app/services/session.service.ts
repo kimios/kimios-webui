@@ -188,7 +188,7 @@ export class SessionService implements OnDestroy {
     startSessionCheck(): void {
         this.intervalId = window.setInterval(
             () => this.setSessionAlive(),
-            5000
+            30000
         );
     }
 

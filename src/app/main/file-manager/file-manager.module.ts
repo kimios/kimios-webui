@@ -125,6 +125,19 @@ import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/
 import {StudioMetaFeedsComponent} from 'app/main/components/studio-meta-feeds/studio-meta-feeds.component';
 import {StudioMetaFeedAdminComponent} from 'app/main/components/studio-meta-feed-admin/studio-meta-feed-admin.component';
 import {ShareFormExternalComponent} from 'app/main/components/share-form-external/share-form-external.component';
+import {EntityPathComponent} from 'app/main/components/entity-path/entity-path.component';
+import {FileHistoryComponent} from 'app/main/components/file-history/file-history.component';
+import {DocumentVersionsComponent} from 'app/main/components/document-versions/document-versions.component';
+import {FileSizePipe} from 'app/main/utils/file-size.pipe';
+import {DocumentMetaDataComponent} from 'app/main/components/document-meta-data/document-meta-data.component';
+import {CartContentComponent} from 'app/main/components/cart-content/cart-content.component';
+import {RelatedDocumentsComponent} from 'app/main/components/related-documents/related-documents.component';
+import {FilePreviewWrapperComponent} from 'app/main/components/file-preview-wrapper/file-preview-wrapper.component';
+import {FileDetailTagsComponent} from 'app/main/components/file-detail-tags/file-detail-tags.component';
+import {FileDetailDataAndTagsComponent} from 'app/main/components/file-detail-data-and-tags/file-detail-data-and-tags.component';
+import {DocumentVersionDataDialogComponent} from 'app/main/components/document-version-data-dialog/document-version-data-dialog.component';
+import {DocumentVersionDataComponent} from 'app/main/components/document-version-data/document-version-data.component';
+import {AdminSpecialTasksDefaultTaskComponent} from 'app/main/components/admin-special-tasks-default-task/admin-special-tasks-default-task.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -212,7 +225,20 @@ library.add(far, fas);
         BrowseTreeDialogComponent,
         StudioMetaFeedsComponent,
         StudioMetaFeedAdminComponent,
-        ShareFormExternalComponent
+        ShareFormExternalComponent,
+        EntityPathComponent,
+        FileHistoryComponent,
+        DocumentVersionsComponent,
+        FileSizePipe,
+        DocumentMetaDataComponent,
+        CartContentComponent,
+        RelatedDocumentsComponent,
+        FilePreviewWrapperComponent,
+        FileDetailTagsComponent,
+        FileDetailDataAndTagsComponent,
+        DocumentVersionDataDialogComponent,
+        DocumentVersionDataComponent,
+        AdminSpecialTasksDefaultTaskComponent
     ],
     imports: [
         FileManagerRoutingModule,
@@ -277,7 +303,9 @@ library.add(far, fas);
         DocumentUploadProgressComponent,
         ConfirmDialogComponent,
         ShareEditDialogComponent,
-        BrowseTreeDialogComponent
+        BrowseTreeDialogComponent,
+        DocumentVersionDataDialogComponent,
+        AdminSpecialTasksDefaultTaskComponent
     ],
     exports: [
         FileUploadListComponent,

@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {AuthenticationSource, DMEntitySecurity, Group, SecurityService, User} from 'app/kimios-client-api';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
@@ -7,13 +7,15 @@ import {CdkDragEnd} from '@angular/cdk/drag-drop';
 import {AdminService} from 'app/services/admin.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
+import {EntityCreationService} from 'app/services/entity-creation.service';
+import {MatTabGroup, PageEvent} from '@angular/material';
 
 @Component({
   selector: 'users-groups-search-panel',
   templateUrl: './users-groups-search-panel.component.html',
   styleUrls: ['./users-groups-search-panel.component.scss']
 })
-export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked {
+export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked, AfterViewInit {
 
   allUsers: Array<User>;
   allGroups: Array<Group>;
@@ -30,13 +32,22 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   userListId;
   @Input()
   currentSecurities: Array<DMEntitySecurity>;
+  @Input()
+  mode: 'containerEntityCreation' | 'other' = 'other';
 
   @ViewChild('tabGroup', {read: ElementRef}) tabGroup: ElementRef;
+  @ViewChild('tabGroup', {read: MatTabGroup}) matTabGroup: MatTabGroup;
+
+  length: number;
+  pageSize = 10;
+  pageSizeOptions: [5, 10, 20];
+  pageIndex = 0;
 
   constructor(
       private sessionService: SessionService,
       private securityService: SecurityService,
-      private adminService: AdminService
+      private adminService: AdminService,
+      private entityCreationService: EntityCreationService
   ) {
     this.allUsers = new Array<User>();
     this.allGroups = new Array<Group>();
@@ -70,12 +81,13 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
           }
         }),
         tap(
-            users => this.allUsers = users
+            users => this.allUsers = this.allUsers.concat(users)
         ),
-        tap(users => this.filteredUsers$.next(users))
+        tap(users => this.length = this.allUsers.length),
+        tap(users => this.filteredUsers$.next(this.makePage(this.allUsers, this.pageSize, this.pageIndex)))
     ).subscribe();
 
-      source$.pipe(
+    source$.pipe(
           concatMap(
               source => this.securityService.getGroups(this.sessionService.sessionToken, source.name)
           ),
@@ -89,31 +101,38 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
               return groups;
             }
           }),
-          tap(groups => this.allGroups = groups),
+          tap(groups => this.allGroups = this.allGroups.concat(groups)),
+          // tap(groups => this.length = groups.length),
           tap(
-              groups => this.filteredGroups$.next(groups)
+              groups => this.filteredGroups$.next(this.makePage(this.allGroups, this.pageSize, this.pageIndex))
           )
       ).subscribe();
 
       this.adminService.selectedUsersAndGroups$.pipe(
           filter(userAndGroups => userAndGroups != null),
           tap(userAndGroups => {
-            const filteredUsers = this.allUsers
-                .filter(user => userAndGroups
-                    .findIndex(
-                        element => element.type === 'user'
-                            && element.element['uid'] === user.uid
-                            && element.element.source === user.source) === -1);
-            this.filteredUsers$.next(filteredUsers);
+            if (this.matTabGroup.selectedIndex === 0) {
+              const filteredUsers = this.allUsers
+                  .filter(user => userAndGroups
+                      .findIndex(
+                          element => element.type === 'user'
+                              && element.element['uid'] === user.uid
+                              && element.element.source === user.source) === -1);
+              this.length = filteredUsers.length;
+              this.filteredUsers$.next(this.makePage(filteredUsers, this.pageSize, this.pageIndex));
+            }
           }),
           tap(userAndGroups => {
-            const filteredGroups = this.allGroups
-                .filter(group => userAndGroups
-                    .findIndex(
-                        element => element.type === 'group'
-                            && element.element['gid'] === group.gid
-                            && element.element.source === group.source) === -1);
-            this.filteredGroups$.next(filteredGroups);
+            if (this.matTabGroup.selectedIndex === 1) {
+              const filteredGroups = this.allGroups
+                  .filter(group => userAndGroups
+                      .findIndex(
+                          element => element.type === 'group'
+                              && element.element['gid'] === group.gid
+                              && element.element.source === group.source) === -1);
+              this.length = filteredGroups.length;
+              this.filteredGroups$.next(this.makePage(filteredGroups, this.pageSize, this.pageIndex));
+            }
           })
       ).subscribe();
   }
@@ -123,7 +142,13 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   }
 
   handleDblClick(userOrGroup: UserOrGroup): void {
-    this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+    console.log('handleDblClick(): ');
+    console.dir(userOrGroup);
+    if (this.mode === 'containerEntityCreation') {
+      this.entityCreationService.newUserOrGroupTmp$.next(userOrGroup);
+    } else {
+      this.adminService.addUserOrGroupToPermissions$.next(userOrGroup);
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -150,5 +175,26 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
             || (this.itemOver.element['gid'] && item.element['gid'] && this.itemOver.element['gid'] === item.element['gid'])
         ) && this.itemOver.element.source === item.element.source;
 
+  }
+
+  paginatorHandler($event: PageEvent): void {
+    this.pageSize = $event.pageSize;
+    this.pageIndex = $event.pageIndex;
+    this.adminService.selectedUsersAndGroups$.next([]);
+  }
+
+  makePage(elements: Array<User> | Array<Group>, pageSize: number, pageIndex: number): Array<User> | Array<Group> {
+    const indexStart = pageSize * (pageIndex - 0);
+    const indexEnd = indexStart + pageSize;
+    return elements.slice(indexStart, indexEnd);
+  }
+
+  ngAfterViewInit(): void {
+    this.matTabGroup.selectedIndexChange.pipe(
+        tap(() => {
+          this.pageIndex = 0;
+          this.adminService.selectedUsersAndGroups$.next([]);
+        })
+    ).subscribe();
   }
 }

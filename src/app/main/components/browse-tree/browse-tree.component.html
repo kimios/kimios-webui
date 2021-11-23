@@ -9,7 +9,7 @@
          [style.padding-left]="node.getNodePadding()"
          [attr.data-nodeuid]="node.uid"
     >
-      <div style="margin-top: 0;">
+      <div style="margin-top: 0;" *ngIf="node.data.dmEntityType !== 'document'">
         <ng-container *ngIf="node.data.isLoading; else notLoading">
           <mat-progress-spinner
                   mode="indeterminate"
@@ -43,8 +43,17 @@
            [treeDrag]="node"
            [treeDragEnabled]="true">
         <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
+          <mat-checkbox *ngIf="mode === 'with-documents' && node.data.dmEntityType === 'document'"
+                        (change)="selectionChange($event, node.data.id)"
+                        [checked]="selectedEntity(node.id)"
+          >
+          </mat-checkbox>
           <mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>
           <mat-icon *ngIf="node.data.svgIcon === 'folder'">folder</mat-icon>
+          <fa-icon *ngIf="node.data.dmEntityType === 'document'"
+                   [icon]="['far', retrieveDocumentIcon(node.data.documentExtension, 'far')]"
+                   size="lg"
+                   [ngClass]="'file-icon-browse-list'"></fa-icon>
           <div>
             <tree-node-content [node]="node" [index]="index"></tree-node-content>
           </div>

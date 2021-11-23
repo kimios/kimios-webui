@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
-import {DataTransaction, DocumentService, DocumentVersionService, FiletransferService, Document as KimiosDocument} from 'app/kimios-client-api';
-import {Observable, of} from 'rxjs';
+import {DataTransaction, Document as KimiosDocument, DocumentService, DocumentVersionService, FiletransferService} from 'app/kimios-client-api';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {concatMap, map, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
-import {TagService} from 'app/services/tag.service';
-import {Tag} from 'app/main/model/tag';
 import {APP_CONFIG} from 'app/app-config/config';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {CacheSecurityService} from 'app/services/cache-security.service';
@@ -15,6 +13,11 @@ import {CacheSecurityService} from 'app/services/cache-security.service';
 })
 export class DocumentDetailService {
 
+  currentVersionId: BehaviorSubject<number>;
+  currentDocumentId$: BehaviorSubject<number>;
+  currentPath$: BehaviorSubject<string>;
+  selectedEntityIdList$: BehaviorSubject<Array<number>>;
+
   constructor(
       private documentService: DocumentService,
       private documentVersionService: DocumentVersionService,
@@ -23,7 +26,10 @@ export class DocumentDetailService {
       private sanitizer: DomSanitizer,
       private cacheSecurityService: CacheSecurityService
   ) {
-
+      this.currentVersionId = new BehaviorSubject<number>(null);
+      this.currentDocumentId$ = new BehaviorSubject<number>(null);
+      this.currentPath$ = new BehaviorSubject<string>('');
+      this.selectedEntityIdList$ = new BehaviorSubject<Array<number>>(null);
   }
 
   retrieveDocumentFromId(docId: number): Observable<KimiosDocument> {
