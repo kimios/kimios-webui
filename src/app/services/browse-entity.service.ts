@@ -512,6 +512,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         }
 
       return this.entityCacheService.reloadEntityChildren(parentUid).pipe(
+        concatMap(() => movedEntityInitialParentUid !== null ?
+          this.entityCacheService.reloadEntityChildren(movedEntityInitialParentUid) :
+          of()
+        ),
         tap(() => {
           const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
           const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
