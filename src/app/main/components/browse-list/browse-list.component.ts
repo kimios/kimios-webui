@@ -98,6 +98,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
     this.bes.loading$.subscribe(
         res => this.showSpinner = res
     );
+
+    this.entityCacheService.reloadedEntity$.pipe(
+      filter(entity => entity != null),
+      tap(entity => this.updateCurrentPageIfNeeded(entity))
+    ).subscribe();
   }
 
   /**
@@ -292,5 +297,14 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         'document' :
         'folder')
       + '?';
+  }
+
+  private updateCurrentPageIfNeeded(entity: DMEntity): void {
+    const entities = this.bes.entitiesToDisplay$.getValue();
+    const idx = entities.findIndex(element => element.uid === entity.uid);
+    if (idx !== -1) {
+      entities[idx] = entity;
+    }
+    this.bes.entitiesToDisplay$.next(entities);
   }
 }

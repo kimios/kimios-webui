@@ -101,7 +101,8 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
     dialogRef.afterClosed().pipe(
         filter(res => res === true),
         concatMap(res => this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid)),
-      concatMap(() => this.entityCacheService.reloadBookmarks())
+      concatMap(() => this.entityCacheService.reloadBookmarks()),
+      concatMap(() => this.entityCacheService.reloadEntity(bookmark.entity.uid))
     ).subscribe(
         null,
         null,

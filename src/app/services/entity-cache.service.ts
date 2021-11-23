@@ -14,7 +14,7 @@ import {
 } from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
-import {combineLatest, from, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
@@ -27,6 +27,7 @@ export class EntityCacheService {
   private entitiesHierarchyCache: Map<number, Array<number>>;
   private allTags: Map<string, number>;
   private bookmarks: Array<Bookmark>;
+  public reloadedEntity$: BehaviorSubject<DMEntity>;
 
   constructor(
       private sessionService: SessionService,
@@ -39,6 +40,7 @@ export class EntityCacheService {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
     this.entitiesHierarchyCache = new Map<number, Array<number>>();
+    this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -317,11 +319,13 @@ export class EntityCacheService {
     const entity = this.getEntity(uid);
     if (entity != null) {
       return this.initBookmarks().pipe(
-        concatMap(() => this.updateEntityInCache(entity))
+        concatMap(() => this.updateEntityInCache(entity)),
+        tap(ent => this.reloadedEntity$.next(ent))
       );
     } else {
       return this.initBookmarks().pipe(
-        concatMap(() =>  this.initEntityInCache(uid))
+        concatMap(() =>  this.initEntityInCache(uid)),
+        tap(ent => this.reloadedEntity$.next(ent))
       );
     }
   }
