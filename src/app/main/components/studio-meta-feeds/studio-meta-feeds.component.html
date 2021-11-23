@@ -20,7 +20,7 @@
             <mat-icon>remove</mat-icon>
           </button>
           <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
-                               'selected-item' : metaFeed.uid === adminService.selectedMetaFeed$.getValue()}">
+                               'selected-item' : metaFeed.uid === selectedMetaFeed$.getValue()}">
             <div>{{metaFeed.name}}</div>
           </div>
         </mat-list-item>
@@ -29,8 +29,8 @@
     </div>
   </div>
   <mat-divider #divider [vertical]="true"></mat-divider>
-  <div *ngIf="adminService.selectedMetaFeed$.getValue() != null
-  || adminService.newMetaFeed$.getValue() === true else noMetaFeedSelectedOrInCreation;">
+  <div *ngIf="selectedMetaFeed$.getValue() != null
+  || newMetaFeed$.getValue() === true else noMetaFeedSelectedOrInCreation;">
     <studio-meta-feed-admin></studio-meta-feed-admin>
   </div>
   <ng-template #noMetaFeedSelectedOrInCreation>

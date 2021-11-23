@@ -14,6 +14,8 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
   metaFeeds$: BehaviorSubject<Array<MetaFeed>>;
 
   @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
+  selectedMetaFeed$: BehaviorSubject<number>;
+  newMetaFeed$: BehaviorSubject<boolean>;
 
   constructor(
       private adminService: AdminService,
@@ -21,6 +23,8 @@ export class StudioMetaFeedsComponent implements OnInit, AfterViewChecked {
       private sessionService: SessionService
   ) {
     this.metaFeeds$ = new BehaviorSubject<Array<MetaFeed>>(null);
+    this.selectedMetaFeed$ = this.adminService.selectedMetaFeed$;
+    this.newMetaFeed$ = this.adminService.newMetaFeed$;
   }
 
   ngOnInit(): void {

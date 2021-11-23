@@ -15,6 +15,8 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
   docTypes$: BehaviorSubject<Array<DocumentType>>;
 
   @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
+  selectedDocumentType$: BehaviorSubject<number>;
+  newDocumentType$: BehaviorSubject<boolean>;
 
   constructor(
       private studioService: StudioService,
@@ -22,6 +24,8 @@ export class StudioDocumentTypesComponent implements OnInit, AfterViewChecked {
       private sessionService: SessionService,
   ) {
     this.docTypes$ = new BehaviorSubject<Array<DocumentType>>(null);
+    this.selectedDocumentType$ = this.adminService.selectedDocumentType$;
+    this.newDocumentType$ = this.adminService.newDocumentType$;
   }
 
   ngOnInit(): void {

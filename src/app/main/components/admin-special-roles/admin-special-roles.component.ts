@@ -1,5 +1,6 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'admin-special-roles',
@@ -17,11 +18,13 @@ export class AdminSpecialRolesComponent implements OnInit, AfterViewChecked {
   ]);
   public possibleRolesId: Array<number>;
   @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
+  selectedRole$: BehaviorSubject<number>;
 
   constructor(
       private adminService: AdminService,
   ) {
     this.possibleRolesId = Array.from(this._possibleRoles.keys());
+    this.selectedRole$ = this.adminService.selectedRole$;
   }
 
   ngOnInit(): void {

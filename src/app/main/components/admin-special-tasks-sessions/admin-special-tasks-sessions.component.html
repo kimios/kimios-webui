@@ -62,7 +62,7 @@
             <ng-container matColumnDef="remove">
                 <mat-header-cell *matHeaderCellDef>
                     <mat-icon [ngClass]="'cursor-pointer'"
-                              (click)="endAllSessions(adminService.selectedUser$.getValue())" >remove</mat-icon>
+                              (click)="endAllSessions(selectedUser$.getValue())" >remove</mat-icon>
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
                     <mat-icon [ngClass]="'cursor-pointer'" (click)="endSession(row)" >remove</mat-icon>

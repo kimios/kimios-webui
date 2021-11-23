@@ -8,6 +8,7 @@ import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {Sort} from '@angular/material';
 import {AdminService} from 'app/services/admin.service';
 import {ITreeNode} from 'angular-tree-component/dist/defs/api';
+import {BehaviorSubject} from 'rxjs';
 
 const sortTypeMapping = {
   'lastUse' : 'number'
@@ -40,6 +41,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
   displayedColumns: Array<string>;
   @ViewChild('tree') tree;
   showSessionList = false;
+  selectedUser$: BehaviorSubject<KimiosUser>;
 
   constructor(
       private administrationService: AdministrationService,
@@ -55,6 +57,7 @@ export class AdminSpecialTasksSessionsComponent implements OnInit {
     };
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
     this.displayedColumns.unshift('remove');
+    this.selectedUser$ = this.adminService.selectedUser$;
   }
 
   ngOnInit(): void {

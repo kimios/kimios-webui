@@ -24,7 +24,7 @@
                                 </button>
                             </div>
                             <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
-                                   'selected-item' : domain.name === adminService.selectedDomain$.getValue()}">
+                                   'selected-item' : domain.name === selectedDomain$.getValue()}">
                                 <div>{{domain.name}}</div>
                             </div>
                         </div>
@@ -37,8 +37,8 @@
 
             <div fxLayout="column" fxLayoutGap="10px" fxFlex>
 
-                <mat-tab-group *ngIf="adminService.selectedDomain$.getValue() !== ''
-                || adminService.newDomain$.getValue() === true else noSelectedDomain;">
+                <mat-tab-group *ngIf="selectedDomain$.getValue() !== ''
+                || newDomain$.getValue() === true else noSelectedDomain;">
                     <mat-tab label="Parameters">
                         <admin-domains-parameters></admin-domains-parameters>
                     </mat-tab>

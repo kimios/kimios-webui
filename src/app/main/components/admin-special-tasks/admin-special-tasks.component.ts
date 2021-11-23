@@ -1,5 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from 'app/services/admin.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'admin-special-tasks',
@@ -14,11 +15,13 @@ export class AdminSpecialTasksComponent implements OnInit {
   ]);
   public possibleTasksId: Array<number>;
   @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
+  selectedTask$: BehaviorSubject<number>;
 
   constructor(
       private adminService: AdminService,
   ) {
     this.possibleTasksId = Array.from(this._possibleTasks.keys());
+    this.selectedTask$ = this.adminService.selectedTask$;
   }
 
   ngOnInit(): void {

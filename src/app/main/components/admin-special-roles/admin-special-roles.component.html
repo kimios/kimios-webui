@@ -7,13 +7,10 @@
         <mat-list>
           <mat-list-item *ngFor="let possibleRoleId of possibleRolesId"
                          [ngClass]="{'cursor-pointer' : true}" >
-            <!--,
-                               'selected-item' : possibleRoleId.name === adminService.selectedDomain$.getValue()}"
-          >-->
             <div fxFill fxLayout="row" fxLayoutAlign="start stretch" (click)="selectRole(possibleRoleId)"
                  fxLayoutGap="10px" >
               <div fxFlex fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'kimios-selection-item': true,
-                                   'selected-item' : possibleRoleId === adminService.selectedRole$.getValue()}">
+                                   'selected-item' : possibleRoleId === selectedRole$.getValue()}">
                 <div>{{_possibleRoles.get(possibleRoleId)}}</div>
               </div>
             </div>
@@ -24,7 +21,7 @@
       <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
 
       <div fxFlex>
-        <div  *ngIf="adminService.selectedRole$.getValue() !== 0 else noSelectedRole;" fxFlex>
+        <div  *ngIf="selectedRole$.getValue() !== 0 else noSelectedRole;" fxFlex>
           <admin-domains-users [_mode]="'roles'">
           </admin-domains-users>
         </div>
