@@ -112,7 +112,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
         this.urlSectionTitleMapping = new Map<string, string>();
         this.urlSectionTitleMapping.set('', 'Workspaces');
         this.urlSectionTitleMapping.set('workspaces', 'Workspaces');
-        this.urlSectionTitleMapping.set('search', 'Search');
+        this.urlSectionTitleMapping.set('searchqueries', 'Search');
         this.urlSectionTitleMapping.set('document', 'Document');
         this.urlSectionTitleMapping.set('mybookmarks', 'My bookmarks');
         this.urlSectionTitleMapping.set('shares', 'Shares');
