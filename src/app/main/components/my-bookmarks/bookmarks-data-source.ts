@@ -6,6 +6,7 @@ import {map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 export const BOOKMARKS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -46,7 +47,7 @@ export class BookmarksDataSource extends MatTableDataSource<Bookmark> {
 
     constructor(
         private sessionService: SessionService,
-        private documentService: DocumentService
+        private entityCacheService: EntityCacheService
     ) {
         super();
     }
@@ -61,7 +62,7 @@ export class BookmarksDataSource extends MatTableDataSource<Bookmark> {
     }
 
     loadData(sort: DMEntitySortSubElement, filter: string): void {
-        this.documentService.getBookmarks(this.sessionService.sessionToken).pipe(
+        this.entityCacheService.findBookmarksInCache().pipe(
             map(bookmarks => filter != null && filter !== undefined && filter !== '' ?
                 this.filterData(bookmarks, filter) :
                 bookmarks

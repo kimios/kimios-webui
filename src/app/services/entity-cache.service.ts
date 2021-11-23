@@ -1,6 +1,17 @@
 import {Injectable} from '@angular/core';
 import {DocumentCacheData, DocumentVersionWithMetaValues, EntityCacheData} from 'app/main/model/entity-cache-data';
-import {DMEntity, Document as KimiosDocument, DocumentService, DocumentVersionService, Folder, FolderService, MetaValue, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {
+  Bookmark,
+  DMEntity,
+  Document as KimiosDocument,
+  DocumentService,
+  DocumentVersionService,
+  Folder,
+  FolderService,
+  MetaValue,
+  Workspace,
+  WorkspaceService
+} from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {combineLatest, from, Observable, of} from 'rxjs';
@@ -15,6 +26,7 @@ export class EntityCacheService {
   private entitiesCache: Map<number, EntityCacheData>;
   private entitiesHierarchyCache: Map<number, Array<number>>;
   private allTags: Map<string, number>;
+  private bookmarks: Array<Bookmark>;
 
   constructor(
       private sessionService: SessionService,
@@ -63,8 +75,15 @@ export class EntityCacheService {
     const documentInCache = this.getDocumentCacheData(uid);
 
     return documentInCache == null ?
-        this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
-            tap(document => this.entitiesCache.set(uid, new EntityCacheData(document)))
+        this.initBookmarks().pipe(
+          concatMap(bookmarks => this.documentService.getDocument(this.sessionService.sessionToken, uid)),
+          map(doc => {
+            if (this.bookmarks.filter(element => element.entity.uid === doc.uid).length > 0) {
+              doc.bookmarked = true;
+            }
+            return doc;
+          }),
+          tap(document => this.entitiesCache.set(uid, new EntityCacheData(document)))
         ) :
         of(documentInCache.entity);
   }
@@ -163,7 +182,16 @@ export class EntityCacheService {
   }
 
   private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntity>> {
-    return this.findEntitiesAtPathFromId(uid).pipe(
+    return this.initBookmarks().pipe(
+      concatMap(() => this.findEntitiesAtPathFromId(uid)),
+      map(entities => entities.map(element => {
+        if (this.bookmarks.findIndex(b => b.entity.uid === element.uid) !== -1) {
+          element.bookmarked = true;
+        } else {
+          element.bookmarked = false;
+        }
+        return element;
+      })),
       tap(entityList => entityList.forEach(entity => this.entitiesCache.set(entity.uid, new EntityCacheData(entity)))),
       tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
     );
@@ -176,7 +204,14 @@ export class EntityCacheService {
   }
 
   private initEntityInCache(entityUid: number): Observable<DMEntity> {
-    return this.retrieveEntity(entityUid).pipe(
+    return this.initBookmarks().pipe(
+      concatMap(bookmarks => this.retrieveEntity(entityUid)),
+      map(entity => {
+        if (this.bookmarks.filter(element => element.entity.uid === entity.uid).length > 0) {
+          entity.bookmarked = true;
+        }
+        return entity;
+      }),
       tap(entity => {
         if (entity != null && entity !== undefined && entity !== '') {
           this.entitiesCache.set(
@@ -281,15 +316,25 @@ export class EntityCacheService {
   reloadEntity(uid: number): Observable<DMEntity> {
     const entity = this.getEntity(uid);
     if (entity != null) {
-      return this.updateEntityInCache(entity);
+      return this.initBookmarks().pipe(
+        concatMap(() => this.updateEntityInCache(entity))
+      );
     } else {
-      return this.initEntityInCache(uid);
+      return this.initBookmarks().pipe(
+        concatMap(() =>  this.initEntityInCache(uid))
+      );
     }
   }
 
   private updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
     if (DMEntityUtils.dmEntityIsDocument(entity)) {
       return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
+        map(doc => {
+          if (this.bookmarks.filter(element => element.entity.uid === doc.uid).length > 0) {
+            doc.bookmarked = true;
+          }
+          return doc;
+        }),
         tap(res => {
           if (res != null && res !== undefined && res !== '') {
             this.entitiesCache.set(res.uid, new EntityCacheData(res));
@@ -299,6 +344,12 @@ export class EntityCacheService {
     } else {
       if (DMEntityUtils.dmEntityIsFolder(entity)) {
         return this.folderService.getFolder(this.sessionService.sessionToken, entity.uid).pipe(
+          map(folder => {
+            if (this.bookmarks.filter(element => element.entity.uid === folder.uid).length > 0) {
+              folder.bookmarked = true;
+            }
+            return folder;
+          }),
           tap(res => {
             if (res != null && res !== undefined && res !== '') {
               this.entitiesCache.set(res.uid, new EntityCacheData(res));
@@ -307,6 +358,12 @@ export class EntityCacheService {
         );
       } else {
         return this.workspaceService.getWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
+          map(workspace => {
+            if (this.bookmarks.filter(element => element.entity.uid === workspace.uid).length > 0) {
+              workspace.bookmarked = true;
+            }
+            return workspace;
+          }),
           tap(res => {
             if (res != null && res !== undefined && res !== '') {
               this.entitiesCache.set(res.uid, new EntityCacheData(res));
@@ -406,5 +463,23 @@ export class EntityCacheService {
         }
       })
     );
+  }
+
+  private initBookmarks(): Observable<Array<Bookmark>> {
+    return this.documentService.getBookmarks(this.sessionService.sessionToken).pipe(
+      tap(bookmarks => this.bookmarks = bookmarks)
+    );
+  }
+
+  public findBookmarksInCache(): Observable<Array<Bookmark>> {
+    if (this.bookmarks == null) {
+      return this.initBookmarks();
+    } else {
+      return of(this.bookmarks);
+    }
+  }
+
+  public reloadBookmarks(): Observable<Array<Bookmark>> {
+    return this.initBookmarks();
   }
 }

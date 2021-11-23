@@ -231,12 +231,6 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   handleBookmarkDocument(entity: DMEntity): void {
-    if (entity.bookmarked === true) {
-      this.documentDetailService.removeBookmark(entity.uid);
-    } else {
-      this.documentDetailService.addBookmark(entity.uid);
-    }
-
     of(entity.bookmarked === true).pipe(
         concatMap(res => {
           if (res) {
@@ -244,7 +238,8 @@ export class BrowseListComponent implements OnInit, OnDestroy {
           } else {
             return this.documentDetailService.addBookmark(entity.uid);
           }
-        })
+        }),
+      concatMap(() => this.entityCacheService.reloadEntity(entity.uid))
     ).subscribe(
         next => entity.bookmarked = !entity.bookmarked
     );

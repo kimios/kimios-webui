@@ -12,6 +12,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'my-bookmarks',
@@ -37,7 +38,8 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
       public dialog: MatDialog,
       private router: Router,
       private bes: BrowseEntityService,
-      private iconService: IconService
+      private iconService: IconService,
+      private entityCacheService: EntityCacheService
   ) {
     this.sort = <DMEntitySortSubElement> {
       name: 'name',
@@ -49,7 +51,7 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
-    this.dataSource = new BookmarksDataSource(this.sessionService, this.documentService);
+    this.dataSource = new BookmarksDataSource(this.sessionService, this.entityCacheService);
     this.dataSource.loadData(this.sort, this.filter);
     this.dataSearch.valueChanges.pipe(
         map(value => this.filterData())
@@ -98,7 +100,8 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
 
     dialogRef.afterClosed().pipe(
         filter(res => res === true),
-        concatMap(res => this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid))
+        concatMap(res => this.documentService.removeBookmark(this.sessionService.sessionToken, bookmark.entity.uid)),
+      concatMap(() => this.entityCacheService.reloadBookmarks())
     ).subscribe(
         null,
         null,

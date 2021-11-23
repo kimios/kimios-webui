@@ -74,12 +74,16 @@ export class EntityListLockButtonComponent implements OnInit {
   handleClick(): void {
     if (!this.disableButton) {
       if (this.lockPossibility === LockPossibility.CAN_LOCK) {
-        this.documentDetailService.checkOut(this.docId).subscribe(
+        this.documentDetailService.checkOut(this.docId).pipe(
+          concatMap(() => this.entityCacheService.reloadEntity(this.docId))
+        ).subscribe(
             next => this.ngOnInit()
         );
       } else {
         if (this.lockPossibility === LockPossibility.CAN_UNLOCK) {
-          this.documentDetailService.checkIn(this.docId).subscribe(
+          this.documentDetailService.checkIn(this.docId).pipe(
+            concatMap(() => this.entityCacheService.reloadEntity(this.docId))
+          ).subscribe(
               next => this.ngOnInit()
           );
         }
