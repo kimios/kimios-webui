@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
 import {Subject} from 'rxjs';
-import {catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {catchError, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {TranslateService} from '@ngx-translate/core';
 import * as _ from 'lodash';
 
@@ -10,7 +10,7 @@ import {FuseSidebarService} from '@fuse/components/sidebar/sidebar.service';
 import {navigation} from 'app/navigation/navigation';
 import {User} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
-import {Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {DocumentExportService} from 'app/services/document-export.service';
@@ -41,6 +41,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
     sideBarIcon = 'format_list_bulleted';
     showSpinner = false;
+    kimiosCurrentSection: string;
+    urlSectionTitleMapping: Map<string, string>;
 
     /**
      * Constructor
@@ -106,6 +108,17 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
         // Set the private defaults
         this._unsubscribeAll = new Subject();
+
+        this.urlSectionTitleMapping = new Map<string, string>();
+        this.urlSectionTitleMapping.set('', 'Workspaces');
+        this.urlSectionTitleMapping.set('workspaces', 'Workspaces');
+        this.urlSectionTitleMapping.set('search', 'Search');
+        this.urlSectionTitleMapping.set('document', 'Document');
+        this.urlSectionTitleMapping.set('mybookmarks', 'My bookmarks');
+        this.urlSectionTitleMapping.set('shares', 'Shares');
+        this.urlSectionTitleMapping.set('settings', 'Settings');
+        this.urlSectionTitleMapping.set('cart', 'Cart');
+        this.urlSectionTitleMapping.set('overview', 'Overview');
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -157,6 +170,11 @@ export class ToolbarComponent implements OnInit, OnDestroy
 
         this.documentExportService.cartSize$.pipe(
             tap(size => this.cartSize = size)
+        ).subscribe();
+
+        this.router.events.pipe(
+          filter(event => event instanceof NavigationEnd),
+          tap((event: NavigationEnd) => this.kimiosCurrentSection = this.initTitle(event.urlAfterRedirects))
         ).subscribe();
     }
 
@@ -219,5 +237,15 @@ export class ToolbarComponent implements OnInit, OnDestroy
     navigateToCart(): boolean {
         this.router.navigate(['/cart']);
         return false;
+    }
+
+    private initTitle(urlAfterRedirects: string): string {
+        const regex = /^\/([^\/]+)(?:\/.*)?$/;
+        const match = urlAfterRedirects.match(regex);
+        return match != null
+        && match[1] != null
+        && this.urlSectionTitleMapping.get(match[1]) != null ?
+          this.urlSectionTitleMapping.get(match[1]) :
+          '';
     }
 }
