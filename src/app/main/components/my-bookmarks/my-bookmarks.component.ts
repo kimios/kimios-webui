@@ -74,7 +74,7 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
         });
     const matHeaderRowElementOffsetHeight = matHeaderRowElement ? matHeaderRowElement.offsetHeight : 0;
     const windowTotalScreen = window.innerHeight;
-    this.matTable['_elementRef'].nativeElement.style.height = windowTotalScreen - matTableOffsetTop - matHeaderRowElementOffsetHeight - 10 + 'px';
+    // this.matTable['_elementRef'].nativeElement.style.height = windowTotalScreen - matTableOffsetTop - matHeaderRowElementOffsetHeight - 10 + 'px';
   }
 
   sortData($event: Sort): void {
