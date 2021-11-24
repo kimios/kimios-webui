@@ -1,6 +1,6 @@
 import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
-import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
+import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
 import {concatMap, filter, flatMap, map, mergeMap, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -33,6 +33,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
   initDataDone$: BehaviorSubject<boolean>;
   entitiesLoaded: Map<number, DMEntity>;
   selectedEntityIdList: Array<number>;
+
+  toBeInsertedInTree: Array<DMEntity>;
 
   @ViewChild('tree') tree;
   @ViewChild('tree') treeElement: ElementRef;
@@ -96,6 +98,21 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     ).subscribe(
         next => updateTree
     )*/
+    this.entityCacheService.newEntity$.pipe(
+      filter(entity => entity != null && DMEntityUtils.dmEntityIsFolder(entity)),
+      tap(entity => {
+        const parentNode = this.tree.treeModel.getNodeById(
+          DMEntityUtils.dmEntityIsDocument(entity) ?
+            (entity as KimiosDocument).folderUid :
+            (entity as Folder).parentUid
+        );
+        if (parentNode == null) {
+          this.toBeInsertedInTree.push(entity);
+        } else {
+          this.tryToInsertEntitiesInTree();
+        }
+      })
+    ).subscribe();
   }
 
     ngAfterViewInit(): void {
@@ -658,5 +675,39 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     ) {
       this.treeElement['viewportComponent'].elementRef.nativeElement.style.overflow = 'unset';
     }
+  }
+
+  private tryToInsertEntitiesInTree(): void {
+    let inserted = 0;
+    do {
+      inserted = 0;
+      const toBeInserted = this.toBeInsertedInTree.slice();
+      toBeInserted.forEach((entity, idx) => {
+        const parentNode = this.tree.treeModel.getNodeById(
+          DMEntityUtils.dmEntityIsDocument(entity) ?
+            (entity as KimiosDocument).folderUid :
+            (entity as Folder).parentUid
+        );
+        if (parentNode != null) {
+          parentNode.data.children.push({
+              name: entity.name,
+              id: entity.uid.toString(),
+              children: null,
+              isLoading: false,
+              svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
+              dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
+              documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
+                (entity as KimiosDocument).extension ?
+                  (entity as KimiosDocument).extension :
+                  '' :
+                '',
+              selected: false
+          });
+          this.tree.treeModel.update();
+          inserted++;
+          this.toBeInsertedInTree.splice(idx, 1);
+        }
+      });
+    } while (inserted > 0 && this.toBeInsertedInTree.length > 0);
   }
 }
