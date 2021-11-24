@@ -185,7 +185,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
             tap(entity => this.tree.treeModel.getNodeById(entity.uid).expand()),
             concatMap(
-                entity => this.browseEntityService.findAllParents(entity.uid)
+                entity => this.entityCacheService.findAllParents(entity.uid)
             ),
             flatMap(
                 entities => entities.reverse()
@@ -348,7 +348,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                         entity => this.browseEntityService.selectedEntityFromGridOrTree$.next(entity)
                     ),
                     concatMap(
-                        entity => this.browseEntityService.findAllParents(entity.uid, true)
+                        entity => this.entityCacheService.findAllParents(entity.uid, true)
                     ),
                     map(entities => entities.reverse())
                 )

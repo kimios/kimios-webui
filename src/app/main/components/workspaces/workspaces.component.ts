@@ -4,7 +4,7 @@ import {BrowseEntityService, PAGE_SIZE_DEFAULT} from 'app/services/browse-entity
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
-import {DMEntity, Folder} from 'app/kimios-client-api';
+import {DMEntity, Folder, Workspace} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
 import {BehaviorSubject, Observable, of} from 'rxjs';
@@ -30,7 +30,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
   @ViewChild('browsePathRow') browsePathRow: ElementRef;
   @ViewChild('treeAndGridRow') treeAndGridRow: ElementRef;
   @ViewChild('sectionContainer', { read: ElementRef }) sectionContainer: ElementRef;
-  @ViewChild('sectionTitle') sectionTitle: ElementRef;
   @ViewChild('sectionContent') sectionContent: ElementRef;
   @ViewChild('treeAndGridRowWrapper') treeAndGridRowWrapper: ElementRef;
   @ViewChild('browsePathAndActions') browsePathAndActions: ElementRef;
@@ -71,7 +70,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
         && this.entityId !== 0) {
       this.browseEntityService.getEntity(this.entityId)
           .subscribe(entity => this.browseEntityService.selectedEntity$.next(entity));
-      this.browseEntityService.findAllParents(this.entityId, true).pipe(
+      this.entityCacheService.findAllParents(this.entityId, true).pipe(
           map(parents => this.browseEntityService.currentPath.next(parents.reverse()))
       ).subscribe();
     }
@@ -109,6 +108,17 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           tap(workspaces => this.browseEntityService.currentPath.next([workspaces[0]]))
       ).subscribe();
     }
+
+    this.entityCacheService.newEntity$.pipe(
+      filter(entity => entity != null),
+      tap(entity => {
+        const currentPath = this.browseEntityService.currentPath.getValue();
+        const currentContainerEntity = currentPath[currentPath.length - 1];
+        if (this.currentContainerEntityIsEntityParent(currentContainerEntity, entity)) {
+          this.addEntityAndReloadPage(entity);
+        }
+      })
+    ).subscribe();
   }
 
   ngAfterViewChecked(): void {
@@ -117,11 +127,10 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     // console.log(this.treeAndGridRow.nativeElement.style.height + ' = ' + this.contentColumn.nativeElement.offsetHeight + ' - ' + this.browsePathRow.nativeElement.offsetHeight);
 
     const sectionHeight = this.sectionContainer.nativeElement.offsetHeight;
-    const sectionTitleHeight = this.sectionTitle.nativeElement.offsetHeight;
+
     const browsePathAndActionsHeight = this.browsePathAndActions.nativeElement.offsetHeight;
-    const sectionTitleMargin = this.sectionTitle.nativeElement.style.marginBottom.replace('.px', '');
-    const sectionTitleMarginNumber = Number(sectionTitleMargin.replace('px', ''));
-    const height = (sectionHeight - sectionTitleHeight - browsePathAndActionsHeight) + 'px';
+
+    const height = (sectionHeight - browsePathAndActionsHeight) + 'px';
     this.treeAndGridRowWrapper.nativeElement.style.height = height;
     this.treeAndGridRowWrapper.nativeElement.style.maxHeight = height;
     this.treeAndGridRowWrapper.nativeElement.style.minHeight = height;
@@ -129,6 +138,26 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
 
   paginatorHandler($event: PageEvent): void {
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
+  }
+
+  private addEntityAndReloadPage(entity: DMEntity): void {
+    if (this.browseEntityService.addEntityToCurrentEntitiesToDisplay(entity)) {
+      this.browseEntityService.reloadPage();
+    }
+  }
+
+  private currentContainerEntityIsEntityParent(currentContainerEntity: DMEntity, entity: DMEntity): boolean {
+    return DMEntityUtils.dmEntityIsDocument(entity) ?
+      (entity as KimiosDocument).folderUid === (
+        DMEntityUtils.dmEntityIsFolder(currentContainerEntity) ?
+          (currentContainerEntity as Folder).uid :
+          (currentContainerEntity as Workspace).uid
+      ) :
+      (entity as Folder).parentUid === (
+        DMEntityUtils.dmEntityIsFolder(currentContainerEntity) ?
+          (currentContainerEntity as Folder).uid :
+          (currentContainerEntity as Workspace).uid
+      );
   }
 
   openFilesUploadDialog(filesMap: Map<string, Array<File>>, droppedInDir?: DMEntity, droppedInTree?: boolean, dirsToCreate?: Array<string>): void {
@@ -200,7 +229,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
               null,
               null,
               () => {
-                this.browseEntityService.deleteCacheEntry(parentDir.uid);
+                // this.browseEntityService.deleteCacheEntry(parentDir.uid);
                 this.browseEntityService.selectedEntity$.next(currentDir);
                 this.fileUploadService.uploading$.next(false);
                 this.browseEntityService.onAddedChildToEntity$.next(parentDir.uid);

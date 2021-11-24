@@ -35,7 +35,7 @@ export class DocumentMenuComponent implements OnInit {
   goToDocument(entityId: number, entityType: 'folder' | 'document'): void {
     if (entityType === 'folder') {
       this.bes.selectedEntityFromGridOrTree$.next(this.entityCacheService.getEntity(entityId));
-      this.bes.findAllParents(entityId, true).subscribe(
+      this.entityCacheService.findAllParents(entityId, true).subscribe(
           next => this.bes.currentPath.next(next.reverse())
       );
       DocumentUtils.navigateToFolderOrWorkspace(this.router, entityId);

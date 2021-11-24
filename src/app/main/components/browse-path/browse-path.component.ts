@@ -3,7 +3,8 @@ import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {takeWhile} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {DocumentUtils} from '../../utils/document-utils';
+import {DocumentUtils} from 'app/main/utils/document-utils';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'browse-path',
@@ -20,6 +21,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
 
   constructor(
       private browseEntityService: BrowseEntityService,
+      private entityCacheService: EntityCacheService,
       public router: Router
   ) {
     this.pathDirs = [];
@@ -34,7 +36,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
       );
     } else {
       if (this.document !== null && this.contextIsDocument()) {
-        this.browseEntityService.findAllParents(this.document.folderUid, true).subscribe(
+        this.entityCacheService.findAllParents(this.document.folderUid, true).subscribe(
             next => this.pathDirs = next.reverse()
         );
       }

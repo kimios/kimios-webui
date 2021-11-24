@@ -1,8 +1,8 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
-import {DMEntity, Document as KimiosDocument, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from 'app/kimios-client-api';
-import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
-import {catchError, concatMap, expand, filter, map, switchMap, takeWhile, tap, toArray} from 'rxjs/operators';
+import {DMEntity, DocumentService, Folder, FolderService, Workspace, WorkspaceService} from 'app/kimios-client-api';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {catchError, concatMap, filter, map, switchMap, takeWhile, tap} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
@@ -261,7 +261,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 this.entityCacheService.getEntity(elem)
             ));
         } else {
-            this.findAllParents(uid, true).subscribe(
+            this.entityCacheService.findAllParents(uid, true).subscribe(
                 next => {
                     this.currentPath.next(next.reverse());
                 }
@@ -306,26 +306,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     /*findEntitiesAtPath(parent?: DMEntity): Observable<DMEntity[]> {
         return this.findEntitiesAtPathFromId((parent === null || parent === undefined) ? null : parent.uid);
     }*/
-
-    findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
-        return this.retrieveContainerEntity(uid).pipe(
-            expand(
-                res => res !== undefined && (DMEntityUtils.dmEntityIsFolder(res) /*|| DMEntityUtils.dmEntityIsWorkspace(res)*/) ?
-                    this.retrieveContainerEntity(res['parentUid']) :
-                    of()
-            ),
-            map(res => res),
-            filter(res => includeEntity || res.uid !== uid)
-        );
-    }
-
-    findAllParents(uid: number, includeEntity: boolean = false): Observable<Array<DMEntity>> {
-        const parents = new Array<DMEntity>();
-        return this.findAllParentsRec(uid, includeEntity).pipe(
-            filter(elem => elem !== null && elem !== undefined && elem !== ''),
-            toArray()
-        );
-    }
 
     retrieveContainerEntity(uid: number): Observable<DMEntity> {
       return this.entityCacheService.findContainerEntityInCache(uid);
@@ -671,6 +651,22 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     retrieveWorkspaces(): Observable<Array<Workspace>> {
       return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
     }
+
+  reloadPage(): void {
+    this.makePage(this.pageIndex.getValue(), this.pageSize, this.sort);
+  }
+
+  addEntityToCurrentEntitiesToDisplay(entity: DMEntity): boolean {
+    let ret = false;
+    const currentEntities = this.totalEntitiesToDisplay$.getValue();
+    if (currentEntities.findIndex(element => element.uid === entity.uid) === -1) {
+      currentEntities.push(entity);
+      this.totalEntitiesToDisplay$.next(currentEntities);
+      ret = true;
+    }
+
+    return ret;
+  }
 }
 
 

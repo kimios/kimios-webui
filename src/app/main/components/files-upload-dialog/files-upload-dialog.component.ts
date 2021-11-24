@@ -81,7 +81,10 @@ export class FilesUploadDialogComponent implements OnInit {
         console.dir(this.form);
     }
 
-    submit(): void {
+    submit($event: MouseEvent): void {
+        $event.stopPropagation();
+        $event.preventDefault();
+
 //        let fileToUpload = new Array<File>();
         const fileToUpload = new Map<string, Array<File>>();
         const formCopyFilesList = this.form.get('filesList');
@@ -98,7 +101,10 @@ export class FilesUploadDialogComponent implements OnInit {
         this.dialogRef.close(true);
     }
 
-    onNoClick(): void {
+    onNoClick($event: MouseEvent): void {
+        $event.stopPropagation();
+        $event.preventDefault();
+
         this.data.filesList = new Map<string, Array<File>>();
         this.dialogRef.close(false);
     }

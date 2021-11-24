@@ -13,7 +13,7 @@ import {
   WorkspaceService
 } from 'app/kimios-client-api';
 import {SessionService} from './session.service';
-import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, expand, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
@@ -28,6 +28,7 @@ export class EntityCacheService {
   private allTags: Map<string, number>;
   private bookmarks: Array<Bookmark>;
   public reloadedEntity$: BehaviorSubject<DMEntity>;
+  public newEntity$: BehaviorSubject<DMEntity>;
 
   constructor(
       private sessionService: SessionService,
@@ -41,6 +42,7 @@ export class EntityCacheService {
     this.allTags = null;
     this.entitiesHierarchyCache = new Map<number, Array<number>>();
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
+    this.newEntity$ = new BehaviorSubject<DMEntity>(null);
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -85,7 +87,9 @@ export class EntityCacheService {
             }
             return doc;
           }),
-          tap(document => this.entitiesCache.set(uid, new EntityCacheData(document)))
+          tap(document => this.entitiesCache.set(uid, new EntityCacheData(document))),
+          tap(document => this.appendDocumentToFolder(document)),
+          tap(document => this.newEntity$.next(document))
         ) :
         of(documentInCache.entity);
   }
@@ -194,7 +198,11 @@ export class EntityCacheService {
         }
         return element;
       })),
-      tap(entityList => entityList.forEach(entity => this.entitiesCache.set(entity.uid, new EntityCacheData(entity)))),
+      tap(entityList => entityList.forEach(entity => {
+        this.entitiesCache.set(entity.uid, DMEntityUtils.dmEntityIsDocument(entity) ?
+          new DocumentCacheData(entity as KimiosDocument) :
+          new EntityCacheData(entity));
+      })),
       tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
     );
   }
@@ -244,7 +252,7 @@ export class EntityCacheService {
   private retrieveContainerEntity(uid: number): Observable<DMEntity> {
     return this.retrieveFolderEntity(uid).pipe(
         concatMap(
-          res => (res === null || res === undefined || res === '') ?
+          res => (res == null || res === undefined || res === '') ?
             this.retrieveWorkspaceEntity(uid) :
             of(res)
         )
@@ -379,7 +387,7 @@ export class EntityCacheService {
   }
 
   findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
-    if (parentUid === null
+    if (parentUid == null
       || parentUid === undefined) {
       return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
     } else {
@@ -486,4 +494,83 @@ export class EntityCacheService {
   public reloadBookmarks(): Observable<Array<Bookmark>> {
     return this.initBookmarks();
   }
+
+  private appendDocumentToFolder(document: KimiosDocument): void {
+    const folder = this.getEntity(document.folderUid);
+    if (folder == null) {
+      this.documentService.retrieveDocumentParents(this.sessionService.sessionToken, document.uid).pipe(
+        tap(parents => {
+          const directParent = parents.shift();
+          const directParentCacheData = this.entitiesCache.get(directParent.uid);
+          if (directParentCacheData == null) {
+            this.entitiesCache.set(directParent.uid, new EntityCacheData(directParent));
+            this.newEntity$.next(directParent);
+          }
+          const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.uid);
+          if (containerHierarchyInCache == null) {
+            this.entitiesHierarchyCache.set(directParent.uid, new Array<number>());
+          }
+          this.entitiesHierarchyCache.get(directParent.uid).push(document.uid);
+
+          this.appendDMEntityToParentRec(parents, directParent);
+        })
+      ).subscribe();
+    } else {
+      if (this.entitiesHierarchyCache.get(folder.uid).findIndex(element => element === document.uid) === -1) {
+        this.entitiesHierarchyCache.get(folder.uid).push(document.uid);
+      }
+    }
+  }
+
+  private appendDMEntityToParentRec(parents: Array<DMEntity>, entity: DMEntity): void {
+    if (parents.length === 0) {
+      return;
+    } else {
+      const directParent = parents.shift();
+      const directParentCacheData = this.entitiesCache.get(directParent.uid);
+      if (directParentCacheData == null) {
+        this.entitiesCache.set(directParent.uid, new EntityCacheData(directParent));
+        this.newEntity$.next(directParent);
+      }
+      const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.uid);
+      if (containerHierarchyInCache == null) {
+        this.entitiesHierarchyCache.set(directParent.uid, new Array<number>());
+      }
+      if (this.entitiesHierarchyCache.get(directParent.uid).findIndex(element => element === entity.uid) === -1) {
+        this.entitiesHierarchyCache.get(directParent.uid).push(entity.uid);
+      }
+      this.appendDMEntityToParentRec(parents, directParent);
+    }
+  }
+
+  private createAllParentFoldersRec(entity: DMEntity): Observable<Array<DMEntity>> {
+    const parentUid = DMEntityUtils.dmEntityIsDocument(entity) ? (entity as KimiosDocument).folderUid : (entity as Folder).parentUid;
+    const containerEntity = this.getEntity(parentUid);
+    // if (containerEntity == null) {
+      return this.findAllParents(entity.uid);
+    /*} else {
+      return of([]);
+    }*/
+  }
+
+  findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
+    return this.findContainerEntityInCache(uid).pipe(
+      expand(
+        res => res !== undefined && (DMEntityUtils.dmEntityIsFolder(res) /*|| DMEntityUtils.dmEntityIsWorkspace(res)*/) ?
+          this.findContainerEntityInCache(res['parentUid']) :
+          of()
+      ),
+      map(res => res),
+      filter(res => includeEntity || res.uid !== uid)
+    );
+  }
+
+  findAllParents(uid: number, includeEntity: boolean = false): Observable<Array<DMEntity>> {
+    const parents = new Array<DMEntity>();
+    return this.findAllParentsRec(uid, includeEntity).pipe(
+      filter(elem => elem !== null && elem !== undefined && elem !== ''),
+      toArray()
+    );
+  }
+
 }
