@@ -12,7 +12,7 @@
     <div>
         <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
             <div fxLayout="column" fxLayoutAlign="start space-between">
-                <mat-form-field ngDefaultControl [formControl]="entityCreationForm.get('name')" appearance="fill">
+                <mat-form-field ngDefaultControl [formControl]="entityCreationForm.get('name')">
                     <mat-label>Name</mat-label>
                     <input matInput>
                 </mat-form-field>
@@ -29,6 +29,7 @@
                     [documentId]="undefined"
                     [showButtonForSearchUsersAndGroups]="false"
                     [showFormButtons]="false"
+                    [showSpinner]="false"
                     cdkDropList
                     [id]="'selectedUsersAndGroups'"
                     [cdkDropListConnectedTo]="[userListId, groupListId]"

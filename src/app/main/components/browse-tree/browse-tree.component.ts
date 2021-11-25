@@ -300,9 +300,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             this.entitiesLoaded.set(entity.uid, entity);
             this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
         })
-    ).subscribe(
-
-    );
+    ).subscribe();
 
         this.browseEntityService.onAddedChildToEntity$.pipe(
             concatMap(entityUid => combineLatest(

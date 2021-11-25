@@ -87,7 +87,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
     if (this.documentId !== undefined ) {
       this.entityCreationService.onFormSubmitted$.next(this.documentId);
       this.entityCreationService.onFormSecuritiesSubmitted$.subscribe(
-          next => next ? alert('securities have been created') : alert('securities NOT created'),
+          null,
           error => console.log('error when creating entity: ' + error.error.message)
       );
     } else {
@@ -104,7 +104,11 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           this.entityCreationService.onFormSubmitted$.next(uidCreated);
           return combineLatest(of(entityType), this.entityCreationService.onFormSecuritiesSubmitted$.asObservable(), of(uidCreated));
         }),
-        tap(([entityType, res, uidCreated]) => this.browseEntityService.onNewWorkspace.next(uidCreated)),
+        tap(([entityType, res, uidCreated]) => {
+          if (this.data.entityType === 'workspace') {
+            this.browseEntityService.onNewWorkspace.next(uidCreated);
+          }
+        }),
         concatMap(([entityType, res, uidCreated]) => entityType === 'folder' ?
           this.entityCacheService.reloadEntityChildren(this.parentEntity.uid) :
           of(null)
@@ -116,7 +120,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
         })
       ).subscribe(
-        next => // this.dialogRef.close(),
+        next => this.dialogRef.close(),
           error => console.log('error when creating entity: ' + error.error.message)
       );
     }

@@ -49,6 +49,7 @@ export class FileSecurityComponent implements OnInit {
   dataSource: MatTableDataSource<DMEntitySecurity>;
   columnsDescription: ColumnDescriptionWithElement[] = DEFAULT_DISPLAYED_COLUMNS;
   displayedColumns = [];
+  @Input()
   showSpinner = true;
   sort = <DMEntitySort> {
     name: 'name',
