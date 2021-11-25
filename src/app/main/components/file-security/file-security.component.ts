@@ -11,9 +11,7 @@ import {EntityCreationService} from 'app/services/entity-creation.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {AdminService} from 'app/services/admin.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {DMEntitySort} from '../../model/dmentity-sort';
-import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
-import {el} from '@angular/platform-browser/testing/src/browser_util';
+import {DMEntitySort} from 'app/main/model/dmentity-sort';
 
 export interface DialogData {
     selectedUsersAndGroups: Array<UserOrGroup>;
@@ -55,6 +53,8 @@ export class FileSecurityComponent implements OnInit {
     name: 'name',
     direction: 'asc'
   };
+  @Input()
+  inDialogComponent = false;
 
   constructor(
       private fb: FormBuilder,

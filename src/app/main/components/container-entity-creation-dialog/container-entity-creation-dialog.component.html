@@ -30,6 +30,7 @@
                     [showButtonForSearchUsersAndGroups]="false"
                     [showFormButtons]="false"
                     [showSpinner]="false"
+                    [inDialogComponent]="true"
                     cdkDropList
                     [id]="'selectedUsersAndGroups'"
                     [cdkDropListConnectedTo]="[userListId, groupListId]"
@@ -38,6 +39,8 @@
                     (cdkDropListEntered)="dropListExited($event)"
                     style="width: 48%"
             ></file-security>
+
+            <mat-divider #divider [vertical]="true"></mat-divider>
 
             <users-groups-search-panel
                     [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
