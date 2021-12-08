@@ -151,7 +151,7 @@ export class SessionService implements OnDestroy {
                                 if (! this.isSessionCheckStarted()) {
                                     this.startSessionCheck();
                                 }
-                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/' + res['wsToken']);
+                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', res['wsToken']);
                             });
                         }
                     }

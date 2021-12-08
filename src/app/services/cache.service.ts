@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {CacheUpdateMessage} from 'app/main/model/cache-update-message';
-import {environment} from '../../environments/environment';
-import {SessionService} from './session.service';
 import {WebSocketSubject} from 'rxjs/internal-compatibility';
 import {webSocket} from 'rxjs/webSocket';
+import {UpdateNoticeMessageImpl} from 'app/main/model/update-notice-message-impl';
+import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessage';
+import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -21,6 +22,7 @@ export class CacheService {
 
   public behaviourSubjects: Map<string, BehaviorSubject<CacheUpdateMessage>>;
   private webSocket: WebSocketSubject<any>;
+  private wsToken: string;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
@@ -29,7 +31,9 @@ export class CacheService {
     this.webSocket = null;
   }
 
-  public initWebSocket(url: string): void {
+  public initWebSocket(url: string, wsToken: string): void {
+    wsToken = wsToken;
+    url = url + wsToken;
     this.webSocket = webSocket(url.replace('http', 'ws'));
     this.webSocket.subscribe(
         msg => {
@@ -46,9 +50,19 @@ export class CacheService {
   }
 
   private handleMsg(msg: any): void {
-    if (msg.constructor === 'Message') {
+    if (msg['updateNoticeType'] != null) {
+      const updateNoticeMessage = Object.assign(new UpdateNoticeMessageImpl(null, null, null, null), msg);
       console.log('Websocket received message: ');
-      console.dir(msg);
+      console.dir(updateNoticeMessage);
+      if (updateNoticeMessage.updateNoticeType === UpdateNoticeTypeEnum.KEEPALIVEPING) {
+        const updateNoticeMessageImpl = new UpdateNoticeMessageImpl(
+          UpdateNoticeTypeEnum.KEEPALIVEPONG,
+          this.wsToken,
+          null,
+          null
+        );
+        this.webSocket.next(updateNoticeMessageImpl);
+      }
     }
   }
 }
