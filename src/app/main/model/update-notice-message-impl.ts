@@ -3,18 +3,18 @@ import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessa
 export class UpdateNoticeMessageImpl implements UpdateNoticeMessage {
   updateNoticeType?: UpdateNoticeMessage.UpdateNoticeTypeEnum;
   token?: string;
-  message?: string;
   sessionId?: string;
+  message?: string;
 
   constructor(
     updateNoticeType,
     token,
-    message,
-    sessionId
+    sessionId,
+    message
   ) {
     this.updateNoticeType = updateNoticeType;
-    token = token;
-    message = message;
-    sessionId = sessionId;
+    this.token = token;
+    this.sessionId = sessionId;
+    this.message = message;
   }
 }

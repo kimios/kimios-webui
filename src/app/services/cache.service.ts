@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {CacheUpdateMessage} from 'app/main/model/cache-update-message';
 import {WebSocketSubject} from 'rxjs/internal-compatibility';
 import {webSocket} from 'rxjs/webSocket';
 import {UpdateNoticeMessageImpl} from 'app/main/model/update-notice-message-impl';
 import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessage';
+import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 
 export enum CacheEnum {
@@ -23,12 +24,13 @@ export class CacheService {
   public behaviourSubjects: Map<string, BehaviorSubject<CacheUpdateMessage>>;
   private webSocket: WebSocketSubject<any>;
   private wsToken: string;
+  public documentCreated$: Subject<KimiosDocument>;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
     Object.keys(CacheEnum).forEach(key => this.behaviourSubjects.set(key, new BehaviorSubject<CacheUpdateMessage>(null)));
-
     this.webSocket = null;
+    this.documentCreated$ = new Subject<KimiosDocument>();
   }
 
   public initWebSocket(url: string, wsToken: string): void {
@@ -62,6 +64,13 @@ export class CacheService {
           null
         );
         this.webSocket.next(updateNoticeMessageImpl);
+      } else {
+        if (updateNoticeMessage.updateNoticeType === UpdateNoticeTypeEnum.DOCUMENT) {
+          const obj = JSON.parse(updateNoticeMessage.message);
+          const docEmpty: KimiosDocument = {};
+          const doc = Object.assign(docEmpty, obj);
+          this.documentCreated$.next(doc);
+        }
       }
     }
   }

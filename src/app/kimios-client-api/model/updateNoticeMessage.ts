@@ -14,8 +14,8 @@
 export interface UpdateNoticeMessage { 
     updateNoticeType?: UpdateNoticeMessage.UpdateNoticeTypeEnum;
     token?: string;
-    message?: string;
     sessionId?: string;
+    message?: string;
 }
 export namespace UpdateNoticeMessage {
     export type UpdateNoticeTypeEnum = 'SHARES_BY_ME' | 'SHARES_WITH_ME' | 'DOCUMENT' | 'FOLDER' | 'WORKSPACE' | 'PREVIEW_READY' | 'PREVIEW_PROCESSING' | 'KEEP_ALIVE_PING' | 'KEEP_ALIVE_PONG';

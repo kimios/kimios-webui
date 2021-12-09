@@ -18,6 +18,7 @@ import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm
 import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
+import {CacheService} from 'app/services/cache.service';
 
 @Component({
   selector: 'app-workspaces',
@@ -57,7 +58,8 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       private adminService: AdminService,
       private route: ActivatedRoute,
       private iconService: IconService,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private cacheService: CacheService
   ) {
     this.isWorkspaceCreator = this.adminService.isWorkspaceCreator();
     this.pageSize = PAGE_SIZE_DEFAULT;
@@ -118,6 +120,11 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           this.addEntityAndReloadPage(entity);
         }
       })
+    ).subscribe();
+
+    this.cacheService.documentCreated$.pipe(
+      tap(document => console.log('cacheService sent document ' + document.uid)),
+      concatMap(document => this.entityCacheService.handleDocumentCreated(document))
     ).subscribe();
   }
 

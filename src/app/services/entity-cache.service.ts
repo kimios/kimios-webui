@@ -573,4 +573,17 @@ export class EntityCacheService {
     );
   }
 
+  handleDocumentCreated(document: KimiosDocument): Observable<boolean> {
+    if (
+      this.entitiesCache.get(document.uid) != null
+      || this.entitiesCache.get(document.folderUid) == null
+    ) {
+      return of(false);
+    } else {
+      this.entitiesCache.set(document.uid, new DocumentCacheData(document));
+      this.entitiesHierarchyCache.get(document.folderUid).push(document.uid);
+      this.newEntity$.next(document);
+      return of(true);
+    }
+  }
 }
