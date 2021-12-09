@@ -56,21 +56,23 @@ export class CacheService {
       const updateNoticeMessage = Object.assign(new UpdateNoticeMessageImpl(null, null, null, null), msg);
       console.log('Websocket received message: ');
       console.dir(updateNoticeMessage);
-      if (updateNoticeMessage.updateNoticeType === UpdateNoticeTypeEnum.KEEPALIVEPING) {
-        const updateNoticeMessageImpl = new UpdateNoticeMessageImpl(
-          UpdateNoticeTypeEnum.KEEPALIVEPONG,
-          this.wsToken,
-          null,
-          null
-        );
-        this.webSocket.next(updateNoticeMessageImpl);
-      } else {
-        if (updateNoticeMessage.updateNoticeType === UpdateNoticeTypeEnum.DOCUMENT) {
+
+      switch (updateNoticeMessage.updateNoticeType) {
+        case UpdateNoticeTypeEnum.KEEPALIVEPING:
+          const updateNoticeMessageImpl = new UpdateNoticeMessageImpl(
+            UpdateNoticeTypeEnum.KEEPALIVEPONG,
+            this.wsToken,
+            null,
+            null
+          );
+          this.webSocket.next(updateNoticeMessageImpl);
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENT:
           const obj = JSON.parse(updateNoticeMessage.message);
           const docEmpty: KimiosDocument = {};
           const doc = Object.assign(docEmpty, obj);
           this.documentCreated$.next(doc);
-        }
+          break;
       }
     }
   }
