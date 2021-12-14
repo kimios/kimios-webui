@@ -134,7 +134,10 @@ export class SearchFormComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {
+  onSubmit($event: any): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
     this.searchEntityService.searchWithFiltersAndSetCurrentQuery(
         this.searchFormGroup.get('content').value,
         this.searchFormGroup.get('name').value,

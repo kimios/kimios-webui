@@ -1,7 +1,6 @@
 <form [ngClass]="'full-width'" #form
       [formGroup]="searchFormGroup"
-      (ngSubmit)="onSubmit()"
-      (keyup)="$event.key === 'Enter' ? onSubmit():1">
+      (ngSubmit)="onSubmit($event)">
 
   <div fxFill fxLayout="column" fxLayoutAlign="space-between stretch">
 
@@ -18,7 +17,8 @@
         </mat-option>
       </mat-autocomplete>
       <button mat-button *ngIf="searchFormGroup.get('name').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('name').setValue('')">
+              (click)="searchFormGroup.get('name').setValue('')"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -26,7 +26,8 @@
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Content" aria-label="document's content" matInput [formControlName]="'content'">
       <button mat-button *ngIf="searchFormGroup.get('content').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('content').setValue('')">
+              (click)="searchFormGroup.get('content').setValue('')"
+              type="button" >
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -42,7 +43,8 @@
         </mat-option>
       </mat-autocomplete>
       <button mat-button *ngIf="searchFormGroup.get('owner').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="deselectUser()">
+              (click)="deselectUser()"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -84,7 +86,8 @@
     <mat-form-field class="example-full-width" fxFill>
       <input type="text" placeholder="Document id" aria-label="document's id" matInput [formControlName]="'id'">
       <button mat-button *ngIf="searchFormGroup.get('id').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('id').setValue('')">
+              (click)="searchFormGroup.get('id').setValue('')"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -93,7 +96,8 @@
       <input type="text" placeholder="Folder" aria-label="document's folder" matInput [formControlName]="'folder'" >
       <mat-icon matSuffix [ngClass]="'cursor-pointer'" (click)="openFolderTree()">folder_open</mat-icon>
       <button mat-button *ngIf="searchFormGroup.get('folder').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="deselectContainerEntity()">
+              (click)="deselectContainerEntity()"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -103,7 +107,8 @@
       <mat-datepicker-toggle matSuffix [for]="dateMinPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMinPicker></mat-datepicker>
       <button mat-button *ngIf="searchFormGroup.get('dateMin').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('dateMin').setValue(null)">
+              (click)="searchFormGroup.get('dateMin').setValue(null)"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -113,7 +118,8 @@
       <mat-datepicker-toggle matSuffix [for]="dateMaxPicker"></mat-datepicker-toggle>
       <mat-datepicker #dateMaxPicker></mat-datepicker>
       <button mat-button *ngIf="searchFormGroup.get('dateMax').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="searchFormGroup.get('dateMax').setValue(null)">
+              (click)="searchFormGroup.get('dateMax').setValue(null)"
+              type="button">
         <mat-icon>close</mat-icon>
       </button>
     </mat-form-field>
@@ -132,7 +138,8 @@
           </mat-option>
         </mat-autocomplete>
         <button mat-button *ngIf="searchFormGroup.get('documentType').value" matSuffix mat-icon-button aria-label="Clear"
-                (click)="deselectDocumentType()">
+                (click)="deselectDocumentType()"
+                type="button">
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
@@ -172,7 +179,8 @@
                 </ng-container>
               </ng-template>
               <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).value" matSuffix mat-icon-button aria-label="Clear"
-                      (click)="resetMetaValue(meta.uid)">
+                      (click)="resetMetaValue(meta.uid)"
+                      type="button">
                 <mat-icon>close</mat-icon>
               </button>
             </mat-form-field>
@@ -198,7 +206,8 @@
                         <mat-datepicker #datePickerBind></mat-datepicker>
                         <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').value"
                                 matSuffix mat-icon-button aria-label="Clear"
-                                (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')">
+                                (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')"
+                                type="button">
                           <mat-icon>close</mat-icon>
                         </button>
                       </mat-form-field>
@@ -209,7 +218,8 @@
                     <input type="text" placeholder="min" matInput [formControlName]="'min'">
                       <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').value"
                               matSuffix mat-icon-button aria-label="Clear"
-                              (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')">
+                              (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('min').setValue('')"
+                              type="button">
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>
@@ -227,7 +237,8 @@
                         <mat-datepicker #datePickerBind></mat-datepicker>
                         <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').value"
                                 matSuffix mat-icon-button aria-label="Clear"
-                                (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').setValue('')">
+                                (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').setValue('')"
+                                type="button">
                           <mat-icon>close</mat-icon>
                         </button>
                       </mat-form-field>
@@ -238,7 +249,8 @@
                       <input type="text" placeholder="max" matInput [formControlName]="'max'">
                       <button mat-button *ngIf="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').value"
                               matSuffix mat-icon-button aria-label="Clear"
-                              (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').setValue('')">
+                              (click)="searchFormGroup.get('metas').get(meta.uid.toString()).get('max').setValue('')"
+                              type="button">
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>
@@ -266,7 +278,8 @@
             <button
                     mat-icon-button
                     (click)="toggleShowForm($event)"
-                    title="{{showForm ? 'Hide search form' : 'Show search form'}}">
+                    title="{{showForm ? 'Hide search form' : 'Show search form'}}"
+                    type="button">
               <mat-icon>{{showForm ? 'expand_less' : 'expand_more'}}</mat-icon>
               </button>
         </div>
@@ -276,23 +289,9 @@
            fxLayoutGap="20px"
            fxFlex
            style="margin-top: 20px !important;">
-          <div [class.kimios-button]="true"
-               [class.kimios-green]="true"
-               [class.inactive]="true"
-               fxLayout="row"
-               fxLayoutAlign="center center"
-               matDialogClose
-               (click)="resetForm()">
-            <span [class.kimios-button-text]="true">CANCEL</span>
-          </div>
-          <div [class.kimios-button]="true"
-               [class.kimios-green]="true"
-               [class.active]="true"
-               fxLayout="row"
-               fxLayoutAlign="center center"
-               (click)="onSubmit()">
-            <span class="kimios-button-text">SEARCH</span>
-          </div>
+
+          <button type="button" (click)="resetForm()" mat-icon-button><mat-icon>cancel</mat-icon></button>
+          <button type="submit" mat-icon-button><mat-icon>check</mat-icon></button>
         </div>
         <div style="width: 50px;">
 
