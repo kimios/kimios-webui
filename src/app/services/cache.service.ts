@@ -25,12 +25,16 @@ export class CacheService {
   private webSocket: WebSocketSubject<any>;
   private wsToken: string;
   public documentCreated$: Subject<KimiosDocument>;
+  public sharedWithMe$: Subject<boolean>;
+  public sharedByMe$: Subject<boolean>;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
     Object.keys(CacheEnum).forEach(key => this.behaviourSubjects.set(key, new BehaviorSubject<CacheUpdateMessage>(null)));
     this.webSocket = null;
     this.documentCreated$ = new Subject<KimiosDocument>();
+    this.sharedWithMe$ = new Subject<boolean>();
+    this.sharedByMe$ = new Subject<boolean>();
   }
 
   public initWebSocket(url: string, wsToken: string): void {
@@ -57,6 +61,8 @@ export class CacheService {
       console.log('Websocket received message: ');
       console.dir(updateNoticeMessage);
 
+      const messageParsedObj = updateNoticeMessage.message != null ? JSON.parse(updateNoticeMessage.message) : null;
+
       switch (updateNoticeMessage.updateNoticeType) {
         case UpdateNoticeTypeEnum.KEEPALIVEPING:
           const updateNoticeMessageImpl = new UpdateNoticeMessageImpl(
@@ -68,11 +74,17 @@ export class CacheService {
           this.webSocket.next(updateNoticeMessageImpl);
           break;
         case UpdateNoticeTypeEnum.DOCUMENT:
-          const obj = JSON.parse(updateNoticeMessage.message);
           const docEmpty: KimiosDocument = {};
-          const doc = Object.assign(docEmpty, obj);
-          this.documentCreated$.next(doc);
+          if (messageParsedObj != null ) {
+            const doc = Object.assign(docEmpty, messageParsedObj);
+            this.documentCreated$.next(doc);
+          }
           break;
+        case UpdateNoticeTypeEnum.SHARESWITHME:
+          this.sharedWithMe$.next(true);
+          break;
+        case UpdateNoticeTypeEnum.SHARESBYME:
+          this.sharedByMe$.next(true);
       }
     }
   }

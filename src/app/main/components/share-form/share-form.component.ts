@@ -1,11 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {SecurityService, Share, ShareService, User} from 'app/kimios-client-api';
-import {from, Observable, Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
-import {map, mergeMap, startWith, tap} from 'rxjs/operators';
+import {concatMap, map, startWith, tap, toArray} from 'rxjs/operators';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {MatDatepickerInputEvent} from '@angular/material';
 import {DatePipe} from '@angular/common';
 
 
@@ -37,13 +36,15 @@ export class ShareFormComponent implements OnInit {
     });
     this.users$ = this.securityService.getAuthenticationSources()
         .pipe(
-            mergeMap(
-                (result) => from(result)
-            ),
-            mergeMap(
+            concatMap(result => result),
+            map(result => result),
+            concatMap(
                 source =>
                     this.securityService.getUsers(this.sessionService.sessionToken, source.name)
             ),
+            concatMap(users => users),
+            map(user => user),
+            toArray(),
             tap(users => {
               if (this.share != null
                   && this.share !== undefined) {

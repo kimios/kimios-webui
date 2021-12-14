@@ -20,6 +20,7 @@ import {Router} from '@angular/router';
 import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
+import {CacheService} from 'app/services/cache.service';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -73,7 +74,8 @@ export class SharesListComponent implements OnInit {
       private bes: BrowseEntityService,
       private router: Router,
       public dialog: MatDialog,
-      private shareService: ShareService
+      private shareService: ShareService,
+      private cacheService: CacheService
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -113,6 +115,18 @@ export class SharesListComponent implements OnInit {
           }
         }
     );
+
+    if (this.mode === SharesListMode.BY_ME) {
+      this.cacheService.sharedByMe$.subscribe(
+        next => this.loadData(true)
+      );
+    } else {
+      if (this.mode === SharesListMode.WITH_ME) {
+        this.cacheService.sharedWithMe$.subscribe(
+          next => this.loadData(true)
+        );
+      }
+    }
   }
 
   private initFormGroupFilters(mode: SharesListMode): FormGroup {

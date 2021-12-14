@@ -29,6 +29,14 @@
         <span title="{{user.name}} ({{user.uid}}@{{user.source}})">{{user.name}} (@{{user.source}})</span>
       </mat-list-item>
     </mat-list>
+    <mat-paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="paginatorHandler($event)"
+            [pageIndex]="pageIndex"
+            showFirstLastButtons>
+    </mat-paginator>
   </mat-tab>
 
   <mat-tab label="Groups">
@@ -56,14 +64,15 @@
         <mat-icon>group</mat-icon>{{group.name}} (@{{group.source}})
       </mat-list-item>
     </mat-list>
+    <mat-paginator
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="paginatorHandler($event)"
+            [pageIndex]="pageIndex"
+            showFirstLastButtons>
+    </mat-paginator>
   </mat-tab>
 
 </mat-tab-group>
-<mat-paginator
-        [length]="length"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        (page)="paginatorHandler($event)"
-        [pageIndex]="pageIndex"
-        showFirstLastButtons>
-</mat-paginator>
+
