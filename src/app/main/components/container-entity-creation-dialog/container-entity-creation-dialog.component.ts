@@ -145,7 +145,8 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
             if (error.error.message.includes('already exists')) {
               this.entityCreationForm.get('name').setErrors({'existing': true});
             }
-          }
+          },
+        () => this.dialogRef.close()
       );
     }
   }
