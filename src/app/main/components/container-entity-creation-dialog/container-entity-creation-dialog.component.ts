@@ -127,7 +127,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   }
 
   cancel(): void {
-
+    this.dialogRef.close();
   }
 
   private parentEntityIsCurrentPath(): boolean {
