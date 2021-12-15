@@ -1,6 +1,6 @@
-import {Component, Inject, Input, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
+import {Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatExpansionPanel} from '@angular/material';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
@@ -10,6 +10,7 @@ import {UserOrGroup} from 'app/main/model/user-or-group';
 import {Folder, Workspace} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {ErrorDialogComponent} from '../error-dialog/error-dialog.component';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -35,6 +36,9 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   documentId: number;
   parentEntity: Workspace | Folder;
   parentEntity$: Observable<Workspace | Folder>;
+  errorOnCreation$: Subject<string>;
+
+  @ViewChild('securityPanel') securityPanel: MatExpansionPanel;
 
   constructor(
       public dialogRef: MatDialogRef<ContainerEntityCreationDialogComponent>,
@@ -43,12 +47,14 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       private browseEntityService: BrowseEntityService,
       private adminService: AdminService,
       private fb: FormBuilder,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private dialog: MatDialog
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
     this.selectedUsersAndGroups = new Array<UserOrGroup>();
 
     this.documentId = undefined;
+    this.errorOnCreation$ = new Subject<string>();
   }
 
   ngOnInit(): void {
@@ -69,6 +75,12 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       );
       this.parentEntity$.subscribe();
     }
+
+    this.errorOnCreation$.pipe(
+      tap(errorStr => this.openErrorDialog(errorStr))
+    ).subscribe(
+
+    );
   }
 
   drop($event: CdkDragDrop<UserOrGroup>): void {
@@ -121,7 +133,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
         })
       ).subscribe(
         next => this.dialogRef.close(),
-          error => console.log('error when creating entity: ' + error.error.message)
+          error => this.openErrorDialog(error.error.message)
       );
     }
   }
@@ -133,5 +145,22 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   private parentEntityIsCurrentPath(): boolean {
     const currentPathEntity = this.browseEntityService.currentPath.getValue().slice().reverse()[0];
     return currentPathEntity.uid === this.parentEntity.uid;
+  }
+
+  handleSecurityPanelClick(): void {
+    if (this.securityPanel.closed) {
+      if (this.entityCreationForm.get('name').value.length === 0) {
+        this.entityCreationForm.get('name').markAsTouched();
+        this.entityCreationForm.get('name').setErrors({'empty': true});
+      }
+    }
+  }
+
+  private openErrorDialog(errorStr: string): void {
+    const dialogRef = this.dialog.open(ErrorDialogComponent, {
+      data: {
+        message: errorStr
+      }
+    });
   }
 }

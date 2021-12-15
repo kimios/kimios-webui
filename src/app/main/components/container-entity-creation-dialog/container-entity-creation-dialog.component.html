@@ -1,29 +1,37 @@
-<div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
-    <div fxLayout="column" fxLayoutAlign="start start">
-        <div>
-            Create {{data.entityType}}
-            <ng-container *ngIf="data.entityType === 'folder'">
-                <span *ngIf="parentEntity$ | async">
-                    at path: <entity-path [entityPath]="parentEntity.path"></entity-path>
+<h2 mat-dialog-title>
+    Create {{data.entityType}}
+    <ng-container *ngIf="data.entityType === 'folder'">
+        <span *ngIf="parentEntity$ | async">
+            at path: <entity-path [entityPath]="parentEntity.path"></entity-path>
                 </span>
-            </ng-container>
+    </ng-container>
+</h2>
+<mat-dialog-content>
+    <div fxLayout="column" fxLayoutAlign="start start">
+
+        <div>
+            <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
+                <div fxLayout="column" fxLayoutAlign="start space-between">
+                    <mat-form-field ngDefaultControl >
+                        <input matInput required placeholder="Enter name" [formControlName]="'name'">
+                        <mat-error *ngIf="entityCreationForm.get('name').invalid">Enter the folder's name</mat-error>
+                    </mat-form-field>
+                </div>
+            </form>
         </div>
-    </div>
-    <div>
-        <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
-            <div fxLayout="column" fxLayoutAlign="start space-between">
-                <mat-form-field ngDefaultControl [formControl]="entityCreationForm.get('name')">
-                    <mat-label>Name</mat-label>
-                    <input matInput>
-                </mat-form-field>
-            </div>
-        </form>
-    </div>
-    <mat-expansion-panel>
+        <div>
+
+            <mat-expansion-panel
+                    #securityPanel
+                    style="margin-bottom: 10px"
+                    [disabled]="entityCreationForm.get('name').value.length === 0"
+                    (click)="handleSecurityPanelClick()">
         <mat-expansion-panel-header>
-            <mat-panel-title>Entity security</mat-panel-title>
-            <mat-panel-description>open to configure entity's access rights</mat-panel-description>
+            <mat-panel-title>Security</mat-panel-title>
+            <mat-panel-description>open to configure access rights</mat-panel-description>
         </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+
         <div fxLayout="row" fxLayoutAlign="space-between">
             <file-security
                     [documentId]="undefined"
@@ -37,7 +45,7 @@
                     (cdkDropListDropped)="drop($event)"
                     (cdkDropListEntered)="dropListEnter($event)"
                     (cdkDropListEntered)="dropListExited($event)"
-                    style="width: 48%"
+                    fxFlex="48"
             ></file-security>
 
             <mat-divider #divider [vertical]="true"></mat-divider>
@@ -46,14 +54,22 @@
                     [cdkDropListConnectedTo_var]="'selectedUsersAndGroups'"
                     [userListId]="userListId"
                     [groupListId]="groupListId"
-                    style="width: 48%"
                     [mode]="'containerEntityCreation'"
+                    fxFlex="48"
             >
             </users-groups-search-panel>
         </div>
+
+        </ng-template>
     </mat-expansion-panel>
-    <div fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
+
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <div fxLayout="row" fxLayoutAlign="center center" style="width: 100%">
         <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
         <button mat-button (click)="cancel()"><mat-icon>cancel</mat-icon></button>
     </div>
-</div>
+</mat-dialog-actions>
+
