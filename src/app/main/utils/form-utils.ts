@@ -1,4 +1,4 @@
-import {FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 export const searchParamsValidator: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
     const content = control.get('content');
@@ -15,3 +15,10 @@ export const searchParamsValidator: ValidatorFn = (control: FormGroup): Validati
         && tagList.value.length === 0
     ) ? { 'searchParamsValid': false } : null;
 };
+
+export function forbiddenCharactersValidator(regExp: RegExp): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+        const forbidden = regExp.test(control.value);
+        return forbidden ? {'forbiddenChar': {value: control.value}} : null;
+    };
+}

@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 export interface ErrorDialogData {
   message: string;
+  title: string;
 }
 
 @Component({
@@ -17,6 +18,9 @@ export class ErrorDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.data.title == null) {
+      this.data.title = '';
+    }
   }
 
   okClick(): void {

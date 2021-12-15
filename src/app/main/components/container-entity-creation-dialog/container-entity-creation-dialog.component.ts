@@ -3,14 +3,15 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatExpansionPanel} from '@angu
 import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {concatMap, tap} from 'rxjs/operators';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {Folder, Workspace} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {ErrorDialogComponent} from '../error-dialog/error-dialog.component';
+import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
+import {forbiddenCharactersValidator} from 'app/main/utils/form-utils';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -59,7 +60,10 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.entityCreationForm = this.fb.group({
-      'name': this.fb.control('')
+      'name': this.fb.control('', [
+        Validators.required,
+        forbiddenCharactersValidator(/^.*(?:\\|\/|\||:|\*|\?|"|<|>).*$/)
+      ])
     });
 
     if (this.data.entityType === 'folder') {
@@ -103,6 +107,9 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
           error => console.log('error when creating entity: ' + error.error.message)
       );
     } else {
+      if (this.entityCreationForm.invalid) {
+        return;
+      }
       combineLatest(of(this.data.entityType), this.entityCreationService.createContainerEntity(
           this.entityCreationForm.get('name').value,
           this.data.entityType,
@@ -133,7 +140,12 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
         })
       ).subscribe(
         next => this.dialogRef.close(),
-          error => this.openErrorDialog(error.error.message)
+          error => {
+            this.openErrorDialog(error.error.message);
+            if (error.error.message.includes('already exists')) {
+              this.entityCreationForm.get('name').setErrors({'existing': true});
+            }
+          }
       );
     }
   }
@@ -159,6 +171,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   private openErrorDialog(errorStr: string): void {
     const dialogRef = this.dialog.open(ErrorDialogComponent, {
       data: {
+        title: 'Error on ' + this.data.entityType + ' creation',
         message: errorStr
       }
     });

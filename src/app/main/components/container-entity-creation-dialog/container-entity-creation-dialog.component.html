@@ -7,14 +7,22 @@
     </ng-container>
 </h2>
 <mat-dialog-content>
-    <div fxLayout="column" fxLayoutAlign="start start">
+    <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
 
         <div>
             <form (ngSubmit)="submit()" [formGroup]="entityCreationForm">
                 <div fxLayout="column" fxLayoutAlign="start space-between">
                     <mat-form-field ngDefaultControl >
-                        <input matInput required placeholder="Enter name" [formControlName]="'name'">
-                        <mat-error *ngIf="entityCreationForm.get('name').invalid">Enter the folder's name</mat-error>
+                        <input matInput required placeholder="Name" [formControlName]="'name'">
+                        <mat-error *ngIf="entityCreationForm.get('name').hasError('required')">
+                            Enter the folder's name
+                        </mat-error>
+                        <mat-error *ngIf="entityCreationForm.get('name').hasError('existing')">
+                            This name is already used
+                        </mat-error>
+                        <mat-error *ngIf="entityCreationForm.get('name').hasError('forbiddenChar')">
+                            These characters are forbidden: \ / : * ? " < > |
+                        </mat-error>
                     </mat-form-field>
                 </div>
             </form>
