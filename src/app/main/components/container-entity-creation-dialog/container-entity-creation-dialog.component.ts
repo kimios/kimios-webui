@@ -36,8 +36,9 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   entityCreationForm: FormGroup;
   documentId: number;
   parentEntity: Workspace | Folder;
-  parentEntity$: Observable<Workspace | Folder>;
+  parentEntity$: Subject<Workspace | Folder>;
   errorOnCreation$: Subject<string>;
+  parentReloadToDo$: Subject<number>;
 
   @ViewChild('securityPanel') securityPanel: MatExpansionPanel;
 
@@ -56,6 +57,8 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
 
     this.documentId = undefined;
     this.errorOnCreation$ = new Subject<string>();
+    this.parentEntity$ = new Subject<Workspace | Folder>();
+    this.parentReloadToDo$ = new Subject<number>();
   }
 
   ngOnInit(): void {
@@ -67,17 +70,16 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
     });
 
     if (this.data.entityType === 'folder') {
-      this.parentEntity$ = of(this.data.parentId != null
-          && this.data.parentId !== undefined).pipe(
-          concatMap(res => res ?
-              this.browseEntityService.getEntity(this.data.parentId) :
-              of(this.browseEntityService.currentPath.getValue().slice().reverse()[0])
-          ),
-          tap(entity => {
-            this.parentEntity = entity;
-          })
-      );
-      this.parentEntity$.subscribe();
+      if (this.data.parentId != null
+        && this.data.parentId !== undefined) {
+        this.browseEntityService.getEntity(this.data.parentId).pipe(
+          tap(parentEntity => this.parentEntity = parentEntity),
+          tap(parentEntity => this.parentEntity$.next(parentEntity))
+        ).subscribe();
+      } else {
+        this.parentEntity = this.browseEntityService.currentPath.getValue().slice().reverse()[0];
+        this.parentEntity$.next(this.parentEntity);
+      }
     }
 
     this.errorOnCreation$.pipe(
@@ -85,6 +87,16 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
     ).subscribe(
 
     );
+
+    this.parentReloadToDo$.pipe(
+      concatMap(parentUid => this.entityCacheService.reloadEntityChildren(this.parentEntity.uid)),
+      tap(() => {
+        if (this.parentEntityIsCurrentPath()) {
+          this.browseEntityService.selectedEntity$.next(this.parentEntity);
+        }
+        this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
+      })
+    ).subscribe();
   }
 
   drop($event: CdkDragDrop<UserOrGroup>): void {
@@ -110,33 +122,23 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       if (this.entityCreationForm.invalid) {
         return;
       }
-      combineLatest(of(this.data.entityType), this.entityCreationService.createContainerEntity(
+      this.entityCreationService.createContainerEntity(
           this.entityCreationForm.get('name').value,
           this.data.entityType,
-          this.parentEntity !== null && this.parentEntity !== undefined ?
+          this.parentEntity != null && this.parentEntity !== undefined ?
               this.parentEntity.uid :
               null
-      )).pipe(
+      ).pipe(
         // make securities form submit securities
-        concatMap(([entityType, uidCreated]) => {
+        tap(uidCreated => {
           this.documentId = uidCreated;
           this.entityCreationService.onFormSubmitted$.next(uidCreated);
-          return combineLatest(of(entityType), this.entityCreationService.onFormSecuritiesSubmitted$.asObservable(), of(uidCreated));
-        }),
-        tap(([entityType, res, uidCreated]) => {
           if (this.data.entityType === 'workspace') {
             this.browseEntityService.onNewWorkspace.next(uidCreated);
           }
-        }),
-        concatMap(([entityType, res, uidCreated]) => entityType === 'folder' ?
-          this.entityCacheService.reloadEntityChildren(this.parentEntity.uid) :
-          of(null)
-        ),
-        tap(() => {
-          if (this.parentEntityIsCurrentPath()) {
-            this.browseEntityService.selectedEntity$.next(this.parentEntity);
+          if (this.data.entityType === 'folder') {
+            this.parentReloadToDo$.next(this.parentEntity.uid);
           }
-          this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
         })
       ).subscribe(
         next => this.dialogRef.close(),
