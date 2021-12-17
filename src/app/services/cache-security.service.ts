@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {SessionService} from 'app/services/session.service';
 import {combineLatest, Observable, of} from 'rxjs';
 import {AuthenticationSource, Group, SecurityService} from 'app/kimios-client-api';
-import {concatMap, map, tap} from 'rxjs/operators';
+import {concatMap, map, tap, toArray} from 'rxjs/operators';
 import {LockPossibility} from 'app/main/model/lock-possibility';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
@@ -117,12 +117,28 @@ export class CacheSecurityService {
         map(([u, g]) => u.concat(g))
     );
   }
+
+  public retrieveUsersWithSearchTerm(searchTerm: string): Observable<Array<User>> {
+
+    return this.securityService.getAuthenticationSources().pipe(
+      concatMap(sources => sources),
+      concatMap(source => this.securityService.getUsers(this.sessionService.sessionToken, source.name)),
+      toArray(),
+      map(arrayOfUsersArray => {
+        let users = new Array<User>();
+        arrayOfUsersArray.forEach(usersArray => users = users.concat(usersArray));
+        return users;
+      }),
+      map(users => this.filterUsers(users, searchTerm))
+    );
+  }
   
   private filterUsers(users: Array<User>, searchTerm: string): Array<User> {
-    return users.filter(user => user.uid.includes(searchTerm) 
-        || user.name.includes(searchTerm)
-        || user.firstName.includes(searchTerm)
-        || user.lastName.includes(searchTerm)
+    searchTerm = searchTerm.toLowerCase();
+    return users.filter(user => user.uid.includes(searchTerm)
+        || user.name.toLowerCase().includes(searchTerm)
+        || user.firstName.toLowerCase().includes(searchTerm)
+        || user.lastName.toLowerCase().includes(searchTerm)
     );
   }
 

@@ -1,24 +1,76 @@
-<table id="table">
+<form (ngSubmit)="submit()" [formGroup]="entityEditForm">
+  <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
 
-  <tr>
-    <td class="talign-right data-title">entity Id:</td>
-    <td>{{entity.uid}}</td>
-  </tr>
-  <tr>
-    <td class="talign-right data-title">entity name:</td>
-    <td>{{entity.name}}</td>
-  </tr>
-  <tr>
-    <td class="talign-right data-title">Type:</td>
-    <td>{{entityType}}</td>
-  </tr>
-  <tr>
-    <td class="talign-right data-title">Owner:</td>
-    <td>{{entity.owner + '@' + entity.ownerSource}}</td>
-  </tr>
-  <tr>
-    <td class="talign-right data-title">Creation date:</td>
-    <td>{{entity.creationDate | date}}</td>
-  </tr>
+    <mat-form-field ngDefaultControl >
+      <input matInput required placeholder="{{entityType === 'folder' ? 'Folder ' : 'Workspace '}}name" [formControlName]="'name'">
+      <mat-error *ngIf="entityEditForm.get('name').hasError('required')">
+        Enter the {{entityType}}'s name
+      </mat-error>
+      <mat-error *ngIf="entityEditForm.get('name').hasError('existing')">
+        This name is already used
+      </mat-error>
+      <mat-error *ngIf="entityEditForm.get('name').hasError('forbiddenChar')">
+        These characters are forbidden: \ / : * ? " < > |
+      </mat-error>
+    </mat-form-field>
 
-</table>
+    <mat-form-field>
+      <input
+                type="text"
+                matInput
+                required
+                [matAutocomplete]="autoSearchUsers"
+                placeholder="Owner"
+                [formControlName]="'owner'"
+                (focus)="sendEventResetSearch()"
+                (click)="handleClick()"
+                (focusout)="handleOwnerFocusOut()"
+      >
+      <mat-autocomplete #autoSearchUsers="matAutocomplete"
+                        fxFlex="40"
+                        [displayWith]="displayWithFunc"
+                        (optionSelected)="selectUser()"
+      >
+        <!--(optionSelected)="selectUser()"-->
+        <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user">
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon>person</mat-icon>
+            <span>
+              {{user.firstName
+            + ' '
+            + user.lastName
+            + ' (' + user.uid + '@' + user.source
+            + ')'}}
+            </span>
+          </div>
+        </mat-option>
+      </mat-autocomplete>
+      <button mat-button *ngIf="entityEditForm.get('owner').value" matSuffix mat-icon-button aria-label="Clear"
+              (click)="clearOwner()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+
+    <table id="table">
+      <tr>
+        <td class="talign-right data-title">Id:</td>
+        <td>{{entity.uid}}</td>
+      </tr>
+      <tr>
+        <td class="talign-right data-title">Location:</td>
+        <td>{{entity.path}}</td>
+      </tr>
+      <tr>
+        <td class="talign-right data-title">Creation date:</td>
+        <td>{{entity.creationDate | date}}</td>
+      </tr>
+
+    </table>
+
+    <div fxLayout="row" fxLayoutAlign="center">
+      <button mat-button type="submit" cdkFocusInitial><mat-icon>check</mat-icon></button>
+      <button mat-button type="button" (click)="reset()" ><mat-icon>cancel</mat-icon></button>
+    </div>
+  </div>
+</form>

@@ -113,6 +113,11 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         }
       })
     ).subscribe();
+
+    this.entityCacheService.reloadedEntity$.pipe(
+      filter(entity => entity != null),
+      tap(entity => this.tree.treeModel.getNodeById(entity.uid).data['name'] = entity.name)
+    ).subscribe();
   }
 
     ngAfterViewInit(): void {

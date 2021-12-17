@@ -586,4 +586,26 @@ export class EntityCacheService {
       return of(true);
     }
   }
+
+  updateFolder(folderUid: number, folderName: string, folderParentUid: number): Observable<any> {
+    return this.folderService.updateFolder(
+      this.sessionService.sessionToken,
+      folderUid,
+      folderName,
+      folderParentUid
+    ).pipe(
+      switchMap(
+        response =>
+          of(response)
+            .catch(error => of(error))
+      ),
+      catchError(error => {
+        console.log('error while folder update');
+        return error;
+      }),
+      concatMap(() => this.reloadEntity(folderUid)),
+      tap(entity => this.reloadedEntity$.next(entity)),
+      concatMap(() => this.reloadEntityChildren(folderParentUid))
+    );
+  }
 }
