@@ -107,6 +107,16 @@ export class ContainerEntityDataComponent implements OnInit {
       '';
   }
 
+  pathWithoutEntity(path: string): string {
+    const regexp = /^(.*)(\/[^\/]+)$/;
+    const match = path.match(regexp);
+    if (match === [''] || match.length < 3) {
+      return '';
+    } else {
+      return match[1] === '' ? '/' : path.replace(match[2], '');
+    }
+  }
+
   clearOwner(): void {
     this.entityEditForm.get('owner').setValue('', {onlySelf: true, emitEvent: false});
   }
