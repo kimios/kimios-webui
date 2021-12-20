@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {DMEntity, Folder, User} from 'app/kimios-client-api';
+import {DMEntity, Folder, FolderService, User} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {combineLatest, Observable, of} from 'rxjs';
 import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
@@ -23,12 +23,15 @@ export class ContainerEntityDataComponent implements OnInit {
   init = false;
   entityOwner: User;
   isAdmin$: Observable<boolean>;
+  canBeMoved = false;
+  isWriteable = false;
 
   constructor(
     private fb: FormBuilder,
     private cacheSecurityService: CacheSecurityService,
     private entityCacheService: EntityCacheService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private folderService: FolderService
   ) {
 
   }
@@ -67,6 +70,16 @@ export class ContainerEntityDataComponent implements OnInit {
       );
 
     this.isAdmin$ = this.sessionService.currentUserIsAdmin();
+
+    this.folderService.canBeMoved(this.sessionService.sessionToken, this.entity.uid).subscribe(
+      res => this.canBeMoved = res,
+      error => this.canBeMoved = false
+    );
+
+    this.folderService.isWriteable(this.sessionService.sessionToken, this.entity.uid).subscribe(
+      res => this.isWriteable = res,
+      error => this.isWriteable = false
+    );
   }
 
   submit(): void {
@@ -144,5 +157,9 @@ export class ContainerEntityDataComponent implements OnInit {
     return idx !== -1 ?
       users[idx] :
       null;
+  }
+
+  openChooseFolderDialog(): void {
+
   }
 }

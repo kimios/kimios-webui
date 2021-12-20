@@ -1,8 +1,13 @@
 <form (ngSubmit)="submit()" [formGroup]="entityEditForm">
-  <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
+  <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px" style="margin-top: 5px">
 
     <mat-form-field ngDefaultControl >
-      <input matInput required placeholder="{{entityType === 'folder' ? 'Folder ' : 'Workspace '}}name" [formControlName]="'name'">
+      <input matInput
+             required
+             placeholder="{{entityType === 'folder' ? 'Folder ' : 'Workspace '}}name"
+             [formControlName]="'name'"
+             [readonly]="! isWriteable"
+      >
       <mat-error *ngIf="entityEditForm.get('name').hasError('required')">
         Enter the {{entityType}}'s name
       </mat-error>
@@ -68,7 +73,15 @@
       </tr>
       <tr>
         <td class="talign-right data-title">Location:</td>
-        <td>{{pathWithoutEntity(entity.path)}}</td>
+        <td>
+          <div fxLayout="row" fxLayoutAlign="start start">
+            <div fxFlex="">{{pathWithoutEntity(entity.path)}}</div>
+            <mat-icon *ngIf="canBeMoved"
+                    (click)="openChooseFolderDialog()" style="cursor: pointer">
+              folder_open
+            </mat-icon>
+          </div>
+        </td>
       </tr>
       <tr>
         <td class="talign-right data-title">Creation date:</td>
@@ -79,7 +92,7 @@
 
     <div fxLayout="row" fxLayoutAlign="center">
       <button mat-button type="submit" cdkFocusInitial><mat-icon>check</mat-icon></button>
-      <button mat-button type="button" (click)="reset()" ><mat-icon>cancel</mat-icon></button>
+      <button mat-button type="button" (click)="reset()"><mat-icon>cancel</mat-icon></button>
     </div>
   </div>
 </form>
