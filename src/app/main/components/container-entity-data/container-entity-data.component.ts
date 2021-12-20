@@ -5,6 +5,7 @@ import {combineLatest, Observable, of} from 'rxjs';
 import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {SessionService} from 'app/services/session.service';
 
 @Component({
   selector: 'container-entity-data',
@@ -21,11 +22,13 @@ export class ContainerEntityDataComponent implements OnInit {
   allUsers: Array<User>;
   init = false;
   entityOwner: User;
+  isAdmin$: Observable<boolean>;
 
   constructor(
     private fb: FormBuilder,
     private cacheSecurityService: CacheSecurityService,
-    private entityCacheService: EntityCacheService
+    private entityCacheService: EntityCacheService,
+    private sessionService: SessionService
   ) {
 
   }
@@ -62,6 +65,8 @@ export class ContainerEntityDataComponent implements OnInit {
         }),
         map(([searchTerm, users]) => users)
       );
+
+    this.isAdmin$ = this.sessionService.currentUserIsAdmin();
   }
 
   submit(): void {

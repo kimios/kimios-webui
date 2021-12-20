@@ -21,3 +21,7 @@ td:last-child {
 .data-title {
   // background-color: #ececec;
 }
+
+mat-autocomplete {
+  max-width: 0 !important;
+}

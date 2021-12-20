@@ -14,45 +14,54 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field>
-      <input
-                type="text"
-                matInput
-                required
-                [matAutocomplete]="autoSearchUsers"
-                placeholder="Owner"
-                [formControlName]="'owner'"
-                (focus)="sendEventResetSearch()"
-                (click)="handleClick()"
-                (focusout)="handleOwnerFocusOut()"
-      >
-      <mat-autocomplete #autoSearchUsers="matAutocomplete"
-                        fxFlex="40"
-                        [displayWith]="displayWithFunc"
-                        (optionSelected)="selectUser()"
-      >
-        <!--(optionSelected)="selectUser()"-->
-        <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user">
-          <div fxLayout="row" fxLayoutAlign="start center">
-            <mat-icon>person</mat-icon>
-            <span>
-              {{user.firstName
-            + ' '
-            + user.lastName
-            + ' (' + user.uid + '@' + user.source
-            + ')'}}
-            </span>
-          </div>
-        </mat-option>
-      </mat-autocomplete>
-      <button mat-button *ngIf="entityEditForm.get('owner').value" matSuffix mat-icon-button aria-label="Clear"
-              (click)="clearOwner()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <ng-container *ngIf="{value: isAdmin$ | async } as context">
+      <mat-form-field *ngIf="context.value">
+        <input
+                  type="text"
+                  matInput
+                  required
+                  [matAutocomplete]="autoSearchUsers ? autoSearchUsers : ''"
+                  placeholder="Owner"
+                  [formControlName]="'owner'"
+                  (focus)="sendEventResetSearch()"
+                  (click)="handleClick()"
+                  (focusout)="handleOwnerFocusOut()"
+                  style="width: 100%"
+        >
+        <button mat-button *ngIf="entityEditForm.get('owner').value" matSuffix mat-icon-button aria-label="Clear"
+                (click)="clearOwner()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-autocomplete #autoSearchUsers="matAutocomplete"
+                          fxFlex="40"
+                          [displayWith]="displayWithFunc"
+                          (optionSelected)="selectUser()"
+        >
+          <!--(optionSelected)="selectUser()"-->
+          <mat-option *ngFor="let user of filteredUsers$ | async" [value]="user">
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <mat-icon>person</mat-icon>
+              <span>
+                {{user.firstName
+              + ' '
+              + user.lastName
+              + ' (' + user.uid + '@' + user.source
+              + ')'}}
+              </span>
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </ng-container>
 
 
     <table id="table">
+      <ng-container *ngIf="{value: isAdmin$ | async } as context">
+        <tr *ngIf="context.value === false">
+          <td class="talign-right data-title">Owner:</td>
+          <td>{{entity.owner + '@' + entity.ownerSource}}</td>
+        </tr>
+      </ng-container>
       <tr>
         <td class="talign-right data-title">Id:</td>
         <td>{{entity.uid}}</td>
