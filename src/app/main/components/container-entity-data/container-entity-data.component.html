@@ -75,7 +75,9 @@
         <td class="talign-right data-title">Location:</td>
         <td>
           <div fxLayout="row" fxLayoutAlign="start start">
-            <div fxFlex="">{{pathWithoutEntity(entity.path)}}</div>
+            <div fxFlex="" *ngIf="parentEntityWanted$ | async as parentEntityWanted">
+              {{parentEntityWanted ? parentEntityWanted.path : '/'}}
+            </div>
             <mat-icon *ngIf="canBeMoved"
                     (click)="openChooseFolderDialog()" style="cursor: pointer">
               folder_open

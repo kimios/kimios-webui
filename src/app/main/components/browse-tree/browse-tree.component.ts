@@ -1,4 +1,4 @@
-import {AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
 import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
@@ -72,7 +72,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       public createContainerEntityDialog: MatDialog,
       private iconService: IconService,
       private entityCacheService: EntityCacheService,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private cdRef: ChangeDetectorRef
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -89,7 +90,9 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       this.tree.treeModel.update();
     }
 
-      this.browseEntityService.updateMoveTreeNode$.subscribe(
+      this.browseEntityService.updateMoveTreeNode$.pipe(
+        filter(next => next != null)
+      ).subscribe(
           next => this.updateMoveTreeNode(next.entityMoved, next.entityTarget, next.initialParentUid)
       );
 
@@ -116,7 +119,9 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
 
     this.entityCacheService.reloadedEntity$.pipe(
       filter(entity => entity != null),
-      tap(entity => this.tree.treeModel.getNodeById(entity.uid).data['name'] = entity.name)
+      tap(entity => { if (this.tree.treeModel.getNodeById(entity.uid) != null) {
+        this.tree.treeModel.getNodeById(entity.uid).data['name'] = entity.name;
+      }})
     ).subscribe();
   }
 
@@ -190,7 +195,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                 ),
             ).subscribe(
                 (res) => {
-                    this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
+                  this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
+                  this.cdRef.detectChanges();
                 },
                 null,
                 () => {
@@ -202,7 +208,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     this.initDataDone$
         .pipe(
             filter(res => res === true),
-            concatMap(res => this.browseEntityService.selectedEntity$),
+            map(res => this.browseEntityService.selectedEntity$.getValue()),
             filter(entity => entity !== undefined),
             tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
             tap(entity => this.tree.treeModel.getNodeById(entity.uid).expand()),
@@ -349,6 +355,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             filter(res => res != null && res !== undefined),
             filter(res => this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG),
             tap(res => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(res)))
+        ).subscribe();
+
+        this.entityCacheService.chosenParentUid$.pipe(
+          filter(res => res != null && res !== undefined),
+          filter(res => this.mode === BROWSE_TREE_MODE.CHOOSE_PARENT),
+          tap(res => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(res)))
         ).subscribe();
   }
 
@@ -502,6 +514,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       } else {
           if (this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG) {
               this.browseEntityService.chosenContainerEntityUid$.next(Number(node.id.toString()));
+          } else {
+            if (this.mode === BROWSE_TREE_MODE.CHOOSE_PARENT) {
+              this.entityCacheService.chosenParentUid$.next(Number(node.id.toString()));
+            }
           }
       }
   }
@@ -559,6 +575,10 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       const nodeToMove = this.tree.treeModel.getNodeById(entityMoved.uid);
       const nodeTarget = this.tree.treeModel.getNodeById(entityTarget.uid);
       const nodeFrom = this.tree.treeModel.getNodeById(initialParentUid);
+      if (nodeToMove == null || nodeTarget == null || nodeFrom == null) {
+        return;
+      }
+
       this.tree.treeModel.moveNode(
           nodeToMove, {
               dropOnNode: false,

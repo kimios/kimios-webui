@@ -14,7 +14,7 @@ import {
 } from 'app/kimios-client-api';
 import {SessionService} from './session.service';
 import {catchError, concatMap, expand, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
-import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of, Subject} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 
@@ -29,6 +29,7 @@ export class EntityCacheService {
   private bookmarks: Array<Bookmark>;
   public reloadedEntity$: BehaviorSubject<DMEntity>;
   public newEntity$: BehaviorSubject<DMEntity>;
+  public chosenParentUid$: Subject<number>;
 
   constructor(
       private sessionService: SessionService,
@@ -43,6 +44,7 @@ export class EntityCacheService {
     this.entitiesHierarchyCache = new Map<number, Array<number>>();
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
     this.newEntity$ = new BehaviorSubject<DMEntity>(null);
+    this.chosenParentUid$ = new Subject<number>();
   }
 
   getEntityCacheData(uid: number): EntityCacheData {

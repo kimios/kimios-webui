@@ -1,11 +1,17 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {DMEntity, Folder, FolderService, User} from 'app/kimios-client-api';
+import {AdministrationService, DMEntity, Folder, FolderService, User, Workspace} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {combineLatest, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {CacheSecurityService} from 'app/services/cache-security.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {SessionService} from 'app/services/session.service';
+import {BrowseTreeDialogComponent} from 'app/main/components/browse-tree-dialog/browse-tree-dialog.component';
+import {MatDialog} from '@angular/material';
+import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
+import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
+import {BrowseEntityService} from 'app/services/browse-entity.service';
 
 @Component({
   selector: 'container-entity-data',
@@ -23,20 +29,31 @@ export class ContainerEntityDataComponent implements OnInit {
   init = false;
   entityOwner: User;
   isAdmin$: Observable<boolean>;
+  isAdmin = false;
   canBeMoved = false;
   isWriteable = false;
+  parentEntity: Folder | Workspace = null;
+  parentEntityWanted$: BehaviorSubject<Folder | Workspace>;
+  precedingParentUid: number;
 
   constructor(
     private fb: FormBuilder,
     private cacheSecurityService: CacheSecurityService,
     private entityCacheService: EntityCacheService,
     private sessionService: SessionService,
-    private folderService: FolderService
+    private folderService: FolderService,
+    public dialog: MatDialog,
+    private administrationService: AdministrationService,
+    private browseEntityService: BrowseEntityService
   ) {
-
+    this.parentEntityWanted$ = new BehaviorSubject<Folder | Workspace>(null);
   }
 
   ngOnInit(): void {
+    this.precedingParentUid = DMEntityUtils.dmEntityIsFolder(this.entity) ?
+      (this.entity as Folder).parentUid :
+      null;
+
     this.entityEditForm = this.fb.group({
       'name': this.fb.control(this.entity.name),
       'owner': this.fb.control('')
@@ -69,7 +86,9 @@ export class ContainerEntityDataComponent implements OnInit {
         map(([searchTerm, users]) => users)
       );
 
-    this.isAdmin$ = this.sessionService.currentUserIsAdmin();
+    this.isAdmin$ = this.sessionService.currentUserIsAdmin().pipe(
+      tap(res => this.isAdmin = res)
+    );
 
     this.folderService.canBeMoved(this.sessionService.sessionToken, this.entity.uid).subscribe(
       res => this.canBeMoved = res,
@@ -80,17 +99,81 @@ export class ContainerEntityDataComponent implements OnInit {
       res => this.isWriteable = res,
       error => this.isWriteable = false
     );
+
+    of('').pipe(
+      concatMap(() => DMEntityUtils.dmEntityIsWorkspace(this.entity) ?
+        of(null) :
+        this.folderService.getFolder(
+          this.sessionService.sessionToken,
+          (this.entity as Folder).parentUid
+        )
+      ),
+      tap(parentFolder => this.parentEntity = parentFolder)
+    ).subscribe();
+
+    this.entityCacheService.chosenParentUid$.pipe(
+      startWith(DMEntityUtils.dmEntityIsWorkspace(this.entity) ? null : (this.entity as Folder).parentUid),
+      concatMap(uid => uid == null ? null : this.entityCacheService.findEntityInCache(uid)),
+      tap(parent => this.parentEntityWanted$.next(parent))
+    ).subscribe();
   }
 
   submit(): void {
-    this.entityCacheService.updateFolder(
-      this.entity.uid,
-      this.entityEditForm.get('name').value,
-      // todo : handle entity move
-      (this.entity as Folder).parentUid
-    ).pipe(
-      tap(() => {
-        this.entity = this.entityCacheService.getEntity(this.entity.uid);
+    if (this.entityEditForm.invalid
+      || (! this.entityEditForm.dirty
+        && (DMEntityUtils.dmEntityIsFolder(this.entity)
+          && (this.parentEntityWanted$.getValue() == null
+            || (this.entity as Folder).parentUid === this.parentEntityWanted$.getValue().uid)))) {
+      return;
+    }
+    of('').pipe(
+      concatMap(() => ((this.entityEditForm.get('name').dirty)
+        || (DMEntityUtils.dmEntityIsFolder(this.entity)
+          && this.parentEntityWanted$.getValue() != null
+          && (this.entity as Folder).parentUid !== this.parentEntityWanted$.getValue().uid)) ?
+        this.entityCacheService.updateFolder(
+          this.entity.uid,
+          this.entityEditForm.get('name').value,
+          this.parentEntityWanted$.getValue().uid
+        ) :
+        of(null)
+      ),
+      concatMap(res =>
+        this.isAdmin
+        && (this.entityEditForm.get('owner').dirty) ?
+          this.administrationService.changeOwnership(
+            this.sessionService.sessionToken,
+            this.entity.uid,
+            this.entityEditForm.get('owner').value.uid,
+            this.entityEditForm.get('owner').value.source
+          ) :
+          of(null)
+      ),
+      concatMap(res => this.entityCacheService.findEntityInCache(this.entity.uid)),
+      tap(reloadedEntity => {
+        if (this.precedingParentUid != null
+          && this.precedingParentUid !== (reloadedEntity as Folder).parentUid) {
+          this.browseEntityService.updateMoveTreeNode$.next(
+            new TreeNodeMoveUpdate(
+              reloadedEntity,
+              this.entityCacheService.getEntity((reloadedEntity as Folder).parentUid),
+              this.precedingParentUid
+            )
+          );
+        }
+      }),
+      concatMap(reloadedEntity =>
+        combineLatest(of(reloadedEntity), this.precedingParentUid != null
+        && this.precedingParentUid !== (reloadedEntity as Folder).parentUid ?
+          this.browseEntityService.updateListAfterMove(
+            reloadedEntity,
+            this.entityCacheService.getEntity((reloadedEntity as Folder).parentUid),
+            this.precedingParentUid
+          ) :
+          of([])
+      )),
+      tap(([reloadedEntity, other]) => {
+        this.entity = reloadedEntity;
         this.entityEditForm.get('name').setValue(this.entity.name);
         this.init = false;
         this.entityEditForm.get('owner').setValue('');
@@ -160,6 +243,10 @@ export class ContainerEntityDataComponent implements OnInit {
   }
 
   openChooseFolderDialog(): void {
-
+    const dialog = this.dialog.open(BrowseTreeDialogComponent, {
+      data: {
+        browseTreeMode: BROWSE_TREE_MODE.CHOOSE_PARENT
+      }
+    });
   }
 }
