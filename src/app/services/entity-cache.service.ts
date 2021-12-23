@@ -252,7 +252,11 @@ export class EntityCacheService {
   }
 
   private retrieveContainerEntity(uid: number): Observable<DMEntity> {
-    return this.retrieveFolderEntity(uid).pipe(
+    return this.getEntity(uid) != null ?
+      DMEntityUtils.dmEntityIsFolder(this.getEntity(uid)) ?
+        this.retrieveFolderEntity(uid) :
+        this.retrieveWorkspaceEntity(uid) :
+      this.retrieveFolderEntity(uid).pipe(
         concatMap(
           res => (res == null || res === undefined || res === '') ?
             this.retrieveWorkspaceEntity(uid) :
