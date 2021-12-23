@@ -123,6 +123,14 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         this.tree.treeModel.getNodeById(entity.uid).data['name'] = entity.name;
       }})
     ).subscribe();
+
+    this.browseEntityService.selectedEntityFromGridOrTree$.pipe(
+      filter(entity => entity != null),
+      filter(entity => this.browseEntityService.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE),
+      tap(entity => { if (this.tree.treeModel.getNodeById(entity.uid) != null) {
+        this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid));
+      }})
+    ).subscribe();
   }
 
     ngAfterViewInit(): void {
@@ -211,6 +219,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             map(res => this.browseEntityService.selectedEntity$.getValue()),
             filter(entity => entity !== undefined),
             tap(entity => this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid))),
+            filter(entity => this.tree.treeModel.getNodeById(entity.uid) != null),
             tap(entity => this.tree.treeModel.getNodeById(entity.uid).expand()),
             concatMap(
                 entity => this.entityCacheService.findAllParents(entity.uid)
