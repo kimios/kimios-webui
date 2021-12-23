@@ -14,6 +14,7 @@ export interface BrowseTreeDialogData {
 export class BrowseTreeDialogComponent implements OnInit {
 
   browseTreeMode: BROWSE_TREE_MODE;
+  dialogTitle: string;
 
   constructor(
       public dialogRef: MatDialogRef<BrowseTreeDialogComponent>,
@@ -23,6 +24,9 @@ export class BrowseTreeDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dialogTitle = this.browseTreeMode === BROWSE_TREE_MODE.CHOOSE_PARENT ?
+      'Choose location' :
+      'Add related documents';
   }
 
 }
