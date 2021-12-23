@@ -103,10 +103,7 @@ export class ContainerEntityDataComponent implements OnInit {
     of('').pipe(
       concatMap(() => DMEntityUtils.dmEntityIsWorkspace(this.entity) ?
         of(null) :
-        this.folderService.getFolder(
-          this.sessionService.sessionToken,
-          (this.entity as Folder).parentUid
-        )
+        this.entityCacheService.findContainerEntityInCache((this.entity as Folder).parentUid)
       ),
       tap(parentFolder => this.parentEntity = parentFolder)
     ).subscribe();
