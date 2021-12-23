@@ -19,6 +19,7 @@ import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {CacheService} from 'app/services/cache.service';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
 @Component({
   selector: 'app-workspaces',
@@ -125,6 +126,17 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     this.cacheService.documentCreated$.pipe(
       tap(document => console.log('cacheService sent document ' + document.uid)),
       concatMap(document => this.entityCacheService.handleDocumentCreated(document))
+    ).subscribe();
+
+    this.browseEntityService.selectedEntityFromGridOrTree$.pipe(
+      filter(res => this.browseEntityService.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE),
+      tap(next => {
+        this.browseEntityService.setHistoryNewEntry(next === undefined ? undefined : next.uid);
+        this.browseEntityService.goHistoryForward();
+        if (next !== undefined) {
+          this.browseEntityService.setCurrentPathForEntityUid(next.uid);
+        }
+      })
     ).subscribe();
   }
 

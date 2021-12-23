@@ -198,19 +198,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         );
 
-        this.selectedEntityFromGridOrTree$.pipe(
-            filter(res => this.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE)
-        )
-            .subscribe(
-            next => {
-                this.setHistoryNewEntry(next === undefined ? undefined : next.uid);
-                this.goHistoryForward();
-                if (next !== undefined) {
-                    this.setCurrentPathForEntityUid(next.uid);
-                }
-            }
-        );
-
         this.selectedEntity$.subscribe(
             entity => this.selectedFolder$.next(entity)
         );
