@@ -84,14 +84,15 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loginForm = this._formBuilder.group({
             login   : ['', Validators.required],
             password: ['', Validators.required],
-            authenticationSource: ['', Validators.required]
+            authenticationSource: ['', Validators.required],
+            rememberMe: this._formBuilder.control(false)
         });
 
         this.intervalId = window.setInterval(
             () => {
                 this.loadAuthenticationSources();
             },
-            1000
+            5000
         );
     }
 
@@ -124,11 +125,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     onSubmit(): void {
         this.sessionService.login(this.loginForm.get('login').value,
             this.loginForm.get('authenticationSource').value,
-            this.loginForm.get('password').value
+            this.loginForm.get('password').value,
+            this.loginForm.get('rememberMe').value
         ).subscribe(
             next => {
-                this.showMessage = !next;
-                this.message = !next ? 'The username or password is invalid.' : '';
+                this.showMessage = (next == null);
+                this.message = (next == null) ? 'The username or password is invalid.' : '';
             },
             null,
             null

@@ -124,7 +124,7 @@ export class SessionService implements OnDestroy {
             .startSession(login, source, pwd);
     }
 
-    login(login: string, authenticationSource: string, password: string): Observable<boolean> {
+    login(login: string, authenticationSource: string, password: string, rememberMe: boolean): Observable<User> {
 
         return this.callStartSession(login, authenticationSource, password)
             .pipe(
@@ -138,21 +138,35 @@ export class SessionService implements OnDestroy {
                         }
                     }
                 }),
+                tap(res => {
+                    if (res
+                      && res['sessionUid'] != null
+                      && res['sessionUid'] !== undefined) {
+                        this.sessionToken = res['sessionUid'];
+                        this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', res['wsToken']);
+                    }
+                }),
+                concatMap(res => res
+                  && res['sessionUid'] != null
+                  && res['sessionUid'] !== undefined ?
+                  this.securityService.getUser(res['sessionUid']) :
+                  null
+                ),
                 tap(
-                    res => {
-                        if (res
-                            && res['sessionUid'] != null
-                            && res['sessionUid'] !== undefined) {
+                  (user) => {
+                        if (user != null) {
                             this._zone.run(() => {
-                                this.sessionToken = res['sessionUid'];
-                                this.initCurrentUser(this.sessionToken);
+                                this._currentUser = user;
+                                // this.initCurrentUser(this.sessionToken);
                                 this.sessionAlive = true;
                                 this.router.navigate(['']);
                                 if (! this.isSessionCheckStarted()) {
                                     this.startSessionCheck();
                                 }
-                                this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', res['wsToken']);
                             });
+                            if (rememberMe) {
+                                // localStorage.setItem('currentUser',)
+                            }
                         }
                     }
                 )
