@@ -1,0 +1,108 @@
+<tree-root [nodes]="nodes" #tree class="kimios-browse-tree"
+           (toggleExpanded)="onToggleExpanded($event)"
+           [focused]="true"
+           (focus)="onFocus($event)"
+           [options]="treeOptions"
+           (drop)="handleDrop($event)">
+  <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
+    <div class="node-wrapper"
+         [style.padding-left]="node.getNodePadding()"
+         [attr.data-nodeuid]="node.uid"
+    >
+      <div style="margin-top: 0;" *ngIf="node.data.dmEntityType !== 'document'">
+        <ng-container *ngIf="node.data.isLoading; else notLoading">
+          <mat-progress-spinner
+                  mode="indeterminate"
+                  diameter="20"></mat-progress-spinner>
+        </ng-container>
+        <ng-template #notLoading>
+          <div [ngClass]="{'disabled-tree-expander' : (node.data.children === null
+                || node.data.children === undefined
+                || node.data.children.length === 0)}" >
+            <button mat-icon-button
+                    [attr.aria-label]="'toggle ' + node.name"
+                    (click)="node.toggleExpanded()"
+                    class="kimios-tree-button-expand">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{tree.treeModel.expandedNodeIds[node.id] !== null
+              && tree.treeModel.expandedNodeIds[node.id] !== undefined
+              && tree.treeModel.expandedNodeIds[node.id] === true ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+          </div>
+        </ng-template>
+      </div>
+      <div class="node-content-wrapper"
+           [class.node-content-wrapper-active]="node.isActive"
+           [class.node-content-wrapper-focused]="node.isFocused"
+           (click)="selectNode(node)"
+           (dblclick)="node.mouseAction('dblClick', $event)"
+           (contextmenu)="node.mouseAction('contextMenu', $event)"
+           (treeDrop)="node.onDrop($event)"
+           [treeAllowDrop]="node.allowDrop"
+           [treeDrag]="node"
+           [treeDragEnabled]="true">
+        <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px">
+          <mat-checkbox *ngIf="mode === 'with-documents' && node.data.dmEntityType === 'document'"
+                        (change)="selectionChange($event, node.data.id)"
+                        [checked]="selectedEntity(node.id)"
+          >
+          </mat-checkbox>
+          <mat-icon *ngIf="node.data.svgIcon === 'workspace'" svgIcon="{{node.data.svgIcon}}"></mat-icon>
+          <mat-icon *ngIf="node.data.svgIcon === 'folder'">folder</mat-icon>
+          <fa-icon *ngIf="node.data.dmEntityType === 'document'"
+                   [icon]="['far', retrieveDocumentIcon(node.data.documentExtension, 'far')]"
+                   size="lg"
+                   [ngClass]="'file-icon-browse-list'"></fa-icon>
+          <div>
+            <tree-node-content [node]="node" [index]="index"></tree-node-content>
+          </div>
+          <div class="treenode-icon-more" (click) = "$event.stopPropagation()">
+            <button mat-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{entityId: node.id}">
+              <mat-icon class="cursor-pointer">more_horiz</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <tree-node-children [node]="node" [templates]="templates">
+    </tree-node-children>
+  </ng-template>
+
+  <!--<ng-template #treeNodeFullTemplate
+               let-node
+               let-index="index"
+               let-templates="templates">
+    <div
+            [class]="node.getClass()"
+            [class.tree-node]="true"
+            [class.tree-node-expanded]="node.isExpanded && node.hasChildren"
+            [class.tree-node-collapsed]="node.isCollapsed && node.hasChildren"
+            [class.tree-node-leaf]="node.isLeaf"
+            [class.tree-node-active]="node.isActive"
+            [class.tree-node-focused]="node.isFocused">
+
+      <tree-node-drop-slot
+              *ngIf="index === 0"
+              [dropIndex]="node.index"
+              [node]="node.parent">
+      </tree-node-drop-slot>
+
+      <tree-node-wrapper [node]="node" [index]="index" [templates]="templates">
+      </tree-node-wrapper>
+
+      <tree-node-children [node]="node" [templates]="templates">
+      </tree-node-children>
+      <tree-node-drop-slot [dropIndex]="node.index + 1" [node]="node.parent">
+      </tree-node-drop-slot>
+    </div>
+  </ng-template>-->
+
+</tree-root>
+
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-entityid="entityId">
+    <button mat-menu-item (click)="openEntityData(entityid)"><mat-icon>info</mat-icon> Properties</button>
+    <button mat-menu-item (click)="createFolderDialog(entityid)"><mat-icon>create_new_folder</mat-icon> New folder</button>
+  </ng-template>
+</mat-menu>
