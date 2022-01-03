@@ -502,15 +502,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
   loadNodesChildren(ids: Array<number>): Observable<number> {
     return from(ids).pipe(
 //          takeWhile(uid => uid !== -1),
-        concatMap(
-            res => iif(
-                () => this.tree.treeModel.getNodeById(res).data.children === null
-                  && this.tree.treeModel.getNodeById(res).data.dmEntityType !== 'document',
-                this.loadChildren(res),
-                of(res)
-            )
-        ),
-        tap(res => this.tree.treeModel.getNodeById(res).expand())
+      concatMap(res => this.tree.treeModel.getNodeById(res).data.children == null
+        && this.tree.treeModel.getNodeById(res).data.dmEntityType !== 'document' ?
+        this.loadChildren(res) :
+        of(res)
+      ),
+      tap(res => this.tree.treeModel.getNodeById(res).expand())
     );
   }
 
