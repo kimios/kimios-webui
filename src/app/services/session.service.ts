@@ -165,7 +165,15 @@ export class SessionService implements OnDestroy {
                                 }
                             });
                             if (rememberMe) {
-                                // localStorage.setItem('currentUser',)
+                                localStorage.setItem('currentUser', this._currentUser.uid);
+                                localStorage.setItem('currentSource', this._currentUser.source);
+                                localStorage.setItem('currentPassword', password);
+                                localStorage.setItem('rememberMe', String(rememberMe));
+                            } else {
+                                localStorage.removeItem('currentUser');
+                                localStorage.removeItem('currentSource');
+                                localStorage.removeItem('currentPassword');
+                                localStorage.removeItem('rememberMe');
                             }
                         }
                     }

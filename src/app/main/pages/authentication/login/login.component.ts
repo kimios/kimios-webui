@@ -87,7 +87,9 @@ export class LoginComponent implements OnInit, OnDestroy {
             authenticationSource: ['', Validators.required],
             rememberMe: this._formBuilder.control(false)
         });
+        this.initLoginForm();
 
+        this.loadAuthenticationSources();
         this.intervalId = window.setInterval(
             () => {
                 this.loadAuthenticationSources();
@@ -148,6 +150,21 @@ export class LoginComponent implements OnInit, OnDestroy {
         } else {
             this.passwordInputType = 'password';
             this.visibilityIconName = 'visibility_off';
+        }
+    }
+
+    private initLoginForm(): void {
+        if (localStorage.getItem('currentUser') != null) {
+            this.loginForm.get('login').setValue(localStorage.getItem('currentUser'));
+        }
+        if (localStorage.getItem('currentSource') != null) {
+            this.loginForm.get('authenticationSource').setValue(localStorage.getItem('currentSource'));
+        }
+        if (localStorage.getItem('currentPassword') != null) {
+            this.loginForm.get('password').setValue(localStorage.getItem('currentPassword'));
+        }
+        if (localStorage.getItem('rememberMe') != null) {
+            this.loginForm.get('rememberMe').setValue(localStorage.getItem('rememberMe'));
         }
     }
 }
