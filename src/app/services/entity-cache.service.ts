@@ -17,6 +17,7 @@ import {catchError, concatMap, expand, filter, map, switchMap, tap, toArray} fro
 import {BehaviorSubject, combineLatest, from, Observable, of, Subject} from 'rxjs';
 import {SearchEntityService} from './searchentity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
+import {FolderUidListParam} from 'app/kimios-client-api/model/folderUidListParam';
 
 @Injectable({
   providedIn: 'root'
@@ -206,6 +207,17 @@ export class EntityCacheService {
           new EntityCacheData(entity));
       })),
       tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
+    );
+  }
+
+  public askFoldersInFolders(uids: Array<number>): void {
+    this.folderService.getFoldersFolders(<FolderUidListParam> {
+      sessionId: this.sessionService.sessionToken,
+      folderUidList: uids
+    }).subscribe(
+      null,
+      error => console.log('askFoldersInFolders() error : ' + error),
+      null
     );
   }
 

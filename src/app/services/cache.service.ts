@@ -7,6 +7,7 @@ import {UpdateNoticeMessageImpl} from 'app/main/model/update-notice-message-impl
 import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessage';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
+import {DataMessageImpl} from 'app/main/model/data-message-impl';
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -60,7 +61,16 @@ export class CacheService {
       const updateNoticeMessage = Object.assign(new UpdateNoticeMessageImpl(null, null, null, null), msg);
       console.log('Websocket received message: ');
       console.dir(updateNoticeMessage);
+      this.handleUpdateNoticeMsg(updateNoticeMessage);
+    } else {
+      if (msg['dmEntityList'] != null && msg['parentUid'] != null) {
+        const dataMessage = Object.assign(new DataMessageImpl(null, null, null, null), msg);
+        this.handleDataMessage(dataMessage);
+      }
+    }
+  }
 
+  private handleUpdateNoticeMsg(updateNoticeMessage: UpdateNoticeMessageImpl): void {
       const messageParsedObj = updateNoticeMessage.message != null ? JSON.parse(updateNoticeMessage.message) : null;
 
       switch (updateNoticeMessage.updateNoticeType) {
@@ -87,5 +97,8 @@ export class CacheService {
           this.sharedByMe$.next(true);
       }
     }
+
+  private handleDataMessage(dataMessage: any): void {
+    // TODO
   }
 }

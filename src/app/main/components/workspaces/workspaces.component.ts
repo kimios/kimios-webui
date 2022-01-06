@@ -77,16 +77,17 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
           map(parents => this.browseEntityService.currentPath.next(parents.reverse()))
       ).subscribe();
     }
-    this.browseEntityService.selectedEntity$.subscribe(
-        entity => {
-          if (entity !== undefined) {
-            this.initial = false;
-            const path = this.location.path();
-            const newPath = path.replace(new RegExp('(?:\/workspaces.*)?$'), '/workspaces/' + entity.uid);
-            this.location.replaceState(newPath);
-          }
-        }
-    );
+    this.browseEntityService.selectedEntity$.pipe(
+      filter(entity => entity != null),
+      tap(entity => {
+        this.initial = false;
+        const path = this.location.path();
+        const newPath = path.replace(new RegExp('(?:\/workspaces.*)?$'), '/workspaces/' + entity.uid);
+        this.location.replaceState(newPath);
+      }),
+      concatMap(entity => this.entityCacheService.findEntityChildrenInCache(entity.uid, true)),
+      tap(children => this.entityCacheService.askFoldersInFolders(children.map(folder => folder.uid)))
+    ).subscribe();
 
     this.browseEntityService.totalEntitiesToDisplay$.subscribe(
         next => this.length = next.length
