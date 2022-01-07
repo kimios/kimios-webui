@@ -6,8 +6,8 @@ import {webSocket} from 'rxjs/webSocket';
 import {UpdateNoticeMessageImpl} from 'app/main/model/update-notice-message-impl';
 import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessage';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
-import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 import {DataMessageImpl} from 'app/main/model/data-message-impl';
+import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -28,6 +28,7 @@ export class CacheService {
   public documentCreated$: Subject<KimiosDocument>;
   public sharedWithMe$: Subject<boolean>;
   public sharedByMe$: Subject<boolean>;
+  private _dataMessages: Array<DataMessageImpl>;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
@@ -98,7 +99,11 @@ export class CacheService {
       }
     }
 
-  private handleDataMessage(dataMessage: any): void {
-    // TODO
+  private handleDataMessage(dataMessage: DataMessageImpl): void {
+    this._dataMessages.push(dataMessage);
+  }
+
+  get dataMessages(): Array<DataMessageImpl> {
+    return this._dataMessages;
   }
 }

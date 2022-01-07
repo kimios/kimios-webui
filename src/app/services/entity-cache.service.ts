@@ -18,6 +18,8 @@ import {BehaviorSubject, combineLatest, from, Observable, of, Subject} from 'rxj
 import {SearchEntityService} from './searchentity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {FolderUidListParam} from 'app/kimios-client-api/model/folderUidListParam';
+import {CacheService} from './cache.service';
+import {DataMessageImpl} from 'app/main/model/data-message-impl';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +33,8 @@ export class EntityCacheService {
   public reloadedEntity$: BehaviorSubject<DMEntity>;
   public newEntity$: BehaviorSubject<DMEntity>;
   public chosenParentUid$: Subject<number>;
+  private _intervalId: number;
+  private _checkingDataMessagesQueue: boolean;
 
   constructor(
       private sessionService: SessionService,
@@ -38,7 +42,8 @@ export class EntityCacheService {
       private documentService: DocumentService,
       private searchEntityService: SearchEntityService,
       private workspaceService: WorkspaceService,
-      private folderService: FolderService
+      private folderService: FolderService,
+      private cacheService: CacheService
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
@@ -46,6 +51,13 @@ export class EntityCacheService {
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
     this.newEntity$ = new BehaviorSubject<DMEntity>(null);
     this.chosenParentUid$ = new Subject<number>();
+
+    this._intervalId = window.setInterval(
+      () => { if (this._checkingDataMessagesQueue === true) {
+        this.checkDataMessagesQueue();
+      }},
+      1000
+    );
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -625,5 +637,24 @@ export class EntityCacheService {
       tap(entity => this.reloadedEntity$.next(entity)),
       concatMap(() => this.reloadEntityChildren(folderParentUid))
     );
+  }
+
+  private checkDataMessagesQueue(): void {
+    this._checkingDataMessagesQueue = true;
+    let dataMessage = this.cacheService.dataMessages.shift();
+    while (dataMessage !== undefined) {
+      this.handleDataMessage(dataMessage);
+      dataMessage = this.cacheService.dataMessages.shift();
+    }
+    this._checkingDataMessagesQueue = false;
+  }
+
+  private handleDataMessage(dataMessage: DataMessageImpl): void {
+    // only folders are considered
+    // TODO : consider also other entity types
+    this.entitiesCache.set(dataMessage.parent.uid, new EntityCacheData(dataMessage.parent));
+    dataMessage.dmEntityList.forEach(dmEntity => this.entitiesCache.set(dmEntity.uid, new EntityCacheData(dmEntity)));
+    this.entitiesHierarchyCache.set(dataMessage.parent.uid, dataMessage.dmEntityList.map(dmEntity => dmEntity.uid));
+
   }
 }
