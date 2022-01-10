@@ -245,5 +245,9 @@ export class ContainerEntityDataComponent implements OnInit {
         browseTreeMode: BROWSE_TREE_MODE.CHOOSE_PARENT
       }
     });
+
+    dialog.afterClosed().pipe(
+      tap(() => this.browseEntityService.browseMode$.next(BROWSE_TREE_MODE.BROWSE))
+    ).subscribe();
   }
 }
