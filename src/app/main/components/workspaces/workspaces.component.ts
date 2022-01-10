@@ -86,7 +86,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
         this.location.replaceState(newPath);
       }),
       concatMap(entity => this.entityCacheService.findEntityChildrenInCache(entity.uid, true)),
-      tap(children => this.entityCacheService.askFoldersInFolders(children.map(folder => folder.uid)))
+      // tap(children => this.entityCacheService.askFoldersInFolders(children.map(folder => folder.uid)))
     ).subscribe();
 
     this.browseEntityService.totalEntitiesToDisplay$.subscribe(
