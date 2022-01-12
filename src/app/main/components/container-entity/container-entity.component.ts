@@ -1,5 +1,4 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Observable, of} from 'rxjs';
 import {DMEntity} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {filter, tap} from 'rxjs/operators';
@@ -16,7 +15,7 @@ export class ContainerEntityComponent implements OnInit {
   @Input()
   entityId: number;
 
-  entityData$: Observable<DMEntity>;
+  entityData: DMEntity;
   entityType: 'folder' | 'workspace';
 
   constructor(
@@ -25,17 +24,23 @@ export class ContainerEntityComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.entityData$ = this.browseEntityService.retrieveContainerEntity(this.entityId).pipe(
+    if (this.entityId == null
+      || this.entityId === undefined) {
+      return;
+    }
+
+    this.browseEntityService.retrieveContainerEntity(this.entityId).pipe(
+      tap(next => this.entityData = next),
       tap(next =>
         this.entityType = DMEntityUtils.dmEntityIsFolder(next) ?
           'folder' :
           'workspace'
       )
-    );
+    ).subscribe();
 
     this.entityCacheService.reloadedEntity$.pipe(
       filter(entity => entity != null),
-      tap(entity => this.entityData$ = of(entity))
+      tap(entity => this.entityData = entity)
     ).subscribe();
   }
 

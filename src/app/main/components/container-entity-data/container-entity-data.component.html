@@ -75,7 +75,7 @@
         <td class="talign-right data-title">Location:</td>
         <td>
           <div fxLayout="row" fxLayoutAlign="start start">
-            <div fxFlex="" *ngIf="parentEntityWanted$ | async as parentEntityWanted">
+            <div fxFlex="" *ngIf="parentEntityWanted">
               {{parentEntityWanted ? parentEntityWanted.path : '/'}}
             </div>
             <mat-icon *ngIf="canBeMoved"
