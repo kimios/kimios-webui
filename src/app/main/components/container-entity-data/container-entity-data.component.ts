@@ -113,6 +113,23 @@ export class ContainerEntityDataComponent implements OnInit {
       concatMap(uid => uid == null ? null : this.entityCacheService.findEntityInCache(uid)),
       tap(parent => this.parentEntityWanted = parent)
     ).subscribe();
+
+    this.entityEditForm.statusChanges.pipe(
+      tap(() => this.updateDirtyFormStatus())
+    ).subscribe();
+
+    this.entityEditForm.valueChanges.pipe(
+      tap(() => this.updateDirtyFormStatus())
+    ).subscribe();
+  }
+
+  updateDirtyFormStatus(): void {
+    if (this.entityEditForm.dirty
+      || this.parentEntity.uid !== this.parentEntityWanted.uid) {
+      this.sessionService.dirtyForm$.next(true);
+    } else {
+      this.sessionService.dirtyForm$.next(false);
+    }
   }
 
   submit(): void {
@@ -123,8 +140,8 @@ export class ContainerEntityDataComponent implements OnInit {
             || (this.entity as Folder).parentUid === this.parentEntityWanted.uid)))) {
       return;
     }
-    of('').pipe(
-      concatMap(() => ((this.entityEditForm.get('name').dirty)
+
+    (((this.entityEditForm.get('name').dirty)
         || (DMEntityUtils.dmEntityIsFolder(this.entity)
           && this.parentEntityWanted != null
           && (this.entity as Folder).parentUid !== this.parentEntityWanted.uid)) ?
@@ -134,7 +151,7 @@ export class ContainerEntityDataComponent implements OnInit {
           this.parentEntityWanted.uid
         ) :
         of(null)
-      ),
+    ).pipe(
       concatMap(res =>
         this.isAdmin
         && (this.entityEditForm.get('owner').dirty) ?
@@ -174,6 +191,7 @@ export class ContainerEntityDataComponent implements OnInit {
         this.entityEditForm.get('name').setValue(this.entity.name);
         this.init = false;
         this.entityEditForm.get('owner').setValue('');
+        this.sessionService.dirtyForm$.next(false);
       }),
     ).subscribe(
       res => console.log('folder updated'),
@@ -226,6 +244,7 @@ export class ContainerEntityDataComponent implements OnInit {
   reset(): void {
     this.resetEditForm();
     this.parentEntityWanted = this.parentEntity;
+    this.sessionService.dirtyForm$.next(false);
   }
 
   private resetEditForm(): void {
@@ -248,7 +267,8 @@ export class ContainerEntityDataComponent implements OnInit {
     });
 
     dialog.afterClosed().pipe(
-      tap(() => this.browseEntityService.browseMode$.next(BROWSE_TREE_MODE.BROWSE))
+      tap(() => this.browseEntityService.browseMode$.next(BROWSE_TREE_MODE.BROWSE)),
+      tap(() => this.sessionService.dirtyForm$.next(false))
     ).subscribe();
   }
 }

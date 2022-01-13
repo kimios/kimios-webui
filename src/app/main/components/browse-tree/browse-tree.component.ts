@@ -1,5 +1,5 @@
 import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, from, Observable, of} from 'rxjs';
 import {DMEntity, Document as KimiosDocument, Folder} from 'app/kimios-client-api';
 import {TreeNodesService} from 'app/services/tree-nodes.service';
 import {concatMap, filter, flatMap, map, mergeMap, switchMap, take, tap, toArray} from 'rxjs/operators';
@@ -8,13 +8,15 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {ActivatedRoute} from '@angular/router';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {ContainerEntityDialogComponent} from 'app/main/components/container-entity-dialog/container-entity-dialog.component';
-import {MatCheckboxChange, MatDialog} from '@angular/material';
+import {MatCheckboxChange, MatDialog, MatDialogRef} from '@angular/material';
 import {ContainerEntityCreationDialogComponent} from 'app/main/components/container-entity-creation-dialog/container-entity-creation-dialog.component';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ITreeModel, ITreeNode} from 'angular-tree-component/dist/defs/api';
 import {IconService} from 'app/services/icon.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {SessionService} from 'app/services/session.service';
+import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'browse-tree',
@@ -35,6 +37,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
   selectedEntityIdList: Array<number>;
 
   toBeInsertedInTree: Array<DMEntity>;
+
+  containerEntityDialogRef: MatDialogRef<ContainerEntityDialogComponent>;
 
   @ViewChild('tree') tree;
   @ViewChild('tree') treeElement: ElementRef;
@@ -70,10 +74,12 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       private entityCreationService: EntityCreationService,
       public containerEntityDialog: MatDialog,
       public createContainerEntityDialog: MatDialog,
+      public confirmDialog: MatDialog,
       private iconService: IconService,
       private entityCacheService: EntityCacheService,
       private documentDetailService: DocumentDetailService,
-      private cdRef: ChangeDetectorRef
+      private cdRef: ChangeDetectorRef,
+      private sessionService: SessionService
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
     this.initDataDone$ = new BehaviorSubject(false);
@@ -604,14 +610,37 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     }
 
     openEntityData(uid: number): void {
-        const dialogRef = this.containerEntityDialog.open(ContainerEntityDialogComponent, {
+        this.containerEntityDialogRef = this.containerEntityDialog.open(ContainerEntityDialogComponent, {
             width: '700px',
             // width: '250px',
             data: {
                 uid: uid
-            }
+            },
+          disableClose: true
         });
+
+      this.containerEntityDialogRef.backdropClick().pipe(
+        tap(() => { if (this.sessionService.dirtyForm$.getValue() === true) {
+          this.openConfirmDialog('You have unsaved work', ['Any modification will be lost. Are you sure?'])
+        } else {
+          this.containerEntityDialogRef.close();
+        }})
+      ).subscribe();
     }
+
+  openConfirmDialog(title: string, messageLines: Array<string>): void {
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+      data: {
+        dialogTitle: title,
+        messageLine1: messageLines[0]
+      }
+    });
+
+    dialogRef.afterClosed().pipe(
+      filter(res => res === true),
+      tap(() => this.containerEntityDialogRef.close())
+    ).subscribe();
+  }
 
     handleDrop($event: DragEvent): void {
         if ($event['droppedInDir']) {

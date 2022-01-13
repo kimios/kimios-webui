@@ -1,7 +1,7 @@
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
-import {Observable, of, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
 import {Router} from '@angular/router';
 import {catchError, concatMap, tap} from 'rxjs/operators';
 import {CacheService} from './cache.service';
@@ -17,6 +17,7 @@ export class SessionService implements OnDestroy {
     private _sessionAlive: boolean;
     private intervalId: number;
     private _currentUser: User;
+    public dirtyForm$: BehaviorSubject<boolean>;
 
     constructor(
         private securityService: SecurityService,
@@ -30,6 +31,7 @@ export class SessionService implements OnDestroy {
             this.sessionAlive = true;
         }
         this.startSessionCheck();
+        this.dirtyForm$ = new BehaviorSubject<boolean>(false);
     }
 
     ngOnDestroy(): void {
