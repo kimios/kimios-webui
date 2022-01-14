@@ -69,7 +69,7 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
   }
 
   handleDomainCreation(): void {
-    // this.adminService.selectedDomain$.next('');
+    this.adminService.selectedDomain$.next('');
     this.adminService.newDomain$.next(true);
   }
 
