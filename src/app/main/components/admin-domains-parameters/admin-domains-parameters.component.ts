@@ -76,7 +76,7 @@ export class AdminDomainsParametersComponent implements OnInit {
     }
 
     this.formGroup = this.fb.group({
-      name: this.fb.control(authSource ? authSource.name : ''),
+      name: this.fb.control({value: authSource ? authSource.name : '', disabled: !this.actionTypeIsCreation()}),
       className: this.fb.control(authSource ? authSource.className : ''),
       enableSso: this.fb.control(authSource ? authSource.enableSso : false),
       enableMailCheck: this.fb.control(authSource ? authSource.enableMailCheck : false),
