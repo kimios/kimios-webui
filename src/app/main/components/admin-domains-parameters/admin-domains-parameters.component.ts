@@ -6,6 +6,7 @@ import {concatMap, filter, tap} from 'rxjs/operators';
 import {SessionService} from 'app/services/session.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {DomainEditionType} from '../../model/domain-edition-type.enum';
+import {MatSelectChange} from '@angular/material';
 
 @Component({
   selector: 'admin-domains-parameters',
@@ -18,9 +19,15 @@ export class AdminDomainsParametersComponent implements OnInit {
   authenticationSource$: BehaviorSubject<AuthenticationSource>;
   authenticationSourceParams$: BehaviorSubject<Map<string, string>>;
   formGroupCreated$: Subject<boolean>;
+  formGroupCreated = false;
   formGroup: FormGroup;
   availableTypes$: Observable<Array<string>>;
   actionType: DomainEditionType;
+  paramsMap: Map<string, string>;
+  selectedDomainObj: AuthenticationSource;
+  selectedDomainParams: { [key: string]: string; };
+  currentDomainParams: { [key: string]: string; };
+  currentDomainParamsKeys: Array<string>;
 
   constructor(
       private adminService: AdminService,
@@ -32,15 +39,26 @@ export class AdminDomainsParametersComponent implements OnInit {
     this.authenticationSourceParams$ = new BehaviorSubject<Map<string, string>>(new Map<string, string>());
     this.availableTypes$ = this.administrationService.getAvailableAuthenticationSources(this.sessionService.sessionToken);
     this.formGroupCreated$ = new Subject<boolean>();
+    this.formGroup = this.fb.group({
+      name: {value: '', disabled: !this.actionTypeIsCreation()},
+      className: '',
+      enableSso: false,
+      enableMailCheck: false,
+      params: this.fb.group({})
+    });
+    this.paramsMap = new Map<string, string>();
   }
 
   ngOnInit(): void {
+    console.log('in parameters component this.adminService.newDomain$.getValue() : ' + this.adminService.newDomain$.getValue());
+
+    if (this.adminService.newDomain$.getValue() === true) {
+      this.handleNewDomainEventTrue();
+    }
+
     this.adminService.newDomain$.pipe(
-      tap(() => {
-        this.actionType = DomainEditionType.CREATION;
-        this.initForm(null, null);
-        this.formGroupCreated$.next(true);
-      })
+      filter(bool => bool === true),
+      tap(() => this.handleNewDomainEventTrue())
     ).subscribe();
 
     this.adminService.selectedDomain$.pipe(
@@ -50,6 +68,7 @@ export class AdminDomainsParametersComponent implements OnInit {
         domainName => this.administrationService.getAuthenticationSource(this.sessionService.sessionToken, domainName)
         ),
         tap(authSource => this.authenticationSource$.next(authSource)),
+        tap(authSource => this.selectedDomainObj = authSource),
         tap(authSource => console.dir(authSource)),
         concatMap(authSource => combineLatest(of(authSource), this.administrationService.getAuthenticationSourceParams(
             this.sessionService.sessionToken,
@@ -60,28 +79,70 @@ export class AdminDomainsParametersComponent implements OnInit {
           const params = new Map<string, string>();
           Object.keys(authSourceParams).forEach(key => params.set(key, authSourceParams[key]));
           this.authenticationSourceParams$.next(params);
+          this.selectedDomainParams = authSourceParams;
+          this.currentDomainParams = authSourceParams;
+          this.currentDomainParamsKeys = this.extractObjectKeys(authSourceParams);
         }),
         tap(([authSource, authSourceParams]) => this.initForm(authSource, authSourceParams))
     ).subscribe(
-        ([authSource, authSourceParams]) => this.formGroupCreated$.next(true)
+        ([authSource, authSourceParams]) => this.formGroupCreated = true
     );
   }
 
+  private extractObjectKeys(obj: { [key: string]: string; }): Array<string> {
+    return Object.keys(obj).map(key => key);
+  }
+
+  public handleClassNameSelection(event: MatSelectChange): void {
+    const className = event.value;
+    this.currentDomainParams = null;
+    this.currentDomainParamsKeys = null;
+    if (this.selectedDomainObj != null && className === this.selectedDomainObj.className) {
+      this.initFormGroup(this.formGroup.get('params') as FormGroup, this.selectedDomainParams);
+    }
+    (className === '' ?
+      of([]) :
+      this.administrationService.getAvailableAuthenticationSourceParams(
+        this.sessionService.sessionToken,
+        className
+      )
+    ).pipe(
+      tap(params => {
+        if (className !== ''
+          || (this.selectedDomainObj != null && className !== this.selectedDomainObj.className)) {
+          const obj = {};
+          params.forEach(param => obj[param] = '');
+          this.initFormGroup(this.formGroup.get('params') as FormGroup, obj);
+          this.currentDomainParams = obj;
+          this.currentDomainParamsKeys = this.extractObjectKeys(obj);
+        }
+      })
+    ).subscribe();
+  }
+
+  private handleNewDomainEventTrue(): void {
+    this.actionType = DomainEditionType.CREATION;
+    this.initForm(null, null);
+    this.formGroupCreated = true;
+    this.formGroup.get('name').enable();
+  }
+
   private initForm(authSource: AuthenticationSource, authSourceParams: { [key: string]: string; }): void {
-    const paramsControl = this.fb.group({});
-    if (authSourceParams != null) {
-      Object.keys(authSourceParams).forEach((key) => {
-        paramsControl.addControl(key, this.fb.control(authSourceParams[key]));
+    this.formGroup.setControl('params', this.fb.group({}));
+    this.initFormGroup(this.formGroup.get('params') as FormGroup, authSourceParams);
+
+    this.formGroup.get('name').setValue(authSource ? authSource.name : '');
+    this.formGroup.get('className').setValue(authSource ? authSource.className : '');
+    this.formGroup.get('enableSso').setValue(authSource ? authSource.enableSso : false);
+    this.formGroup.get('enableMailCheck').setValue(authSource ? authSource.enableMailCheck : false);
+  }
+
+  private initFormGroup(formGroup: FormGroup, obj: { [key: string]: string; }): void {
+    if (obj != null) {
+      Object.keys(obj).forEach((key) => {
+        formGroup.addControl(key, this.fb.control(obj[key]));
       });
     }
-
-    this.formGroup = this.fb.group({
-      name: this.fb.control({value: authSource ? authSource.name : '', disabled: !this.actionTypeIsCreation()}),
-      className: this.fb.control(authSource ? authSource.className : ''),
-      enableSso: this.fb.control(authSource ? authSource.enableSso : false),
-      enableMailCheck: this.fb.control(authSource ? authSource.enableMailCheck : false),
-      params: paramsControl
-    });
   }
 
   public getParamsControlAsMap(): Map<string, string> {

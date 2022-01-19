@@ -1,6 +1,9 @@
-<div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+<div #settingsWrapper
+        fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
 
-<mat-tab-group *ngIf="(isAdmin$ | async) || (hasStudioAccess$ | async); else personalSettingsOnly">
+<mat-tab-group *ngIf="(isAdmin$ | async) || (hasStudioAccess$ | async); else personalSettingsOnly"
+               style="height: 100%"
+>
 
   <mat-tab label="Settings">
     <personal-settings style="padding: 0"></personal-settings>

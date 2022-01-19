@@ -1,10 +1,8 @@
 
-  <ng-container *ngIf="formGroupCreated$ | async as formGroupCreated">
-    <ng-container *ngIf="formGroupCreated === true">
 
-  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" >
 
-      <div fxLayout="column" fxFlexAlign="start start" >
+      <div fxLayout="column" fxFlexAlign="start start">
         <mat-form-field>
           <mat-label>Domain name</mat-label>
           <input
@@ -20,6 +18,7 @@
           <mat-select
                   placeholder="Java class name"
                   [formControlName]="'className'"
+                  (selectionChange)="handleClassNameSelection($event)"
           >
             <mat-option
                     *ngFor="let type of availableTypes$ | async"
@@ -42,7 +41,7 @@
 
           <!-- domain specific parameters -->
           <!--<ng-container *ngIf="authenticationSourceParams$ | async as params">-->
-          <ng-container *ngIf="getParamsControlAsMap().size > 0">
+          <ng-container *ngIf="currentDomainParamsKeys != null">
             <!--<ng-container *ngIf="params.size > 0">-->
             <div fxLayout="column" [formGroup]="formGroup.get('params')" >
               <div [ngClass]="'domain-form-div'">
@@ -50,7 +49,7 @@
               </div>
               <div>
                 <table>
-                  <tr *ngFor="let key of getParamsControlAsMap().keys()">
+                  <tr *ngFor="let key of currentDomainParamsKeys">
                     <td>{{key}}</td>
                     <td>
                       <mat-form-field>
@@ -91,7 +90,4 @@
         </div>
       </div>
   </form>
-
-    </ng-container>
-  </ng-container>
-
+  

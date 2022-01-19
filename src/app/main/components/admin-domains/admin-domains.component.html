@@ -1,14 +1,14 @@
-<div class="file-tab-content-wrapper">
+<div class="file-tab-content-wrapper" #adminDomainsWrapper>
     <div class="file-tab-content fit">
 
         <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" id="admin-domains-container">
 
-            <div fxLayout="column">
+            <div fxLayout="column" style="height: 100%">
                 <button mat-button mat-icon-button aria-label="Create document type"
                         (click)="handleDomainCreation()">
                     <mat-icon>add</mat-icon>
                 </button>
-                <div>
+                <div style="overflow: auto">
                 <mat-list>
                     <mat-list-item *ngFor="let domain of domains$ | async"
                                    (click)="selectDomain(domain.name)"
@@ -35,19 +35,22 @@
 
             <mat-divider #divider [vertical]="true" style="height: available"></mat-divider>
 
-            <div fxLayout="column" fxLayoutGap="10px" fxFlex>
+            <div fxLayout="column" fxLayoutGap="10px" fxFlex style="height: 100%">
 
-                <mat-tab-group *ngIf="selectedDomain$.getValue() !== ''
-                || newDomain$.getValue() === true else noSelectedDomain;">
-                    <mat-tab label="Parameters">
-                        <admin-domains-parameters></admin-domains-parameters>
+                <mat-tab-group #matTabGroup *ngIf="selectedDomain !== ''
+                || newDomain === true else noSelectedDomain;"
+                               style="height: 100%"
+                >
+                    <mat-tab label="Parameters" style="height: 100%; overflow-y: auto;">
+                        <admin-domains-parameters style="height: 100%; display: inline-block">
+                        </admin-domains-parameters>
                     </mat-tab>
 
-                    <mat-tab label="Users">
+                    <mat-tab label="Users" *ngIf="selectedDomain !== ''">
                         <admin-domains-users></admin-domains-users>
                     </mat-tab>
 
-                    <mat-tab label="Groups">
+                    <mat-tab label="Groups" *ngIf="selectedDomain !== ''">
                         <admin-domains-groups></admin-domains-groups>
                     </mat-tab>
 

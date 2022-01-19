@@ -3,7 +3,7 @@ import {AdministrationService, AuthenticationSource, SecurityService} from 'app/
 import {SessionService} from 'app/services/session.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AdminService} from 'app/services/admin.service';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatTabGroup} from '@angular/material';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {concatMap, filter, tap} from 'rxjs/operators';
 
@@ -17,8 +17,12 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
   domains$: Observable<Array<AuthenticationSource>>;
   selectedDomainName = '';
   selectedDomain$: BehaviorSubject<string>;
+  selectedDomain = '';
   newDomain$: BehaviorSubject<boolean>;
+  newDomain = false;
   @ViewChild('divider',  { read: ElementRef }) divider: ElementRef;
+  @ViewChild('matTabGroup') matTabGroup: MatTabGroup;
+  @ViewChild('adminDomainsWrapper', { read: ElementRef }) adminDomainsWrapper: ElementRef;
 
   constructor(
       private sessionService: SessionService,
@@ -33,6 +37,15 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.domains$ = this.adminService.domains$;
+
+    this.adminService.selectedDomain$.pipe(
+      tap(selected => this.selectedDomain = selected)
+    ).subscribe();
+
+    this.adminService.newDomain$.pipe(
+      tap(bool => console.log('this.adminService.newDomain$ : ' + bool)),
+      tap(bool => this.newDomain = bool)
+    ).subscribe();
 
     this.adminService.newDomainCreated$.pipe(
       tap(() => this.refreshDomainList())
@@ -66,6 +79,23 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
     const nextSiblingHeight = this.divider.nativeElement.nextSibling.clientHeight;
     const dividerHeight = Math.max(previousSiblingHeight, nextSiblingHeight);
     this.divider.nativeElement.style.height = dividerHeight + 'px';
+
+    /*if (this.matTabGroup !== undefined) {
+      const windowTotalScreen = window.innerHeight;
+      const matTabGroupOffsetTop = this.matTabGroup._tabBodyWrapper.nativeElement.offsetTop;
+      const secondHeaderHeight = 56;
+      this.matTabGroup._tabBodyWrapper.nativeElement.style.height = windowTotalScreen - matTabGroupOffsetTop - secondHeaderHeight - 15 + 'px';
+    }*/
+
+    /*const sectionHeight = this.adminDomainsWrapper.nativeElement.offsetHeight;
+    console.log('sectionHeight : ' + sectionHeight);*/
+
+    /*const browsePathAndActionsHeight = this.browsePathAndActions.nativeElement.offsetHeight;
+
+    const height = (sectionHeight - browsePathAndActionsHeight) + 'px';
+    this.treeAndGridRowWrapper.nativeElement.style.height = height;
+    this.treeAndGridRowWrapper.nativeElement.style.maxHeight = height;
+    this.treeAndGridRowWrapper.nativeElement.style.minHeight = height;*/
   }
 
   handleDomainCreation(): void {

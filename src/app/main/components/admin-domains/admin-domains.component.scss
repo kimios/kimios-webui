@@ -8,6 +8,14 @@
 }
 
 #admin-domains-container {
-  height: fit-content;
-  overflow-y: hidden;
+  height: 100%;
+  // overflow-y: hidden;
+}
+
+.file-tab-content-wrapper {
+  height: 100%;
+}
+
+.file-tab-content {
+  height: 100%;
 }
