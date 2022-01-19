@@ -48,6 +48,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   userGroups: FormGroup;
   showSpinnerFormSubmit: false;
+  currentUserIsAdmin$: Observable<boolean>;
 
   constructor(
       private adminService: AdminService,
@@ -59,9 +60,12 @@ export class AdminDomainsGroupsComponent implements OnInit {
   ) {
     this.filteredData$ = new Observable<Array<GroupWithData>>();
     this.userGroups = this.fb.group({});
+    this.currentUserIsAdmin$ = new Observable<boolean>();
   }
 
   ngOnInit(): void {
+    this.currentUserIsAdmin$ = this.securityService.isAdmin(this.sessionService.sessionToken);
+
     if (this.mode == null
         || this.mode === undefined) {
       this.mode = 'domain';

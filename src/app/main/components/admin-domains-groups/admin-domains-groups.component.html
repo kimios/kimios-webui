@@ -1,14 +1,22 @@
 <div fxLayout="column" fxLayoutGap="5px">
 
-  <div *ngIf="modeIsDomain() || edit">
+  <div *ngIf="modeIsDomain() || edit" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+    <ng-container *ngIf="currentUserIsAdmin$ | async as currentUserIsAdmin">
+      <ng-container *ngIf="currentUserIsAdmin && modeIsDomain()">
+        <div>
+          <button mat-button mat-icon-button aria-label="Create group" (click)="showGroup(null)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+    </ng-container>
+
     <div fxFlex="70">
     <form (ngSubmit)="filterData()">
       <mat-form-field style="width: 90%;">
         <input #inputDataSearch type="text" name="inputFilename" matInput aria-label="Tags" [formControl]="dataSearch"
-               [matAutocomplete]="autoDataSearch" placeholder="login or name">
-        <button mat-button (click)="filterData()" >
-          <mat-icon>search</mat-icon>
-        </button>
+               [matAutocomplete]="autoDataSearch" placeholder="search by group's name">
         <mat-autocomplete #autoDataSearch="matAutocomplete" fxFlex="40" [displayWith]="displayFn">
           <mat-option *ngFor="let group of filteredData$ | async" placeholder="File name" value=""
                       (click)="showGroup(group)" >
@@ -17,10 +25,6 @@
         </mat-autocomplete>
       </mat-form-field>
     </form>
-    </div>
-
-    <div>
-      <button *ngIf="modeIsDomain()" (click)="showGroup(null)"><mat-icon>add</mat-icon></button>
     </div>
 
   </div>
