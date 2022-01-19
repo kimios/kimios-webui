@@ -14,32 +14,32 @@
           fxLayout="row"
        fxLayoutAlign="center"
        style="width: 100%;"
-  >
-    <div
-         #browsePathRow id="browsePathRow" fxFlex>
-      <browse-path></browse-path>
-    </div>
-    <div>
-      <form>
-        <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
-               multiple="multiple"
-        />
-        <!--              webkitdirectory=""
+    >
+      <div
+              #browsePathRow id="browsePathRow" fxFlex>
+        <browse-path></browse-path>
+      </div>
+      <div>
+        <form>
+          <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
+                 multiple="multiple"
+          />
+          <!--              webkitdirectory=""
           directory=""-->
-      </form>
-      <button mat-button>
-        <mat-icon class="cursor-pointer"
-                  (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
-      </button>
-    </div>
-    <ng-container *ngIf="isWorkspaceCreator | async as isWC">
-      <ng-container *ngIf="isWC">
-        <app-workspace-menu></app-workspace-menu>
+        </form>
+        <button mat-button>
+          <mat-icon class="cursor-pointer"
+                    (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
+        </button>
+      </div>
+      <ng-container *ngIf="isWorkspaceCreator | async as isWC">
+        <ng-container *ngIf="isWC">
+          <app-workspace-menu></app-workspace-menu>
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </div>
+    </div>
 
-      <div id="treeAndGridRowWrapper" #treeAndGridRowWrapper>
+    <div id="treeAndGridRowWrapper" #treeAndGridRowWrapper>
         <div fxLayout="row"
            fxLayoutAlign="start stretch"
            #treeAndGridRow id="treeAndGridRow" >
@@ -91,7 +91,7 @@
 
         </div>
 
-      </div>
+    </div>
 
   </div>
 
