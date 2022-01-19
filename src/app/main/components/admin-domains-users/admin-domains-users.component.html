@@ -4,7 +4,7 @@
     <div fxLayout="column" fxLayoutGap="5px">
 
       <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-        <!--<ng-container *ngIf="currentUserIsAdmin$ | async as currentUserIsAdmin">
+        <ng-container *ngIf="currentUserIsAdmin$ | async as currentUserIsAdmin">
           <ng-container *ngIf="currentUserIsAdmin && (modeIsAdmin() || _mode === 'roles')">
             <div>
               <button mat-button mat-icon-button aria-label="Create user" (click)="openDialog()">
@@ -12,7 +12,7 @@
               </button>
             </div>
           </ng-container>
-        </ng-container>-->
+        </ng-container>
 
         <div *ngIf="modeIsAdmin()" fxFlex="70">
         <form (ngSubmit)="filterUsers()">
