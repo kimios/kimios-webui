@@ -71,7 +71,13 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
         this.sessionService.sessionToken,
         domain.name
       ))
-    ).subscribe();
+    ).subscribe(
+      next => {
+        if (this.selectedDomain === domain.name) {
+          this.adminService.selectedDomain$.next('');
+        }
+        this.refreshDomainList();
+      });
   }
 
   ngAfterViewChecked(): void {
