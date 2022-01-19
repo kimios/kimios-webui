@@ -82,6 +82,10 @@ export class AdminDomainsUsersComponent implements OnInit {
           this.dialogRef.close();
         }
       });
+
+      if (this.modeIsAdmin()) {
+        this.displayedColumns = [ 'remove', 'uid', 'lastName', 'firstName' ];
+      }
     }
 
     this.dataSource.totalNbElements$.subscribe(
@@ -251,6 +255,22 @@ export class AdminDomainsUsersComponent implements OnInit {
             key,
             this.adminService.selectedDomain$.getValue()
         ))
+    ).subscribe();
+  }
+
+  removeUser(row: KimiosUser): void {
+    this.administrationService.deleteUser(
+      this.sessionService.sessionToken,
+      row.uid,
+      this.adminService.selectedDomain$.getValue()
+    ).pipe(
+      concatMap(() => this.dataSource.loadUsers(
+        this.adminService.selectedDomain$.getValue(),
+        this.sort,
+        this.userSearch.value,
+        this.page,
+        this.pageSize,
+        true))
     ).subscribe();
   }
 }
