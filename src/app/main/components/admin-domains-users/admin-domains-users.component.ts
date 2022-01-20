@@ -11,6 +11,7 @@ import {MatAutocompleteTrigger, MatDialog, MatDialogRef, PageEvent, Sort} from '
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {UserDialogComponent} from 'app/main/components/user-dialog/user-dialog.component';
 import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/admin-special-roles-add-to-role-dialog/admin-special-roles-add-to-role-dialog.component';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 @Component({
   selector: 'admin-domains-users',
@@ -21,7 +22,10 @@ import {AdminSpecialRolesAddToRoleDialogComponent} from 'app/main/components/adm
 export class AdminDomainsUsersComponent implements OnInit {
 
   @Input()
-  _mode: 'admin' | 'roles' | 'addToRole' = 'admin';
+  _mode: 'admin' | 'roles' | 'addToRole' | 'groupUsers' = 'admin';
+
+  @Input()
+  groupGid: string;
 
   dataSource: UsersDataSource;
   columnsDescription = USERS_DEFAULT_DISPLAYED_COLUMNS;
@@ -54,7 +58,8 @@ export class AdminDomainsUsersComponent implements OnInit {
       private sessionService: SessionService,
       private administrationService: AdministrationService,
       public dialog: MatDialog,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private usersCacheService: UsersCacheService
   ) {
     this.filteredUsers$ = new Observable<Array<KimiosUser>>();
     this.usersToAddToRole = this.fb.group({});
@@ -142,6 +147,30 @@ export class AdminDomainsUsersComponent implements OnInit {
             this.pageSize,
             true))
     ).subscribe();
+
+    if (this._mode === 'groupUsers') {
+      this.usersLoaded$ = this.adminService.selectedDomain$.pipe(
+        filter(domainName => domainName !== ''),
+        concatMap(domainName => this.usersCacheService.findGroupUsersInCache(this.groupGid, domainName)),
+        tap(users => this.dataSource.connect().next(users))
+      );
+
+/*
+      this.filteredUsers$ = this.userSearch.valueChanges.pipe(
+        filter(value => typeof value === 'string'),
+        map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
+      );
+
+      this.adminService.closeUserDialog$.subscribe(boolean => {
+        if (boolean && this.dialogRef != null) {
+          this.dialogRef.close();
+        }
+      });
+*/
+
+      this.displayedColumns = [ 'remove', 'uid', 'lastName', 'firstName' ];
+    }
+
   }
 
   public modeIsAdmin(): boolean {
@@ -272,5 +301,25 @@ export class AdminDomainsUsersComponent implements OnInit {
         this.pageSize,
         true))
     ).subscribe();
+  }
+
+  removeUserFromGroup(row: KimiosUser): void {
+    /*this.administrationService.removeUserFromGroup(
+      this.sessionService.sessionToken,
+      row.uid,
+      this.groupGid,
+      row.source
+    ).pipe(
+      concatMap(() => this.usersCacheService.removeUserInCache(row)),
+      concatMap(userRemovedOrNot => userRemovedOrNot === true ?
+        this.usersCacheService.findGroupUsersInCache(this.groupGid, row.source) :
+        of(null)
+      ),
+      tap(users => {
+        if (users != null) {
+          this.dataSource.connect().next(users);
+        }
+      })
+    ).subscribe();*/
   }
 }

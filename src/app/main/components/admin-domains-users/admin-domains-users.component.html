@@ -74,6 +74,15 @@
           </mat-cell>
         </ng-container>
 
+        <ng-container *ngIf="_mode === 'groupUsers'" matColumnDef="remove">
+          <mat-header-cell *matHeaderCellDef>
+
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-icon [ngClass]="'cursor-pointer'" (click)="removeUserFromGroup(row)" >remove</mat-icon>
+          </mat-cell>
+        </ng-container>
+
         <ng-container *ngIf="_mode === 'addToRole'" matColumnDef="checkbox">
           <mat-header-cell *matHeaderCellDef>
 

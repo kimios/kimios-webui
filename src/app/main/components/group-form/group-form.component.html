@@ -17,6 +17,8 @@
       <input matInput [formControlName]="'name'">
     </mat-form-field>
 
+    <admin-domains-users [groupGid]="group.gid" [_mode]="'groupUsers'"></admin-domains-users>
+
     <div fxLayout="row">
       <div fxLayout="row"
            fxLayoutAlign="center center"
