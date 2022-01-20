@@ -36,6 +36,21 @@ export class UsersCacheService {
       of(userInCache);
   }
 
+  findUsersInCache(source: string): Observable<Array<KimiosUser>> {
+    const usersInCache = this.userCache.get(source) == null ?
+      null :
+      Array.from(this.userCache.get(source).values());
+
+    return usersInCache == null ?
+      this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
+        tap(users => {
+          this.userCache.set(source, new Map<string, KimiosUser>());
+          users.forEach(user => this.userCache.get(source).set(user.uid, user));
+        })
+      ) :
+      of(usersInCache);
+  }
+
   private initUserInCache(user: KimiosUser): void {
     if (this.userCache.get(user.source) == null) {
       this.userCache.set(user.source, new Map<string, KimiosUser>());

@@ -1,12 +1,13 @@
 import {User as KimiosUser} from 'app/kimios-client-api/model/user';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {SessionService} from 'app/services/session.service';
 import {SecurityService} from 'app/kimios-client-api';
-import {catchError, concatMap, finalize, map, tap} from 'rxjs/operators';
+import {concatMap, finalize, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {DMEntitySort} from 'app/main/model/dmentity-sort';
 import {AdminService} from 'app/services/admin.service';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 export const USERS_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
     {
@@ -46,15 +47,13 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
     public loading$ = this.loadingSubject.asObservable();
     public totalNbElements$: BehaviorSubject<number>;
 
-    usersCacheByDomain: Map<string, Array<KimiosUser>>;
-
     constructor(
         private sessionService: SessionService,
         private securityService: SecurityService,
-        private adminService: AdminService
+        private adminService: AdminService,
+        private usersCacheService: UsersCacheService
     ) {
         super();
-        this.usersCacheByDomain = new Map<string, Array<KimiosUser>>();
         this.totalNbElements$ = new BehaviorSubject<number>(0);
     }
 
@@ -69,41 +68,20 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
 
     loadUsers(source: string, sort: DMEntitySort, filter, pageIndex, pageSize, refresh?): Observable<Array<KimiosUser>> {
         this.loadingSubject.next(true);
-        if (this.usersCacheByDomain.get(source) == null
-            || this.usersCacheByDomain.get(source) === undefined
-            || refresh) {
-            return this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
-                catchError(() => of([])),
-                tap(users => this._setCacheForDomain(source, users)),
-                tap(users => this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize)),
-                finalize(() => this.loadingSubject.next(false))
-            );
-        } else {
-            return of(this._loadUsersFromCache(source, sort, filter, pageIndex, pageSize));
-        }
+        return this.usersCacheService.findUsersInCache(source).pipe(
+          map(allSourceUsers => allSourceUsers.length !== 0 ?
+            this.makePage(allSourceUsers, sort, filter, pageIndex, pageSize) :
+            allSourceUsers
+          ),
+          tap(usersToReturn => this.usersSubject.next(usersToReturn)),
+          finalize(() => this.loadingSubject.next(false))
+        );
     }
 
-    private _setCacheForDomain(domainName: string, data: Array<KimiosUser>): void {
-        this.usersCacheByDomain.set(domainName, data);
-    }
-
-    _loadUsersFromCache(source: string, sort: DMEntitySort, filter, pageIndex, pageSize): Array<KimiosUser> {
-        let usersToReturn = new Array<KimiosUser>();
-        if (this.usersCacheByDomain.get(source).length !== 0) {
-            usersToReturn = this.usersCacheByDomain.get(source);
-            if (filter !== '') {
-                usersToReturn = this._filterUsers(filter, usersToReturn);
-            }
-            this.totalNbElements$.next(usersToReturn.length);
-            usersToReturn = this._sortUsers(usersToReturn, sort);
-            usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize * (pageIndex + 1));
-        }
-        this.usersSubject.next(usersToReturn);
-        return usersToReturn;
-    }
-
-    filterUsers(value: string, source): Array<KimiosUser> {
-        return this._filterUsers(value, this.usersCacheByDomain.get(source));
+    filterUsers(value: string, source): Observable<Array<KimiosUser>> {
+        return this.usersCacheService.findUsersInCache(source).pipe(
+          map(users => this._filterUsers(value, users))
+        );
     }
 
     private _filterUsers(value: string, userList: Array<KimiosUser>): Array<KimiosUser> {
@@ -138,5 +116,16 @@ export class UsersDataSource  extends MatTableDataSource<KimiosUser> {
             map(users => this._sortUsers(users, sort)),
             tap(usersSorted => this.usersSubject.next(usersSorted))
         );
+    }
+
+    private makePage(allSourceUsers: Array<KimiosUser>, sort: DMEntitySort, filter: any, pageIndex: any, pageSize: any): Array<KimiosUser> {
+        let usersToReturn = allSourceUsers;
+        if (filter !== '') {
+            usersToReturn = this._filterUsers(filter, usersToReturn);
+        }
+        this.totalNbElements$.next(usersToReturn.length);
+        usersToReturn = this._sortUsers(usersToReturn, sort);
+        usersToReturn = usersToReturn.slice(pageIndex * pageSize, pageSize * (pageIndex + 1));
+        return usersToReturn;
     }
 }

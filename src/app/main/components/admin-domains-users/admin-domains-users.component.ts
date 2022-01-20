@@ -68,7 +68,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource = new UsersDataSource(this.sessionService, this.securityService, this.adminService);
+    this.dataSource = new UsersDataSource(this.sessionService, this.securityService, this.adminService, this.usersCacheService);
 
     if (this.modeIsAdmin()
         || this._mode === 'addToRole') {
@@ -79,7 +79,7 @@ export class AdminDomainsUsersComponent implements OnInit {
 
       this.filteredUsers$ = this.userSearch.valueChanges.pipe(
           filter(value => typeof value === 'string'),
-          map(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
+          concatMap(value => this.dataSource.filterUsers(value, this.adminService.selectedDomain$.getValue()))
       );
 
       this.adminService.closeUserDialog$.subscribe(boolean => {
