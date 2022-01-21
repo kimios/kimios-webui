@@ -363,4 +363,16 @@
     .mat-column-width200 {
         min-width: 200px !important;
     }
+
+    fuse-sidebar {
+        min-width: 400px;
+        max-width: 400px;
+        width: 400px;
+    }
+
+    quick-panel {
+        min-width: 400px;
+        max-width: 400px;
+        width: 400px;
+    }
 }

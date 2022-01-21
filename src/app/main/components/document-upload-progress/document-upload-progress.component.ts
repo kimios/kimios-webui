@@ -38,7 +38,9 @@ export class DocumentUploadProgressComponent implements OnInit {
   }
 
   goToDoc(id: number): void {
-    DocumentUtils.navigateToFile(this.router, id);
-    this._fuseSidebarService.getSidebar('quickPanel').close();
+    if (this.upload.isSuccessful()) {
+      DocumentUtils.navigateToFile(this.router, id);
+      this._fuseSidebarService.getSidebar('quickPanel').close();
+    }
   }
 }
