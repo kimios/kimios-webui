@@ -9,6 +9,7 @@ import {SessionService} from 'app/services/session.service';
 import {catchError, concatMap, filter, map, startWith, tap} from 'rxjs/operators';
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 const sortTypeMapping = {
   'nbUsers' : 'number'
@@ -56,7 +57,8 @@ export class AdminDomainsGroupsComponent implements OnInit {
       private sessionService: SessionService,
       private administrationService: AdministrationService,
       private dialog: MatDialog,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private usersCacheService: UsersCacheService
   ) {
     this.filteredData$ = new Observable<Array<GroupWithData>>();
     this.userGroups = this.fb.group({});
@@ -79,7 +81,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
           elem => elem === colDesc.matColumnDef) !== -1);
     }
 
-    this.dataSource = new GroupsDataSource(this.sessionService, this.securityService, this.administrationService);
+    this.dataSource = new GroupsDataSource(this.sessionService, this.securityService, this.administrationService, this.usersCacheService);
 
     this.adminService.selectedDomain$.pipe(
         filter(domainName => domainName !== '')

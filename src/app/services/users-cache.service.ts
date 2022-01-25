@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {SessionService} from './session.service';
 import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {Observable, of} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -68,6 +68,18 @@ export class UsersCacheService {
         tap(group => this.initGroupInCache(group))
       ) :
       of(groupInCache);
+  }
+
+  findGroupsInCache(source: string): Observable<Array<Group>> {
+    const groupsInCache = this.groupCache.get(source) == null ?
+      null :
+      this.groupCache.get(source).values();
+
+    return groupsInCache == null ?
+      this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+        tap(groups => groups.forEach(grp => this.initGroupInCache(grp)))
+      ) :
+      of(Array.from(groupsInCache));
   }
 
   private initGroupInCache(group: Group): void {

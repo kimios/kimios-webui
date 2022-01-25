@@ -6,6 +6,7 @@ import {catchError, concatMap, finalize, map, tap} from 'rxjs/operators';
 import {MatTableDataSource} from '@angular/material';
 import {ColumnDescription} from 'app/main/model/column-description';
 import {compareNumbers} from '@angular/compiler-cli/src/diagnostics/typescript_version';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 export interface GroupWithData extends Group {
     nbUsers: number;
@@ -46,7 +47,6 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
 
     public loading$ = this.loadingSubject.asObservable();
     public totalNbElements$: BehaviorSubject<number>;
-    public elementUpdated$: BehaviorSubject<GroupWithData>;
 
     dataCacheByDomain: Map<string, Array<GroupWithData>>;
     dataCacheUsersByDomain: Map<string, Array<KimiosUser>>;
@@ -57,14 +57,14 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     constructor(
         private sessionService: SessionService,
         private securityService: SecurityService,
-        private administrationService: AdministrationService
+        private administrationService: AdministrationService,
+        private usersCacheService: UsersCacheService
     ) {
         super();
         this.dataCacheByDomain = new Map<string, Array<GroupWithData>>();
         this.dataCacheUsersByDomain = new Map<string, Array<KimiosUser>>();
         this.dataCacheByUser = new Map<string, Array<GroupWithData>>();
         this.totalNbElements$ = new BehaviorSubject<number>(0);
-        this.elementUpdated$ = new BehaviorSubject<GroupWithData>(null);
     }
 
     connect(): BehaviorSubject<GroupWithData[]> {
@@ -81,7 +81,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         if (this.dataCacheByDomain.get(source) == null
             || this.dataCacheByDomain.get(source) === undefined
             || reload === true) {
-            this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+            this.usersCacheService.findGroupsInCache(source).pipe(
                 catchError(() => of([])),
                 map(elements => this._convertAllToGroupWithData(elements)),
                 tap(data => this._setCacheForDomain(source, data)),
@@ -215,7 +215,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
             return;
         }
         from(groups).pipe(
-            concatMap(group => combineLatest(of(group), this.administrationService.getManageableUsers(this.sessionService.sessionToken, group.gid, source))),
+            concatMap(group => combineLatest(of(group), this.usersCacheService.findGroupUsersInCache(group.gid, source))),
             map(([ group, users ]) => {
                 this._updateElementInDataCache(source, group, 'nbUsers', users.length);
                 this.dataCacheUsersByDomain[source] = users;
@@ -224,7 +224,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     }
 
     public loadNbUser(gid: string, source: string): void {
-        this.administrationService.getManageableUsers(this.sessionService.sessionToken, gid, source).pipe(
+        this.usersCacheService.findGroupUsersInCache(gid, source).pipe(
             map(users => {
                 this._updateElementInDataCacheFromGid(source, gid, 'nbUsers', users.length);
                 this.dataCacheUsersByDomain[source] = users;
@@ -238,7 +238,6 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
             return;
         }
         this.dataCacheByDomain.get(source)[idx][key] = value;
-        this.elementUpdated$.next(this.dataCacheByDomain.get(source)[idx]);
     }
 
     private _updateElementInDataCacheFromGid(source: string, groupId: string, key: string, value: number): void {
@@ -253,7 +252,6 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
             return;
         }
         this.dataCacheByDomain.get(source)[idx][key] = value;
-        this.elementUpdated$.next(this.dataCacheByDomain.get(source)[idx]);
     }
 
     addToData(group: GroupWithData): void {
