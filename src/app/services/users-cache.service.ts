@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
-import {Observable, of} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {Observable, of, Subject} from 'rxjs';
+import {tap} from 'rxjs/operators';
+import {UserGroupAdd} from 'app/main/model/cache/event/user-group-add';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,8 @@ export class UsersCacheService {
   userCache: Map<string, Map<string, KimiosUser>>;
   groupCache: Map<string, Map<string, Group>>;
 
+  userAddedToGroup$: Subject<UserGroupAdd>;
+
   constructor(
     private sessionService: SessionService,
     private administrationService: AdministrationService,
@@ -22,6 +25,7 @@ export class UsersCacheService {
     this.userCache = new Map<string, Map<string, KimiosUser>>();
     this.groupCache = new Map<string, Map<string, Group>>();
     this.groupUsersCache = new Map<string, Map<string, Array<string>>>();
+    this.userAddedToGroup$ = new Subject<UserGroupAdd>();
   }
 
   findUserInCache(uid: string, source: string): Observable<KimiosUser> {
@@ -58,7 +62,7 @@ export class UsersCacheService {
     this.userCache.get(user.source).set(user.uid, user);
   }
 
-  findGroupInCache(gid: string, source: string): Observable<Group> {
+  findGroupInCache(source: string, gid: string): Observable<Group> {
     const groupInCache = this.groupCache.get(source) == null ?
       null :
       this.groupCache.get(source).get(gid);
@@ -132,5 +136,18 @@ export class UsersCacheService {
     });
     this.userCache.get(user.source).delete(user.uid);
     return of(true);
+  }
+
+  handleUserGroupAdd(obj: UserGroupAdd): void {
+    const sourceGroups = this.groupUsersCache.get(obj.source);
+    if (sourceGroups == null) {
+      this.initGroupUsersInCache(obj.source, obj.group, []);
+    }
+    const groupUsers = this.groupUsersCache.get(obj.source).get(obj.group);
+    if (groupUsers == null) {
+      this.initGroupUsersInCache(obj.source, obj.group, []);
+    }
+    this.groupUsersCache.get(obj.source).get(obj.group).push(obj.user);
+    this.userAddedToGroup$.next(obj);
   }
 }

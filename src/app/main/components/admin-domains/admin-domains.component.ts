@@ -6,6 +6,8 @@ import {AdminService} from 'app/services/admin.service';
 import {MatDialog, MatTabGroup} from '@angular/material';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {concatMap, filter, tap} from 'rxjs/operators';
+import {CacheService} from 'app/services/cache.service';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 @Component({
   selector: 'admin-domains',
@@ -29,7 +31,9 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
       private administrationService: AdministrationService,
       private securityService: SecurityService,
       private adminService: AdminService,
-      private dialog: MatDialog
+      private dialog: MatDialog,
+      private cacheService: CacheService,
+      private usersCacheService: UsersCacheService
   ) {
     this.selectedDomain$ = this.adminService.selectedDomain$;
     this.newDomain$ = this.adminService.newDomain$;
@@ -49,6 +53,10 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
 
     this.adminService.newDomainCreated$.pipe(
       tap(() => this.refreshDomainList())
+    ).subscribe();
+
+    this.cacheService.userGroupAdd$.pipe(
+      tap(obj => this.usersCacheService.handleUserGroupAdd(obj))
     ).subscribe();
   }
 

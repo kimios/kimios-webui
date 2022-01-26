@@ -8,6 +8,7 @@ import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessa
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {DataMessageImpl} from 'app/main/model/data-message-impl';
 import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
+import {UserGroupAdd} from 'app/main/model/cache/event/user-group-add';
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -29,6 +30,7 @@ export class CacheService {
   public sharedWithMe$: Subject<boolean>;
   public sharedByMe$: Subject<boolean>;
   private _dataMessages: Array<DataMessageImpl>;
+  public userGroupAdd$: Subject<UserGroupAdd>;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
@@ -37,6 +39,7 @@ export class CacheService {
     this.documentCreated$ = new Subject<KimiosDocument>();
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
+    this.userGroupAdd$ = new Subject<UserGroupAdd>();
   }
 
   public initWebSocket(url: string, wsToken: string): void {
@@ -96,6 +99,13 @@ export class CacheService {
           break;
         case UpdateNoticeTypeEnum.SHARESBYME:
           this.sharedByMe$.next(true);
+          break;
+        case UpdateNoticeTypeEnum.USERGROUPADD:
+          const obj: UserGroupAdd = {};
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.userGroupAdd$.next(o);
+          }
       }
     }
 

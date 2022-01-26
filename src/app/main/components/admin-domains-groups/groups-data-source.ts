@@ -264,5 +264,38 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
         const data = this.dataSubject.getValue().filter(grp => grp.gid !== gid);
         this.dataSubject.next(data);
     }
+
+    updateGroup(source: string, gid: string): void {
+        const groupsWithData = this.dataSubject.getValue();
+        const idx = groupsWithData.findIndex(groupWithDataa => groupWithDataa.gid === gid);
+        if (idx === -1) {
+            return;
+        }
+        this.usersCacheService.findGroupInCache(source, gid).pipe(
+          concatMap(group => combineLatest(of(group), this.usersCacheService.findGroupUsersInCache(gid, source))),
+          map(([group, users]) => {
+              const gWithData = this._createGroupWithDataFromGroup(group);
+              gWithData.nbUsers = users.length;
+              return gWithData;
+          }),
+          tap(gWithData => {
+              const localDomainGroupsCache = this.dataCacheByDomain.get(source);
+              const idxGrp = localDomainGroupsCache.findIndex(g => g.source === gWithData.source && g.gid === gWithData.gid);
+              if (idxGrp === -1) {
+                  return;
+              }
+              this.dataCacheByDomain.get(source)[idx] = gWithData;
+          }),
+          tap(gWithData => {
+              const data = this.connect().getValue();
+              const idxGrp = data.findIndex(g => g.source === gWithData.source && g.gid === gWithData.gid);
+              if (idxGrp === -1) {
+                  return;
+              }
+              data[idxGrp] = gWithData;
+              this.dataSubject.next(data);
+          })
+        ).subscribe();
+    }
 }
 

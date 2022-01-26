@@ -10,6 +10,7 @@ import {catchError, concatMap, filter, map, startWith, tap} from 'rxjs/operators
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 import {UsersCacheService} from 'app/services/users-cache.service';
+import {UserGroupAdd} from 'app/main/model/cache/event/user-group-add';
 
 const sortTypeMapping = {
   'nbUsers' : 'number'
@@ -138,6 +139,9 @@ export class AdminDomainsGroupsComponent implements OnInit {
       ).subscribe();
     }
 
+    this.usersCacheService.userAddedToGroup$.pipe(
+      tap(next => this.handleUserAddedToGroup(next))
+    ).subscribe();
   }
 
   private _mergeFormGroup(formGroup: FormGroup, groups: Array<GroupWithData>): FormGroup {
@@ -280,5 +284,9 @@ export class AdminDomainsGroupsComponent implements OnInit {
       );
     }
     return groups;
+  }
+
+  private handleUserAddedToGroup(next: UserGroupAdd): void {
+    this.dataSource.updateGroup(next.source, next.group);
   }
 }
