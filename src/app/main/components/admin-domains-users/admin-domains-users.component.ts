@@ -310,7 +310,7 @@ export class AdminDomainsUsersComponent implements OnInit {
       this.groupGid,
       row.source
     ).pipe(
-      concatMap(() => this.usersCacheService.removeUserInCache(row)),
+      concatMap(() => this.usersCacheService.removeGroupUserInCache(this.groupGid, row)),
       concatMap(userRemovedOrNot => userRemovedOrNot === true ?
         this.usersCacheService.findGroupUsersInCache(this.groupGid, row.source) :
         of(null)

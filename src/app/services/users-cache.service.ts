@@ -140,6 +140,23 @@ export class UsersCacheService {
     return of(true);
   }
 
+  removeGroupUserInCache(gid: string, user: KimiosUser): Observable<boolean> {
+    const domainGroups = this.groupUsersCache.get(user.source);
+    if (domainGroups == null) {
+      return of(false);
+    }
+    const groupUsers = domainGroups.get(gid);
+    if (groupUsers == null) {
+      return of(false);
+    }
+    const idx = groupUsers.findIndex(u => u === user.uid);
+    if (idx === -1) {
+      return of(false);
+    }
+    groupUsers.splice(idx, 1);
+    return of(true);
+  }
+
   handleUserGroupAdd(obj: UserGroupAdd): void {
     const sourceGroups = this.groupUsersCache.get(obj.source);
     if (sourceGroups == null) {
