@@ -31,6 +31,7 @@ export class CacheService {
   public sharedByMe$: Subject<boolean>;
   private _dataMessages: Array<DataMessageImpl>;
   public userGroupAdd$: Subject<UserGroupAdd>;
+  public userGroupRemove$: Subject<UserGroupAdd>;
 
   constructor() {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
@@ -40,6 +41,7 @@ export class CacheService {
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
     this.userGroupAdd$ = new Subject<UserGroupAdd>();
+    this.userGroupRemove$ = new Subject<UserGroupAdd>();
   }
 
   public initWebSocket(url: string, wsToken: string): void {
@@ -106,6 +108,14 @@ export class CacheService {
             const o = Object.assign(obj, messageParsedObj);
             this.userGroupAdd$.next(o);
           }
+          break;
+        case UpdateNoticeTypeEnum.USERGROUPREMOVE:
+          const obj1: UserGroupAdd = {};
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj1, messageParsedObj);
+            this.userGroupRemove$.next(o);
+          }
+          break;
       }
     }
 

@@ -284,7 +284,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
               if (idxGrp === -1) {
                   return;
               }
-              this.dataCacheByDomain.get(source)[idx] = gWithData;
+              this.dataCacheByDomain.get(source)[idxGrp] = gWithData;
           }),
           tap(gWithData => {
               const data = this.connect().getValue();

@@ -142,6 +142,10 @@ export class AdminDomainsGroupsComponent implements OnInit {
     this.usersCacheService.userAddedToGroup$.pipe(
       tap(next => this.handleUserAddedToGroup(next))
     ).subscribe();
+
+    this.usersCacheService.userRemovedFromGroup$.pipe(
+      tap(next => this.handleUserRemovedFromGroup(next))
+    ).subscribe();
   }
 
   private _mergeFormGroup(formGroup: FormGroup, groups: Array<GroupWithData>): FormGroup {
@@ -287,6 +291,10 @@ export class AdminDomainsGroupsComponent implements OnInit {
   }
 
   private handleUserAddedToGroup(next: UserGroupAdd): void {
+    this.dataSource.updateGroup(next.source, next.group);
+  }
+
+  private handleUserRemovedFromGroup(next: UserGroupAdd): void {
     this.dataSource.updateGroup(next.source, next.group);
   }
 }

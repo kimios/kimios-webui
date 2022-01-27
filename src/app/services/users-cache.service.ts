@@ -16,6 +16,7 @@ export class UsersCacheService {
   groupCache: Map<string, Map<string, Group>>;
 
   userAddedToGroup$: Subject<UserGroupAdd>;
+  userRemovedFromGroup$: Subject<UserGroupAdd>;
 
   constructor(
     private sessionService: SessionService,
@@ -26,6 +27,7 @@ export class UsersCacheService {
     this.groupCache = new Map<string, Map<string, Group>>();
     this.groupUsersCache = new Map<string, Map<string, Array<string>>>();
     this.userAddedToGroup$ = new Subject<UserGroupAdd>();
+    this.userRemovedFromGroup$ = new Subject<UserGroupAdd>();
   }
 
   findUserInCache(uid: string, source: string): Observable<KimiosUser> {
@@ -149,5 +151,21 @@ export class UsersCacheService {
     }
     this.groupUsersCache.get(obj.source).get(obj.group).push(obj.user);
     this.userAddedToGroup$.next(obj);
+  }
+
+  handleUserGroupRemove(obj: UserGroupAdd): void {
+    const sourceGroups = this.groupUsersCache.get(obj.source);
+    if (sourceGroups == null) {
+      return;
+    }
+    const groupUsers = this.groupUsersCache.get(obj.source).get(obj.group);
+    if (groupUsers == null) {
+      return;
+    }
+    const idx = groupUsers.findIndex(user => user === obj.user);
+    if (idx !== -1) {
+      this.groupUsersCache.get(obj.source).get(obj.group).splice(idx, 1);
+    }
+    this.userRemovedFromGroup$.next(obj);
   }
 }

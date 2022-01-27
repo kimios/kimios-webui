@@ -304,7 +304,7 @@ export class AdminDomainsUsersComponent implements OnInit {
   }
 
   removeUserFromGroup(row: KimiosUser): void {
-    /*this.administrationService.removeUserFromGroup(
+    this.administrationService.removeUserFromGroup(
       this.sessionService.sessionToken,
       row.uid,
       this.groupGid,
@@ -320,6 +320,6 @@ export class AdminDomainsUsersComponent implements OnInit {
           this.dataSource.connect().next(users);
         }
       })
-    ).subscribe();*/
+    ).subscribe();
   }
 }
