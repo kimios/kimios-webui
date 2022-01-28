@@ -62,6 +62,18 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
     this.cacheService.userGroupRemove$.pipe(
       tap(obj => this.usersCacheService.handleUserGroupRemove(obj))
     ).subscribe();
+
+    this.cacheService.userCreated$.pipe(
+      tap(next => this.usersCacheService.handleUserCreated(next))
+    ).subscribe();
+
+    this.cacheService.userRemoved$.pipe(
+      tap(next => this.usersCacheService.handleUserRemoved(next))
+    ).subscribe();
+
+    this.cacheService.userUpdated$.pipe(
+      tap(next => this.usersCacheService.handleUserUpdated(next))
+    ).subscribe();
   }
 
   selectDomain(name: string): void {

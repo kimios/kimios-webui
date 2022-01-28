@@ -10,7 +10,7 @@ import {catchError, concatMap, filter, map, startWith, tap} from 'rxjs/operators
 import {GROUPS_DEFAULT_DISPLAYED_COLUMNS, GroupsDataSource, GroupWithData} from './groups-data-source';
 import {GroupDialogComponent} from 'app/main/components/group-dialog/group-dialog.component';
 import {UsersCacheService} from 'app/services/users-cache.service';
-import {UserGroupAdd} from 'app/main/model/cache/event/user-group-add';
+import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
 
 const sortTypeMapping = {
   'nbUsers' : 'number'
@@ -290,11 +290,11 @@ export class AdminDomainsGroupsComponent implements OnInit {
     return groups;
   }
 
-  private handleUserAddedToGroup(next: UserGroupAdd): void {
+  private handleUserAddedToGroup(next: UpdateNoticeParameters): void {
     this.dataSource.updateGroup(next.source, next.group);
   }
 
-  private handleUserRemovedFromGroup(next: UserGroupAdd): void {
+  private handleUserRemovedFromGroup(next: UpdateNoticeParameters): void {
     this.dataSource.updateGroup(next.source, next.group);
   }
 }

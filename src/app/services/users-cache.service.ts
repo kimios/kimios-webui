@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {Observable, of, Subject} from 'rxjs';
-import {tap} from 'rxjs/operators';
-import {UserGroupAdd} from 'app/main/model/cache/event/user-group-add';
+import {concatMap, tap} from 'rxjs/operators';
+import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +15,14 @@ export class UsersCacheService {
   userCache: Map<string, Map<string, KimiosUser>>;
   groupCache: Map<string, Map<string, Group>>;
 
-  userAddedToGroup$: Subject<UserGroupAdd>;
-  userRemovedFromGroup$: Subject<UserGroupAdd>;
+  userAddedToGroup$: Subject<UpdateNoticeParameters>;
+  userRemovedFromGroup$: Subject<UpdateNoticeParameters>;
+  userCreated$: Subject<UpdateNoticeParameters>;
+  userRemoved$: Subject<UpdateNoticeParameters>;
+  userUpdated$: Subject<UpdateNoticeParameters>;
+  groupCreated$: Subject<UpdateNoticeParameters>;
+  groupRemoved: Subject<UpdateNoticeParameters>;
+  groupUpdated$: Subject<UpdateNoticeParameters>;
 
   constructor(
     private sessionService: SessionService,
@@ -26,8 +32,14 @@ export class UsersCacheService {
     this.userCache = new Map<string, Map<string, KimiosUser>>();
     this.groupCache = new Map<string, Map<string, Group>>();
     this.groupUsersCache = new Map<string, Map<string, Array<string>>>();
-    this.userAddedToGroup$ = new Subject<UserGroupAdd>();
-    this.userRemovedFromGroup$ = new Subject<UserGroupAdd>();
+    this.userAddedToGroup$ = new Subject<UpdateNoticeParameters>();
+    this.userRemovedFromGroup$ = new Subject<UpdateNoticeParameters>();
+    this.userCreated$ = new Subject<UpdateNoticeParameters>();
+    this.userRemoved$ = new Subject<UpdateNoticeParameters>();
+    this.userUpdated$ = new Subject<UpdateNoticeParameters>();
+    this.groupCreated$ = new Subject<UpdateNoticeParameters>();
+    this.groupRemoved = new Subject<UpdateNoticeParameters>();
+    this.groupUpdated$ = new Subject<UpdateNoticeParameters>();
   }
 
   findUserInCache(uid: string, source: string): Observable<KimiosUser> {
@@ -35,7 +47,7 @@ export class UsersCacheService {
       null :
       this.userCache.get(source).get(uid);
 
-    return userInCache == null ?
+    return userInCache == null || userInCache === undefined ?
       this.administrationService.getManageableUser(this.sessionService.sessionToken, uid, source).pipe(
         tap(user => this.initUserInCache(user))
       ) :
@@ -47,7 +59,7 @@ export class UsersCacheService {
       null :
       Array.from(this.userCache.get(source).values());
 
-    return usersInCache == null ?
+    return usersInCache == null || usersInCache === undefined ?
       this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
         tap(users => {
           this.userCache.set(source, new Map<string, KimiosUser>());
@@ -69,7 +81,7 @@ export class UsersCacheService {
       null :
       this.groupCache.get(source).get(gid);
 
-    return groupInCache == null ?
+    return groupInCache == null || groupInCache === undefined ?
       this.administrationService.getManageableGroup(this.sessionService.sessionToken, gid, source).pipe(
         tap(group => this.initGroupInCache(group))
       ) :
@@ -81,7 +93,7 @@ export class UsersCacheService {
       null :
       this.groupCache.get(source).values();
 
-    return groupsInCache == null ?
+    return groupsInCache == null || groupsInCache === undefined ?
       this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
         tap(groups => groups.forEach(grp => this.initGroupInCache(grp)))
       ) :
@@ -100,7 +112,7 @@ export class UsersCacheService {
       null :
       this.groupUsersCache.get(source).get(gid);
 
-    return groupUsersInCache == null ?
+    return groupUsersInCache == null || groupUsersInCache === undefined ?
       this.administrationService.getManageableUsers(this.sessionService.sessionToken, gid, source).pipe(
         tap(users => this.initGroupUsersInCache(source, gid, users))
       ) :
@@ -122,21 +134,35 @@ export class UsersCacheService {
   }
 
   private userIsInCache(user: KimiosUser): boolean {
-    return this.userCache.get(user.source) != null
-      && this.userCache.get(user.source).get(user.uid) != null;
+    if (user == null) {
+      return ;
+    }
+    return this.userUidIsInCache(user.uid, user.source);
+  }
+
+  private userUidIsInCache(userUid: string, source: string): boolean {
+    return this.userCache.get(source) != null
+      && this.userCache.get(source).get(userUid) != null;
   }
 
   removeUserInCache(user: KimiosUser): Observable<boolean> {
-    if (!this.userIsInCache(user)) {
+    if (user == null) {
+      return ;
+    }
+    return this.removeUserUidInCache(user.uid, user.source);
+  }
+
+  removeUserUidInCache(userUid: string, source: string): Observable<boolean> {
+    if (!this.userUidIsInCache(userUid, source)) {
       return of(false);
     }
-    this.groupUsersCache.get(user.source).forEach((users) => {
-      const idx = users.findIndex(uid => uid === user.uid);
+    this.groupUsersCache.get(source).forEach((users) => {
+      const idx = users.findIndex(uid => uid === userUid);
       if (idx !== -1) {
         users.splice(idx, 1);
       }
     });
-    this.userCache.get(user.source).delete(user.uid);
+    this.userCache.get(source).delete(userUid);
     return of(true);
   }
 
@@ -157,7 +183,13 @@ export class UsersCacheService {
     return of(true);
   }
 
-  handleUserGroupAdd(obj: UserGroupAdd): void {
+  updateUserInCache(source: string, userUid: string): Observable<KimiosUser> {
+    return this.removeUserUidInCache(userUid, source).pipe(
+      concatMap(() => this.findUserInCache(userUid, source))
+    );
+  }
+
+  handleUserGroupAdd(obj: UpdateNoticeParameters): void {
     const sourceGroups = this.groupUsersCache.get(obj.source);
     if (sourceGroups == null) {
       this.initGroupUsersInCache(obj.source, obj.group, []);
@@ -170,7 +202,7 @@ export class UsersCacheService {
     this.userAddedToGroup$.next(obj);
   }
 
-  handleUserGroupRemove(obj: UserGroupAdd): void {
+  handleUserGroupRemove(obj: UpdateNoticeParameters): void {
     const sourceGroups = this.groupUsersCache.get(obj.source);
     if (sourceGroups == null) {
       return;
@@ -184,5 +216,23 @@ export class UsersCacheService {
       this.groupUsersCache.get(obj.source).get(obj.group).splice(idx, 1);
     }
     this.userRemovedFromGroup$.next(obj);
+  }
+
+  handleUserCreated(parameters: UpdateNoticeParameters): void {
+    this.findUserInCache(parameters.user, parameters.source).pipe(
+      tap(next => this.userCreated$.next(parameters))
+    ).subscribe();
+  }
+
+  handleUserRemoved(parameters: UpdateNoticeParameters): void {
+    this.removeUserUidInCache(parameters.user, parameters.source).pipe(
+      tap(next => this.userRemoved$.next(parameters))
+    ).subscribe();
+  }
+
+  handleUserUpdated(parameters: UpdateNoticeParameters): void {
+    this.updateUserInCache(parameters.source, parameters.user).pipe(
+      tap(next => this.userUpdated$.next(parameters))
+    ).subscribe();
   }
 }

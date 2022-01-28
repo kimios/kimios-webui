@@ -91,6 +91,30 @@ export class AdminDomainsUsersComponent implements OnInit {
       if (this.modeIsAdmin()) {
         this.displayedColumns = [ 'remove', 'uid', 'lastName', 'firstName' ];
       }
+
+      this.usersCacheService.userCreated$.pipe(
+        concatMap(() => this.dataSource.loadUsers(
+          this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize)
+        ),
+      ).subscribe();
+
+      this.usersCacheService.userUpdated$.pipe(
+        concatMap(() => this.dataSource.loadUsers(
+          this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize)
+        ),
+      ).subscribe();
+
+      this.usersCacheService.userRemoved$.pipe(
+        concatMap(() => this.dataSource.loadUsers(
+          this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, this.page, this.pageSize)
+        ),
+        concatMap(users => users.length === 0 && this.page > 0 ?
+          this.dataSource.loadUsers(
+            this.adminService.selectedDomain$.getValue(), this.sort, this.userSearch.value, --this.page, this.pageSize
+          ) :
+          of(users)
+        ),
+      ).subscribe();
     }
 
     this.dataSource.totalNbElements$.subscribe(
