@@ -96,7 +96,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     _initCacheForDomain(source: string): Observable<boolean> {
         return this.isCacheSetForDomain(source) ?
             of(this.isCacheSetForDomain(source)) :
-            this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+            this.usersCacheService.findGroupsInCache(source).pipe(
                 catchError(() => of([])),
                 map(elements => this._convertAllToGroupWithData(elements)),
                 tap(data => this._setCacheForDomain(source, data)),
@@ -111,7 +111,7 @@ export class GroupsDataSource extends MatTableDataSource<GroupWithData> {
     loadDataForUserId(source: string, sort: DMEntitySort, userId: string): void {
         if (this.dataCacheByDomain.get(source) == null
             || this.dataCacheByDomain.get(source) === undefined) {
-            this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+            this.usersCacheService.findGroupsInCache(source).pipe(
                 catchError(() => of([])),
                 map(elements => this._convertAllToGroupWithData(elements)),
                 tap(data => this._setCacheForDomain(source, data))

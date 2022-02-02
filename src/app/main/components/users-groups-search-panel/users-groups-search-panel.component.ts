@@ -91,7 +91,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
 
     source$.pipe(
           concatMap(
-              source => this.securityService.getGroups(this.sessionService.sessionToken, source.name)
+              source => this.usersCacheService.findGroupsInCache(source.name)
           ),
           map(groups => {
             if (this.currentSecurities) {

@@ -175,7 +175,7 @@ export class AdminDomainsGroupsComponent implements OnInit {
 
   loadData(source: string, dataFilter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 20):
       Observable<Array<Group>> {
-    return this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+    return this.usersCacheService.findGroupsInCache(source).pipe(
         catchError(() => of(new Array<Group>())),
         tap(data => console.log('returned ' + data.length + ' elements')),
         map(data => data),
