@@ -103,6 +103,14 @@ export class UsersCacheService {
 
     return groupsInCache == null || groupsInCache === undefined ?
       this.securityService.getGroups(this.sessionService.sessionToken, source).pipe(
+        switchMap(
+          res => of(res).catch(error => of(error))
+        ),
+        catchError(error => {
+          console.log('findGroupsInCache(' + source + '): ');
+          console.dir(error);
+          return of([]);
+        }),
         tap(groups => groups.forEach(grp => this.initGroupInCache(grp)))
       ) :
       of(Array.from(groupsInCache));

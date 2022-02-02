@@ -107,11 +107,11 @@ export class CacheSecurityService {
     return this.securityService.getAuthenticationSources().pipe(
         concatMap(sources => sources),
         concatMap(source => combineLatest(
-            this.securityService.getUsers(this.sessionService.sessionToken, source.name).pipe(
+            this.usersCacheService.findUsersInCache(source.name).pipe(
                 map(users => this.filterUsers(users, searchTerm)),
                 concatMap(users => of(this.toUserOrGroupArrayWithType('user', users)))
             ),
-            this.securityService.getGroups(this.sessionService.sessionToken, source.name).pipe(
+            this.usersCacheService.findGroupsInCache(source.name).pipe(
                 map(groups => this.filterGroups(groups, searchTerm)),
                 concatMap(groups => of(this.toUserOrGroupArrayWithType('group', groups)))
             )
