@@ -24,6 +24,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {SessionService} from 'app/services/session.service';
 import {MetaWithValue} from 'app/main/model/meta-with-value';
 import {MetaValueRange, MetaValueRangeDate, MetaValueRangeNumber} from 'app/main/model/meta-value-range';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 @Component({
   selector: 'search-form',
@@ -63,7 +64,8 @@ export class SearchFormComponent implements OnInit {
       private securityService: SecurityService,
       private sessionService: SessionService,
       private studioService: StudioService,
-      private documentVersionService: DocumentVersionService
+      private documentVersionService: DocumentVersionService,
+      private usersCacheService: UsersCacheService
   ) {
     this.filteredUsers$ = new Observable<Array<User>>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
@@ -294,8 +296,7 @@ export class SearchFormComponent implements OnInit {
   private initAndReturnAllUsers(): Observable<Array<User>> {
     return this.securityService.getAuthenticationSources().pipe(
         concatMap(sources => sources),
-        concatMap(source => this.securityService.getUsers(
-            this.sessionService.sessionToken,
+        concatMap(source => this.usersCacheService.findUsersInCache(
             source.name
         )),
         concatMap(users => users),

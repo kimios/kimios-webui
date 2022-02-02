@@ -6,6 +6,7 @@ import {SessionService} from 'app/services/session.service';
 import {concatMap, map, startWith, tap, toArray} from 'rxjs/operators';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DatePipe} from '@angular/common';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 
 @Component({
@@ -21,7 +22,8 @@ export class ShareFormComponent implements OnInit {
       private sessionService: SessionService,
       private shareService: ShareService,
       private browseEntityService: BrowseEntityService,
-      private datePipe: DatePipe
+      private datePipe: DatePipe,
+      private usersCacheService: UsersCacheService
   ) {
     this.possibleTimeSelections = new Array<String>();
     this.filteredUsers$ = new Observable<User[]>();
@@ -40,7 +42,7 @@ export class ShareFormComponent implements OnInit {
             map(result => result),
             concatMap(
                 source =>
-                    this.securityService.getUsers(this.sessionService.sessionToken, source.name)
+                    this.usersCacheService.findUsersInCache(source.name)
             ),
             concatMap(users => users),
             map(user => user),

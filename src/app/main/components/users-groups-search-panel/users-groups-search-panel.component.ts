@@ -9,6 +9,7 @@ import {UserOrGroup} from 'app/main/model/user-or-group';
 import {DMEntitySecurityType} from 'app/main/model/dmentity-security-type.enum';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {MatTabGroup, PageEvent} from '@angular/material';
+import {UsersCacheService} from 'app/services/users-cache.service';
 
 @Component({
   selector: 'users-groups-search-panel',
@@ -47,7 +48,8 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
       private sessionService: SessionService,
       private securityService: SecurityService,
       private adminService: AdminService,
-      private entityCreationService: EntityCreationService
+      private entityCreationService: EntityCreationService,
+      private usersCacheService: UsersCacheService
   ) {
     this.allUsers = new Array<User>();
     this.allGroups = new Array<Group>();
@@ -68,7 +70,7 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
 
     source$.pipe(
         concatMap(
-            source => this.securityService.getUsers(this.sessionService.sessionToken, source.name)
+            source => this.usersCacheService.findUsersInCache(source.name)
         ),
         map(users => {
           if (this.currentSecurities) {

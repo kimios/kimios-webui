@@ -151,7 +151,7 @@ export class CacheSecurityService {
   }
 
   retrieveUsers(source: AuthenticationSource): Observable<Array<User>> {
-    return this.securityService.getUsers(this.sessionService.sessionToken, source.name);
+    return this.usersCacheService.findUsersInCache(source.name);
   }
 
 
