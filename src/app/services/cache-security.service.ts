@@ -8,6 +8,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {User} from 'app/kimios-client-api/model/user';
 import {EntityCacheService} from './entity-cache.service';
+import {UsersCacheService} from './users-cache.service';
 
 export interface SecurityEnt {
   read: boolean;
@@ -27,7 +28,8 @@ export class CacheSecurityService {
       private sessionService: SessionService,
       private securityService: SecurityService,
       private browseEntityService: BrowseEntityService,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private usersCacheService: UsersCacheService
   ) {
     this._securitiesMap = new Map<number, SecurityEnt>();
     this._lockPossibilityMap = new Map<number, LockPossibility>();
@@ -122,7 +124,7 @@ export class CacheSecurityService {
 
     return this.securityService.getAuthenticationSources().pipe(
       concatMap(sources => sources),
-      concatMap(source => this.securityService.getUsers(this.sessionService.sessionToken, source.name)),
+      concatMap(source => this.usersCacheService.findUsersInCache(source.name)),
       toArray(),
       map(arrayOfUsersArray => {
         let users = new Array<User>();

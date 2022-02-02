@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {SessionService} from './session.service';
 import {AdministrationService, Group, SecurityService, User as KimiosUser} from 'app/kimios-client-api';
 import {Observable, of, Subject} from 'rxjs';
-import {concatMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, switchMap, tap} from 'rxjs/operators';
 import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
 
 @Injectable({
@@ -61,6 +61,14 @@ export class UsersCacheService {
 
     return usersInCache == null || usersInCache === undefined ?
       this.securityService.getUsers(this.sessionService.sessionToken, source).pipe(
+        switchMap(
+          res => of(res).catch(error => of(error))
+        ),
+        catchError(error => {
+          console.log('findUsersInCache(' + source + '): ');
+          console.dir(error);
+          return of([]);
+        }),
         tap(users => {
           this.userCache.set(source, new Map<string, KimiosUser>());
           users.forEach(user => this.userCache.get(source).set(user.uid, user));
