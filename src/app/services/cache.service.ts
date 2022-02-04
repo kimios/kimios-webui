@@ -7,8 +7,9 @@ import {UpdateNoticeMessageImpl} from 'app/main/model/update-notice-message-impl
 import {UpdateNoticeMessage} from 'app/kimios-client-api/model/updateNoticeMessage';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {DataMessageImpl} from 'app/main/model/data-message-impl';
-import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
+import {CacheSubjectsService} from './cache-subjects.service';
+import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -24,43 +25,33 @@ export enum CacheEnum {
 export class CacheService {
 
   public behaviourSubjects: Map<string, BehaviorSubject<CacheUpdateMessage>>;
-  private webSocket: WebSocketSubject<any>;
+  private _webSocket: WebSocketSubject<any>;
   private wsToken: string;
   public documentCreated$: Subject<KimiosDocument>;
   public sharedWithMe$: Subject<boolean>;
   public sharedByMe$: Subject<boolean>;
   private _dataMessages: Array<DataMessageImpl>;
-  public userGroupAdd$: Subject<UpdateNoticeParameters>;
-  public userGroupRemove$: Subject<UpdateNoticeParameters>;
-  public userCreated$: Subject<UpdateNoticeParameters>;
-  public userUpdated$: Subject<UpdateNoticeParameters>;
-  public userRemoved$: Subject<UpdateNoticeParameters>;
-  public GroupCreated$: Subject<UpdateNoticeParameters>;
-  public GroupUpdated$: Subject<UpdateNoticeParameters>;
-  public GroupRemoved$: Subject<UpdateNoticeParameters>;
 
-  constructor() {
+  constructor(
+    private cacheSubjectsService: CacheSubjectsService
+  ) {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
     Object.keys(CacheEnum).forEach(key => this.behaviourSubjects.set(key, new BehaviorSubject<CacheUpdateMessage>(null)));
-    this.webSocket = null;
+    this._webSocket = null;
     this.documentCreated$ = new Subject<KimiosDocument>();
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
-    this.userGroupAdd$ = new Subject<UpdateNoticeParameters>();
-    this.userGroupRemove$ = new Subject<UpdateNoticeParameters>();
-    this.userCreated$ = new Subject<UpdateNoticeParameters>();
-    this.userUpdated$ = new Subject<UpdateNoticeParameters>();
-    this.userRemoved$ = new Subject<UpdateNoticeParameters>();
-    this.GroupCreated$ = new Subject<UpdateNoticeParameters>();
-    this.GroupUpdated$ = new Subject<UpdateNoticeParameters>();
-    this.GroupRemoved$ = new Subject<UpdateNoticeParameters>();
+  }
+
+  get webSocket(): WebSocketSubject<any> {
+    return this._webSocket;
   }
 
   public initWebSocket(url: string, wsToken: string): void {
     wsToken = wsToken;
     url = url + wsToken;
-    this.webSocket = webSocket(url.replace('http', 'ws'));
-    this.webSocket.subscribe(
+    this._webSocket = webSocket(url.replace('http', 'ws'));
+    this._webSocket.subscribe(
         msg => {
           console.log('message received: ' + msg);
           console.dir(msg);
@@ -100,7 +91,7 @@ export class CacheService {
             null,
             null
           );
-          this.webSocket.next(updateNoticeMessageImpl);
+          this._webSocket.next(updateNoticeMessageImpl);
           break;
         case UpdateNoticeTypeEnum.DOCUMENT:
           const docEmpty: KimiosDocument = {};
@@ -118,49 +109,85 @@ export class CacheService {
         case UpdateNoticeTypeEnum.USERGROUPADD:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.userGroupAdd$.next(o);
+            this.cacheSubjectsService.userGroupAdd$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.USERGROUPREMOVE:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.userGroupRemove$.next(o);
+            this.cacheSubjectsService.userGroupRemove$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.USERCREATED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.userCreated$.next(o);
+            this.cacheSubjectsService.userCreated$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.USERMODIFIED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.userUpdated$.next(o);
+            this.cacheSubjectsService.userUpdated$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.USERREMOVED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.userRemoved$.next(o);
+            this.cacheSubjectsService.userRemoved$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.GROUPCREATED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.GroupCreated$.next(o);
+            this.cacheSubjectsService.groupCreated$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.GROUPMODIFIED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.GroupUpdated$.next(o);
+            this.cacheSubjectsService.groupUpdated$.next(o);
           }
           break;
         case UpdateNoticeTypeEnum.GROUPREMOVED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
-            this.GroupRemoved$.next(o);
+            this.cacheSubjectsService.groupRemoved$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.WORKSPACECREATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.workspaceCreated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.WORKSPACEUPDATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.workspaceUpdated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.WORKSPACEREMOVED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.workspaceRemoved$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.FOLDERCREATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.folderCreated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.FOLDERUPDATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.folderUpdated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.FOLDERREMOVED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.folderRemoved$.next(o);
           }
           break;
       }

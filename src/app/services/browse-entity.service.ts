@@ -350,6 +350,11 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         if (pageSize != null && pageSize !== undefined) {
             this.pageSize = pageSize;
         }
+
+        const totalEntitiesToDisplay = this.totalEntitiesToDisplay$.getValue();
+        if (totalEntitiesToDisplay.length <= (this.pageSize * pageIndex)) {
+          pageIndex = pageIndex - 1;
+        }
         this.pageIndex.next(pageIndex);
         const sortRequired = this.isSortedRequired(sort);
         if (sort != null && sort !== undefined) {
@@ -653,6 +658,29 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     }
 
     return ret;
+  }
+
+  updateListOnDelete(dmEntityId: number): void {
+      const totalEntities = this.totalEntitiesToDisplay$.getValue();
+      const idx = totalEntities.findIndex(entity => entity.uid === dmEntityId);
+      if (idx !== -1) {
+        totalEntities.splice(idx, 1);
+        this.totalEntitiesToDisplay$.next(totalEntities);
+        this.makePage(this.pageIndex.getValue(), this.pageSize, this.workspaceSessionService.sort.getValue());
+      }
+  }
+
+  updateListOnCreate(folderId: number): void {
+    this.entityCacheService.findContainerEntityInCache(folderId).pipe(
+      concatMap(containerEntity => this.entityCacheService.findContainerEntityInCache((containerEntity as Folder).parentUid)),
+      filter(parentEntity => parentEntity.uid === this.selectedFolder$.getValue().uid),
+      concatMap(res => this.entityCacheService.findEntityChildrenInCache(res.uid, false)),
+      tap(children => {
+        this.totalEntitiesToDisplay$.next(children);
+        // reset this variable to null to inform it has to be filled
+        this.makePage(this.pageIndex.getValue(), this.pageSize, this.workspaceSessionService.sort.getValue());
+      })
+    ).subscribe();
   }
 }
 

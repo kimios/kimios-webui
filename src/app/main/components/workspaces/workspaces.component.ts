@@ -139,6 +139,14 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
         }
       })
     ).subscribe();
+
+    this.entityCacheService.folderRemoved$.pipe(
+      tap(folderId => this.browseEntityService.updateListOnDelete(folderId))
+    ).subscribe();
+
+    this.entityCacheService.folderCreated$.pipe(
+      tap(folderId => this.browseEntityService.updateListOnCreate(folderId))
+    ).subscribe();
   }
 
   ngAfterViewChecked(): void {

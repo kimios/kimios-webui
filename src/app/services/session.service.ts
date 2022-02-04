@@ -62,6 +62,9 @@ export class SessionService implements OnDestroy {
                             this.stopSessionCheck();
                             this.cookieService.delete(KIMIOS_COOKIE);
                         }
+                        if (this.cacheService.webSocket == null || this.cacheService.webSocket === undefined) {
+                            this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', res['wsToken']);
+                        }
                     },
                     error => this._sessionAlive = error.error.text
                 );

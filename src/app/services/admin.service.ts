@@ -111,10 +111,13 @@ export class AdminService {
 
     isWorkspaceCreator(): Observable<boolean> {
         return this.findUsersWithRole(SPECIAL_ROLES.WORKSPACE_CREATOR).pipe(
-            map(roles => roles.filter(role =>
-                role.userName === this.sessionService.currentUser.uid
-            && role.userSource === this.sessionService.currentUser.source).length > 0
-        ));
+          concatMap(roles => combineLatest(of(roles), this.sessionService.retrieveUserData())),
+          map(([roles, currentUser]) =>
+            roles.filter(role =>
+              role.userName === currentUser.uid
+              && role.userSource === currentUser.source
+            ).length > 0
+          ));
     }
 
     retrieveDomains(): void {

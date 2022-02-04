@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AdministrationService, DMEntity, Folder, FolderService, User, Workspace} from 'app/kimios-client-api';
+import {AdministrationService, DMEntity, Folder, FolderService, SecurityService, User, Workspace} from 'app/kimios-client-api';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {combineLatest, Observable, of} from 'rxjs';
 import {concatMap, filter, map, startWith, tap} from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class ContainerEntityDataComponent implements OnInit {
   parentEntity: Folder | Workspace = null;
   parentEntityWanted: Folder | Workspace;
   precedingParentUid: number;
+  location: string;
 
   constructor(
     private fb: FormBuilder,
@@ -44,7 +45,8 @@ export class ContainerEntityDataComponent implements OnInit {
     private folderService: FolderService,
     public dialog: MatDialog,
     private administrationService: AdministrationService,
-    private browseEntityService: BrowseEntityService
+    private browseEntityService: BrowseEntityService,
+    private securityService: SecurityService
   ) {
 
   }
@@ -95,7 +97,7 @@ export class ContainerEntityDataComponent implements OnInit {
       error => this.canBeMoved = false
     );
 
-    this.folderService.isWriteable(this.sessionService.sessionToken, this.entity.uid).subscribe(
+    this.securityService.canWrite(this.sessionService.sessionToken, this.entity.uid).subscribe(
       res => this.isWriteable = res,
       error => this.isWriteable = false
     );
@@ -105,12 +107,17 @@ export class ContainerEntityDataComponent implements OnInit {
         of(null) :
         this.entityCacheService.findContainerEntityInCache((this.entity as Folder).parentUid)
       ),
-      tap(parentFolder => this.parentEntity = parentFolder)
+      tap(parentFolder => this.parentEntity = parentFolder),
+      tap(parentFolder => this.location =
+        parentFolder == null ?
+          '/' :
+          parentFolder.path
+      )
     ).subscribe();
 
     this.entityCacheService.chosenParentUid$.pipe(
       startWith(DMEntityUtils.dmEntityIsWorkspace(this.entity) ? null : (this.entity as Folder).parentUid),
-      concatMap(uid => uid == null ? null : this.entityCacheService.findEntityInCache(uid)),
+      concatMap(uid => uid == null ? of(null) : this.entityCacheService.findEntityInCache(uid)),
       tap(parent => this.parentEntityWanted = parent)
     ).subscribe();
 
@@ -125,7 +132,7 @@ export class ContainerEntityDataComponent implements OnInit {
 
   updateDirtyFormStatus(): void {
     if (this.entityEditForm.dirty
-      || this.parentEntity.uid !== this.parentEntityWanted.uid) {
+      || (this.parentEntity != null && this.parentEntity.uid !== this.parentEntityWanted.uid)) {
       this.sessionService.dirtyForm$.next(true);
     } else {
       this.sessionService.dirtyForm$.next(false);
@@ -141,14 +148,20 @@ export class ContainerEntityDataComponent implements OnInit {
       return;
     }
 
-    (((this.entityEditForm.get('name').dirty)
-        || (DMEntityUtils.dmEntityIsFolder(this.entity)
-          && this.parentEntityWanted != null
-          && (this.entity as Folder).parentUid !== this.parentEntityWanted.uid)) ?
+    ((DMEntityUtils.dmEntityIsFolder(this.entity)
+        && (this.entityEditForm.get('name').dirty
+          || (this.parentEntityWanted != null
+            && (this.entity as Folder).parentUid !== this.parentEntityWanted.uid))) ?
         this.entityCacheService.updateFolder(
           this.entity.uid,
           this.entityEditForm.get('name').value,
           this.parentEntityWanted.uid
+        ) :
+      (DMEntityUtils.dmEntityIsWorkspace(this.entity)
+        && this.entityEditForm.get('name').dirty) ?
+        this.entityCacheService.updateWorkspace(
+          this.entity.uid,
+          this.entityEditForm.get('name').value
         ) :
         of(null)
     ).pipe(

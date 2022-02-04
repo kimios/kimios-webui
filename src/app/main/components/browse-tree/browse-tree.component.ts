@@ -17,6 +17,7 @@ import {EntityCacheService} from 'app/services/entity-cache.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SessionService} from 'app/services/session.service';
 import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
+import {TreeModel} from 'angular-tree-component';
 
 @Component({
   selector: 'browse-tree',
@@ -136,6 +137,30 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       tap(entity => { if (this.tree.treeModel.getNodeById(entity.uid) != null) {
         this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid));
       }})
+    ).subscribe();
+
+    this.entityCacheService.workspaceCreated$.pipe(
+      tap(workspaceId => this.browseEntityService.onNewWorkspace.next(workspaceId))
+    ).subscribe();
+    this.entityCacheService.workspaceUpdated$.pipe(
+      concatMap(workspaceId => this.entityCacheService.findContainerEntityInCache(workspaceId)),
+      tap(workspace => this.updateNodeData(this.nodes, this.tree.treeModel, workspace))
+    ).subscribe();
+    this.entityCacheService.workspaceRemoved$.pipe(
+      tap(workspaceId => this.removeNode(this.tree.treeModel, this.nodes, workspaceId))
+    ).subscribe();
+
+    this.entityCacheService.folderCreated$.pipe(
+      concatMap(folderId => this.entityCacheService.findContainerEntityInCache(folderId)),
+      concatMap(folder => this.entityCacheService.findContainerEntityInCache((folder as Folder).parentUid)),
+      tap(parentFolder => this.browseEntityService.onAddedChildToEntity$.next(parentFolder.uid))
+    ).subscribe();
+    this.entityCacheService.folderUpdated$.pipe(
+      concatMap(folderId => this.entityCacheService.findContainerEntityInCache(folderId)),
+      tap(folder => this.updateNodeData(this.nodes, this.tree.treeModel, folder))
+    ).subscribe();
+    this.entityCacheService.folderRemoved$.pipe(
+      tap(folderId => this.removeNode(this.tree.treeModel, this.nodes, folderId)),
     ).subscribe();
   }
 
@@ -307,6 +332,9 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     this.browseEntityService.onNewWorkspace.pipe(
         concatMap(workspaceId => this.browseEntityService.retrieveWorkspaceEntity(workspaceId)),
         tap(entity => {
+          if (this.tree.treeModel.getNodeById(entity.uid) != null) {
+            return;
+          }
             const newNode = {
                 name: entity.name,
                 id: entity.uid.toString(),
@@ -322,6 +350,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
               selected: false
             };
             this.nodes.push(newNode);
+            this.nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
             this.tree.treeModel.update();
             this.entitiesLoaded.set(entity.uid, entity);
             this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
@@ -621,7 +650,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
 
       this.containerEntityDialogRef.backdropClick().pipe(
         tap(() => { if (this.sessionService.dirtyForm$.getValue() === true) {
-          this.openConfirmDialog('You have unsaved work', ['Any modification will be lost. Are you sure?'])
+          this.openConfirmDialog('You have unsaved work', ['Any modification will be lost. Are you sure?']);
         } else {
           this.containerEntityDialogRef.close();
         }})
@@ -767,5 +796,52 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         }
       });
     } while (inserted > 0 && this.toBeInsertedInTree.length > 0);
+  }
+
+  /*private insertEntityInTree(nodes: Array<any>, treeModel: TreeModel, containerEntity: DMEntity): void {
+    const parentNode = DMEntityUtils.dmEntityIsWorkspace(containerEntity) ?
+      null :
+      treeModel.getNodeById((containerEntity as Folder).parentUid);
+
+    const node = {
+      name: containerEntity.name,
+        id: containerEntity.uid.toString(),
+      children: null,
+      isLoading: false,
+      svgIcon: DMEntityUtils.determinePropertyValue(containerEntity, 'workspace', 'folder', ''),
+      dmEntityType: DMEntityUtils.determinePropertyValue(containerEntity, 'workspace', 'folder', 'document'),
+      selected: false
+    };
+
+    if (parentNode == null || parentNode === undefined) {
+      nodes.push(node);
+      nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
+    } else {
+      const children = parentNode.data.children;
+      children.push(node);
+      parentNode.data.children = children.sort((n1, n2) => n1.name.localeCompare(n2.name));
+    }
+    treeModel.update();
+  }*/
+
+  private updateNodeData(nodes: any[], treeModel: TreeModel, folder: DMEntity): void {
+    console.dir(folder);
+    treeModel.getNodeById(folder.uid).name = folder.name;
+  }
+
+  private removeNode(treeModel: TreeModel, nodes: any[], workspaceId: number): void {
+    const node = treeModel.getNodeById(workspaceId);
+    if (node == null) {
+      return;
+    }
+    const parentNode = node.parent;
+    const array = parentNode == null ?
+      nodes :
+      parentNode.data.children;
+    const idx = array.findIndex(n => n.id === workspaceId.toString());
+    if (idx !== -1) {
+      array.splice(idx, 1);
+    }
+    treeModel.update();
   }
 }

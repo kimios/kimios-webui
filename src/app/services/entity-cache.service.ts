@@ -20,6 +20,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {FolderUidListParam} from 'app/kimios-client-api/model/folderUidListParam';
 import {CacheService} from './cache.service';
 import {DataMessageImpl} from 'app/main/model/data-message-impl';
+import {CacheSubjectsService} from './cache-subjects.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +36,13 @@ export class EntityCacheService {
   public chosenParentUid$: Subject<number>;
   private _intervalId: number;
   private _checkingDataMessagesQueue: boolean;
-
+  public workspaceCreated$: Subject<number>;
+  public workspaceUpdated$: Subject<number>;
+  public workspaceRemoved$: Subject<number>;
+  public folderCreated$: Subject<number>;
+  public folderUpdated$: Subject<number>;
+  public folderRemoved$: Subject<number>;
+  
   constructor(
       private sessionService: SessionService,
       private documentVersionService: DocumentVersionService,
@@ -43,7 +50,8 @@ export class EntityCacheService {
       private searchEntityService: SearchEntityService,
       private workspaceService: WorkspaceService,
       private folderService: FolderService,
-      private cacheService: CacheService
+      private cacheService: CacheService,
+      private cacheSubjectsService: CacheSubjectsService
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
@@ -58,6 +66,33 @@ export class EntityCacheService {
       }},
       1000
     );
+
+    this.workspaceCreated$ = new Subject<number> ();
+    this.workspaceUpdated$ = new Subject<number> ();
+    this.workspaceRemoved$ = new Subject<number> ();
+    this.folderCreated$ = new Subject<number> ();
+    this.folderUpdated$ = new Subject<number> ();
+    this.folderRemoved$ = new Subject<number> ();
+
+    this.cacheSubjectsService.workspaceCreated$.pipe(
+      tap(params => this.handleWorkspaceCreated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.workspaceUpdated$.pipe(
+      tap(params => this.handleWorkspaceUpdated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.workspaceRemoved$.pipe(
+      tap(params => this.handleWorkspaceRemoved(params.dmEntityId))
+    ).subscribe();
+
+    this.cacheSubjectsService.folderCreated$.pipe(
+      tap(params => this.handleFolderCreated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.folderUpdated$.pipe(
+      tap(params => this.handleFolderUpdated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.folderRemoved$.pipe(
+      tap(params => this.handleFolderRemoved(params.dmEntityId))
+    ).subscribe();
   }
 
   getEntityCacheData(uid: number): EntityCacheData {
@@ -262,6 +297,7 @@ export class EntityCacheService {
   }
 
   public findContainerEntityInCache(entityUid): Observable<DMEntity> {
+    console.log('this.entitiesCache.get(' + entityUid + '): ' + this.entitiesCache.get(entityUid));
     return this.entitiesCache.get(entityUid) != null ?
       of(this.entitiesCache.get(entityUid).entity) :
       this.initContainerEntityInCache(entityUid);
@@ -281,6 +317,13 @@ export class EntityCacheService {
         this.retrieveFolderEntity(uid) :
         this.retrieveWorkspaceEntity(uid) :
       this.retrieveFolderEntity(uid).pipe(
+        switchMap(
+          res => of(res).catch(error => of(error))
+        ),
+        catchError(error => {
+          console.log(error);
+          return of('');
+        }),
         concatMap(
           res => (res == null || res === undefined || res === '') ?
             this.retrieveWorkspaceEntity(uid) :
@@ -316,10 +359,16 @@ export class EntityCacheService {
   }
 
   private initContainerEntityInCache(entityUid: number): Observable<DMEntity> {
+
     return this.retrieveContainerEntity(entityUid).pipe(
       tap(entity => {
         if (entity != null && entity !== undefined && entity !== '') {
           this.entitiesCache.set(entity.uid, new EntityCacheData(entity));
+        }
+      }),
+      tap(entity => {
+        if (DMEntityUtils.dmEntityIsFolder(entity)) {
+           this.appendFolderToParent(entity);
         }
       })
     );
@@ -552,6 +601,13 @@ export class EntityCacheService {
     }
   }
 
+  private appendFolderToParent(folder: Folder): void {
+    // parent must have been loaded
+    if (this.entitiesHierarchyCache.get(folder.parentUid) != null) {
+      this.entitiesHierarchyCache.get(folder.parentUid).push(folder.uid);
+    }
+  }
+
   private appendDMEntityToParentRec(parents: Array<DMEntity>, entity: DMEntity): void {
     if (parents.length === 0) {
       return;
@@ -631,11 +687,32 @@ export class EntityCacheService {
       ),
       catchError(error => {
         console.log('error while folder update');
-        return error;
+        return of(false);
       }),
-      concatMap(() => this.reloadEntity(folderUid)),
+      filter(res => res != false),
+      concatMap(res => this.reloadEntity(folderUid)),
       tap(entity => this.reloadedEntity$.next(entity)),
       concatMap(() => this.reloadEntityChildren(folderParentUid))
+    );
+  }
+
+  updateWorkspace(workspaceUid: number, workspaceName: string): Observable<any> {
+    return this.workspaceService.updateWorkspace(
+      this.sessionService.sessionToken,
+      workspaceUid,
+      workspaceName
+    ).pipe(
+      switchMap(
+        response =>
+          of(response)
+            .catch(error => of(error))
+      ),
+      catchError(error => {
+        console.log('error while workspace update');
+        return error;
+      }),
+      concatMap(() => this.reloadEntity(workspaceUid)),
+      tap(entity => this.reloadedEntity$.next(entity))
     );
   }
 
@@ -656,5 +733,39 @@ export class EntityCacheService {
     dataMessage.dmEntityList.forEach(dmEntity => this.entitiesCache.set(dmEntity.uid, new EntityCacheData(dmEntity)));
     this.entitiesHierarchyCache.set(dataMessage.parent.uid, dataMessage.dmEntityList.map(dmEntity => dmEntity.uid));
 
+  }
+
+  handleWorkspaceCreated(dmEntityId: number): void {
+    this.initContainerEntityInCache(dmEntityId).pipe(
+      tap(() => this.workspaceCreated$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  handleWorkspaceUpdated(dmEntityId: number): void {
+    this.reloadEntity(dmEntityId).pipe(
+      tap(() => this.workspaceUpdated$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  handleWorkspaceRemoved(dmEntityId: number): void {
+    this.removeEntityInCache(dmEntityId);
+    this.workspaceRemoved$.next(dmEntityId);
+  }
+
+  handleFolderCreated(dmEntityId: number): void {
+    this.initContainerEntityInCache(dmEntityId).pipe(
+      tap(() => this.folderCreated$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  handleFolderUpdated(dmEntityId: number): void {
+    this.reloadEntity(dmEntityId).pipe(
+      tap(() => this.folderUpdated$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  handleFolderRemoved(dmEntityId: number): void {
+    this.removeEntityInCache(dmEntityId);
+    this.folderRemoved$.next(dmEntityId);
   }
 }

@@ -4,6 +4,7 @@ import {AdministrationService, Group, SecurityService, User as KimiosUser} from 
 import {Observable, of, Subject} from 'rxjs';
 import {catchError, concatMap, switchMap, tap} from 'rxjs/operators';
 import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
+import {CacheSubjectsService} from './cache-subjects.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class UsersCacheService {
   constructor(
     private sessionService: SessionService,
     private administrationService: AdministrationService,
-    private securityService: SecurityService
+    private securityService: SecurityService,
+    private cacheSubjectsService: CacheSubjectsService
   ) {
     this.userCache = new Map<string, Map<string, KimiosUser>>();
     this.groupCache = new Map<string, Map<string, Group>>();
@@ -40,6 +42,26 @@ export class UsersCacheService {
     this.groupCreated$ = new Subject<UpdateNoticeParameters>();
     this.groupRemoved = new Subject<UpdateNoticeParameters>();
     this.groupUpdated$ = new Subject<UpdateNoticeParameters>();
+
+    this.cacheSubjectsService.userGroupAdd$.pipe(
+      tap(obj => this.handleUserGroupAdd(obj))
+    ).subscribe();
+
+    this.cacheSubjectsService.userGroupRemove$.pipe(
+      tap(obj => this.handleUserGroupRemove(obj))
+    ).subscribe();
+
+    this.cacheSubjectsService.userCreated$.pipe(
+      tap(next => this.handleUserCreated(next))
+    ).subscribe();
+
+    this.cacheSubjectsService.userRemoved$.pipe(
+      tap(next => this.handleUserRemoved(next))
+    ).subscribe();
+
+    this.cacheSubjectsService.userUpdated$.pipe(
+      tap(next => this.handleUserUpdated(next))
+    ).subscribe();
   }
 
   findUserInCache(uid: string, source: string): Observable<KimiosUser> {

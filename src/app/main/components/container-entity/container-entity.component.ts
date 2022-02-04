@@ -29,7 +29,7 @@ export class ContainerEntityComponent implements OnInit {
       return;
     }
 
-    this.browseEntityService.retrieveContainerEntity(this.entityId).pipe(
+    this.entityCacheService.findContainerEntityInCache(this.entityId).pipe(
       tap(next => this.entityData = next),
       tap(next =>
         this.entityType = DMEntityUtils.dmEntityIsFolder(next) ?
