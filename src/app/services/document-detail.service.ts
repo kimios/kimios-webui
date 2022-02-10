@@ -32,17 +32,6 @@ export class DocumentDetailService {
       this.selectedEntityIdList$ = new BehaviorSubject<Array<number>>(null);
   }
 
-  retrieveDocumentFromId(docId: number): Observable<KimiosDocument> {
-      return this.documentService.getDocument(this.sessionService.sessionToken, docId);
-  }
-
-  retrieveDocumentDetails(docId: number): void {
-    this.documentService.getDocument(this.sessionService.sessionToken, docId)
-        .pipe(
-            concatMap(res => this.documentVersionService.getDocumentVersions(this.sessionService.sessionToken, docId))
-        );
-  }
-
   startDownloadTransaction(documentVersionId: number): Observable<DataTransaction> {
       return this.filetransferService.startDownloadTransaction(this.sessionService.sessionToken, documentVersionId)
           .pipe(
