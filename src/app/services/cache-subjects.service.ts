@@ -21,6 +21,25 @@ export class CacheSubjectsService {
   public folderCreated$: Subject<UpdateNoticeParameters>;
   public folderUpdated$: Subject<UpdateNoticeParameters>;
   public folderRemoved$: Subject<UpdateNoticeParameters>;
+  public documentUpdate$: Subject<UpdateNoticeParameters>;
+  public documentVersionCreated$: Subject<UpdateNoticeParameters>;
+  public documentVersionUpdated$: Subject<UpdateNoticeParameters>;
+  public documentRemoved$: Subject<UpdateNoticeParameters>;
+  public documentCheckout$: Subject<UpdateNoticeParameters>;
+  public documentCheckin$: Subject<UpdateNoticeParameters>;
+  public documentAddRelated$: Subject<UpdateNoticeParameters>;
+  public documentRemoveRelated$: Subject<UpdateNoticeParameters>;
+  public documentVersionCreate$: Subject<UpdateNoticeParameters>;
+  public documentVersionCreateFromLatest$: Subject<UpdateNoticeParameters>;
+  public documentVersionUpdate$: Subject<UpdateNoticeParameters>;
+  public documentVersionRead$: Subject<UpdateNoticeParameters>;
+  public metaValueUpdate$: Subject<UpdateNoticeParameters>;
+  public documentVersionCommentCreate$: Subject<UpdateNoticeParameters>;
+  public documentVersionCommentUpdate$: Subject<UpdateNoticeParameters>;
+  public documentVersionCommentDelete$: Subject<UpdateNoticeParameters>;
+  public documentTrash$: Subject<UpdateNoticeParameters>;
+  public documentUntrash$: Subject<UpdateNoticeParameters>;
+  public documentShared$: Subject<UpdateNoticeParameters>;
 
   constructor() {
     this.userGroupAdd$ = new Subject<UpdateNoticeParameters>();
@@ -37,5 +56,24 @@ export class CacheSubjectsService {
     this.folderCreated$ = new Subject<UpdateNoticeParameters>();
     this.folderUpdated$ = new Subject<UpdateNoticeParameters>();
     this.folderRemoved$ = new Subject<UpdateNoticeParameters>();
+    this.documentUpdate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCreated$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionUpdated$ = new Subject<UpdateNoticeParameters>();
+    this.documentRemoved$ = new Subject<UpdateNoticeParameters>();
+    this.documentCheckout$ = new Subject<UpdateNoticeParameters>();
+    this.documentCheckin$ = new Subject<UpdateNoticeParameters>();
+    this.documentAddRelated$ = new Subject<UpdateNoticeParameters>();
+    this.documentRemoveRelated$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCreate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCreateFromLatest$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionUpdate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionRead$ = new Subject<UpdateNoticeParameters>();
+    this.metaValueUpdate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCommentCreate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCommentUpdate$ = new Subject<UpdateNoticeParameters>();
+    this.documentVersionCommentDelete$ = new Subject<UpdateNoticeParameters>();
+    this.documentTrash$ = new Subject<UpdateNoticeParameters>();
+    this.documentUntrash$ = new Subject<UpdateNoticeParameters>();
+    this.documentShared$ = new Subject<UpdateNoticeParameters>();
   }
 }
