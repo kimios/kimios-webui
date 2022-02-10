@@ -269,9 +269,9 @@ export class FileUploadService {
             )
         ).pipe(
             concatMap(
-                () => this.documentService.getDocument(this.sessionService.sessionToken, docId)
+                () => this.entityCacheService.reloadEntity(docId)
             ),
-            map(doc => doc.tags)
+            map(doc => (doc as KimiosDocument).tags)
         );
     }
 
