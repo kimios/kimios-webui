@@ -129,15 +129,7 @@ export class EntityCacheService {
     const documentInCache = this.getDocumentCacheData(uid);
 
     return documentInCache == null ?
-        this.initBookmarks().pipe(
-          concatMap(bookmarks => this.documentService.getDocument(this.sessionService.sessionToken, uid)),
-          map(doc => {
-            if (this.bookmarks.filter(element => element.entity.uid === doc.uid).length > 0) {
-              doc.bookmarked = true;
-            }
-            return doc;
-          }),
-          tap(document => this.entitiesCache.set(uid, new EntityCacheData(document))),
+        this.initDocumentInCache(uid).pipe(
           tap(document => this.appendDocumentToFolder(document)),
           tap(document => this.newEntity$.next(document))
         ) :
@@ -163,6 +155,29 @@ export class EntityCacheService {
   private initDocumentDataInCache(uid: number): Observable<DocumentCacheData> {
     return this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
       concatMap(doc => doc == null ? of(null) : of(new DocumentCacheData(doc)))
+    );
+  }
+
+  private initDocumentInCache(uid: number): Observable<KimiosDocument> {
+    return this.initBookmarks().pipe(
+      concatMap(() => this.documentService.getDocument(this.sessionService.sessionToken, uid)),
+      map(entity => {
+        if (entity == null || entity === undefined) {
+          return null;
+        }
+        if (this.bookmarks.filter(element => element.entity.uid === entity.uid).length > 0) {
+          entity.bookmarked = true;
+        }
+        return entity;
+      }),
+      tap(entity => {
+        if (entity != null && entity !== undefined && entity !== '') {
+          this.entitiesCache.set(
+            entity.uid,
+            new DocumentCacheData(entity)
+          );
+        }
+      })
     );
   }
 
