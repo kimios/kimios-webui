@@ -190,6 +190,121 @@ export class CacheService {
             this.cacheSubjectsService.folderRemoved$.next(o);
           }
           break;
+
+        case UpdateNoticeTypeEnum.DOCUMENTUPDATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentUpdate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCREATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCreated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONUPDATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionUpdated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTREMOVED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentRemoved$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTCHECKOUT:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentCheckout$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTCHECKIN:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentCheckin$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTADDRELATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentAddRelated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTREMOVERELATED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentRemoveRelated$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCREATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCreate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCREATEFROMLATEST:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCreateFromLatest$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONUPDATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionUpdate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONREAD:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionRead$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.METAVALUEUPDATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.metaValueUpdate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCOMMENTCREATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCommentCreate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCOMMENTUPDATE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCommentUpdate$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCOMMENTDELETE:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentVersionCommentDelete$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTTRASH:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.folderRemoved$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTUNTRASH:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentTrash$.next(o);
+          }
+          break;
+        case UpdateNoticeTypeEnum.DOCUMENTSHARED:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.documentShared$.next(o);
+          }
+          break;
       }
     }
 
