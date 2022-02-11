@@ -42,6 +42,8 @@ export class EntityCacheService {
   public folderCreated$: Subject<number>;
   public folderUpdated$: Subject<number>;
   public folderRemoved$: Subject<number>;
+  public documentUpdate$: Subject<number>;
+  public documentVersionCreated$: Subject<number>;
   
   constructor(
       private sessionService: SessionService,
@@ -73,6 +75,8 @@ export class EntityCacheService {
     this.folderCreated$ = new Subject<number> ();
     this.folderUpdated$ = new Subject<number> ();
     this.folderRemoved$ = new Subject<number> ();
+    this.documentUpdate$ = new Subject<number>();
+    this.documentVersionCreated$ = new Subject<number>();
 
     this.cacheSubjectsService.workspaceCreated$.pipe(
       tap(params => this.handleWorkspaceCreated(params.dmEntityId))
@@ -92,6 +96,64 @@ export class EntityCacheService {
     ).subscribe();
     this.cacheSubjectsService.folderRemoved$.pipe(
       tap(params => this.handleFolderRemoved(params.dmEntityId))
+    ).subscribe();
+    
+    this.cacheSubjectsService.documentUpdate$.pipe(
+      tap(params => this.handleDocumentUpdate(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCreated$.pipe(
+      tap(params => this.handleDocumentVersionCreated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionUpdated$.pipe(
+      tap(params => this.handleDocumentVersionUpdate(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentCheckout$.pipe(
+      tap(params => this.handleDocumentCheckout(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentCheckin$.pipe(
+      tap(params => this.handleDocumentCheckin(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentRemoved$.pipe(
+      tap(params => this.handleDocumentRemoved(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentAddRelated$.pipe(
+      tap(params => this.handleDocumentAddRelated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentRemoveRelated$.pipe(
+      tap(params => this.handleDocumentRemoveRelated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCreate$.pipe(
+      tap(params => this.handleDocumentVersionCreated(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCreateFromLatest$.pipe(
+      tap(params => this.handleDocumentVersionCreateFromLatest(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionUpdate$.pipe(
+      tap(params => this.handleDocumentVersionUpdate(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionRead$.pipe(
+      tap(params => this.handleDocumentVersionRead(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.metaValueUpdate$.pipe(
+      tap(params => this.handleMetaValueUpdate$(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCommentCreate$.pipe(
+      tap(params => this.handleDocumentVersionCommentCreate(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCommentUpdate$.pipe(
+      tap(params => this.handleDocumentVersionCommentUpdate(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentVersionCommentDelete$.pipe(
+      tap(params => this.handleDocumentVersionCommentDelete(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentTrash$.pipe(
+      tap(params => this.handleDocumentTrash(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentUntrash$.pipe(
+      tap(params => this.handleDocumentUntrash(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.documentShared$.pipe(
+      tap(params => this.handleDocumentShared(params.dmEntityId))
     ).subscribe();
   }
 
@@ -136,7 +198,7 @@ export class EntityCacheService {
         of(documentInCache.entity);
   }
 
-  findDocumentVersionsInCache(uid: number): Observable<Array<DocumentVersionWithMetaValues>> {
+  findDocumentVersionsInCache(uid: number, reload = false): Observable<Array<DocumentVersionWithMetaValues>> {
     return (this.getDocumentCacheData(uid) == null ?
       this.initDocumentDataInCache(uid) :
       of(this.getDocumentCacheData(uid))
@@ -144,7 +206,7 @@ export class EntityCacheService {
       tap(documentCacheData => console.dir(documentCacheData)),
       concatMap(documentCacheData => documentCacheData == null ?
         of(null) :
-        this.getDocumentCacheDataWithVersions(documentCacheData)
+        this.getDocumentCacheDataWithVersions(documentCacheData, reload)
       ),
       tap(() => console.log('after getDocumentCacheDataWithVersions()')),
       tap(documentCacheData => console.dir(documentCacheData)),
@@ -191,8 +253,8 @@ export class EntityCacheService {
     );
   }
 
-  private getDocumentCacheDataWithVersions(documentCacheData: DocumentCacheData): Observable<DocumentCacheData> {
-    return documentCacheData.versions == null ?
+  private getDocumentCacheDataWithVersions(documentCacheData: DocumentCacheData, reload = false): Observable<DocumentCacheData> {
+    return documentCacheData.versions == null || reload === true ?
       this.updateDocumentCacheDataVersions(documentCacheData) :
       of(documentCacheData);
   }
@@ -610,7 +672,9 @@ export class EntityCacheService {
         })
       ).subscribe();
     } else {
-      if (this.entitiesHierarchyCache.get(folder.uid).findIndex(element => element === document.uid) === -1) {
+      const entityHierarchyCache = this.entitiesHierarchyCache.get(folder.uid);
+      if (entityHierarchyCache != null
+        && entityHierarchyCache.findIndex(element => element === document.uid) === -1) {
         this.entitiesHierarchyCache.get(folder.uid).push(document.uid);
       }
     }
@@ -782,5 +846,77 @@ export class EntityCacheService {
   handleFolderRemoved(dmEntityId: number): void {
     this.removeEntityInCache(dmEntityId);
     this.folderRemoved$.next(dmEntityId);
+  }
+
+  private handleDocumentUpdate(dmEntityId: number): void {
+    this.reloadEntity(dmEntityId).pipe(
+      tap(() => this.documentUpdate$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  private handleDocumentVersionCreated(dmEntityId: number): void {
+
+  }
+
+  private handleDocumentVersionUpdate(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentCheckout(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentCheckin(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentRemoved(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentAddRelated(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentRemoveRelated(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentVersionCreateFromLatest(dmEntityId: number): void {
+    this.findDocumentVersionsInCache(dmEntityId, true).pipe(
+      tap(() => this.documentVersionCreated$.next(dmEntityId))
+    ).subscribe();
+  }
+
+  private handleDocumentVersionRead(dmEntityId: number): void {
+    
+  }
+
+  private handleMetaValueUpdate$(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentVersionCommentCreate(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentVersionCommentUpdate(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentVersionCommentDelete(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentTrash(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentUntrash(dmEntityId: number): void {
+    
+  }
+
+  private handleDocumentShared(dmEntityId: number): void {
+    
   }
 }

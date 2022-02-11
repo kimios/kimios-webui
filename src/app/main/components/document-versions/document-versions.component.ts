@@ -79,6 +79,14 @@ export class DocumentVersionsComponent implements OnInit {
     } else {
       this.documentId$.next(this.documentId);
     }
+
+    this.entityCacheService.documentVersionCreated$.pipe(
+      filter(docId => docId != null),
+      concatMap(docId => this.entityCacheService.findDocumentVersionsInCache(docId, true)),
+      map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+        .map(v => v.documentVersion)),
+      tap(versionList => this.dataSource.setData(versionList)),
+    ).subscribe();
   }
 
   handleVersionDownload(versionId: number): void {

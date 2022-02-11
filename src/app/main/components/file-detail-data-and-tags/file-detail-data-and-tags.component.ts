@@ -39,6 +39,11 @@ export class FileDetailDataAndTagsComponent implements OnInit {
     } else {
       this.documentId$.next(this.documentId);
     }
+
+    this.entityCacheService.documentUpdate$.pipe(
+      filter(docId => this.documentId != null && this.documentId === docId),
+      tap(docId => this.documentId$.next(docId))
+    ).subscribe();
   }
 
 }

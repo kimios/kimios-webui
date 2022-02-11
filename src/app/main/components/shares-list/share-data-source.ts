@@ -13,6 +13,7 @@ import {PropertyFilter} from 'app/main/model/property-filter';
 import {ObjectUtils} from 'app/main/utils/object-utils';
 import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareExtendedService} from 'app/services/share-extended.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 
 export const SHARES_DEFAULT_DISPLAYED_COLUMNS: ColumnDescription[] = [
@@ -89,7 +90,8 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
     constructor(
         private sessionService: SessionService,
         private shareExtendedService: ShareExtendedService,
-        mode: SharesListMode
+        mode: SharesListMode,
+        private entityCacheService: EntityCacheService
     ) {
         super();
         this.mode = mode;
@@ -167,5 +169,20 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
 
     private filterSharesByStatus(shares: Array<ShareWithTargetUser>, statusFilter: Array<Share.ShareStatus>): Array<ShareWithTargetUser> {
         return shares.filter(share => statusFilter.includes(share.shareStatus));
+    }
+
+    updateDocumentData(docId: number): void {
+        const data = this.connect().getValue();
+        const indexesToUpdate: Array<number> = new Array<number>();
+        data.forEach((share, idx) => {
+            if (share.entity.uid === docId) {
+                indexesToUpdate.push(idx);
+            }
+        });
+
+        this.entityCacheService.findDocumentInCache(docId).pipe(
+          tap(doc => indexesToUpdate.forEach(idx => data[idx].entity = doc)),
+          tap(() => this.sharesSubject.next(data))
+        ).subscribe();
     }
 }

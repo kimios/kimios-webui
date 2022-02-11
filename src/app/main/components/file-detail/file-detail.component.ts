@@ -114,6 +114,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 return of(true);
             })
         ).subscribe();
+
+        this.entityCacheService.documentUpdate$.pipe(
+          filter(documentId => this.documentId === documentId),
+          concatMap(documentId => this.entityCacheService.findDocumentInCache(this.documentId)),
+          tap(doc => this.documentData$ = of(doc))
+        ).subscribe();
     }
 
     initDocumentDetail(): void {
@@ -338,7 +344,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.documentData$ = this.allTagsKey$
             .pipe(
                 // tap(res => this.allTags = res),
-                concatMap(res => this.documentService.getDocument(this.sessionService.sessionToken, this.documentId)),
+                concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
                 tap(res => this.document = res),
                 tap(res => this.documentTags$.next(res.tags))
             );

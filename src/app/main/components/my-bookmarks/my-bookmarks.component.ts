@@ -5,13 +5,13 @@ import {SessionService} from 'app/services/session.service';
 import {MatDialog, MatTable, Sort} from '@angular/material';
 import {DMEntitySortSubElement} from 'app/main/model/dmentity-sort-sub-element';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
-import {concatMap, filter, map} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
 import {FormControl} from '@angular/forms';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
@@ -31,6 +31,7 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
   dataSearch = new FormControl('');
   filteredData$: Observable<Array<Bookmark>>;
   @ViewChild('matTable') matTable: MatTable<Bookmark>;
+  entityUpdated$: Subject<number>;
 
   constructor(
       private documentService: DocumentService,
@@ -48,6 +49,7 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
     };
     this.displayedColumns = this.columnsDescription.map(colDesc => colDesc.id);
     this.displayedColumns.unshift('remove');
+    this.entityUpdated$ = new Subject<number>();
   }
 
   ngOnInit(): void {
@@ -55,6 +57,18 @@ export class MyBookmarksComponent implements OnInit, AfterViewChecked {
     this.dataSource.loadData(this.sort, this.filter);
     this.dataSearch.valueChanges.pipe(
         map(value => this.filterData())
+    ).subscribe();
+
+    this.entityCacheService.documentUpdate$.pipe(
+      tap(docId => this.entityUpdated$.next(docId))
+    ).subscribe();
+
+    this.entityCacheService.folderUpdated$.pipe(
+      tap(folderId => this.entityUpdated$.next(folderId))
+    ).subscribe();
+
+    this.entityUpdated$.pipe(
+      tap(entityId => this.dataSource.updateEntityData(entityId))
     ).subscribe();
   }
 

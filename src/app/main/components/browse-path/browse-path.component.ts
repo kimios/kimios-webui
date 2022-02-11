@@ -1,10 +1,11 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {DMEntity, Document as KimiosDocument} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {takeWhile} from 'rxjs/operators';
+import {concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {DocumentUtils} from 'app/main/utils/document-utils';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {combineLatest, of, Subject} from 'rxjs';
 
 @Component({
   selector: 'browse-path',
@@ -18,6 +19,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
 
   @Input()
   document: KimiosDocument;
+  entityUpdated$: Subject<number>;
 
   constructor(
       private browseEntityService: BrowseEntityService,
@@ -25,6 +27,7 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
       public router: Router
   ) {
     this.pathDirs = [];
+    this.entityUpdated$ = new Subject<number>();
   }
 
   ngOnInit(): void {
@@ -41,6 +44,25 @@ export class BrowsePathComponent implements OnInit, OnDestroy {
         );
       }
     }
+    
+    this.entityCacheService.workspaceUpdated$.pipe(
+      map(workspaceId => this.entityUpdated$.next(workspaceId))
+    ).subscribe();
+
+    this.entityCacheService.folderUpdated$.pipe(
+      tap(folderId => this.entityUpdated$.next(folderId))
+    ).subscribe();
+
+    this.entityCacheService.documentUpdate$.pipe(
+      tap(documentId => this.entityUpdated$.next(documentId))
+    ).subscribe();
+    
+    this.entityUpdated$.pipe(
+      map(entityId => this.pathDirs.findIndex(entity => entity.uid === entityId)),
+      filter(entityIdx => entityIdx !== -1),
+      concatMap(entityIdx => combineLatest(of(entityIdx), this.entityCacheService.findEntityInCache(this.pathDirs[entityIdx].uid))),
+      tap(([entityIdx, entity]) => this.pathDirs[entityIdx] = entity)
+    ).subscribe();
   }
 
   ngOnDestroy(): void {

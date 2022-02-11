@@ -95,4 +95,19 @@ export class BookmarksDataSource extends MatTableDataSource<Bookmark> {
     private filterData(data: Bookmark[], filter: string): Bookmark[] {
         return data.filter(bookmark => bookmark.entity.name.toLowerCase().includes(filter.toLowerCase()));
     }
+
+    updateEntityData(entityId: number): void {
+        const data = this.connect().getValue();
+        const indexesToUpdate: Array<number> = new Array<number>();
+        data.forEach((bookmark, idx) => {
+            if (bookmark.entity.uid === entityId) {
+                indexesToUpdate.push(idx);
+            }
+        });
+
+        this.entityCacheService.findEntityInCache(entityId).pipe(
+          tap(entity => indexesToUpdate.forEach(idx => data[idx].entity = entity)),
+          tap(() => this.bookmarksSubject.next(data))
+        ).subscribe();
+    }
 }

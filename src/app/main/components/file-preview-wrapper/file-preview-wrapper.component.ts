@@ -3,11 +3,13 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {Direction} from 'app/main/components/file-detail/file-detail.component';
 import {Document as KimiosDocument, DocumentVersion} from 'app/kimios-client-api';
 import {formatDate} from '@angular/common';
-import {Observable, of, Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {concatMap, filter, map, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {ActivatedRoute} from '@angular/router';
+import {Router} from '@angular/router';
+import {MatDialog} from '@angular/material';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'file-preview-wrapper',
@@ -47,7 +49,9 @@ export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
   constructor(
       private documentDetailService: DocumentDetailService,
       @Inject(LOCALE_ID) private locale: string,
-      private entityCacheService: EntityCacheService
+      private entityCacheService: EntityCacheService,
+      private dialog: MatDialog,
+      private router: Router
   ) {
     this.documentVersionIds = new Array<number>();
     this.currentVersionId = 0;
@@ -79,6 +83,11 @@ export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
     this.documentDetailService.currentVersionId.pipe(
       filter(currentVersionId => currentVersionId != null),
       tap(currentVersionId => this.currentVersionId = currentVersionId)
+    ).subscribe();
+
+    this.entityCacheService.documentVersionCreated$.pipe(
+      filter(docId => docId === this.documentId),
+      tap(() => this.handleNewVersion())
     ).subscribe();
   }
 
@@ -164,5 +173,44 @@ export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
     const windowTotalScreen = window.innerHeight;
     // toolbar and browse path are always visible
     this.divWrapper.nativeElement.style.height = windowTotalScreen - 64 - 60  + 'px';
+  }
+
+  private handleNewVersion(): void {
+    this.entityCacheService.findDocumentVersionsInCache(this.documentId).pipe(
+      map(versionWithMetaDataValuesList => versionWithMetaDataValuesList
+        .map(v => v.documentVersion)),
+      tap(documentVersions => this.documentVersions = documentVersions),
+      tap(res => this.previewTitle = this.makePreviewTitle(this.currentVersionId, res)),
+      tap(
+        res => this.documentVersionIds = this.documentVersions.slice()
+          .sort((a, b) => a.modificationDate < b.modificationDate ? -1 : 1)
+          .map(version => version.uid)
+      ),
+      tap(() => {
+        if (new RegExp('^\/document\/\\d+\/preview$').test(this.router.url)) {
+          this.askForDisplayLastVersion();
+        } else {
+          const lastVersionId = this.documentVersionIds[this.documentVersionIds.length - 1];
+          this.handleVersionPreview(lastVersionId);
+        }
+      })
+    ).subscribe();
+  }
+
+  private askForDisplayLastVersion(): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        dialogTitle: 'New version available',
+        messageLine1: 'Do you want to see it?'
+      }
+    });
+
+    dialogRef.afterClosed().pipe(
+      filter(res => res === true),
+      tap(() => {
+        const lastVersionId = this.documentVersionIds[this.documentVersionIds.length - 1];
+        this.handleVersionPreview(lastVersionId);
+      })
+    ).subscribe();
   }
 }

@@ -21,6 +21,7 @@ import {ShareWithTargetUser} from 'app/main/model/share-with-target-user';
 import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/share-edit-dialog.component';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {CacheService} from 'app/services/cache.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -75,7 +76,8 @@ export class SharesListComponent implements OnInit {
       private router: Router,
       public dialog: MatDialog,
       private shareService: ShareService,
-      private cacheService: CacheService
+      private cacheService: CacheService,
+      private entityCacheService: EntityCacheService
   ) {
     this.sort = <DMEntitySort> {
       name: 'creationDate',
@@ -101,7 +103,7 @@ export class SharesListComponent implements OnInit {
     this.shareStatusValue = this.shareStatusTypes;
     this.formGroupFilters.get('shareStatus').setValue(this.shareStatusValue);
 
-    this.dataSource = new ShareDataSource(this.sessionService, this.shareExtendedService, this.mode);
+    this.dataSource = new ShareDataSource(this.sessionService, this.shareExtendedService, this.mode, this.entityCacheService);
     this.loadData();
 
     this.formGroupFilters.valueChanges.subscribe(
@@ -127,6 +129,10 @@ export class SharesListComponent implements OnInit {
         );
       }
     }
+
+    this.entityCacheService.documentUpdate$.pipe(
+      tap(docId => this.dataSource.updateDocumentData(docId))
+    ).subscribe();
   }
 
   private initFormGroupFilters(mode: SharesListMode): FormGroup {
@@ -158,6 +164,8 @@ export class SharesListComponent implements OnInit {
         this.makeFiltersFromFormGroup(this.formGroupFilters, this.propertyFilterString),
         refreshCache
     );
+
+
   }
 
   sortData($event: Sort): void {

@@ -103,6 +103,11 @@ export class BrowseListComponent implements OnInit, OnDestroy {
       filter(entity => entity != null),
       tap(entity => this.updateCurrentPageIfNeeded(entity))
     ).subscribe();
+
+    this.entityCacheService.documentUpdate$.pipe(
+      concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
+      tap(entity => this.updateCurrentPageIfNeeded(entity))
+    ).subscribe();
   }
 
   /**
