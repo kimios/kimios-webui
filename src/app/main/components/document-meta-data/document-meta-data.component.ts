@@ -1,13 +1,14 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionService, Meta, MetaValue, StudioService, DocumentVersionRestOnlyService} from 'app/kimios-client-api';
+import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionRestOnlyService, DocumentVersionService, Meta, MetaValue, StudioService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 import {MatAutocompleteTrigger} from '@angular/material';
 import {UpdateDocumentVersionMetaDataParam} from 'app/kimios-client-api/model/updateDocumentVersionMetaDataParam';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {Moment} from 'moment';
 
 @Component({
   selector: 'document-meta-data',
@@ -145,7 +146,12 @@ export class DocumentMetaDataComponent implements OnInit {
   ): void {
     documentMetas.forEach(meta => formGroup.addControl(
         meta.uid.toString(),
-        this.fb.control(documentMetasMap && documentMetasMap.get(meta.uid) ? documentMetasMap.get(meta.uid) : '')
+        this.fb.control(
+          documentMetasMap && documentMetasMap.get(meta.uid) ?
+            documentMetasMap.get(meta.uid) :
+            null,
+          this.determineValidator(meta)
+        )
     ));
   }
 
@@ -177,6 +183,9 @@ export class DocumentMetaDataComponent implements OnInit {
   }
 
   submit($event: MouseEvent): void {
+    if (! this.formGroup.valid) {
+      return;
+    }
     // handle document type property removed from document
     const documentTypeUid = this.documentType == null ?
       -1 :
@@ -184,6 +193,13 @@ export class DocumentMetaDataComponent implements OnInit {
     const metaValues = {};
     Object.keys((this.formGroup.get('metas') as FormGroup).controls).forEach(metaUidStr =>
         metaValues[metaUidStr] = this.formGroup.get('metas').get(metaUidStr).value);
+    Object.keys(metaValues).forEach(metaUidStr => {
+      if (this.documentTypeMetas.filter(m => m.uid.toString() === metaUidStr)[0].metaType === 3
+      && metaValues[metaUidStr] != null
+      && metaValues[metaUidStr] !== '') {
+        metaValues[metaUidStr] = (metaValues[metaUidStr] as Moment).milliseconds();
+      }
+    });
     this.documentVersionRestOnlyService.updateDocumentMetaData(
         <UpdateDocumentVersionMetaDataParam> {
           sessionId: this.sessionService.sessionToken,
@@ -201,5 +217,18 @@ export class DocumentMetaDataComponent implements OnInit {
 
   metaDataFieldTitle(meta: Meta): string {
     return meta.name + (meta.mandatory && meta.mandatory === true ? ' *' : '');
+  }
+
+  private determineValidator(meta: Meta): ValidatorFn {
+    let validator;
+    switch (meta.metaType) {
+      case 2:
+        validator = (control: AbstractControl): {[key: string]: any} | null => {
+          const naN = isNaN(control.value);
+          return naN ? {'NaN': {value: control.value}} : null;
+        };
+        break;
+    }
+    return validator;
   }
 }

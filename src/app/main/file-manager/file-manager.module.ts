@@ -139,6 +139,7 @@ import {DocumentVersionDataDialogComponent} from 'app/main/components/document-v
 import {DocumentVersionDataComponent} from 'app/main/components/document-version-data/document-version-data.component';
 import {AdminSpecialTasksDefaultTaskComponent} from 'app/main/components/admin-special-tasks-default-task/admin-special-tasks-default-task.component';
 import {BrowseTreeChooseLocationComponent} from 'app/main/components/browse-tree-choose-location/browse-tree-choose-location.component';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -279,7 +280,9 @@ library.add(far, fas);
         MatGridListModule,
 
         TreeModule.forRoot(),
-        FontAwesomeModule
+        FontAwesomeModule,
+
+        MatMomentDateModule
     ],
     providers   : [
         EntityService,

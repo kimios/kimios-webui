@@ -91,6 +91,9 @@
                             (click)="formGroup.get('metas').get(meta.uid.toString()).setValue('')">
                       <mat-icon>close</mat-icon>
                     </button>
+                    <mat-error *ngIf="formGroup.get('metas').get(meta.uid.toString()).hasError('NaN')">
+                      The value must be a number
+                    </mat-error>
                   </mat-form-field>
                 </ng-container>
 
