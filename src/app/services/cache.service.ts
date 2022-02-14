@@ -197,18 +197,6 @@ export class CacheService {
             this.cacheSubjectsService.documentUpdate$.next(o);
           }
           break;
-        case UpdateNoticeTypeEnum.DOCUMENTVERSIONCREATED:
-          if (messageParsedObj != null ) {
-            const o = Object.assign(obj, messageParsedObj);
-            this.cacheSubjectsService.documentVersionCreated$.next(o);
-          }
-          break;
-        case UpdateNoticeTypeEnum.DOCUMENTVERSIONUPDATED:
-          if (messageParsedObj != null ) {
-            const o = Object.assign(obj, messageParsedObj);
-            this.cacheSubjectsService.documentVersionUpdated$.next(o);
-          }
-          break;
         case UpdateNoticeTypeEnum.DOCUMENTREMOVED:
           if (messageParsedObj != null ) {
             const o = Object.assign(obj, messageParsedObj);
