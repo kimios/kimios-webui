@@ -116,11 +116,11 @@ export class FilePreviewComponent implements OnInit, OnChanges {
   }
 
   public docIsTextFormat(docExtension: string): boolean {
-    return DocumentUtils.extensionIsText(docExtension);
+    return docExtension != null && DocumentUtils.extensionIsText(docExtension);
   }
 
   public docNeedsConversionToPdf(docExtension: string): boolean {
-      return DocumentUtils.extensionHasToBeConvertedToPdf(docExtension.toLowerCase());
+      return docExtension != null && DocumentUtils.extensionHasToBeConvertedToPdf(docExtension.toLowerCase());
   }
 
   private docIsImg(docExtension: string): boolean {

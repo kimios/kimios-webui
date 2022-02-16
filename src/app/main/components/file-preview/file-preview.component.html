@@ -6,7 +6,8 @@
     </pre>
 </ng-container>
 <ng-template #docPdf>
-    <ng-container *ngIf="docNeedsConversionToPdf(documentExtension) || documentExtension.toLowerCase() === 'pdf'; else docImg">
+    <ng-container *ngIf="documentExtension != null
+    && (docNeedsConversionToPdf(documentExtension) || documentExtension.toLowerCase() === 'pdf'); else docImg">
         <ng-container *ngIf="link$ | async as link">
             <object  type="application/pdf"
                      [data]="link"
