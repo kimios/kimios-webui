@@ -3,12 +3,13 @@ import {DocumentService, DocumentType as KimiosDocumentType, DocumentVersionRest
 import {SessionService} from 'app/services/session.service';
 import {concatMap, filter, map, startWith, tap, toArray} from 'rxjs/operators';
 import {BehaviorSubject, combineLatest, from, iif, Observable, of} from 'rxjs';
-import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn} from '@angular/forms';
 import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 import {MatAutocompleteTrigger} from '@angular/material';
 import {UpdateDocumentVersionMetaDataParam} from 'app/kimios-client-api/model/updateDocumentVersionMetaDataParam';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {Moment} from 'moment';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'document-meta-data',
@@ -38,7 +39,8 @@ export class DocumentMetaDataComponent implements OnInit {
       private documentVersionRestOnlyService: DocumentVersionRestOnlyService,
       private fb: FormBuilder,
       private studioService: StudioService,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private entityCacheService: EntityCacheService
   ) {
     this.documentMetasMap = new Map<number, MetaValue>();
     this.documentType = null;
@@ -110,6 +112,11 @@ export class DocumentMetaDataComponent implements OnInit {
     } else {
       this.documentId$.next(this.documentId);
     }
+
+    this.entityCacheService.documentVersionUpdated$.pipe(
+      tap(docVersionWithMetaData =>
+        this.updateFormMetaValues(this.formGroup.get('metas') as FormGroup, docVersionWithMetaData.metaValues))
+    ).subscribe();
   }
 
   displayAutoCompleteDocumentType(docType: KimiosDocumentType): string {
@@ -153,6 +160,15 @@ export class DocumentMetaDataComponent implements OnInit {
           this.determineValidator(meta)
         )
     ));
+  }
+
+  private updateFormMetaValues(
+    formGroup: FormGroup,
+    metaValues: Array<MetaValue>
+  ): void {
+    metaValues.forEach(metaValue =>
+      this.updateFormControlIfExists((formGroup.get(metaValue.metaId.toString()) as FormControl), metaValue.value)
+    );
   }
 
   private resetFormMetas(): void {
@@ -230,5 +246,11 @@ export class DocumentMetaDataComponent implements OnInit {
         break;
     }
     return validator;
+  }
+
+  private updateFormControlIfExists(formControl: FormControl, value: any): void {
+    if (formControl != null) {
+      formControl.setValue(value);
+    }
   }
 }

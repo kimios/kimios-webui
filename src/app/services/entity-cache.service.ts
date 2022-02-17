@@ -44,6 +44,7 @@ export class EntityCacheService {
   public folderRemoved$: Subject<number>;
   public documentUpdate$: Subject<number>;
   public documentVersionCreated$: Subject<number>;
+  public documentVersionUpdated$: Subject<DocumentVersionWithMetaValues>;
   
   constructor(
       private sessionService: SessionService,
@@ -77,6 +78,7 @@ export class EntityCacheService {
     this.folderRemoved$ = new Subject<number> ();
     this.documentUpdate$ = new Subject<number>();
     this.documentVersionCreated$ = new Subject<number>();
+    this.documentVersionUpdated$ = new Subject<DocumentVersionWithMetaValues>();
 
     this.cacheSubjectsService.workspaceCreated$.pipe(
       tap(params => this.handleWorkspaceCreated(params.dmEntityId))
@@ -859,7 +861,10 @@ export class EntityCacheService {
   }
 
   private handleDocumentVersionUpdate(dmEntityId: number): void {
-    
+    this.findDocumentVersionsInCache(dmEntityId, true).pipe(
+      concatMap(versions => this.initDocumentVersionMetaDataValues(dmEntityId, versions[0].documentVersion.uid)),
+      tap(version => this.documentVersionUpdated$.next(version))
+    ).subscribe();
   }
 
   private handleDocumentCheckout(dmEntityId: number): void {
