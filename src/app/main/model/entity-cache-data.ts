@@ -1,9 +1,9 @@
-import {DMEntity, DocumentVersion, MetaValue} from 'app/kimios-client-api';
+import {DMEntity, Document as KimiosDocument, DocumentVersion, Folder, MetaValue, Workspace} from 'app/kimios-client-api';
 
 export class EntityCacheData {
-    entity: DMEntity;
+    entity: Folder | Workspace | KimiosDocument;
 
-    constructor(entity: DMEntity) {
+    constructor(entity: Folder | Workspace | KimiosDocument) {
         this.entity = entity;
     }
 }
@@ -11,7 +11,7 @@ export class EntityCacheData {
 export class DocumentCacheData extends EntityCacheData {
     private _versions: Array<DocumentVersionWithMetaValues>;
 
-    constructor(entity: DMEntity) {
+    constructor(entity: KimiosDocument) {
         super(entity);
         this._versions = null;
     }

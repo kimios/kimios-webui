@@ -41,6 +41,7 @@ export class CacheService {
     this.documentCreated$ = new Subject<KimiosDocument>();
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
+    this._dataMessages = new Array<DataMessageImpl>();
   }
 
   get webSocket(): WebSocketSubject<any> {
@@ -72,7 +73,7 @@ export class CacheService {
       console.dir(updateNoticeMessage);
       this.handleUpdateNoticeMsg(updateNoticeMessage);
     } else {
-      if (msg['dmEntityList'] != null && msg['parentUid'] != null) {
+      if (msg['dmEntityList'] != null && msg['parent'] != null) {
         const dataMessage = Object.assign(new DataMessageImpl(null, null, null, null), msg);
         this.handleDataMessage(dataMessage);
       }

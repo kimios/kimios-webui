@@ -33,9 +33,10 @@ export class EntityCacheService {
   private bookmarks: Array<Bookmark>;
   public reloadedEntity$: BehaviorSubject<DMEntity>;
   public newEntity$: BehaviorSubject<DMEntity>;
+  public folderWithChildren$: Subject<DMEntity>;
   public chosenParentUid$: Subject<number>;
   private _intervalId: number;
-  private _checkingDataMessagesQueue: boolean;
+  private _checkingDataMessagesQueue = false;
   public workspaceCreated$: Subject<number>;
   public workspaceUpdated$: Subject<number>;
   public workspaceRemoved$: Subject<number>;
@@ -62,9 +63,10 @@ export class EntityCacheService {
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
     this.newEntity$ = new BehaviorSubject<DMEntity>(null);
     this.chosenParentUid$ = new Subject<number>();
+    this.folderWithChildren$ = new Subject<DMEntity>();
 
     this._intervalId = window.setInterval(
-      () => { if (this._checkingDataMessagesQueue === true) {
+      () => { if (this._checkingDataMessagesQueue === false) {
         this.checkDataMessagesQueue();
       }},
       1000
@@ -197,7 +199,7 @@ export class EntityCacheService {
           tap(document => this.appendDocumentToFolder(document)),
           tap(document => this.newEntity$.next(document))
         ) :
-        of(documentInCache.entity);
+        of(documentInCache.entity as KimiosDocument);
   }
 
   findDocumentVersionsInCache(uid: number, reload = false): Observable<Array<DocumentVersionWithMetaValues>> {
@@ -273,7 +275,7 @@ export class EntityCacheService {
     );
   }
 
-  public findEntityChildrenInCache(uidParam: number, onlyContainers: boolean): Observable<Array<DMEntity>> {
+  public findEntityChildrenInCache(uidParam: number, onlyContainers: boolean): Observable<Array<Folder | KimiosDocument>> {
     const idInHierarchy = uidParam == null ? 0 : uidParam;
     return from(of(uidParam)).pipe(
       concatMap(uid =>
@@ -316,7 +318,7 @@ export class EntityCacheService {
     this.entitiesCache.delete(uid);
   }
 
-  private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntity>> {
+  private initHierarchyCacheForEntity(uid: number): Observable<Array<Folder | Workspace>> {
     return this.initBookmarks().pipe(
       concatMap(() => this.findEntitiesAtPathFromId(uid)),
       map(entities => entities.map(element => {
@@ -336,15 +338,11 @@ export class EntityCacheService {
     );
   }
 
-  public askFoldersInFolders(uids: Array<number>): void {
-    this.folderService.getFoldersFolders(<FolderUidListParam> {
+  public askFoldersInFolders(uids: Array<number>): Observable<any> {
+    return this.folderService.getFoldersFolders(<FolderUidListParam> {
       sessionId: this.sessionService.sessionToken,
       folderUidList: uids
-    }).subscribe(
-      null,
-      error => console.log('askFoldersInFolders() error : ' + error),
-      null
-    );
+    });
   }
 
   public findEntityInCache(entityUid: number): Observable<DMEntity> {
@@ -390,7 +388,7 @@ export class EntityCacheService {
       ));
   }
 
-  private retrieveContainerEntity(uid: number): Observable<DMEntity> {
+  private retrieveContainerEntity(uid: number): Observable<Folder | Workspace> {
     return this.getEntity(uid) != null ?
       DMEntityUtils.dmEntityIsFolder(this.getEntity(uid)) ?
         this.retrieveFolderEntity(uid) :
@@ -544,7 +542,7 @@ export class EntityCacheService {
     }
   }
 
-  findEntitiesAtPathFromId(parentUid?: number): Observable<DMEntity[]> {
+  findEntitiesAtPathFromId(parentUid?: number): Observable<Array<Folder | Workspace>> {
     if (parentUid == null
       || parentUid === undefined) {
       return this.workspaceService.getWorkspaces(this.sessionService.sessionToken);
@@ -813,7 +811,11 @@ export class EntityCacheService {
     this.entitiesCache.set(dataMessage.parent.uid, new EntityCacheData(dataMessage.parent));
     dataMessage.dmEntityList.forEach(dmEntity => this.entitiesCache.set(dmEntity.uid, new EntityCacheData(dmEntity)));
     this.entitiesHierarchyCache.set(dataMessage.parent.uid, dataMessage.dmEntityList.map(dmEntity => dmEntity.uid));
+    this.folderWithChildren$.next(dataMessage.parent);
+  }
 
+  get checkingDataMessagesQueue(): boolean {
+    return this._checkingDataMessagesQueue;
   }
 
   handleWorkspaceCreated(dmEntityId: number): void {
