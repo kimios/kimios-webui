@@ -10,6 +10,7 @@ import {AuthenticationSource} from 'app/kimios-client-api';
 import {Observable, of, throwError} from 'rxjs';
 import {SessionService} from 'app/services/session.service';
 import {catchError} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Component({
     selector     : 'login',
@@ -46,7 +47,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         private _formBuilder: FormBuilder,
         private userService: UserService,
         private securityService: SecurityService,
-        private sessionService: SessionService
+        private sessionService: SessionService,
+        private router: Router
     )
     {
         // Configure the layout
@@ -81,6 +83,10 @@ export class LoginComponent implements OnInit, OnDestroy {
      */
     ngOnInit(): void
     {
+        if (this.sessionService.sessionAlive) {
+            this.router.navigate(['workspaces']);
+        }
+
         this.loginForm = this._formBuilder.group({
             login   : ['', Validators.required],
             password: ['', Validators.required],
