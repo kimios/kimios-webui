@@ -1,13 +1,13 @@
-import {AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {Location} from '@angular/common';
+import {AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Location, LocationStrategy} from '@angular/common';
 import {BrowseEntityService, PAGE_SIZE_DEFAULT} from 'app/services/browse-entity.service';
 import {MatDialog, PageEvent} from '@angular/material';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
-import {catchError, concatMap, filter, map, takeWhile, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, map, takeUntil, takeWhile, tap} from 'rxjs/operators';
 import {DMEntity, Folder, Workspace} from 'app/kimios-client-api';
 import {FilesUploadDialogComponent} from 'app/main/components/files-upload-dialog/files-upload-dialog.component';
 import {Tag} from 'app/main/model/tag';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
@@ -26,7 +26,9 @@ import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss']
 })
-export class WorkspacesComponent implements OnInit, AfterViewChecked {
+export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy {
+
+  unsubscribeSubject$ = new Subject();
 
   @ViewChild('contentColumn') contentColumn: ElementRef;
   @ViewChild('browsePathRow') browsePathRow: ElementRef;
@@ -78,6 +80,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       ).subscribe();
     }
     this.browseEntityService.selectedEntity$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       filter(entity => entity != null),
       tap(entity => {
         this.initial = false;
@@ -89,17 +92,22 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
       // tap(children => this.entityCacheService.askFoldersInFolders(children.map(folder => folder.uid)))
     ).subscribe();
 
-    this.browseEntityService.totalEntitiesToDisplay$.subscribe(
+    this.browseEntityService.totalEntitiesToDisplay$.pipe(
+      takeUntil(this.unsubscribeSubject$)
+    ).subscribe(
         next => this.length = next.length
     );
 
     this.workspaceSessionService.sort.pipe(
+        takeUntil(this.unsubscribeSubject$),
         filter(next => next != null)
     ).subscribe(
         next => this.browseEntityService.makePage(0, this.pageSize, next)
     );
 
-    this.browseEntityService.pageIndex.subscribe(
+    this.browseEntityService.pageIndex.pipe(
+      takeUntil(this.unsubscribeSubject$),
+    ).subscribe(
         next => this.pageIndex = next
     );
 
@@ -114,6 +122,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     }
 
     this.entityCacheService.newEntity$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       filter(entity => entity != null),
       tap(entity => {
         const currentPath = this.browseEntityService.currentPath.getValue();
@@ -125,11 +134,13 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     ).subscribe();
 
     this.cacheService.documentCreated$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       tap(document => console.log('cacheService sent document ' + document.uid)),
       concatMap(document => this.entityCacheService.handleDocumentCreated(document))
     ).subscribe();
 
     this.browseEntityService.selectedEntityFromGridOrTree$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       filter(res => this.browseEntityService.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE),
       tap(next => {
         this.browseEntityService.setHistoryNewEntry(next === undefined ? undefined : next.uid);
@@ -141,12 +152,19 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked {
     ).subscribe();
 
     this.entityCacheService.folderRemoved$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       tap(folderId => this.browseEntityService.updateListOnDelete(folderId))
     ).subscribe();
 
     this.entityCacheService.folderCreated$.pipe(
+      takeUntil(this.unsubscribeSubject$),
       tap(folderId => this.browseEntityService.updateListOnCreate(folderId))
     ).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeSubject$.next();
+    this.unsubscribeSubject$.complete();
   }
 
   ngAfterViewChecked(): void {
