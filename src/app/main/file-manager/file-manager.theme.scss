@@ -52,9 +52,12 @@
         }
     }
 
-    fuse-sidebar {
+    fuse-sidebar.left-positioned {
 //        background-color: $kimios-navbar-background-color;
 //        box-shadow: none;
+        min-width: 200px;
+        max-width: 200px;
+        width: 200px;
     }
 
     .mat-toolbar {
