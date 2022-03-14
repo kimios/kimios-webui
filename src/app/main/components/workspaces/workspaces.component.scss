@@ -5,7 +5,7 @@
 #treeAndGridRow {
   // background-color: white;
   // box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.35);
-  padding-top: 20px;
+  padding-top: 10px;
   height: 100%;
   border-radius: 10px;
   padding-bottom: 10px;
@@ -13,9 +13,9 @@
 
 #treeAndGridRowWrapper {
   padding-left: 0px;
-  padding-right: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   // flex-grow: 1;
 
   width: 100%;
@@ -32,4 +32,8 @@
   display: flex;
   // width: 300px;
   overflow: auto;
+}
+
+#browsePathAndActions {
+  width: 100%;
 }
