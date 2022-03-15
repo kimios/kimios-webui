@@ -41,6 +41,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
 
   containerEntityDialogRef: MatDialogRef<ContainerEntityDialogComponent>;
 
+  showNodeMenuButton = undefined;
+
   @ViewChild('tree') tree;
   @ViewChild('tree') treeElement: ElementRef;
 
@@ -1011,5 +1013,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       parentNode.data.children.push(this.createNodeFromEntity(entity, loading));
     }
     treeModel.update();
+  }
+
+  private addNode(newNode: any, nodes: any[]): void {
+    nodes.push(newNode);
+    this.treeNodesService.addNode(newNode, this.mode);
+  }
+
+  public displayNodeMenuButton(id: number): void {
+    this.showNodeMenuButton = id;
+  }
+
+  public hideNodeMenuButton(): void {
+    this.showNodeMenuButton = undefined;
   }
 }

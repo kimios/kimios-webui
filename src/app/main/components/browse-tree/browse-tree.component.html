@@ -48,30 +48,55 @@
       >
         <div fxLayoutAlign="space-between center" fxLayout="row" fxLayoutGap="15px"
              style="margin-left: 5px; margin-right: 5px;">
-          <mat-checkbox *ngIf="mode === 'with-documents' && node.data.dmEntityType === 'document'
-&& (showNodeMenuButton === undefined || showNodeMenuButton !== node.id)"
-                        (change)="selectionChange($event, node.data.id)"
-                        [checked]="selectedEntity(node.id)"
+          <div
+               style="height: 100%;"
+               [ngClass]="{'hidden': showNodeMenuButton === node.id}"
           >
-          </mat-checkbox>
-          <mat-icon (mouseenter)="displayNodeMenuButton(node.id)" (mouseleave)="hideNodeMenuButton()"
-                    *ngIf="node.data.svgIcon === 'workspace'
-&& (showNodeMenuButton === undefined || showNodeMenuButton !== node.id)"
-                    svgIcon="{{node.data.svgIcon}}">
-          </mat-icon>
-          <mat-icon (mouseenter)="displayNodeMenuButton(node.id)" (mouseleave)="hideNodeMenuButton()"
-                    *ngIf="node.data.svgIcon === 'folder'
-&& (showNodeMenuButton === undefined || showNodeMenuButton !== node.id)">
-            folder
-          </mat-icon>
-          <fa-icon *ngIf="node.data.dmEntityType === 'document'
-&& (showNodeMenuButton === undefined || showNodeMenuButton !== node.id)"
-                   [icon]="['far', retrieveDocumentIcon(node.data.documentExtension, 'far')]"
-                   size="lg"
-                   [ngClass]="'file-icon-browse-list'"></fa-icon>
-          <mat-icon *ngIf="showNodeMenuButton === node.id"
-                    [matMenuTriggerFor]="menu" [matMenuTriggerData]="{entityId: node.id}"
-                    (mouseleave)="hideNodeMenuButton()" class="cursor-pointer">more_horiz</mat-icon>
+            <div
+                    fxLayoutAlign="start center"
+                    fxLayout="row"
+                    style="height: 100%;"
+            >
+              <mat-checkbox *ngIf="mode === 'with-documents' && node.data.dmEntityType === 'document'"
+                            (change)="selectionChange($event, node.data.id)"
+                            [checked]="selectedEntity(node.id)"
+              >
+              </mat-checkbox>
+              <mat-icon (mouseenter)="displayNodeMenuButton(node.id)"
+                        *ngIf="node.data.svgIcon === 'workspace'"
+                        svgIcon="{{node.data.svgIcon}}"
+              >
+              </mat-icon>
+              <mat-icon (mouseenter)="displayNodeMenuButton(node.id)"
+                        *ngIf="node.data.svgIcon === 'folder'"
+              >
+                folder
+              </mat-icon>
+              <fa-icon *ngIf="node.data.dmEntityType === 'document'"
+                       [icon]="['far', retrieveDocumentIcon(node.data.documentExtension, 'far')]"
+                       size="lg"
+                       [ngClass]="{'file-icon-browse-list': true}"
+              >
+              </fa-icon>
+            </div>
+          </div>
+          <div (click) = "$event.stopPropagation()"
+               style="height: 100%;"
+               [ngClass]="{'cursor-pointer': true, 'hidden': showNodeMenuButton !== node.id}"
+          >
+            <div
+                 fxLayoutAlign="start center"
+                 fxLayout="row"
+                 style="height: 100%;"
+            >
+              <mat-icon
+                        [matMenuTriggerFor]="menu" [matMenuTriggerData]="{entityId: node.id}"
+                        (mouseleave)="hideNodeMenuButton()"
+              >
+                more_horiz
+              </mat-icon>
+            </div>
+          </div>
           <div>
             <tree-node-content [node]="node" [index]="index"></tree-node-content>
           </div>

@@ -15,7 +15,7 @@
 }
 
 .kimios-tree-button-expand {
-  width: 25px;
+  width: 19px;
   height: 25px;
 }
 
@@ -34,4 +34,16 @@ tree-node-content > span {
 
 #wrapper {
   // overflow: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.marginAuto {
+  margin: auto;
+}
+
+divCenter {
+  justify-content: center;
 }
