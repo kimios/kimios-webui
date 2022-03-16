@@ -637,7 +637,8 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
       data: {
         entityType: entityType,
         parentId: entityId
-      }
+      },
+      disableClose: true
     });
   }
 

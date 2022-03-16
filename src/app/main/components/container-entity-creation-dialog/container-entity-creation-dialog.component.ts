@@ -5,13 +5,15 @@ import {CdkDragDrop, CdkDragEnter} from '@angular/cdk/drag-drop';
 import {EntityCreationService} from 'app/services/entity-creation.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
-import {concatMap, tap} from 'rxjs/operators';
+import {concatMap, filter, tap} from 'rxjs/operators';
 import {UserOrGroup} from 'app/main/model/user-or-group';
 import {Folder, Workspace} from 'app/kimios-client-api';
 import {AdminService} from 'app/services/admin.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {ErrorDialogComponent} from 'app/main/components/error-dialog/error-dialog.component';
 import {forbiddenCharactersValidator} from 'app/main/utils/form-utils';
+import {SessionService} from 'app/services/session.service';
+import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 
 export interface ContainerEntityCreationDialogData {
   entityType: 'workspace' | 'folder';
@@ -50,7 +52,9 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       private adminService: AdminService,
       private fb: FormBuilder,
       private entityCacheService: EntityCacheService,
-      private dialog: MatDialog
+      private dialog: MatDialog,
+      private sessionService: SessionService,
+      public confirmDialog: MatDialog
   ) {
     this.selectedUsersAndGroups$ = new BehaviorSubject<Array<UserOrGroup>>([]);
     this.selectedUsersAndGroups = new Array<UserOrGroup>();
@@ -96,6 +100,14 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
         }
         this.browseEntityService.onAddedChildToEntity$.next(this.parentEntity.uid);
       })
+    ).subscribe();
+
+    this.entityCreationForm.statusChanges.pipe(
+      tap(() => this.updateDirtyFormStatus())
+    ).subscribe();
+
+    this.entityCreationForm.valueChanges.pipe(
+      tap(() => this.updateDirtyFormStatus())
     ).subscribe();
   }
 
@@ -154,7 +166,25 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
   }
 
   cancel(): void {
-    this.dialogRef.close();
+    if (this.sessionService.dirtyForm$.getValue() === false) {
+      this.dialogRef.close();
+    } else {
+      this.openConfirmDialog('You have unsaved work', ['Any modification will be lost. Are you sure?']);
+    }
+  }
+
+  openConfirmDialog(title: string, messageLines: Array<string>): void {
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+      data: {
+        dialogTitle: title,
+        messageLine1: messageLines[0]
+      }
+    });
+
+    dialogRef.afterClosed().pipe(
+      filter(res => res === true),
+      tap(() => this.dialogRef.close())
+    ).subscribe();
   }
 
   private parentEntityIsCurrentPath(): boolean {
@@ -178,5 +208,13 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
         message: errorStr
       }
     });
+  }
+
+  updateDirtyFormStatus(): void {
+    if (this.entityCreationForm.dirty) {
+      this.sessionService.dirtyForm$.next(true);
+    } else {
+      this.sessionService.dirtyForm$.next(false);
+    }
   }
 }
