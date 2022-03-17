@@ -407,7 +407,6 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     addTag(tag: string): void {
-        console.log('addTag() ' + tag);
         this.selectedTag$.next(tag);
         this.tagInput.nativeElement.value = '';
         this.tagCtrl.setValue(null);

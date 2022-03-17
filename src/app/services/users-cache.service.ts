@@ -87,8 +87,6 @@ export class UsersCacheService {
           res => of(res).catch(error => of(error))
         ),
         catchError(error => {
-          console.log('findUsersInCache(' + source + '): ');
-          console.dir(error);
           return of([]);
         }),
         tap(users => {
@@ -129,8 +127,6 @@ export class UsersCacheService {
           res => of(res).catch(error => of(error))
         ),
         catchError(error => {
-          console.log('findGroupsInCache(' + source + '): ');
-          console.dir(error);
           return of([]);
         }),
         tap(groups => groups.forEach(grp => this.initGroupInCache(grp)))

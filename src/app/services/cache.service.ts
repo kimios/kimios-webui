@@ -54,14 +54,12 @@ export class CacheService {
     this._webSocket = webSocket(url.replace('http', 'ws'));
     this._webSocket.subscribe(
         msg => {
-          console.log('message received: ' + msg);
-          console.dir(msg);
           this.handleMsg(msg);
         },
         // Called whenever there is a message from the server
-        err => console.log(err),
+        // err => console.log(err),
         // Called if WebSocket API signals some kind of error
-        () => console.log('complete')
+        // () => console.log('complete')
         // Called when connection is closed (for whatever reason)
     );
   }
@@ -69,8 +67,6 @@ export class CacheService {
   private handleMsg(msg: any): void {
     if (msg['updateNoticeType'] != null) {
       const updateNoticeMessage = Object.assign(new UpdateNoticeMessageImpl(null, null, null, null), msg);
-      console.log('Websocket received message: ');
-      console.dir(updateNoticeMessage);
       this.handleUpdateNoticeMsg(updateNoticeMessage);
     } else {
       if (msg['dmEntityList'] != null && msg['parent'] != null) {

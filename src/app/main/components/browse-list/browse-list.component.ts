@@ -209,7 +209,6 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   dragStart($event: DragEvent, row: DMEntity): void {
-    console.log('dragging ' + row.name);
     $event.dataTransfer.setData('text', row.uid.toString());
     $event.dataTransfer.effectAllowed = 'move';
     $event['kimiosEntityMove'] = true;

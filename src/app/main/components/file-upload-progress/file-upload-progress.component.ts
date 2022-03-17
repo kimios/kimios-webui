@@ -46,8 +46,8 @@ export class FileUploadProgressComponent implements OnInit {
               )
               .subscribe(
                   (res) => res !== null && res !== undefined ? this.file.next(res) : console.log('undefined'),
-                  (error) => console.log(error),
-                  () => console.log('no file')
+                  // (error) => console.log(error),
+                  // () => console.log('no file')
               );
       } else {
           this.file.next(this.uploadingFileName);
@@ -131,7 +131,7 @@ export class FileUploadProgressComponent implements OnInit {
       );
 
       this.messageDisplayed.subscribe(
-          next => console.log('messageDisplayed => ' + next)
+          // next => console.log('messageDisplayed => ' + next)
       );
   }
 

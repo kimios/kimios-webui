@@ -128,7 +128,7 @@ export class ContainerEntityCreationDialogComponent implements OnInit {
       this.entityCreationService.onFormSubmitted$.next(this.documentId);
       this.entityCreationService.onFormSecuritiesSubmitted$.subscribe(
           null,
-          error => console.log('error when creating entity: ' + error.error.message)
+          // error => console.log('error when creating entity: ' + error.error.message)
       );
     } else {
       if (this.entityCreationForm.invalid) {

@@ -137,13 +137,6 @@ export class SearchEntityService implements Resolve<any> {
         this.query = query;
         this._criterias = criterias;
 
-        console.log('inside getFiles entity Service...');
-        /*if (!this.sessionService.sessionAlive) {
-                console.log('session not alive');
-                resolve([]);
-            }*/
-
-
         // TODO: enhance sorfielf mapping:
 
         const searchFieldMapping = {
@@ -166,7 +159,7 @@ export class SearchEntityService implements Resolve<any> {
                 res => of(res).catch(error => of(error))
             ),
             catchError(error => {
-                console.log('we catched the error !');
+                // console.log('we catched the error !');
                 console.log('getFiles( '
                     + sortField
                     + ' : string, '

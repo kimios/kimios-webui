@@ -10,7 +10,6 @@ export class LoggedInGuard implements CanActivate {
     constructor(private sessionService: SessionService, public router: Router) {
         this.intervalId = window.setInterval(
             () => {
-                console.log('session alive ? ', this.sessionService.sessionAlive)
                 if (! this.sessionService.sessionAlive
                     && this.router.url !== '/login') {
                     this.router.navigate(['login']);

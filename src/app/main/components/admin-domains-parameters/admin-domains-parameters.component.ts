@@ -50,8 +50,6 @@ export class AdminDomainsParametersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('in parameters component this.adminService.newDomain$.getValue() : ' + this.adminService.newDomain$.getValue());
-
     if (this.adminService.newDomain$.getValue() === true) {
       this.handleNewDomainEventTrue();
     }
@@ -178,8 +176,7 @@ export class AdminDomainsParametersComponent implements OnInit {
             this.adminService.newDomainCreated$.next(true);
             this.adminService.selectedDomain$.next(this.formGroup.get('name').value);
           },
-          error => null,
-          () => console.log('authentication source saved: ' + this.formGroup.get('name').value)
+          error => null
         );
       } else {
         this.administrationService.updateAuthenticationSource_2(
@@ -193,8 +190,7 @@ export class AdminDomainsParametersComponent implements OnInit {
           }
         ).subscribe(
           null,
-          error => this.adminService.selectedDomain$.next(this.formGroup.get('name').value),
-          () => console.log('authentication source saved: ' + this.formGroup.get('name').value)
+          error => this.adminService.selectedDomain$.next(this.formGroup.get('name').value)
         );
       }
     }

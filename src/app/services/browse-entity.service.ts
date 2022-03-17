@@ -145,10 +145,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         // if (this.entitiesPathIds.get(lastEntity.uid) === null || this.entitiesPath.get(lastEntity.uid) === undefined) {
             this.entitiesPathIds.set(lastEntity.uid, next.map(elem => elem.uid));
         }
-        console.log('entitiesPath');
-        // console.log(this.entitiesPathId);
-        // console.log(this.entitiesPathValue);
-        console.log(this.entitiesPathIds);
     }
 
     ngOnInit(): void {
@@ -175,7 +171,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             filter(next => next > -1)
         ).subscribe(
             next => {
-                console.log(this.history);
                 this.historyHasForward.next(this.history.length > 1 && next < this.history.length - 1);
                 this.historyHasBackward.next(this.history.length > 1 && next > 0);
                 this.selectedEntity$.next(this.entityCacheService.getEntity(this.history[next]) ?
@@ -308,7 +303,6 @@ export class BrowseEntityService implements OnInit, OnDestroy {
                 res => of(res).catch(error => of(error))
             ),
             catchError(error => {
-                console.log(error);
                 return of('');
             }),
             map(res => res)

@@ -162,8 +162,6 @@ export class FileUploadService {
                             if (event['ok'] != null
                                 && event['ok'] !== undefined
                                 && event['ok'] === false) {
-                                console.log('error catched: ');
-                                console.log(event);
                                 res = { name: document.name, status: 'status', message: event['statusText'] ? event['statusText'] : '<no message>' };
                                 reportProgress = false;
                             } else {
@@ -217,8 +215,6 @@ export class FileUploadService {
                 };
                 this.filesProgress.get(uploadId).next(res);
                 this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR);
-                console.log('second catchError: ');
-                console.log(res);
                 return of(res);
             }),
             map(response => {
@@ -229,7 +225,6 @@ export class FileUploadService {
                 if (['done', 'error'].includes(res.status)) {
                     this.uploadFinished$.next(uploadId);
                 }
-                console.log('in the map (' + document.name + ')');
                 return res;
             }),
             tap(
@@ -340,8 +335,6 @@ export class FileUploadService {
                 let res;
                 if (event.ok
                     && event.ok === false) {
-                    console.log('error catched: ');
-                    console.log(event);
                     res = { name: document.name, status: 'error', message: event.message };
                 } else {
 

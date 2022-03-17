@@ -135,7 +135,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
 
     this.cacheService.documentCreated$.pipe(
       takeUntil(this.unsubscribeSubject$),
-      tap(document => console.log('cacheService sent document ' + document.uid)),
       concatMap(document => this.entityCacheService.handleDocumentCreated(document))
     ).subscribe();
 
@@ -221,8 +220,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
       if (! result) {
         return;
       }
-      console.log('The dialog was closed');
-      console.dir(dialogRef.componentInstance.data.filesList);
 
       const currentPath = this.browseEntityService.currentPath.getValue();
       let path: string;
@@ -266,8 +263,6 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
       ]))
           .pipe(
               catchError(error => {
-                console.log('server error: ');
-                console.dir(error);
                 return of({ name: 'filename', status: 'error', message: (error.error && error.error.message) ? error.error.message : '' });
               })
           )
@@ -398,7 +393,6 @@ loading.pipe(
       } else {
         if (event['dataTransfer']['files'] != null
             && event['dataTransfer']['files'].length > 0) {
-          Array.from(event['dataTransfer']['files']).forEach(file => console.log(file));
           this.openFilesUploadDialog(
               event['dataTransfer']['files'],
               event['droppedInDir'] ? event['droppedInDir'] : '',

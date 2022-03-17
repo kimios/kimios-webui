@@ -227,27 +227,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
         flatMap(
           entities => entities.reverse()
         ),
-        tap(
-          entityRet => {
-            this.tree.treeModel.update();
-            if (this.tree === null) {
-              console.log('this.tree is null');
-            } else {
-              if (this.tree.treeModel === null) {
-                console.log('this.tree.treeModele is null');
-              } else {
-
-                if (this.tree.treeModel.getNodeById(entityRet.uid.toString()) === null) {
-                  console.log('>>>>>>>>>>>>');
-                  console.log('this.tree.treeModel.getNodeById( ' + entityRet.uid + ' ) === null');
-                  console.log(entityRet);
-                  console.log(this.nodes);
-                  console.log('<<<<<<<<<<<<<<<<<<<<<<<<');
-                }
-              }
-            }
-          }
-        ),
+        tap(entityRet => this.tree.treeModel.update()),
         concatMap(
           entityRet => combineLatest(
             of(entityRet),
@@ -257,7 +237,6 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
           )
         ),
         tap(([entity, entityUid]) => {
-          console.log(this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.uid.toString()));
           if (! DMEntityUtils.dmEntityIsDocument(entity)
             && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.uid.toString()).length === 0
           ) {
@@ -623,7 +602,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
   }
 
   showProperties(entityId: number): void {
-    console.log('entityId is ' + entityId);
+    // console.log('entityId is ' + entityId);
   }
 
   createFolderDialog(entityId: number): void {

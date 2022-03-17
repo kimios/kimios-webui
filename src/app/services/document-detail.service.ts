@@ -35,7 +35,7 @@ export class DocumentDetailService {
   startDownloadTransaction(documentVersionId: number): Observable<DataTransaction> {
       return this.filetransferService.startDownloadTransaction(this.sessionService.sessionToken, documentVersionId)
           .pipe(
-              tap(res => console.log(res))
+              // tap(res => console.log(res))
           );
   }
 

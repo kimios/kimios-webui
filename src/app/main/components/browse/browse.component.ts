@@ -131,7 +131,6 @@ export class BrowseComponent implements OnInit {
                 || Number(dataSplitted[1]) === NaN) {
                 return;
             }
-            console.log(dataSplitted.join(' : '));
             this.openEntityMoveConfirmDialog(
                 this.entityCacheService.getEntity(Number(dataSplitted[1])),
                 event['droppedInDir']
@@ -163,8 +162,6 @@ export class BrowseComponent implements OnInit {
             if (! result) {
                 return;
             }
-            console.log('The dialog was closed');
-            console.dir(dialogRef.componentInstance.data.filesList);
 
             const currentPath = this.browseEntityService.currentPath.getValue();
             let path: string;

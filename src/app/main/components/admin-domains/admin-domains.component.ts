@@ -47,7 +47,6 @@ export class AdminDomainsComponent implements OnInit, AfterViewChecked {
     ).subscribe();
 
     this.adminService.newDomain$.pipe(
-      tap(bool => console.log('this.adminService.newDomain$ : ' + bool)),
       tap(bool => this.newDomain = bool)
     ).subscribe();
 

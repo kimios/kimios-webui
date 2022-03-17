@@ -108,7 +108,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.securityService.getAuthenticationSources()
             .pipe(
                 catchError(error => {
-                    console.log('server is not responding: ' + error);
                     return of();
                 })
             )
@@ -116,8 +115,8 @@ export class LoginComponent implements OnInit, OnDestroy {
                 (sources) => {
                     this.authenticationSources$ = of(sources);
                 },
-                (error) => console.log('server is not responding: ' + error),
-                () => console.log('load try completed')
+                /*(error) => console.log('server is not responding: ' + error),
+                () => console.log('load try completed')*/
             );
     }
 

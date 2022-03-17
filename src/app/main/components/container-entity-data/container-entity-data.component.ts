@@ -207,9 +207,9 @@ export class ContainerEntityDataComponent implements OnInit {
         this.sessionService.dirtyForm$.next(false);
       }),
     ).subscribe(
-      res => console.log('folder updated'),
+      /*res => console.log('folder updated'),
       error => console.log('error during update ' + error.error.message),
-      null
+      null*/
     );
   }
 

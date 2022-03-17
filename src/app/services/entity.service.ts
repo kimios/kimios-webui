@@ -51,7 +51,6 @@ export class EntityService implements Resolve<any> {
     retrieveEntity(path: string): Observable<DMEntity> {
         let entity: Observable<DMEntity>;
         entity = this.searchService.getDMentityFromPath(this.sessionService.sessionToken, path);
-        console.log('entity ', entity);
         return entity;
 
 
@@ -99,14 +98,11 @@ export class EntityService implements Resolve<any> {
     getFiles(sortField: string, sortDirection: string): Promise<any>
     {
         return new Promise((resolve, reject) => {
-            console.log('inside Promise getFiles entity Service...')
             if (!this.sessionService.sessionAlive){
-                console.log('session not alive');
                 resolve([]);
             } else {
                 this.searchService.getDMentityFromPath(this.sessionService.sessionToken, '/boumboumboum/mika')
                         .subscribe((response: any) => {
-                            console.log('loaded folder', response);
                             this.documentService.getDocuments(this.sessionService.sessionToken, response.uid)
                                 .subscribe((response2: any) => {
 
@@ -134,9 +130,7 @@ export class EntityService implements Resolve<any> {
 
     searchDocuments(sortField: string, sortDirection: string, page: number, pageSize: number, query: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log('inside Promise getFiles entity Service...');
             if (!this.sessionService.sessionAlive) {
-                console.log('session not alive');
                 resolve([]);
             } else {
 
@@ -160,7 +154,6 @@ export class EntityService implements Resolve<any> {
                 this.searchService.advancedSearchDocuments(this.sessionService.sessionToken,
                     page * pageSize, pageSize, searchFieldMapping[sortField], sortDirection, null, -1, false, criterias, null, false)
                     .subscribe((response: any) => {
-                        console.log('loaded results', response);
                         this.onFilesChanged.next(response.rows);
                         this.onFileSelected.next(response.rows[0]);
                         resolve(response.rows);

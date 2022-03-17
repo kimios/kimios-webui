@@ -111,7 +111,6 @@ export class DocumentVersionsComponent implements OnInit {
       const cmp = sortType === 'number' ?
           compareNumbers([elem1[sort.name]], [elem2[sort.name]]) :
           elem1[sort.name].localeCompare(elem2[sort.name]);
-      console.log(dir + ' ' + cmp + ' ' + elem1[sort.name] + ' ' + elem2[sort.name] + ' ' + sortType);
       return dir * cmp;
     });
     this.dataSource.setData(sortedData);

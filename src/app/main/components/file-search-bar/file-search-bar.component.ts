@@ -157,8 +157,6 @@ export class FileSearchBarComponent implements OnInit {
     }
 
     onSubmit(): void {
-        console.log(this.searchParams.errors);
-
         this.searchParams.updateValueAndValidity();
 
         if (this.searchParams.errors === null

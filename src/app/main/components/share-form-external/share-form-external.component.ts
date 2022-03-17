@@ -103,7 +103,7 @@ export class ShareFormExternalComponent implements OnInit {
           expirationDate: this.formatDate(this.shareFormGroup.get('dateUntil').value, this.shareFormGroup.get('timeUntil').value)
         }).subscribe(
             res => this.browseEntityService.shareDocumentReturn$.next(true),
-            error => console.log('error when sharing document')
+            // error => console.log('error when sharing document')
         );
       } else {
         /*const inputDateUntilValue = this.shareFormGroup.get('dateUntil').value;

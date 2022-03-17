@@ -212,7 +212,6 @@ export class EntityCacheService {
         of(null) :
         this.getDocumentCacheDataWithVersions(documentCacheData, reload)
       ),
-      tap(() => console.log('after getDocumentCacheDataWithVersions()')),
       tap(documentCacheData => console.dir(documentCacheData)),
       map(documentCacheData => documentCacheData instanceof DocumentCacheData ? documentCacheData.versions : null)
     );
@@ -374,7 +373,6 @@ export class EntityCacheService {
   }
 
   public findContainerEntityInCache(entityUid): Observable<DMEntity> {
-    console.log('this.entitiesCache.get(' + entityUid + '): ' + this.entitiesCache.get(entityUid));
     return this.entitiesCache.get(entityUid) != null ?
       of(this.entitiesCache.get(entityUid).entity) :
       this.initContainerEntityInCache(entityUid);
@@ -398,7 +396,6 @@ export class EntityCacheService {
           res => of(res).catch(error => of(error))
         ),
         catchError(error => {
-          console.log(error);
           return of('');
         }),
         concatMap(
@@ -415,7 +412,6 @@ export class EntityCacheService {
         res => of(res).catch(error => of(error))
       ),
       catchError(error => {
-        console.log(error);
         return of('');
       }),
       map(res => res)
@@ -428,7 +424,6 @@ export class EntityCacheService {
         res => of(res).catch(error => of(error))
       ),
       catchError(error => {
-        console.log(error);
         return of('');
       }),
       map(res => res)
@@ -765,7 +760,6 @@ export class EntityCacheService {
             .catch(error => of(error))
       ),
       catchError(error => {
-        console.log('error while folder update');
         return of(false);
       }),
       filter(res => res != false),
@@ -787,7 +781,6 @@ export class EntityCacheService {
             .catch(error => of(error))
       ),
       catchError(error => {
-        console.log('error while workspace update');
         return error;
       }),
       concatMap(() => this.reloadEntity(workspaceUid)),

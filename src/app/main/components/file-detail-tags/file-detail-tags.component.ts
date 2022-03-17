@@ -84,7 +84,6 @@ export class FileDetailTagsComponent implements OnInit {
         tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
         tap(res => this.document = res),
         tap(res => this.loading$ = of(false)),
-        tap(() => console.log('document found in cache')),
         tap(res => console.dir(res)),
         tap(res => this.documentTags$.next(res.tags)),
       ).subscribe();

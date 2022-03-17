@@ -177,7 +177,6 @@ export class AdminDomainsGroupsComponent implements OnInit {
       Observable<Array<Group>> {
     return this.usersCacheService.findGroupsInCache(source).pipe(
         catchError(() => of(new Array<Group>())),
-        tap(data => console.log('returned ' + data.length + ' elements')),
         map(data => data),
     );
   }

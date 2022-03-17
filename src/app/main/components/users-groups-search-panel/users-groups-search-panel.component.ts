@@ -144,8 +144,6 @@ export class UsersGroupsSearchPanelComponent implements OnInit, AfterViewChecked
   }
 
   handleDblClick(userOrGroup: UserOrGroup): void {
-    console.log('handleDblClick(): ');
-    console.dir(userOrGroup);
     if (this.mode === 'containerEntityCreation') {
       this.entityCreationService.newUserOrGroupTmp$.next(userOrGroup);
     } else {

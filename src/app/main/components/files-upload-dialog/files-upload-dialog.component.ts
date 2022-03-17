@@ -91,7 +91,6 @@ export class FilesUploadDialogComponent implements OnInit {
         console.dir(formCopyFilesList);
         console.dir(this.data.filesList);
         this.data.filesList.forEach((filesArray, path) => {
-            console.log(path);
             fileToUpload.set(path, filesArray.filter((elem, i) =>
                 (formCopyFilesList.get(this.makeKeyFromPathForFormControl(path)) as FormArray).at(i).value === 1));
         });
@@ -121,7 +120,6 @@ export class FilesUploadDialogComponent implements OnInit {
     }
 
     dragOver($event: CdkDragEnter<any>): void {
-        console.log('dragover');
         $event.container.element.nativeElement.classList.add('dragover');
     }
 
