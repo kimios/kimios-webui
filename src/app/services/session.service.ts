@@ -1,13 +1,14 @@
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {SecurityService, User} from 'app/kimios-client-api';
 import {CookieService} from 'ngx-cookie-service';
-import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subscription, throwError} from 'rxjs';
 import {Router} from '@angular/router';
-import {catchError, concatMap, tap} from 'rxjs/operators';
+import {catchError, concatMap, filter, tap} from 'rxjs/operators';
 import {CacheService} from './cache.service';
 import {environment} from '../../environments/environment';
 
-const KIMIOS_COOKIE = 'kimios';
+const KIMIOS_COOKIE_ST = 'kimios_st';
+export const KIMIOS_COOKIE_WST = 'kimios_wst';
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +19,7 @@ export class SessionService implements OnDestroy {
     private intervalId: number;
     private _currentUser: User;
     public dirtyForm$: BehaviorSubject<boolean>;
+    private checkSessionSubscription: Subscription;
 
     constructor(
         private securityService: SecurityService,
@@ -30,24 +32,43 @@ export class SessionService implements OnDestroy {
         if (this.sessionToken) {
             this.sessionAlive = true;
         }
+        this.setSessionAlive();
         this.startSessionCheck();
         this.dirtyForm$ = new BehaviorSubject<boolean>(false);
+
+        this.checkSessionSubscription =
+        this.cacheService.newWebSocketToken$.pipe(
+          filter(next => next !== '')
+        ).subscribe(
+          next => this.setCookie(KIMIOS_COOKIE_WST, next)
+        );
     }
 
     ngOnDestroy(): void {
         this.stopSessionCheck();
+        this.checkSessionSubscription.unsubscribe();
     }
 
     get sessionToken(): string {
-        if (this._sessionToken === undefined || this._sessionToken === null) {
-            this.sessionToken = this.readSessionTokenFromCookie();
+        if (this._sessionToken == null || this._sessionToken === undefined) {
+            const token = this.readTokenFromCookie(KIMIOS_COOKIE_ST);
+            this._sessionToken = token ? token : null;
         }
         return this._sessionToken;
     }
 
     set sessionToken(value: string) {
         this._sessionToken = value;
-        this.cookieService.set(KIMIOS_COOKIE, value);
+        this.setCookie(KIMIOS_COOKIE_ST, this._sessionToken);
+    }
+
+    setCookie(cookieName: string, cookieValue: string): void {
+        this.cookieService.set(
+          cookieName,
+          cookieValue,
+          null,
+          '/'
+        );
     }
 
     setSessionAlive(): void {
@@ -60,10 +81,17 @@ export class SessionService implements OnDestroy {
                         this._sessionAlive = res;
                         if (this._sessionAlive === false) {
                             this.stopSessionCheck();
-                            this.cookieService.delete(KIMIOS_COOKIE);
-                        }
-                        if (this.cacheService.webSocket == null || this.cacheService.webSocket === undefined) {
-                            this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', res['wsToken']);
+                            this.cookieService.delete(KIMIOS_COOKIE_ST);
+                            this.cookieService.delete(KIMIOS_COOKIE_WST);
+                        } else {
+                            if (this.cacheService.webSocket == null || this.cacheService.webSocket === undefined) {
+                                const token = this.readTokenFromCookie(KIMIOS_COOKIE_WST);
+                                if (token != null) {
+                                    this.cacheService.initWebSocket(environment.apiPath + '/chat/chat/', token);
+                                } else {
+                                    this.disconnect();
+                                }
+                            }
                         }
                     },
                     error => this._sessionAlive = error.error.text
@@ -90,8 +118,13 @@ export class SessionService implements OnDestroy {
             of(this._currentUser);
     }
 
-    readSessionTokenFromCookie(): string {
-        return this.cookieService.check(KIMIOS_COOKIE) ? this.cookieService.get(KIMIOS_COOKIE) : '';
+    readTokenFromCookie(cookieName: string): string {
+        if (! this.cookieService.check(cookieName)) {
+            return null;
+        }
+        const cookieValue = this.cookieService.get(cookieName);
+
+        return cookieValue;
     }
 
     retrieveUserData(): Observable<User> {
@@ -103,7 +136,10 @@ export class SessionService implements OnDestroy {
     logout(): void {
         this.stopSessionCheck();
         this.securityService.endSession(this.sessionToken).subscribe(
-            () => { this.cookieService.delete(KIMIOS_COOKIE); }
+            () => {
+                this.cookieService.delete(KIMIOS_COOKIE_ST);
+                this.cookieService.delete(KIMIOS_COOKIE_WST);
+            }
         );
         this.router.navigate(['/login']).then(
             () => window.location.reload()
@@ -114,8 +150,10 @@ export class SessionService implements OnDestroy {
         return this.securityService.endSession(this.sessionToken).pipe(
             tap(
                 res => {
-                    this.cookieService.delete(KIMIOS_COOKIE);
+                    this.cookieService.delete(KIMIOS_COOKIE_ST);
+                    this.cookieService.delete(KIMIOS_COOKIE_WST);
                     this.sessionToken = '';
+                    this.sessionAlive = false;
                 }
             ),
             concatMap(

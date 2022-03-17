@@ -10,6 +10,7 @@ import {DataMessageImpl} from 'app/main/model/data-message-impl';
 import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-parameters';
 import {CacheSubjectsService} from './cache-subjects.service';
 import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
+import {Message} from 'app/main/model/message';
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -31,6 +32,7 @@ export class CacheService {
   public sharedWithMe$: Subject<boolean>;
   public sharedByMe$: Subject<boolean>;
   private _dataMessages: Array<DataMessageImpl>;
+  public newWebSocketToken$: BehaviorSubject<string>;
 
   constructor(
     private cacheSubjectsService: CacheSubjectsService
@@ -42,6 +44,7 @@ export class CacheService {
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
     this._dataMessages = new Array<DataMessageImpl>();
+    this.newWebSocketToken$ = new BehaviorSubject<string>('');
   }
 
   get webSocket(): WebSocketSubject<any> {
@@ -72,6 +75,9 @@ export class CacheService {
       if (msg['dmEntityList'] != null && msg['parent'] != null) {
         const dataMessage = Object.assign(new DataMessageImpl(null, null, null, null), msg);
         this.handleDataMessage(dataMessage);
+      } else {
+        const message = Object.assign(new Message(null, null), msg);
+        this.handleSimpleMsg(message);
       }
     }
   }
@@ -84,7 +90,7 @@ export class CacheService {
         case UpdateNoticeTypeEnum.KEEPALIVEPING:
           const updateNoticeMessageImpl = new UpdateNoticeMessageImpl(
             UpdateNoticeTypeEnum.KEEPALIVEPONG,
-            this.wsToken,
+            updateNoticeMessage.token,
             null,
             null
           );
@@ -299,5 +305,9 @@ export class CacheService {
 
   get dataMessages(): Array<DataMessageImpl> {
     return this._dataMessages;
+  }
+
+  private handleSimpleMsg(message: Message): void {
+    this.newWebSocketToken$.next(message.token);
   }
 }

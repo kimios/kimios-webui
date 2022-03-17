@@ -20,4 +20,11 @@ export class TreeNodesService {
   setTreeNodes(value: Array<TreeNode>, browseTreeNode: BROWSE_TREE_MODE): void {
     this._treeNodes.set(browseTreeNode, value);
   }
+
+  addNode(node: TreeNode, browseTreeNode: BROWSE_TREE_MODE): void {
+    if (this._treeNodes.get(browseTreeNode) == null) {
+      this._treeNodes.set(browseTreeNode, new Array<TreeNode>());
+    }
+    this._treeNodes.get(browseTreeNode).push(node);
+  }
 }
