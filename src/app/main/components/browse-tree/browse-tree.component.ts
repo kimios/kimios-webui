@@ -44,9 +44,11 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
   containerEntityDialogRef: MatDialogRef<ContainerEntityDialogComponent>;
 
   showNodeMenuButton = undefined;
+  initial = true;
 
   @ViewChild('tree') tree;
   @ViewChild('tree') treeElement: ElementRef;
+  @ViewChild('.node-content-wrapper-focused') focusedNode: ElementRef;
 
   nodes = [];
   treeOptions = {
@@ -145,7 +147,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       filter(entity => this.browseEntityService.browseMode$.getValue() === BROWSE_TREE_MODE.BROWSE),
       tap(entity => { if (entity != null && this.tree.treeModel.getNodeById(entity.uid) != null) {
         this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entity.uid));
-      }})
+      }}),
+      tap(() => {
+        if (this.initial === true) {
+          this.initial = false;
+          this.scrollToFocusedNode();
+        }
+      })
     ).subscribe();
 
     this.entityCacheService.workspaceCreated$.pipe(
@@ -227,13 +235,19 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             takeUntil(this.unsubscribeSubject$),
             filter(entities => entities.length > 0),
             map(entities => this.entitiesLoadedInTree(entities, this.tree.treeModel) ? entities : []),
-            concatMap(entities => entities.length > 0 ?
+            concatMap(entities => combineLatest(of(entities), entities.length > 0 ?
               this.expandEntitiesToExpand(entities) :
               this.loadEntitiesToExpand(entities)
-            ),
-            tap(entities =>
+            )),
+            tap(([entities, any]) =>
               this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].uid))
-            )
+            ),
+            tap(() => {
+              if (this.initial === true) {
+                this.initial = false;
+                this.scrollToFocusedNode();
+                }
+            })
           ).subscribe();
         } else {
           this.browseEntityService.selectedEntity$.pipe(
@@ -241,7 +255,16 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             filter(selected => selected != null && selected !== undefined),
             concatMap(() => this.retrieveEntitiesToExpand()),
             filter(entities => entities.length > 0),
-            concatMap(entities => this.loadEntitiesToExpand(entities))
+            concatMap(entities => combineLatest(of(entities), this.loadEntitiesToExpand(entities))),
+            tap(([entities]) =>
+              this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].uid))
+            ),
+            tap(() => {
+              if (this.initial === true) {
+                this.initial = false;
+                this.scrollToFocusedNode();
+              }
+            })
           ).subscribe();
 
 /*          this.retrieveEntitiesToExpand().pipe(
@@ -317,7 +340,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             );*/
         }
 
-    this.initDataDone$
+    /*this.initDataDone$
         .pipe(
           takeUntil(this.unsubscribeSubject$),
             filter(res => res === true),
@@ -365,7 +388,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
               }
             }
         );
-
+*/
     this.browseEntityService.nodeToRemoveFromTree.pipe(
       takeUntil(this.unsubscribeSubject$),
     ).subscribe(
@@ -1085,6 +1108,16 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
 
   private expandEntitiesToExpand(entities: Array<DMEntity>): Observable<any> {
     entities.forEach(entity => this.tree.treeModel.getNodeById(entity.uid).expand());
-    return of();
+    return of('');
+  }
+
+  private scrollToFocusedNode(): void {
+    const els = document.getElementsByClassName('node-content-wrapper-focused');
+    console.dir(els);
+    if (els.length === 0) {
+      return;
+    }
+    const element = els[0];
+    element.scrollIntoView();
   }
 }

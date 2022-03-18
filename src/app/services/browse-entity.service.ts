@@ -24,7 +24,7 @@ export enum EXPLORER_MODE {
   providedIn: 'root'
 })
 export class BrowseEntityService implements OnInit, OnDestroy {
-    public selectedEntityFromGridOrTree$: BehaviorSubject<DMEntity>;
+    public selectedEntityFromGridOrTree$: Subject<DMEntity>;
     public selectedEntity$: BehaviorSubject<DMEntity>;
     public selectedFolder$: BehaviorSubject<DMEntity>;
     public onAddedChildToEntity$: Subject<number>;
@@ -83,7 +83,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
   ) {
       this.selectedEntity$ = new BehaviorSubject(undefined);
       this.selectedFolder$ = new BehaviorSubject<DMEntity>(undefined);
-      this.selectedEntityFromGridOrTree$ = new BehaviorSubject<DMEntity>(undefined);
+      this.selectedEntityFromGridOrTree$ = new Subject<DMEntity>();
       this.currentPath = new BehaviorSubject<Array<DMEntity>>([]);
       this.entitiesPath = new Map<number, DMEntity[]>();
       this.entitiesPathId = Array<number>();
