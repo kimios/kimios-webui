@@ -2,20 +2,20 @@ import {FuseNavigation} from '@fuse/types';
 
 export const navigation: FuseNavigation[] = [
 
-    {
+   /* {
         id: 'overview',
         title: 'Overview',
         translate: 'NAV.SAMPLE.TITLE',
         type: 'item',
         icon: 'view_comfy',
         url: '/overview',
-        /*badge: {
+        /!*badge: {
             title: '1',
             translate: 'NAV.SAMPLE.BADGE',
             bg: '#f41e4a',
             fg: '#FFFFFF'
-        }*/
-    },
+        }*!/
+    },*/
     {
         id: 'workspaces',
         title: 'Workspaces',
