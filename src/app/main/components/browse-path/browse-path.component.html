@@ -1,20 +1,26 @@
-<div fxLayout="row"  fxLayoutGap="8px" fxLayoutAlign=" center" style="height: 100%">
+<div fxLayout="row"  fxLayoutAlign=" center" style="height: 100%">
   <div (click)="contextIsWorkspace() ? goToHome() : router.navigate(['/workspaces', ''])" class="cursor-pointer">
     <mat-icon>home</mat-icon>
   </div>
   <ng-container *ngIf="contextIsWorkspace()" >
-    <ng-container *ngFor="let dir of pathDirs; let index">
+    <ng-container *ngFor="let dir of pathDirs; let index; last as isLast">
       <mat-icon>chevron_right</mat-icon>
-      <div (click)="goToDir(dir)" class="cursor-pointer">{{dir.name}}</div>
+      <div (click)="goToDir(dir)"
+           [ngClass]="{'cursor-pointer': true, 'browse-path': true, 'focused': isLast}"
+      >
+        {{dir.name}}
+      </div>
     </ng-container>
   </ng-container>
 
   <ng-container *ngIf="contextIsDocument()" >
     <ng-container *ngFor="let dir of pathDirs; let index">
       <mat-icon>chevron_right</mat-icon>
-      <div (click)="navigateToDir(dir.uid)" class="cursor-pointer">{{dir.name}}</div>
+      <div [ngClass]="{'browse-path': true}" (click)="navigateToDir(dir.uid)" class="cursor-pointer">{{dir.name}}</div>
     </ng-container>
     <mat-icon>chevron_right</mat-icon>
-    <div>{{document.name + (document.extension ? '.' + document.extension : '')}}</div>
+    <div [ngClass]="{'browse-path': true, 'focused': true}">
+      {{document.name + (document.extension ? '.' + document.extension : '')}}
+    </div>
   </ng-container>
 </div>
