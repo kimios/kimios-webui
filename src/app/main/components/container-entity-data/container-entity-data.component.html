@@ -92,9 +92,20 @@
 
     </table>
 
-    <div fxLayout="row" fxLayoutAlign="center">
-      <button mat-button type="submit" cdkFocusInitial><mat-icon>check</mat-icon></button>
-      <button mat-button type="button" (click)="reset()"><mat-icon>cancel</mat-icon></button>
+    <div  fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px" [ngClass]="'button-box'">
+      <div [ngClass]="'kimios-button discreet'"
+           fxLayout="row"
+           fxLayoutAlign="center center"
+           (click)="reset()" >
+        <span [class.kimios-button-text]="true">CANCEL</span>
+      </div>
+      <div [ngClass]="'kimios-button highlight'"
+           fxLayout="row"
+           fxLayoutAlign="center center"
+           (click)="submit()"
+           cdkFocusInitial >
+        <span [class.kimios-button-text]="true">SAVE</span>
+      </div>
     </div>
   </div>
 </form>
