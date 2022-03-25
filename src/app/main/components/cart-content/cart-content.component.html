@@ -9,9 +9,11 @@
     <div #sectionButtons
          fxLayout="row"
          fxLayoutAlign="start start"
-         fxLayoutGap="20px">
+         fxLayoutGap="20px"
+         [ngClass]="'button-box'"
+    >
         <div [class.kimios-button]="true"
-             [class.discreet]="true"
+             [class.highlight]="true"
              fxLayout="row"
              fxLayoutAlign="center center"
              (click)="doZip()" >
