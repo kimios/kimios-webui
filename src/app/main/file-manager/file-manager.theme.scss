@@ -55,7 +55,7 @@
     }
 
     #kimios_site_link {
-        color: $kimios-green;
+        color: map-get($accent, 500);
     }
 
     .external_link {
@@ -87,12 +87,12 @@
         border-style: solid;
         height: 40px !important;
         min-width: 120px;
-        border-color: $kimios-green;
+        border-color: map-get($accent, 500);
 
         @extend .cursor-pointer;
 
         &.active {
-            background-color: $kimios-green;
+            background-color: map-get($accent, 500);
 
             span.kimios-button-text {
                 color: #F5F5F5;
@@ -100,8 +100,9 @@
         }
 
         &.inactive {
+            border-color: transparent;
             span.kimios-button-text {
-                color: $kimios-green;
+                color: map-get($accent, 500);
             }
         }
         span.kimios-button-text {
@@ -111,8 +112,8 @@
         }
 
         &:hover {
-            background-color: $kimios-green;
-
+            background-color: map-get($accent, 500);
+            border-color: map-get($accent, 500);
             span.kimios-button-text {
                 color: #F5F5F5;
             }
@@ -130,14 +131,14 @@
     }
 
     .mat-ink-bar {
-        background-color: $kimios-green !important;
+        background-color: map-get($accent, 500) !important;
     }
 
     .mat-tab-label-active {
         background-color: map-get($background, card);
 
         .mat-tab-label-content {
-            color: $kimios-green;
+            color: map-get($accent, 500);
             font-weight: bolder;
         }
     }
@@ -335,7 +336,7 @@
     }
 
     button.add-to-selection-list {
-        background-color: $kimios-green;
+        background-color: map-get($accent, 500);
         margin-right: 5px;
         visibility: hidden;
     }
