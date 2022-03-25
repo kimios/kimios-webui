@@ -91,7 +91,7 @@
 
         @extend .cursor-pointer;
 
-        &.active {
+        &.highlight {
             background-color: map-get($accent, 500);
 
             span.kimios-button-text {
@@ -99,7 +99,7 @@
             }
         }
 
-        &.inactive {
+        &.discreet {
             border-color: transparent;
             span.kimios-button-text {
                 color: map-get($accent, 500);
