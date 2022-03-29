@@ -6,8 +6,19 @@
     >
     </users-and-groups-selection-panel>
 
-    <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions>
-        <button mat-button (click)="submit()"><mat-icon>check</mat-icon></button>
-        <button mat-button (click)="onNoClick()"><mat-icon>cancel</mat-icon></button>
+    <div  fxLayout="row" fxLayoutAlign="center center" mat-dialog-actions fxLayoutGap="20px" [ngClass]="'button-box'">
+        <button [ngClass]="'kimios-button discreet'"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                (click)="onNoClick()" >
+            <span [class.kimios-button-text]="true">CANCEL</span>
+        </button>
+        <button [ngClass]="'kimios-button highlight'"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                (click)="submit()"
+                cdkFocusInitial >
+            <span [class.kimios-button-text]="true">SAVE</span>
+        </button>
     </div>
 </div>

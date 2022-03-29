@@ -64,9 +64,20 @@
 
           </mat-table>
 
-                <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" >
-                    <button mat-button (click)="submit($event)"><mat-icon>check</mat-icon></button>
-                    <button mat-button (click)="cancel($event)"><mat-icon>cancel</mat-icon></button>
+                <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px" [ngClass]="'button-box'">
+                    <button [ngClass]="'kimios-button discreet'"
+                            fxLayout="row"
+                            fxLayoutAlign="center center"
+                            (click)="cancel($event)" >
+                        <span [class.kimios-button-text]="true">CANCEL</span>
+                    </button>
+                    <button [ngClass]="'kimios-button highlight'"
+                            fxLayout="row"
+                            fxLayoutAlign="center center"
+                            (click)="submit($event)"
+                            cdkFocusInitial >
+                        <span [class.kimios-button-text]="true">SAVE</span>
+                    </button>
                 </div>
 
             </div>

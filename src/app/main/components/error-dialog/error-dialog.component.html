@@ -9,6 +9,12 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <div fxLayout="row" fxLayoutAlign="center center" style="width: 100%">
-    <button mat-button (click)="okClick()" cdkFocusInitial>Ok</button>
+    <button [ngClass]="'kimios-button discreet'"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            (click)="okClick()"
+            cdkFocusInitial >
+      <span [class.kimios-button-text]="true">OK</span>
+    </button>
   </div>
 </mat-dialog-actions>

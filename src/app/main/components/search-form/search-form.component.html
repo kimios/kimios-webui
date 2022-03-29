@@ -290,8 +290,19 @@
            fxFlex
            style="margin-top: 20px !important;">
 
-          <button type="button" (click)="resetForm()" mat-icon-button><mat-icon>cancel</mat-icon></button>
-          <button type="submit" mat-icon-button><mat-icon>check</mat-icon></button>
+          <button [ngClass]="'kimios-button discreet'"
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  (click)="resetForm()" >
+            <span [class.kimios-button-text]="true">CANCEL</span>
+          </button>
+          <button [ngClass]="'kimios-button highlight'"
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  type="submit"
+                  cdkFocusInitial >
+            <span [class.kimios-button-text]="true">SEARCH</span>
+          </button>
         </div>
         <div style="width: 50px;">
 
