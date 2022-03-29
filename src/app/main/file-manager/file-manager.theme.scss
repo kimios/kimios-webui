@@ -100,6 +100,7 @@
         }
 
         &.discreet {
+            background-color: transparent;
             border-color: transparent;
             span.kimios-button-text {
                 color: map-get($accent, 500);
