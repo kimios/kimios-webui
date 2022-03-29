@@ -155,7 +155,9 @@ export class DocumentMetaDataComponent implements OnInit {
         meta.uid.toString(),
         this.fb.control(
           documentMetasMap && documentMetasMap.get(meta.uid) ?
-            documentMetasMap.get(meta.uid) :
+            meta.metaType === 3 ?
+              (new Date(Number(documentMetasMap.get(meta.uid)))) :
+              documentMetasMap.get(meta.uid) :
             null,
           this.determineValidator(meta)
         )
@@ -213,7 +215,9 @@ export class DocumentMetaDataComponent implements OnInit {
       if (this.documentTypeMetas.filter(m => m.uid.toString() === metaUidStr)[0].metaType === 3
       && metaValues[metaUidStr] != null
       && metaValues[metaUidStr] !== '') {
-        metaValues[metaUidStr] = (metaValues[metaUidStr] as Moment).milliseconds();
+        metaValues[metaUidStr] = metaValues[metaUidStr]._d ?
+          metaValues[metaUidStr]._d.getTime() :
+          metaValues[metaUidStr].getTime();
       }
     });
     this.documentVersionRestOnlyService.updateDocumentMetaData(
@@ -224,7 +228,19 @@ export class DocumentMetaDataComponent implements OnInit {
           documentTypeUid: documentTypeUid,
           metaValues: metaValues
         }
-    ).subscribe();
+    ).subscribe(
+      null,
+      null,
+      () => {
+        Object.keys(metaValues).forEach(metaUidStr => {
+          if (this.documentTypeMetas.filter(m => m.uid.toString() === metaUidStr)[0].metaType === 3
+            && metaValues[metaUidStr] != null
+            && metaValues[metaUidStr] !== '') {
+            this.formGroup.get('metas').get(metaUidStr).setValue(new Date(metaValues[metaUidStr]));
+          }
+        });
+      }
+    );
   }
 
   cancel($event: MouseEvent): void {
