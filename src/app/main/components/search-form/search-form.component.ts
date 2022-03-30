@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, combineLatest, iif, Observable, of} from 'rxjs';
 
 import {
@@ -54,6 +54,9 @@ export class SearchFormComponent implements OnInit {
   addOnBlur = false;
   selectedDocumentType: KimiosDocumentType = null;
   showForm: boolean;
+
+  @Input()
+  docNameSearch: string;
 
   constructor(
       private fb: FormBuilder,
@@ -134,12 +137,21 @@ export class SearchFormComponent implements OnInit {
       this.searchEntityService.loadQuery(this.searchEntityService.currentSearchEntityQuery);
       this.initFormFromQuery(this.searchFormGroup, this.searchEntityService.currentSearchEntityQuery);
     }
+
+    if (this.docNameSearch != null
+      && this.docNameSearch !== undefined
+      && this.docNameSearch !== '') {
+      this.searchFormGroup.get('name').setValue(this.docNameSearch);
+      this.onSubmit(null);
+    }
   }
 
   onSubmit($event: any): void {
-    $event.preventDefault();
-    $event.stopPropagation();
-    $event.stopImmediatePropagation();
+    if ($event != null) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      $event.stopImmediatePropagation();
+    }
     this.searchEntityService.searchWithFiltersAndSetCurrentQuery(
         this.searchFormGroup.get('content').value,
         this.searchFormGroup.get('name').value,

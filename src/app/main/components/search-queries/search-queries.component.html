@@ -5,7 +5,7 @@
          fxLayoutAlign="start"
          [ngClass]="'kimios-search-queries-form'"
     >
-      <search-form></search-form>
+      <search-form [docNameSearch]="docNameSearch" ></search-form>
     </div>
     <div #paginator style="margin-top: 10px;">
       <mat-paginator

@@ -10,7 +10,14 @@
         </label>
 
         <input id="fuse-search-bar-input" class="ml-24" type="text" placeholder="Search" (input)="search($event)"
-               fxFlex>
+               fxFlex [matAutocomplete]="autoDataSearch" (keyup.enter)="goToSearch($event)" >
+
+        <mat-autocomplete #autoDataSearch="matAutocomplete" fxFlex="40">
+            <mat-option *ngFor="let doc of filteredDocs" placeholder="Document name" value=""
+                        (click)="goToDoc(doc)" >
+                <span>{{doc.name}}</span>
+            </mat-option>
+        </mat-autocomplete>
 
         <button mat-icon-button class="fuse-search-bar-collapser" (click)="collapse()"
                 aria-label="Collapse Search Bar">

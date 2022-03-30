@@ -118,7 +118,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
         this.urlSectionTitleMapping.set('shares', 'Shares');
         this.urlSectionTitleMapping.set('settings', 'Settings');
         this.urlSectionTitleMapping.set('cart', 'Cart');
-        this.urlSectionTitleMapping.set('overview', 'Overview');
+        // this.urlSectionTitleMapping.set('overview', 'Overview');
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -150,10 +150,24 @@ export class ToolbarComponent implements OnInit, OnDestroy
             );
 
         this.searchTerms.pipe(
+            takeUntil(this._unsubscribeAll),
             debounceTime(300),
             distinctUntilChanged(),
             switchMap(
-                value => this.searchEntityService.searchInContent(value)
+                value => this.searchEntityService.searchWithFiltersAndSetCurrentQuery(
+                  null,
+                  value,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  false,
+                  true
+                )
             ),
             catchError(error => {
                 // TODO: real error handling

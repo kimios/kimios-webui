@@ -15,7 +15,7 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {SessionService} from './session.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {TAG_META_DATA_PREFIX, TagService} from './tag.service';
-import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
 import {Tag} from 'app/main/model/tag';
 import {SearchEntityQuery} from 'app/main/model/search-entity-query';
 import {DatePipe} from '@angular/common';
@@ -61,6 +61,7 @@ export class SearchEntityService implements Resolve<any> {
     private query: string;
     private _criterias: Criteria[];
     public currentSearchEntityQuery: SearchEntityQuery;
+    public documentListForAutoComplete$: BehaviorSubject<Array<KimiosDocumentType>>;
 
     static compare(a: number | string, b: number | string, isAsc: boolean): number {
 
@@ -94,6 +95,7 @@ export class SearchEntityService implements Resolve<any> {
         this.onSortChanged = new BehaviorSubject({});
         this._pageSize = PAGE_SIZE_DEFAULT;
         this._criterias = new Array<Criteria>();
+        this.documentListForAutoComplete$ = new BehaviorSubject<Array<DocumentType>>(new Array<DocumentType>());
     }
 
     /**
@@ -285,7 +287,8 @@ export class SearchEntityService implements Resolve<any> {
         dateMax: Date,
         documentType: KimiosDocumentType,
         metas: Array<MetaWithValue>,
-        onlyTags = false
+        onlyTags = false,
+        pushToAutoComplete = false
     ): Observable<DMEntity[]> {
         this.currentSearchEntityQuery = <SearchEntityQuery> {
             name: filename,
@@ -312,6 +315,12 @@ export class SearchEntityService implements Resolve<any> {
             documentType != null ? documentType.uid : null,
             metas,
             onlyTags
+        ).pipe(
+          tap(documentList => {
+              if (pushToAutoComplete === true) {
+                  this.documentListForAutoComplete$.next(documentList);
+              }
+          })
         );
     }
 
@@ -347,7 +356,8 @@ export class SearchEntityService implements Resolve<any> {
         if (filename) {
             criterias = criterias.concat(this.filenameTermsToCriterias(filename));
         }
-        if (tagList.length > 0) {
+        if (tagList != null
+            && tagList.length > 0) {
             criterias.push({
                 fieldName: 'DocumentTags',
                 query: tagList.join('||')

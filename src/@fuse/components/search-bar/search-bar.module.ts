@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { MatButtonModule, MatIconModule } from '@angular/material';
+import {MatAutocompleteModule, MatButtonModule, MatIconModule} from '@angular/material';
 
 import { FuseSearchBarComponent } from './search-bar.component';
 
@@ -10,13 +10,14 @@ import { FuseSearchBarComponent } from './search-bar.component';
     declarations: [
         FuseSearchBarComponent
     ],
-    imports     : [
-        CommonModule,
-        RouterModule,
+  imports: [
+    CommonModule,
+    RouterModule,
 
-        MatButtonModule,
-        MatIconModule
-    ],
+    MatButtonModule,
+    MatIconModule,
+    MatAutocompleteModule
+  ],
     exports     : [
         FuseSearchBarComponent
     ]

@@ -124,9 +124,14 @@ const fileManagerRoutes: Routes = [
         canActivate: [ LoggedInGuard ]
     },
     {
-        path: 'searchqueries',
+        path: 'searchqueries/:docNameSearch',
         component: SearchQueriesComponent,
         canActivate: [ LoggedInGuard ]
+    },
+    {
+      path: 'searchqueries',
+      component: SearchQueriesComponent,
+      canActivate: [ LoggedInGuard ]
     },
     {
         path: 'settings',

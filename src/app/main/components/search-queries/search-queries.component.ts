@@ -1,8 +1,9 @@
-import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {PAGE_SIZE_DEFAULT, SearchEntityService} from 'app/services/searchentity.service';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {SearchEntityService} from 'app/services/searchentity.service';
 import {BehaviorSubject} from 'rxjs';
 import {PageEvent} from '@angular/material';
 import {isNumber} from 'util';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-search-queries',
@@ -20,12 +21,17 @@ export class SearchQueriesComponent implements OnInit {
   pageIndex: number;
   pageSizeOptions = [5, 10, 20];
 
+  @Input()
+  docNameSearch: string;
+
   @ViewChild('kimiosContentArea') kimiosContentArea: ElementRef;
   @ViewChild('paginator') paginator: ElementRef;
   @ViewChild('fileListContainer') fileListContainer: ElementRef;
 
+
   constructor(
-      private searchEntityService: SearchEntityService
+      private searchEntityService: SearchEntityService,
+      private route: ActivatedRoute,
   ) {
     this.totalFilesFound$ = new BehaviorSubject<number>(undefined);
     this.pageSize = this.searchEntityService.pageSize;
@@ -39,6 +45,12 @@ export class SearchQueriesComponent implements OnInit {
     this.searchEntityService.onTotalFilesChanged.subscribe(
         res => this.totalFilesFound$.next(isNumber(res) ? res : undefined)
     );
+
+    this.docNameSearch = this.route.snapshot.paramMap.get('docNameSearch');
+    if (this.docNameSearch != null
+      && this.docNameSearch !== undefined) {
+
+    }
   }
 
   paginatorHandler($event: PageEvent): void {
