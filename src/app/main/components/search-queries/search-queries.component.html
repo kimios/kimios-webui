@@ -1,13 +1,14 @@
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
 
-  <div #kimiosContentArea [ngClass]="'kimios-content-area'" fxLayout="column" style="overflow-y: auto;">
+  <div #kimiosContentArea [ngClass]="'kimios-content-area radius'" fxLayout="column" style="overflow-y: auto;">
     <div fxLayout="row"
          fxLayoutAlign="start"
          [ngClass]="'kimios-search-queries-form'"
     >
       <search-form [docNameSearch]="docNameSearch" ></search-form>
     </div>
-    <div #paginator style="margin-top: 10px;">
+    <mat-divider></mat-divider>
+    <div #paginator >
       <mat-paginator
               [length]="totalFilesFound$ | async"
               [pageSize]="pageSize"
@@ -18,7 +19,7 @@
       </mat-paginator>
       <mat-divider></mat-divider>
     </div>
-    <div #fileListContainer>
+    <div #fileListContainer style="overflow-y: auto;">
       <file-list></file-list>
     </div>
   </div>
