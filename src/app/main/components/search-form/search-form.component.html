@@ -271,18 +271,9 @@
 
     <div>
       <div fxLayout="row"
-           fxLayoutAlign="start start"
+           fxLayoutAlign="start stretch"
            fxLayoutGap="20px"
            fxFlex>
-        <div style="width: 50px;">
-            <button
-                    mat-icon-button
-                    (click)="toggleShowForm($event)"
-                    title="{{showForm ? 'Hide search form' : 'Show search form'}}"
-                    type="button">
-              <mat-icon>{{showForm ? 'expand_less' : 'expand_more'}}</mat-icon>
-              </button>
-        </div>
         <div *ngIf="showForm"
            fxLayout="row"
            fxLayoutAlign="center center"
@@ -304,10 +295,18 @@
             <span [class.kimios-button-text]="true">SEARCH</span>
           </button>
         </div>
-        <div style="width: 50px;">
-
-        </div>
       </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <button
+              mat-icon-button
+              (click)="toggleShowForm($event)"
+              title="{{showForm ? 'Hide search form' : 'Show search form'}}"
+              type="button">
+        <mat-icon>{{showForm ? 'expand_less' : 'expand_more'}}</mat-icon>
+      </button>
+      <mat-divider fxFlex *ngIf="showForm" ></mat-divider>
     </div>
 
   </div>
