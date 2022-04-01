@@ -280,13 +280,35 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
   }
 
   handleFileInput(files: FileList): void {
+    const filesMap = this.computeFilePathMap(files);
+    this.openFilesUploadDialog(filesMap, null);
+  }
+
+  computeFilePathMap(files: FileList):  Map<string, File[]> {
     const filesMap = new Map<string, Array<File>>();
-    filesMap.set('', new Array<File>());
+
     for (let i = 0; i < files.length; i++) {
-      filesMap.get('').push(files.item(i));
+      const fileItem = files.item(i);
+      const relativePath = fileItem['webkitRelativePath'];
+      if (relativePath === '') {
+        if (filesMap.get('') == null) {
+          filesMap.set('', new Array<File>());
+        }
+        filesMap.get('').push(fileItem);
+      } else {
+        const splitTab = relativePath.toString().split('/');
+        if (splitTab.length > 1) {
+          splitTab.splice(splitTab.length - 1, 1);
+          const fileRelativePath = splitTab.join('/') + '/';
+          if (filesMap.get(fileRelativePath) == null) {
+            filesMap.set(fileRelativePath, new Array<File>());
+          }
+          filesMap.get(fileRelativePath).push(fileItem);
+        }
+      }
     }
 
-    this.openFilesUploadDialog(filesMap, null);
+    return filesMap;
   }
 
   handleDrop(event: Event): boolean {

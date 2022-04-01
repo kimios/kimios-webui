@@ -23,13 +23,21 @@
           <input hidden type="file" #fileInput (change)="handleFileInput($event.target.files)"
                  multiple="multiple"
           />
+          <input hidden type="file" #fileInputFolder (change)="handleFileInput($event.target.files)"
+                 multiple="multiple" webkitdirectory
+          />
           <!--              webkitdirectory=""
           directory=""-->
         </form>
-        <button mat-button>
-          <mat-icon class="cursor-pointer"
-                    (click)="fileInput.click($event.target.files)">cloud_upload</mat-icon>
+
+        <button mat-button [matMenuTriggerFor]="menuInputType">
+          <mat-icon class="cursor-pointer">cloud_upload</mat-icon>
         </button>
+        <mat-menu #menuInputType="matMenu">
+          <button mat-menu-item (click)="fileInput.click($event.target.files)">Files</button>
+          <button mat-menu-item (click)="fileInputFolder.click($event.target.files)">Directories</button>
+        </mat-menu>
+
       </div>
       <ng-container *ngIf="isWorkspaceCreator | async as isWC">
         <ng-container *ngIf="isWC">
