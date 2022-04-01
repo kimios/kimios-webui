@@ -431,6 +431,12 @@ export class EntityCacheService {
   }
 
   private initContainerEntityInCache(entityUid: number): Observable<DMEntity> {
+    console.log('initContainerEntityInCache( ' + entityUid + ' )' );
+
+    if (this.getEntity(entityUid) != null) {
+      console.log('not null' );
+      return of(null);
+    }
 
     return this.retrieveContainerEntity(entityUid).pipe(
       tap(entity => {
@@ -677,7 +683,8 @@ export class EntityCacheService {
 
   private appendFolderToParent(folder: Folder): void {
     // parent must have been loaded
-    if (this.entitiesHierarchyCache.get(folder.parentUid) != null) {
+    if (this.entitiesHierarchyCache.get(folder.parentUid) != null
+    && ! this.entitiesHierarchyCache.get(folder.parentUid).includes(folder.uid)) {
       this.entitiesHierarchyCache.get(folder.parentUid).push(folder.uid);
     }
   }
@@ -741,6 +748,9 @@ export class EntityCacheService {
       return of(false);
     } else {
       this.entitiesCache.set(document.uid, new DocumentCacheData(document));
+      if (this.entitiesHierarchyCache.get(document.folderUid) == null) {
+        this.entitiesHierarchyCache.set(document.folderUid, new Array<number>());
+      }
       this.entitiesHierarchyCache.get(document.folderUid).push(document.uid);
       this.newEntity$.next(document);
       return of(true);
@@ -829,9 +839,12 @@ export class EntityCacheService {
   }
 
   handleFolderCreated(dmEntityId: number): void {
-    this.initContainerEntityInCache(dmEntityId).pipe(
-      tap(() => this.folderCreated$.next(dmEntityId))
-    ).subscribe();
+    if (dmEntityId !== undefined) {
+      this.initContainerEntityInCache(dmEntityId).pipe(
+        filter(entity => entity != null),
+        tap(() => this.folderCreated$.next(dmEntityId))
+      ).subscribe();
+    }
   }
 
   handleFolderUpdated(dmEntityId: number): void {
