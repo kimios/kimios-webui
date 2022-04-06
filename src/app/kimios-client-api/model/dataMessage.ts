@@ -9,12 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { DMEntity } from './dMEntity';
+import {DMEntityWrapper} from './dMEntityWrapper';
 
 
 export interface DataMessage { 
     token?: string;
     sessionId?: string;
-    dmEntityList?: Array<DMEntity>;
+    dmEntityList?: Array<DMEntityWrapper>;
     parentUid?: number;
 }

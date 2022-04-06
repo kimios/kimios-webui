@@ -6,9 +6,11 @@ import {concatMap, map, tap, toArray} from 'rxjs/operators';
 import {LockPossibility} from 'app/main/model/lock-possibility';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {UserOrGroup} from 'app/main/model/user-or-group';
+import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {User} from 'app/kimios-client-api/model/user';
 import {EntityCacheService} from './entity-cache.service';
 import {UsersCacheService} from './users-cache.service';
+import {DMEntityWrapper} from '../kimios-client-api/model/dMEntityWrapper';
 
 export interface SecurityEnt {
   read: boolean;
@@ -68,7 +70,12 @@ export class CacheSecurityService {
   private computeLockPossibility(docId: number): Observable<LockPossibility> {
     return this.sessionService.getCurrentUserObs().pipe(
         concatMap(currentUser => combineLatest(of(currentUser), this.entityCacheService.findDocumentInCache(docId))),
-        concatMap(([currentUser, doc]) => combineLatest(of(currentUser), of(doc), this.getSecurityEnt(doc.uid))),
+        concatMap(([currentUser, docWrapper]) =>
+          combineLatest(
+            of(currentUser),
+            of((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument),
+            this.getSecurityEnt(docWrapper.dmEntity.uid))
+        ),
         concatMap(([currentUser, doc, secEnt]) => {
           let lockPossibility: LockPossibility = null;
           if (doc.checkedOut) {

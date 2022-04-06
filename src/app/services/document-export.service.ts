@@ -68,7 +68,7 @@ export class DocumentExportService {
     };
     return this.entityCacheService.findEntityChildrenInCache(entity.uid, false).pipe(
         concatMap(children => children),
-        concatMap(child => this.makeNodeFromDMEntity(child)),
+        concatMap(childWrapper => this.makeNodeFromDMEntity(childWrapper.dmEntity)),
         tap(nodeChild => node.children.push(nodeChild)),
         toArray(),
         map(() => node)

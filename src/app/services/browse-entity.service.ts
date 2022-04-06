@@ -12,6 +12,7 @@ import {DocumentUtils} from 'app/main/utils/document-utils';
 import {Router} from '@angular/router';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {EntityCacheService} from './entity-cache.service';
+import {DMEntityWrapper} from '../kimios-client-api/model/dMEntityWrapper';
 
 export const PAGE_SIZE_DEFAULT = 20;
 
@@ -29,8 +30,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     public selectedFolder$: BehaviorSubject<DMEntity>;
     public onAddedChildToEntity$: Subject<number>;
 
-    public totalEntitiesToDisplay$: BehaviorSubject<DMEntity[]>;
-    public entitiesToDisplay$: BehaviorSubject<DMEntity[]>;
+    public totalEntitiesToDisplay$: BehaviorSubject<DMEntityWrapper[]>;
+    public entitiesToDisplay$: BehaviorSubject<DMEntityWrapper[]>;
 
     public entitiesPath: Map<number, DMEntity[]>;
     public entitiesPathId: number[];
@@ -98,8 +99,8 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       this.historyHasForward = new BehaviorSubject<boolean>(false);
       this.historyHasBackward = new BehaviorSubject<boolean>(false);
 
-      this.totalEntitiesToDisplay$ = new BehaviorSubject<DMEntity[]>([]);
-      this.entitiesToDisplay$ = new BehaviorSubject<DMEntity[]>([]);
+      this.totalEntitiesToDisplay$ = new BehaviorSubject<DMEntityWrapper[]>([]);
+      this.entitiesToDisplay$ = new BehaviorSubject<DMEntityWrapper[]>([]);
 
       this.pageIndex = new BehaviorSubject<number>(0);
       this.pageSize = PAGE_SIZE_DEFAULT;
@@ -217,7 +218,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
         );
 
-        this.explorerMode.pipe(
+        /*this.explorerMode.pipe(
             filter(next => next === EXPLORER_MODE.SEARCH),
             concatMap(
                 next => this.searchEntityService.onFilesChanged
@@ -231,7 +232,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             map(
                 next => this.length.next(next)
             )
-        ).subscribe();
+        ).subscribe();*/
     }
 
     setCurrentPathForEntityUid(uid: number): void {
@@ -363,45 +364,52 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             this.entitiesToDisplay$.next(entitiesSorted.slice(indexBeginning, indexEnd));
         } else {
             this.searchEntityService.changePage(this.pageIndex.getValue(), this.pageSize).subscribe(
-                next => this.entitiesToDisplay$.next(next)
+                next => this.entitiesToDisplay$.next(
+                  next.map(entity => <DMEntityWrapper> {
+                    dmEntity: entity,
+                    canRead: null,
+                    canWrite: null,
+                    hasFullAccess: null
+                  })
+                )
             );
         }
         this.loading$.next(false);
     }
 
-    private sortEntities(entities: Array<DMEntity>, sort: DMEntitySort): Array<DMEntity> {
+    private sortEntities(entities: Array<DMEntityWrapper>, sort: DMEntitySort): Array<DMEntityWrapper> {
         let fun = null;
         const sortOp = (sort.direction === 'asc') ? 1 : -1;
         switch (sort.name) {
             case 'name':
                 fun = (a, b) => {
-                    return sortOp * (a.name.localeCompare(b.name));
+                    return sortOp * (a.dmEntity.name.localeCompare(b.dmEntity.name));
                 };
                 break;
             case 'extension':
                 fun = (a, b) => {
                     let ret = -1;
-                    if (a.extension == null) {
-                        if (b.extension == null) {
+                    if (a.dmEntity.extension == null) {
+                        if (b.dmEntity.extension == null) {
                             ret = 0;
                         } else {
                             ret = 1;
                         }
                     } else {
-                        if (b.extension == null) {
+                        if (b.dmEntity.extension == null) {
                             ret = -1;
                         } else {
-                            ret = a.extension.localeCompare(b.extension);
+                            ret = a.dmEntity.extension.localeCompare(b.dmEntity.extension);
                         }
                     }
                     return ret === 0 ?
-                            a.name.localeCompare(b.name) :
+                            a.dmEntity.name.localeCompare(b.dmEntity.name) :
                             sortOp * ret;
                 };
                 break;
             case 'updateDate':
                 fun = (a, b) => {
-                    return sortOp * (a.updateDate < b.updateDate ? -1 : 1);
+                    return sortOp * (a.dmEntity.updateDate < b.dmEntity.updateDate ? -1 : 1);
                 };
                 break;
             default :
@@ -439,7 +447,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       return this.documentService.deleteDocument(this.sessionService.sessionToken, uid);
     }
 
-    updateListAfterDelete(entity: DMEntity): Observable<Array<DMEntity>> {
+    updateListAfterDelete(entity: DMEntity): Observable<Array<DMEntityWrapper>> {
         let parentUid: number;
         if (entity['parentUid']) {
             parentUid = entity['parentUid'];
@@ -453,7 +461,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
           tap(() => {
             // this.selectedEntity$.next(this.entities.get(parentUid));
             const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-            const idx = totalEntities.findIndex(elem => elem.uid === entity.uid);
+            const idx = totalEntities.findIndex(elem => elem.dmEntity.uid === entity.uid);
             if (idx !== -1) {
               totalEntities.splice(idx, 1);
               this.totalEntitiesToDisplay$.next(totalEntities);
@@ -467,7 +475,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         );
     }
 
-    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity, movedEntityInitialParentUid?: number): Observable<Array<DMEntity>> {
+    updateListAfterMove(entityMoved: DMEntity, entityTarget: DMEntity, movedEntityInitialParentUid?: number): Observable<Array<DMEntityWrapper>> {
         let parentUid: number;
         if (entityMoved['parentUid']) {
             parentUid = entityMoved['parentUid'];
@@ -484,7 +492,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
         ),
         tap(() => {
           const totalEntities = this.totalEntitiesToDisplay$.getValue().slice();
-          const idx = totalEntities.findIndex(elem => elem.uid === entityMoved.uid);
+          const idx = totalEntities.findIndex(elem => elem.dmEntity.uid === entityMoved.uid);
           const currentPathValue = this.currentPath.getValue();
           if (movedEntityInitialParentUid === currentPathValue[currentPathValue.length - 1].uid) {
             if (idx !== -1) {
@@ -492,7 +500,9 @@ export class BrowseEntityService implements OnInit, OnDestroy {
             }
           } else {
             if (entityTarget.uid === currentPathValue[currentPathValue.length - 1].uid) {
-              totalEntities.push(entityMoved);
+              const entityMovedCacheData = this.entityCacheService.getEntityCacheData(entityMoved.uid);
+              const entityMovedWrapper = this.entityCacheService.entityCacheDataToDMEntityWrapper(entityMovedCacheData);
+              totalEntities.push(entityMovedWrapper);
             }
           }
           this.totalEntitiesToDisplay$.next(totalEntities);
@@ -642,10 +652,10 @@ export class BrowseEntityService implements OnInit, OnDestroy {
     this.makePage(this.pageIndex.getValue(), this.pageSize, this.sort);
   }
 
-  addEntityToCurrentEntitiesToDisplay(entity: DMEntity): boolean {
+  addEntityToCurrentEntitiesToDisplay(entity: DMEntityWrapper): boolean {
     let ret = false;
     const currentEntities = this.totalEntitiesToDisplay$.getValue();
-    if (currentEntities.findIndex(element => element.uid === entity.uid) === -1) {
+    if (currentEntities.findIndex(element => element.dmEntity.uid === entity.dmEntity.uid) === -1) {
       currentEntities.push(entity);
       this.totalEntitiesToDisplay$.next(currentEntities);
       ret = true;
@@ -656,7 +666,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
 
   updateListOnDelete(dmEntityId: number): void {
       const totalEntities = this.totalEntitiesToDisplay$.getValue();
-      const idx = totalEntities.findIndex(entity => entity.uid === dmEntityId);
+      const idx = totalEntities.findIndex(entity => entity.dmEntity.uid === dmEntityId);
       if (idx !== -1) {
         totalEntities.splice(idx, 1);
         this.totalEntitiesToDisplay$.next(totalEntities);

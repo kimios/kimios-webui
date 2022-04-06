@@ -233,8 +233,8 @@ export class FileUploadService {
                         const newDocId = res['message'];
                         this.entityCacheService.findDocumentInCache(newDocId)
                             .subscribe(
-                                kimiosDocument => {
-                                    this.filesUploadedDocuments.get(uploadId).next(kimiosDocument);
+                                kimiosDocumentWrapper => {
+                                    this.filesUploadedDocuments.get(uploadId).next(kimiosDocumentWrapper.dmEntity as KimiosDocument);
                                 }
                             );
                         if (tags

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {concatMap, filter, tap} from 'rxjs/operators';
+import {concatMap, filter, map, tap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
@@ -28,6 +28,7 @@ export class FileDetailDataAndTagsComponent implements OnInit {
     this.document$ = this.documentId$.pipe(
       filter(docId => docId != null),
       concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
+      map(documentWrapper => documentWrapper.dmEntity as KimiosDocument)
     );
 
     if (this.documentId == null) {

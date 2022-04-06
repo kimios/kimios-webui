@@ -63,7 +63,8 @@ export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
     this.document$ = this.documentDetailService.currentDocumentId$.pipe(
       filter(docId => docId != null),
       tap(docId => this.documentId = docId),
-      concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId))
+      concatMap(documentId => this.entityCacheService.findDocumentInCache(documentId)),
+      map(documentWrapper => documentWrapper.dmEntity)
     );
 
     this.document$.pipe(

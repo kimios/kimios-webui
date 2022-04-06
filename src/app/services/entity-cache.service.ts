@@ -8,7 +8,7 @@ import {
   DocumentVersionService,
   Folder,
   FolderService,
-  MetaValue,
+  MetaValue, SecurityService,
   Workspace,
   WorkspaceService
 } from 'app/kimios-client-api';
@@ -21,6 +21,8 @@ import {FolderUidListParam} from 'app/kimios-client-api/model/folderUidListParam
 import {CacheService} from './cache.service';
 import {DataMessageImpl} from 'app/main/model/data-message-impl';
 import {CacheSubjectsService} from './cache-subjects.service';
+import {DMEntityWrapper} from '../kimios-client-api/model/dMEntityWrapper';
+import {EntityPermissions} from '../main/model/entity-permissions';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +34,7 @@ export class EntityCacheService {
   private allTags: Map<string, number>;
   private bookmarks: Array<Bookmark>;
   public reloadedEntity$: BehaviorSubject<DMEntity>;
-  public newEntity$: BehaviorSubject<DMEntity>;
+  public newEntity$: BehaviorSubject<DMEntityWrapper>;
   public folderWithChildren$: Subject<DMEntity>;
   public chosenParentUid$: Subject<number>;
   private _intervalId: number;
@@ -55,13 +57,14 @@ export class EntityCacheService {
       private workspaceService: WorkspaceService,
       private folderService: FolderService,
       private cacheService: CacheService,
-      private cacheSubjectsService: CacheSubjectsService
+      private cacheSubjectsService: CacheSubjectsService,
+      private securityService: SecurityService
   ) {
     this.entitiesCache = new Map<number, EntityCacheData>();
     this.allTags = null;
     this.entitiesHierarchyCache = new Map<number, Array<number>>();
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
-    this.newEntity$ = new BehaviorSubject<DMEntity>(null);
+    this.newEntity$ = new BehaviorSubject<DMEntityWrapper>(null);
     this.chosenParentUid$ = new Subject<number>();
     this.folderWithChildren$ = new Subject<DMEntity>();
 
@@ -191,15 +194,24 @@ export class EntityCacheService {
     this.entitiesCache.set(uid, documentCacheData);
   }
 
-  findDocumentInCache(uid: number): Observable<KimiosDocument> {
+  findDocumentInCache(uid: number): Observable<DMEntityWrapper> {
     const documentInCache = this.getDocumentCacheData(uid);
 
     return documentInCache == null ?
         this.initDocumentInCache(uid).pipe(
-          tap(document => this.appendDocumentToFolder(document)),
-          tap(document => this.newEntity$.next(document))
+          tap(documentWrapper => this.appendDocumentToFolder(documentWrapper.dmEntity as KimiosDocument)),
+          tap(documentWrapper => this.newEntity$.next(documentWrapper))
         ) :
-        of(documentInCache.entity as KimiosDocument);
+        of(this.entityCacheDataToDMEntityWrapper(documentInCache));
+  }
+
+  public entityCacheDataToDMEntityWrapper(entityCacheData: EntityCacheData): DMEntityWrapper {
+    return <DMEntityWrapper> {
+      dmEntity: entityCacheData.entity as KimiosDocument,
+      canRead: entityCacheData.canRead,
+      canWrite: entityCacheData.canWrite,
+      hasFullAccess: entityCacheData.hasFullAccess
+    };
   }
 
   findDocumentVersionsInCache(uid: number, reload = false): Observable<Array<DocumentVersionWithMetaValues>> {
@@ -219,11 +231,32 @@ export class EntityCacheService {
 
   private initDocumentDataInCache(uid: number): Observable<DocumentCacheData> {
     return this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
-      concatMap(doc => doc == null ? of(null) : of(new DocumentCacheData(doc)))
+      concatMap(doc =>  doc != null ?
+        combineLatest(of(doc), this.retrievePermissions((doc as KimiosDocument).uid)) :
+        combineLatest(of(null), of(null))
+      ),
+      concatMap(([doc, permissions]) => doc == null ?
+        of(null) :
+        of(new DocumentCacheData(doc, permissions.canRead, permissions.canWrite, permissions.hasFullAccess))
+      ),
+    );
+  }
+  
+  retrievePermissions(uid: number): Observable<EntityPermissions> {
+    return combineLatest(
+      this.securityService.canRead(this.sessionService.sessionToken, uid),
+      this.securityService.canWrite(this.sessionService.sessionToken, uid),
+      this.securityService.hasFullAccess(this.sessionService.sessionToken, uid)
+    ).pipe(
+      map(([read, write, fullAccess]) => <EntityPermissions>{
+        canRead: read,
+        canWrite: write,
+        hasFullAccess: fullAccess
+      })
     );
   }
 
-  private initDocumentInCache(uid: number): Observable<KimiosDocument> {
+  private initDocumentInCache(uid: number): Observable<DMEntityWrapper> {
     return this.initBookmarks().pipe(
       concatMap(() => this.documentService.getDocument(this.sessionService.sessionToken, uid)),
       map(entity => {
@@ -235,11 +268,24 @@ export class EntityCacheService {
         }
         return entity;
       }),
-      tap(entity => {
-        if (entity != null && entity !== undefined && entity !== '') {
+      concatMap(entity => entity != null ?
+        combineLatest(of(entity), this.retrievePermissions(entity.uid)) :
+        of(null)
+      ),
+      map(([entity, permissions]) => entity != null && entity !== undefined && entity !== '' ?
+        <DMEntityWrapper> {
+          dmEntity: entity,
+          canRead: permissions.canRead,
+          canWrite: permissions.canWrite,
+          hasFullAccess: permissions.hasFullAccess
+        } :
+        null
+      ),
+      tap((entityWrapper) => {
+        if (entityWrapper != null) {
           this.entitiesCache.set(
-            entity.uid,
-            new DocumentCacheData(entity)
+            entityWrapper.dmEntity.uid,
+            new DocumentCacheData(entityWrapper.dmEntity, entityWrapper.canRead, entityWrapper.canWrite, entityWrapper.hasFullAccess)
           );
         }
       })
@@ -274,23 +320,29 @@ export class EntityCacheService {
     );
   }
 
-  public findEntityChildrenInCache(uidParam: number, onlyContainers: boolean): Observable<Array<Folder | KimiosDocument>> {
+  public findEntityChildrenInCache(uidParam: number, onlyContainers: boolean): Observable<Array<DMEntityWrapper>> {
     const idInHierarchy = uidParam == null ? 0 : uidParam;
     return from(of(uidParam)).pipe(
       concatMap(uid =>
         (this.entitiesHierarchyCache.get(idInHierarchy) == null
           || this.entitiesHierarchyCache.get(idInHierarchy) === undefined) ?
           this.initHierarchyCacheForEntity(uid) :
-          of(this.entitiesHierarchyCache.get(idInHierarchy).map(entityUid => this.entitiesCache.get(entityUid).entity))
+          of(
+            this.entitiesHierarchyCache.get(idInHierarchy)
+              .map(entityUid => this.entityCacheDataToDMEntityWrapper(this.entitiesCache.get(entityUid)))
+          )
       ),
       concatMap(entityList => onlyContainers === true ?
-        of(entityList.filter(entity => DMEntityUtils.dmEntityIsFolder(entity) || DMEntityUtils.dmEntityIsWorkspace(entity))) :
+        of(entityList.filter(entityWrapper =>
+          DMEntityUtils.dmEntityIsFolder(entityWrapper.dmEntity)
+          || DMEntityUtils.dmEntityIsWorkspace(entityWrapper.dmEntity)
+        )) :
         of(entityList)
       )
     );
   }
 
-  public reloadEntityChildren(uid: number): Observable<Array<DMEntity>> {
+  public reloadEntityChildren(uid: number): Observable<Array<DMEntityWrapper>> {
     return this.initHierarchyCacheForEntity(uid);
   }
 
@@ -317,7 +369,7 @@ export class EntityCacheService {
     this.entitiesCache.delete(uid);
   }
 
-  private initHierarchyCacheForEntity(uid: number): Observable<Array<Folder | Workspace>> {
+  private initHierarchyCacheForEntity(uid: number): Observable<Array<DMEntityWrapper>> {
     return this.initBookmarks().pipe(
       concatMap(() => this.findEntitiesAtPathFromId(uid)),
       map(entities => entities.map(element => {
@@ -328,12 +380,39 @@ export class EntityCacheService {
         }
         return element;
       })),
-      tap(entityList => entityList.forEach(entity => {
-        this.entitiesCache.set(entity.uid, DMEntityUtils.dmEntityIsDocument(entity) ?
-          new DocumentCacheData(entity as KimiosDocument) :
-          new EntityCacheData(entity));
+      concatMap(entities => entities),
+      concatMap(entity => combineLatest(
+        of(entity),
+        this.securityService.canRead(this.sessionService.sessionToken, entity.uid),
+        this.securityService.canWrite(this.sessionService.sessionToken, entity.uid),
+        this.securityService.hasFullAccess(this.sessionService.sessionToken, entity.uid)
+      )),
+      map(([entity, canRead, canWrite, hasFullAccess]) =>
+        <DMEntityWrapper> {
+          dmEntity: entity,
+          canRead: canRead,
+          canWrite: canWrite,
+          hasFullAccess: hasFullAccess
+        }
+      ),
+      toArray(),
+      tap(entityList => entityList.forEach(entityWrapper => {
+        this.entitiesCache.set(entityWrapper.dmEntity.uid, DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+          new DocumentCacheData(
+            entityWrapper.dmEntity as KimiosDocument,
+            entityWrapper.canRead,
+            entityWrapper.canWrite,
+            entityWrapper.hasFullAccess
+          ) :
+          new EntityCacheData(
+            entityWrapper.dmEntity,
+            entityWrapper.canRead,
+            entityWrapper.canWrite,
+            entityWrapper.hasFullAccess
+          )
+        );
       })),
-      tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entity => entity.uid)))
+      tap(entityList => this.entitiesHierarchyCache.set(uid == null ? 0 : uid, entityList.map(entityWrapper => entityWrapper.dmEntity.uid)))
     );
   }
 
@@ -359,13 +438,17 @@ export class EntityCacheService {
         }
         return entity;
       }),
-      tap(entity => {
+      concatMap(entity => entity != null ?
+        combineLatest(of(entity), this.retrievePermissions(entity.uid)) :
+        of(null)
+      ),
+      tap(([entity, permissions]) => {
         if (entity != null && entity !== undefined && entity !== '') {
           this.entitiesCache.set(
             entity.uid,
             DMEntityUtils.dmEntityIsDocument(entity) ?
-              new DocumentCacheData(entity) :
-              new EntityCacheData(entity)
+              new DocumentCacheData(entity, permissions.canRead, permissions.canWrite, permissions.hasFullAccess) :
+              new EntityCacheData(entity, permissions.canRead, permissions.canWrite, permissions.hasFullAccess)
           );
         }
       })
@@ -439,9 +522,13 @@ export class EntityCacheService {
     }
 
     return this.retrieveContainerEntity(entityUid).pipe(
-      tap(entity => {
+      concatMap(entity => entity != null ?
+        combineLatest(of(entity), this.retrievePermissions(entity.uid)) :
+        of(null)
+      ),
+      tap(([entity, permissions]) => {
         if (entity != null && entity !== undefined && entity !== '') {
-          this.entitiesCache.set(entity.uid, new EntityCacheData(entity));
+          this.entitiesCache.set(entity.uid, new EntityCacheData(entity, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
         }
       }),
       tap(entity => {
@@ -504,9 +591,13 @@ export class EntityCacheService {
           }
           return doc;
         }),
-        tap(res => {
-          if (res != null && res !== undefined && res !== '') {
-            this.entitiesCache.set(res.uid, new EntityCacheData(res));
+        concatMap(doc => doc != null ?
+          combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
+          of(null)
+        ),
+        tap(([doc, permissions]) => {
+          if (doc != null && doc !== undefined && doc !== '') {
+            this.entitiesCache.set(doc.uid, new EntityCacheData(doc, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
           }
         })
       );
@@ -519,9 +610,13 @@ export class EntityCacheService {
             }
             return folder;
           }),
-          tap(res => {
-            if (res != null && res !== undefined && res !== '') {
-              this.entitiesCache.set(res.uid, new EntityCacheData(res));
+          concatMap(doc => doc != null ?
+            combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
+            of(null)
+          ),
+          tap(([folder, permissions]) => {
+            if (folder != null && folder !== undefined && folder !== '') {
+              this.entitiesCache.set(folder.uid, new EntityCacheData(folder, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
             }
           })
         );
@@ -533,9 +628,13 @@ export class EntityCacheService {
             }
             return workspace;
           }),
-          tap(res => {
-            if (res != null && res !== undefined && res !== '') {
-              this.entitiesCache.set(res.uid, new EntityCacheData(res));
+          concatMap(doc => doc != null ?
+            combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
+            of(null)
+          ),
+          tap(([workspace, permissions]) => {
+            if (workspace != null && workspace !== undefined && workspace !== '') {
+              this.entitiesCache.set(workspace.uid, new EntityCacheData(workspace, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
             }
           })
         );
@@ -656,20 +755,39 @@ export class EntityCacheService {
     const folder = this.getEntity(document.folderUid);
     if (folder == null) {
       this.documentService.retrieveDocumentParents(this.sessionService.sessionToken, document.uid).pipe(
+        concatMap(entities => entities),
+        concatMap(entity => combineLatest(
+          of(entity),
+          this.securityService.canRead(this.sessionService.sessionToken, entity.uid),
+          this.securityService.canWrite(this.sessionService.sessionToken, entity.uid),
+          this.securityService.hasFullAccess(this.sessionService.sessionToken, entity.uid)
+        )),
+        map(([entity, canRead, canWrite, hasFullAccess]) =>
+          <DMEntityWrapper> {
+            dmEntity: entity,
+            canRead: canRead,
+            canWrite: canWrite,
+            hasFullAccess: hasFullAccess
+          }
+        ),
+        toArray(),
         tap(parents => {
           const directParent = parents.shift();
-          const directParentCacheData = this.entitiesCache.get(directParent.uid);
+          const directParentCacheData = this.entitiesCache.get(directParent.dmEntity.uid);
           if (directParentCacheData == null) {
-            this.entitiesCache.set(directParent.uid, new EntityCacheData(directParent));
+            this.entitiesCache.set(
+              directParent.dmEntity.uid,
+              new EntityCacheData(directParent.dmEntity, directParent.canRead, directParent.canWrite, directParent.hasFullAccess)
+            );
             this.newEntity$.next(directParent);
           }
-          const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.uid);
+          const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.dmEntity.uid);
           if (containerHierarchyInCache == null) {
-            this.entitiesHierarchyCache.set(directParent.uid, new Array<number>());
+            this.entitiesHierarchyCache.set(directParent.dmEntity.uid, new Array<number>());
           }
-          this.entitiesHierarchyCache.get(directParent.uid).push(document.uid);
+          this.entitiesHierarchyCache.get(directParent.dmEntity.uid).push(document.uid);
 
-          this.appendDMEntityToParentRec(parents, directParent);
+          this.appendDMEntityToParentRec(parents, directParent.dmEntity);
         })
       ).subscribe();
     } else {
@@ -689,24 +807,27 @@ export class EntityCacheService {
     }
   }
 
-  private appendDMEntityToParentRec(parents: Array<DMEntity>, entity: DMEntity): void {
+  private appendDMEntityToParentRec(parents: Array<DMEntityWrapper>, entity: DMEntity): void {
     if (parents.length === 0) {
       return;
     } else {
       const directParent = parents.shift();
-      const directParentCacheData = this.entitiesCache.get(directParent.uid);
+      const directParentCacheData = this.entitiesCache.get(directParent.dmEntity.uid);
       if (directParentCacheData == null) {
-        this.entitiesCache.set(directParent.uid, new EntityCacheData(directParent));
+        this.entitiesCache.set(
+          directParent.dmEntity.uid,
+          new EntityCacheData(directParent.dmEntity, directParent.canRead, directParent.canWrite, directParent.hasFullAccess)
+        );
         this.newEntity$.next(directParent);
       }
-      const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.uid);
+      const containerHierarchyInCache = this.entitiesHierarchyCache.get(directParent.dmEntity.uid);
       if (containerHierarchyInCache == null) {
-        this.entitiesHierarchyCache.set(directParent.uid, new Array<number>());
+        this.entitiesHierarchyCache.set(directParent.dmEntity.uid, new Array<number>());
       }
-      if (this.entitiesHierarchyCache.get(directParent.uid).findIndex(element => element === entity.uid) === -1) {
-        this.entitiesHierarchyCache.get(directParent.uid).push(entity.uid);
+      if (this.entitiesHierarchyCache.get(directParent.dmEntity.uid).findIndex(element => element === entity.uid) === -1) {
+        this.entitiesHierarchyCache.get(directParent.dmEntity.uid).push(entity.uid);
       }
-      this.appendDMEntityToParentRec(parents, directParent);
+      this.appendDMEntityToParentRec(parents, directParent.dmEntity);
     }
   }
 
@@ -740,19 +861,22 @@ export class EntityCacheService {
     );
   }
 
-  handleDocumentCreated(document: KimiosDocument): Observable<boolean> {
+  handleDocumentCreated(documentWrapper: DMEntityWrapper): Observable<boolean> {
     if (
-      this.entitiesCache.get(document.uid) != null
-      || this.entitiesCache.get(document.folderUid) == null
+      this.entitiesCache.get(documentWrapper.dmEntity.uid) != null
+      || this.entitiesCache.get((documentWrapper.dmEntity as KimiosDocument).folderUid) == null
     ) {
       return of(false);
     } else {
-      this.entitiesCache.set(document.uid, new DocumentCacheData(document));
-      if (this.entitiesHierarchyCache.get(document.folderUid) == null) {
-        this.entitiesHierarchyCache.set(document.folderUid, new Array<number>());
+      this.entitiesCache.set(
+        documentWrapper.dmEntity.uid,
+        new DocumentCacheData(documentWrapper.dmEntity, documentWrapper.canRead, documentWrapper.canWrite, documentWrapper.hasFullAccess)
+      );
+      if (this.entitiesHierarchyCache.get((documentWrapper.dmEntity as KimiosDocument).folderUid) == null) {
+        this.entitiesHierarchyCache.set((documentWrapper.dmEntity as KimiosDocument).folderUid, new Array<number>());
       }
-      this.entitiesHierarchyCache.get(document.folderUid).push(document.uid);
-      this.newEntity$.next(document);
+      this.entitiesHierarchyCache.get((documentWrapper.dmEntity as KimiosDocument).folderUid).push(documentWrapper.dmEntity.uid);
+      this.newEntity$.next(documentWrapper);
       return of(true);
     }
   }
@@ -811,10 +935,31 @@ export class EntityCacheService {
   private handleDataMessage(dataMessage: DataMessageImpl): void {
     // only folders are considered
     // TODO : consider also other entity types
-    this.entitiesCache.set(dataMessage.parent.uid, new EntityCacheData(dataMessage.parent));
-    dataMessage.dmEntityList.forEach(dmEntity => this.entitiesCache.set(dmEntity.uid, new EntityCacheData(dmEntity)));
-    this.entitiesHierarchyCache.set(dataMessage.parent.uid, dataMessage.dmEntityList.map(dmEntity => dmEntity.uid));
-    this.folderWithChildren$.next(dataMessage.parent);
+    this.entitiesCache.set(
+      dataMessage.parent.dmEntity.uid,
+      new EntityCacheData(
+        dataMessage.parent.dmEntity,
+        dataMessage.parent.canRead,
+        dataMessage.parent.canWrite,
+        dataMessage.parent.hasFullAccess
+      )
+    );
+    dataMessage.dmEntityList.forEach(dmEntityWrapper =>
+      this.entitiesCache.set(
+        dmEntityWrapper.dmEntity.uid,
+        new EntityCacheData(
+          dmEntityWrapper.dmEntity,
+          dmEntityWrapper.canRead,
+          dmEntityWrapper.canWrite,
+          dmEntityWrapper.hasFullAccess
+        )
+      )
+    );
+    this.entitiesHierarchyCache.set(
+      dataMessage.parent.dmEntity.uid,
+      dataMessage.dmEntityList.map(dmEntityWrapper => dmEntityWrapper.dmEntity.uid)
+    );
+    this.folderWithChildren$.next(dataMessage.parent.dmEntity);
   }
 
   get checkingDataMessagesQueue(): boolean {

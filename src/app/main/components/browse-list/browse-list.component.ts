@@ -78,7 +78,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
         next => this.dialog.closeAll()
     );
     this.bes.entitiesToDisplay$.subscribe(
-        entities => this.dataSource.setData(entities)
+        entitiesWrapperList => this.dataSource.setData(entitiesWrapperList.map(wrapper => wrapper.dmEntity))
     );
 
     this.bes.removedFolder$.pipe(
@@ -106,7 +106,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
     this.entityCacheService.documentUpdate$.pipe(
       concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
-      tap(entity => this.updateCurrentPageIfNeeded(entity))
+      tap(entityWrapper => this.updateCurrentPageIfNeeded(entityWrapper.dmEntity))
     ).subscribe();
   }
 
@@ -262,15 +262,15 @@ export class BrowseListComponent implements OnInit, OnDestroy {
   }
 
   delete(uid: number, name: string): void {
-    const entityToDelete = this.bes.entitiesToDisplay$.getValue().filter(element => element.uid === uid)[0];
+    const entityWrapperToDelete = this.bes.entitiesToDisplay$.getValue().filter(element => element.dmEntity.uid === uid)[0];
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        dialogTitle: this.makeDialogTitle(entityToDelete),
-        iconLine1: DMEntityUtils.dmEntityIsDocument(entityToDelete) ?
-          DMEntityUtils.retrieveEntityIconName(this.iconService, entityToDelete, 'far') :
+        dialogTitle: this.makeDialogTitle(entityWrapperToDelete.dmEntity),
+        iconLine1: DMEntityUtils.dmEntityIsDocument(entityWrapperToDelete.dmEntity) ?
+          DMEntityUtils.retrieveEntityIconName(this.iconService, entityWrapperToDelete.dmEntity, 'far') :
           null,
-        messageLine1: entityToDelete.name,
+        messageLine1: entityWrapperToDelete.dmEntity.name,
       }/*,
       width: '400px',
       height: '400px'*/
@@ -278,7 +278,7 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().pipe(
       filter(result => result === true),
-      concatMap(() => this.deleteEntity(entityToDelete)),
+      concatMap(() => this.deleteEntity(entityWrapperToDelete.dmEntity)),
       tap(() => this.bes.loading$.next(false))
     ).subscribe();
   }
@@ -305,9 +305,9 @@ export class BrowseListComponent implements OnInit, OnDestroy {
 
   private updateCurrentPageIfNeeded(entity: DMEntity): void {
     const entities = this.bes.entitiesToDisplay$.getValue();
-    const idx = entities.findIndex(element => element.uid === entity.uid);
+    const idx = entities.findIndex(element => element.dmEntity.uid === entity.uid);
     if (idx !== -1) {
-      entities[idx] = entity;
+      entities[idx].dmEntity = entity;
     }
     this.bes.entitiesToDisplay$.next(entities);
   }

@@ -18,6 +18,7 @@ import {DocumentDetailService} from 'app/services/document-detail.service';
 import {SessionService} from 'app/services/session.service';
 import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
 import {TreeModel, TreeNode} from 'angular-tree-component';
+import {DMEntityWrapper} from 'app/kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'browse-tree',
@@ -118,15 +119,15 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     )*/
     this.entityCacheService.newEntity$.pipe(
       takeUntil(this.unsubscribeSubject$),
-      filter(entity => entity != null && DMEntityUtils.dmEntityIsFolder(entity)),
-      tap(entity => {
+      filter(entityWrapper => entityWrapper != null && DMEntityUtils.dmEntityIsFolder(entityWrapper.dmEntity)),
+      tap(entityWrapper => {
         const parentNode = this.tree.treeModel.getNodeById(
-          DMEntityUtils.dmEntityIsDocument(entity) ?
-            (entity as KimiosDocument).folderUid :
-            (entity as Folder).parentUid
+          DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+            (entityWrapper.dmEntity as KimiosDocument).folderUid :
+            (entityWrapper.dmEntity as Folder).parentUid
         );
         if (parentNode == null) {
-          this.toBeInsertedInTree.push(entity);
+          this.toBeInsertedInTree.push(entityWrapper.dmEntity);
         } else {
           this.tryToInsertEntitiesInTree();
         }
@@ -192,21 +193,23 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         of(entity),
         this.entityCacheService.findEntityChildrenInCache(entity.uid, true)
       )),
-      tap(([entity, children]) => {
+      tap(([entity, childrenWrapperList]) => {
         const parentNode = this.tree.treeModel.getNodeById(entity.uid);
         if (parentNode == null) {
-          this.toBeInsertedInTree.push(children);
+          this.toBeInsertedInTree.push(childrenWrapperList.map(wrapper => wrapper.dmEntity));
         } else {
-          if (children.length === 0) {
+          if (childrenWrapperList.length === 0) {
             parentNode.data.isLoading = false;
             this.tree.treeModel.update();
           } else {
             const existingChildrenIdList = parentNode.data.children == null ?
               [] :
               parentNode.data.children.map(child => child.id);
-            this.toBeInsertedInTree.push(children.filter(child =>
-              !existingChildrenIdList.includes(child.uid)
-            ));
+            this.toBeInsertedInTree.push(
+              childrenWrapperList
+                .filter(wrapper => !existingChildrenIdList.includes(wrapper.dmEntity.uid))
+                .map(wrapper => wrapper.dmEntity)
+            );
           }
           this.tryToInsertEntitiesInTree();
 
@@ -240,7 +243,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
               this.loadEntitiesToExpand(entities)
             )),
             tap(([entities, any]) =>
-              this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].uid))
+              this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].dmEntity.uid))
             ),
             tap(() => {
               if (this.initial === true) {
@@ -257,7 +260,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             filter(entities => entities.length > 0),
             concatMap(entities => combineLatest(of(entities), this.loadEntitiesToExpand(entities))),
             tap(([entities]) =>
-              this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].uid))
+              this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].dmEntity.uid))
             ),
             tap(() => {
               if (this.initial === true) {
@@ -450,18 +453,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                     currentChildrenTmp;
                 const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
                 childrenEntities
-                    .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
-                    .forEach(entity => {
+                    .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+                    .forEach(entityWrapper => {
                         currentChildren.push({
-                            name: entity.name,
-                            id: entity.uid.toString(),
+                            name: entityWrapper.dmEntity.name,
+                            id: entityWrapper.dmEntity.uid.toString(),
                             children: null,
                             isLoading: false,
-                            svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                            dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
-                            documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
-                              (entity as KimiosDocument).extension ?
-                                (entity as KimiosDocument).extension :
+                            svgIcon: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', ''),
+                            dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', 'document'),
+                            documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+                              (entityWrapper.dmEntity as KimiosDocument).extension ?
+                                (entityWrapper.dmEntity as KimiosDocument).extension :
                                 '' :
                               '',
                           selected: false
@@ -471,8 +474,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                   .sort((n1, n2) => n1.name.localeCompare(n2.name));
                 this.tree.treeModel.update();
                 childrenEntities
-                    .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
-                    .forEach(entity => this.loadChildren(entity.uid).subscribe());
+                    .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+                    .forEach(entityWrapper => this.loadChildren(entityWrapper.dmEntity.uid).subscribe());
             })
         ).subscribe();
 
@@ -491,18 +494,18 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         ).subscribe();
   }
 
-  retrieveFoldersAndInsertInTree(entities: Array<DMEntity>): Observable<any> {
+  retrieveFoldersAndInsertInTree(entities: Array<DMEntityWrapper>): Observable<any> {
     return from(entities).pipe(
-      concatMap(entity => this.entityCacheService.reloadEntityChildren(entity.uid)),
-      map(children => children.filter(child => DMEntityUtils.dmEntityIsFolder(child))),
-      tap(folders => this.toBeInsertedInTree.push(folders)),
+      concatMap(entityWrapper => this.entityCacheService.reloadEntityChildren(entityWrapper.dmEntity.uid)),
+      map(children => children.filter(child => DMEntityUtils.dmEntityIsFolder(child.dmEntity))),
+      tap(folders => this.toBeInsertedInTree.push(folders.map(folderWrapper => folderWrapper.dmEntity))),
       tap(() => this.tryToInsertEntitiesInTree()),
       toArray()
       // tap(() => this.tree.treeModel.getNodeById(entity.uid).expand())
     );
   }
 
-  retrieveEntitiesToExpand(): Observable<Array<DMEntity>> {
+  retrieveEntitiesToExpand(): Observable<Array<DMEntityWrapper>> {
     return this.route.paramMap.pipe(
         switchMap(
             params => {
@@ -527,13 +530,25 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                     concatMap(
                         entity => this.entityCacheService.findAllParents(entity.uid, true)
                     ),
+                    concatMap(entities => entities),
+                    concatMap(entity => combineLatest(
+                      of(entity),
+                      this.entityCacheService.retrievePermissions(entity.uid)
+                    )),
+                    map(([entity, permissions]) => <DMEntityWrapper> {
+                      dmEntity: entity,
+                      canRead: permissions.canRead,
+                      canWrite: permissions.canWrite,
+                      hasFullAccess: permissions.hasFullAccess
+                    }),
+                    toArray(),
                     map(entities => entities.reverse())
                 )
         )
     );
   }
 
-  loadNodeAndChildren(entity: DMEntity): Observable<DMEntity> {
+  /*loadNodeAndChildren(entity: DMEntity): Observable<DMEntity> {
     return of(entity).pipe(
         map(
             entityRet => {
@@ -593,7 +608,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         )
     );
   }
-
+*/
   loadChildren(entityUid: number): Observable<number> {
     this.tree.treeModel.getNodeById(entityUid.toString()).data.isLoading = true;
     return combineLatest(
@@ -601,17 +616,17 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       this.entityCacheService.findEntityChildrenInCache(entityUid, this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
     ).pipe(
         tap(
-            ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityChild => {
+            ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityWrapperChild => {
               return {
-                name: entityChild.name,
-                id: entityChild.uid.toString(),
+                name: entityWrapperChild.dmEntity.name,
+                id: entityWrapperChild.dmEntity.uid.toString(),
                 children: null,
                 isLoading: false,
-                svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document'),
-                documentExtension: DMEntityUtils.dmEntityIsDocument(entityChild) ?
-                  (entityChild as KimiosDocument).extension ?
-                    (entityChild as KimiosDocument).extension :
+                svgIcon: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapperChild.dmEntity) ?
+                  (entityWrapperChild.dmEntity as KimiosDocument).extension ?
+                    (entityWrapperChild.dmEntity as KimiosDocument).extension :
                     '' :
                   '',
                 selected: false
@@ -625,7 +640,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             ([entityUidRet, entities]) => this.tree.treeModel.update()
         ),
         tap(
-            ([entityUidRet, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+            ([entityUidRet, entities]) => entities.forEach(entWrapper => this.entitiesLoaded.set(entWrapper.dmEntity.uid, entWrapper.dmEntity))
         ),
         map(
             ([entityUidRet, entities]) => entityUidRet
@@ -1008,8 +1023,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     return newNode;
   }
 
-  private appendEntitiesRec(entities: Array<DMEntity>, treeModel: TreeModel): Observable<boolean> {
-    entities.forEach(entity => this.insertEntityInTree(entity, treeModel, this.nodes, false));
+  private appendEntitiesRec(entities: Array<DMEntityWrapper>, treeModel: TreeModel): Observable<boolean> {
+    entities.forEach(entityWrapper => this.insertEntityInTree(entityWrapper.dmEntity, treeModel, this.nodes, false));
     return of(true);
   }
 
@@ -1050,50 +1065,53 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     this.showNodeMenuButton = undefined;
   }
 
-  private entitiesLoadedInTree(entities: Array<DMEntity>, treeModel: TreeModel): boolean {
-    return entities.every(entity => treeModel.getNodeById(entity.uid) !== null);
+  private entitiesLoadedInTree(entities: Array<DMEntityWrapper>, treeModel: TreeModel): boolean {
+    return entities.every(entityWrapper => treeModel.getNodeById(entityWrapper.dmEntity.uid) !== null);
   }
 
-  private loadEntitiesToExpand(entitiesParam: Array<DMEntity>): Observable<any> {
+  private loadEntitiesToExpand(entitiesParam: Array<DMEntityWrapper>): Observable<any> {
     return combineLatest(
       of(entitiesParam),
       this.entityCacheService.findEntityChildrenInCache(null, true)
     ).pipe(
-    tap(([entities, workspaces]) => this.appendEntitiesRec(entities, this.tree.treeModel)),
+      tap(([entities, workspaces]) => this.appendEntitiesRec(
+        entities,
+        this.tree.treeModel
+      )),
       map(([entities, workspaces]) => {
-        workspaces.forEach(workspace => {
-          const newNode = this.createNodeFromEntity(workspace);
+        workspaces.forEach(workspaceWrapper => {
+          const newNode = this.createNodeFromEntity(workspaceWrapper.dmEntity);
           if (this.tree.treeModel.getNodeById(newNode.id) == null) {
             this.addNode(newNode, this.nodes);
             // this.cdRef.detectChanges();
             this.tree.treeModel.update();
-            this.entitiesLoaded.set(workspace.uid, workspace);
+            this.entitiesLoaded.set(workspaceWrapper.dmEntity.uid, workspaceWrapper.dmEntity);
           }
         });
         return ([entities, workspaces]);
       }),
       tap(([entities, workspaces]) => console.dir(entities)),
-      concatMap(([entities, workspaces]) =>
+      /*concatMap(([entities, workspaces]) =>
         combineLatest(
           of(entities),
           of(workspaces)
         )
-      ),
+      ),*/
       concatMap(([entities, workspaces]) => combineLatest(
         of(entities),
         of(workspaces),
         this.retrieveFoldersAndInsertInTree(entities)
       )),
       tap(([entities, workspaces]) => entities.forEach(entity => {
-        if (! DMEntityUtils.dmEntityIsDocument(entity)
-          && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.uid.toString()).length === 0
+        if (! DMEntityUtils.dmEntityIsDocument(entity.dmEntity)
+          && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.dmEntity.uid.toString()).length === 0
         ) {
-          this.tree.treeModel.getNodeById(entity.uid).expand();
+          this.tree.treeModel.getNodeById(entity.dmEntity.uid).expand();
         }
       })),
-      tap(([entities, workspaces]) => this.entityCacheService.askFoldersInFolders([entities[entities.length - 1].uid])),
+      tap(([entities, workspaces]) => this.entityCacheService.askFoldersInFolders([entities[entities.length - 1].dmEntity.uid])),
       tap(([entities, workspaces]) =>
-        this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].uid))
+        this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[entities.length - 1].dmEntity.uid))
       ),
       /*tap(([entities, workspaces]) =>
         this.browseEntityService.selectedEntityFromGridOrTree$.next(
@@ -1101,13 +1119,13 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
         )
       ),*/
       concatMap(([entities, workspaces]) =>
-        this.entityCacheService.askFoldersInFolders(workspaces.map(workspace => workspace.uid))
+        this.entityCacheService.askFoldersInFolders(workspaces.map(workspace => workspace.dmEntity.uid))
       )
     );
   }
 
-  private expandEntitiesToExpand(entities: Array<DMEntity>): Observable<any> {
-    entities.forEach(entity => this.tree.treeModel.getNodeById(entity.uid).expand());
+  private expandEntitiesToExpand(entities: Array<DMEntityWrapper>): Observable<any> {
+    entities.forEach(entityWrapper => this.tree.treeModel.getNodeById(entityWrapper.dmEntity.uid).expand());
     return of('');
   }
 

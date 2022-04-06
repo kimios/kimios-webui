@@ -20,6 +20,7 @@ import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {CacheService} from 'app/services/cache.service';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'app-workspaces',
@@ -72,7 +73,9 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
     this.entityId = Number(this.route.snapshot.paramMap.get('entityId'));
     if (this.entityId != null
         && this.entityId !== undefined
-        && this.entityId !== 0) {
+        && this.entityId !== 0
+        && this.entityId !== NaN
+    ) {
       this.browseEntityService.getEntity(this.entityId)
           .subscribe(entity => this.browseEntityService.selectedEntity$.next(entity));
       this.entityCacheService.findAllParents(this.entityId, true).pipe(
@@ -111,8 +114,11 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
         next => this.pageIndex = next
     );
 
-    if ((this.entityId === 0)
+    if ((this.entityId === 0 || this.entityId === NaN)
         && this.initial === true) {
+      if (this.entityId === NaN) {
+        this.entityId = 0;
+      }
       this.initial = false;
       this.browseEntityService.retrieveWorkspaces().pipe(
           filter(workspaces => workspaces.length > 0),
@@ -123,12 +129,12 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
 
     this.entityCacheService.newEntity$.pipe(
       takeUntil(this.unsubscribeSubject$),
-      filter(entity => entity != null),
-      tap(entity => {
+      filter(entityWrapper => entityWrapper != null),
+      tap(entityWrapper => {
         const currentPath = this.browseEntityService.currentPath.getValue();
         const currentContainerEntity = currentPath[currentPath.length - 1];
-        if (this.currentContainerEntityIsEntityParent(currentContainerEntity, entity)) {
-          this.addEntityAndReloadPage(entity);
+        if (this.currentContainerEntityIsEntityParent(currentContainerEntity, entityWrapper. dmEntity)) {
+          this.addEntityAndReloadPage(entityWrapper);
         }
       })
     ).subscribe();
@@ -185,7 +191,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
     this.browseEntityService.makePage($event.pageIndex, $event.pageSize);
   }
 
-  private addEntityAndReloadPage(entity: DMEntity): void {
+  private addEntityAndReloadPage(entity: DMEntityWrapper): void {
     if (this.browseEntityService.addEntityToCurrentEntitiesToDisplay(entity)) {
       this.browseEntityService.reloadPage();
     }

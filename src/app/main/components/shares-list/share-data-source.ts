@@ -181,7 +181,7 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
         });
 
         this.entityCacheService.findDocumentInCache(docId).pipe(
-          tap(doc => indexesToUpdate.forEach(idx => data[idx].entity = doc)),
+          tap(doc => indexesToUpdate.forEach(idx => data[idx].entity = doc.dmEntity)),
           tap(() => this.sharesSubject.next(data))
         ).subscribe();
     }

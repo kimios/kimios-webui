@@ -81,11 +81,11 @@ export class FileDetailTagsComponent implements OnInit {
         tap(res => this.loading$ = of(true)),
         // tap(res => this.allTags = res),
         concatMap(res => this.entityCacheService.findDocumentInCache(this.document.uid)),
-        tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
-        tap(res => this.document = res),
+        tap(res => this.documentDetailService.currentVersionId.next((res.dmEntity as KimiosDocument).lastVersionId)),
+        tap(res => this.document = res.dmEntity as KimiosDocument),
         tap(res => this.loading$ = of(false)),
         tap(res => console.dir(res)),
-        tap(res => this.documentTags$.next(res.tags)),
+        tap(res => this.documentTags$.next((res.dmEntity as KimiosDocument).tags)),
       ).subscribe();
 
     this.selectedTag$

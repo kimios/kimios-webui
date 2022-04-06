@@ -11,6 +11,7 @@ import {UpdateNoticeParameters} from 'app/main/model/cache/event/update-notice-p
 import {CacheSubjectsService} from './cache-subjects.service';
 import UpdateNoticeTypeEnum = UpdateNoticeMessage.UpdateNoticeTypeEnum;
 import {Message} from 'app/main/model/message';
+import {DMEntityWrapper} from '../kimios-client-api/model/dMEntityWrapper';
 
 export enum CacheEnum {
   SHARES_BY_ME= 'shares by me',
@@ -28,7 +29,7 @@ export class CacheService {
   public behaviourSubjects: Map<string, BehaviorSubject<CacheUpdateMessage>>;
   private _webSocket: WebSocketSubject<any>;
   private wsToken: string;
-  public documentCreated$: Subject<KimiosDocument>;
+  public documentCreated$: Subject<DMEntityWrapper>;
   public sharedWithMe$: Subject<boolean>;
   public sharedByMe$: Subject<boolean>;
   private _dataMessages: Array<DataMessageImpl>;
@@ -40,7 +41,7 @@ export class CacheService {
     this.behaviourSubjects = new Map<string, BehaviorSubject<CacheUpdateMessage>>();
     Object.keys(CacheEnum).forEach(key => this.behaviourSubjects.set(key, new BehaviorSubject<CacheUpdateMessage>(null)));
     this._webSocket = null;
-    this.documentCreated$ = new Subject<KimiosDocument>();
+    this.documentCreated$ = new Subject<DMEntityWrapper>();
     this.sharedWithMe$ = new Subject<boolean>();
     this.sharedByMe$ = new Subject<boolean>();
     this._dataMessages = new Array<DataMessageImpl>();

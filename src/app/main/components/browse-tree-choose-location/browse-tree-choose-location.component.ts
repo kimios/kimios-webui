@@ -102,15 +102,15 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
         next => updateTree
     )*/
     this.entityCacheService.newEntity$.pipe(
-      filter(entity => entity != null && DMEntityUtils.dmEntityIsFolder(entity)),
-      tap(entity => {
+      filter(entityWrapper => entityWrapper != null && DMEntityUtils.dmEntityIsFolder(entityWrapper.dmEntity)),
+      tap(entityWrapper => {
         const parentNode = this.tree.treeModel.getNodeById(
-          DMEntityUtils.dmEntityIsDocument(entity) ?
-            (entity as KimiosDocument).folderUid :
-            (entity as Folder).parentUid
+          DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+            (entityWrapper.dmEntity as KimiosDocument).folderUid :
+            (entityWrapper.dmEntity as Folder).parentUid
         );
         if (parentNode == null) {
-          this.toBeInsertedInTree.push(entity);
+          this.toBeInsertedInTree.push(entityWrapper.dmEntity);
         } else {
           this.tryToInsertEntitiesInTree();
         }
@@ -148,28 +148,28 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
           res => res
         ),
         map(
-          entity => {
-            if (this.tree.treeModel.getNodeById(entity.uid) === undefined) {
+          entityWrapper => {
+            if (this.tree.treeModel.getNodeById(entityWrapper.dmEntity.uid) === undefined) {
               const newNode = {
-                name: entity.name,
-                id: entity.uid.toString(),
+                name: entityWrapper.dmEntity.name,
+                id: entityWrapper.dmEntity.uid.toString(),
                 children: null,
                 isLoading: true,
                 allowDrop: true,
-                svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-                dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
-                documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
-                  (entity as KimiosDocument).extension ?
-                    (entity as KimiosDocument).extension :
+                svgIcon: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', ''),
+                dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', 'document'),
+                documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+                  (entityWrapper.dmEntity as KimiosDocument).extension ?
+                    (entityWrapper.dmEntity as KimiosDocument).extension :
                     '' :
                   '',
                 selected: false
               };
               this.nodes.push(newNode);
               this.tree.treeModel.update();
-              this.entitiesLoaded.set(entity.uid, entity);
+              this.entitiesLoaded.set(entityWrapper.dmEntity.uid, entityWrapper.dmEntity);
             }
-            return entity;
+            return entityWrapper.dmEntity;
           }
         ),
         flatMap(
@@ -313,18 +313,18 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
           currentChildrenTmp;
         const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
         childrenEntities
-          .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
-          .forEach(entity => {
+          .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+          .forEach(entityWrapper => {
             currentChildren.push({
-              name: entity.name,
-              id: entity.uid.toString(),
+              name: entityWrapper.dmEntity.name,
+              id: entityWrapper.dmEntity.uid.toString(),
               children: null,
               isLoading: false,
-              svgIcon: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', ''),
-              dmEntityType: DMEntityUtils.determinePropertyValue(entity, 'workspace', 'folder', 'document'),
-              documentExtension: DMEntityUtils.dmEntityIsDocument(entity) ?
-                (entity as KimiosDocument).extension ?
-                  (entity as KimiosDocument).extension :
+              svgIcon: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', ''),
+              dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', 'document'),
+              documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+                (entityWrapper.dmEntity as KimiosDocument).extension ?
+                  (entityWrapper.dmEntity as KimiosDocument).extension :
                   '' :
                 '',
               selected: false
@@ -334,8 +334,8 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
           .sort((n1, n2) => n1.name.localeCompare(n2.name));
         this.tree.treeModel.update();
         childrenEntities
-          .filter(entity => currentChildrenIds.indexOf(entity.uid) === -1)
-          .forEach(entity => this.loadChildren(entity.uid).subscribe());
+          .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+          .forEach(entityWrapper => this.loadChildren(entityWrapper.dmEntity.uid).subscribe());
       })
     ).subscribe();
 
@@ -376,7 +376,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
     );
   }
 
-  loadNodeAndChildren(entity: DMEntity): Observable<DMEntity> {
+  /*loadNodeAndChildren(entity: DMEntity): Observable<DMEntity> {
     return of(entity).pipe(
       map(
         entityRet => {
@@ -435,7 +435,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
         ([entityRet, entities]) => entityRet
       )
     );
-  }
+  }*/
 
   loadChildren(entityUid: number): Observable<number> {
     this.tree.treeModel.getNodeById(entityUid.toString()).data.isLoading = true;
@@ -444,17 +444,17 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
       this.entityCacheService.findEntityChildrenInCache(entityUid, this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
     ).pipe(
       tap(
-        ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityChild => {
+        ([entityUidRet, entities]) => this.tree.treeModel.getNodeById(entityUid).data.children = entities.map(entityWrapperChild => {
           return {
-            name: entityChild.name,
-            id: entityChild.uid.toString(),
+            name: entityWrapperChild.dmEntity.name,
+            id: entityWrapperChild.dmEntity.uid.toString(),
             children: null,
             isLoading: false,
-            svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
-            dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document'),
-            documentExtension: DMEntityUtils.dmEntityIsDocument(entityChild) ?
-              (entityChild as KimiosDocument).extension ?
-                (entityChild as KimiosDocument).extension :
+            svgIcon: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', ''),
+            dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', 'document'),
+            documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapperChild.dmEntity) ?
+              (entityWrapperChild.dmEntity as KimiosDocument).extension ?
+                (entityWrapperChild.dmEntity as KimiosDocument).extension :
                 '' :
               '',
             selected: false
@@ -468,7 +468,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
         ([entityUidRet, entities]) => this.tree.treeModel.update()
       ),
       tap(
-        ([entityUidRet, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+        ([entityUidRet, entities]) => entities.forEach(entWrapper => this.entitiesLoaded.set(entWrapper.dmEntity.uid, entWrapper.dmEntity))
       ),
       map(
         ([entityUidRet, entities]) => entityUidRet
@@ -529,17 +529,17 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
       tap(
         ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.children = entities.length === 0 ?
           [] :
-          entities.map(entityChild => {
+          entities.map(entityWrapperChild => {
             return {
-              name: entityChild.name,
-              id: entityChild.uid.toString(),
+              name: entityWrapperChild.dmEntity.name,
+              id: entityWrapperChild.dmEntity.uid.toString(),
               children: null,
               isLoading: false,
-              svgIcon: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', ''),
-              dmEntityType: DMEntityUtils.determinePropertyValue(entityChild, 'workspace', 'folder', 'document'),
-              documentExtension: DMEntityUtils.dmEntityIsDocument(entityChild) ?
-                (entityChild as KimiosDocument).extension ?
-                  (entityChild as KimiosDocument).extension :
+              svgIcon: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', ''),
+              dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapperChild.dmEntity, 'workspace', 'folder', 'document'),
+              documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapperChild.dmEntity) ?
+                (entityWrapperChild.dmEntity as KimiosDocument).extension ?
+                  (entityWrapperChild.dmEntity as KimiosDocument).extension :
                   '' :
                 '',
               selected: false
@@ -550,7 +550,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
         ([parentUid, entities]) => this.tree.treeModel.update()
       ),
       tap(
-        ([parentUid, entities]) => entities.forEach(ent => this.entitiesLoaded.set(ent.uid, ent))
+        ([parentUid, entities]) => entities.forEach(entWrapper => this.entitiesLoaded.set(entWrapper.dmEntity.uid, entWrapper.dmEntity))
       )
     ).subscribe(
       ([parentUid, entities]) => this.tree.treeModel.getNodeById(parentUid).data.isLoading = false,

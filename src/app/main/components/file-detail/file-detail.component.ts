@@ -13,6 +13,7 @@ import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
 import {formatDate, Location} from '@angular/common';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 export enum Direction {
     NEXT = 1,
@@ -118,7 +119,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.entityCacheService.documentUpdate$.pipe(
           filter(documentId => this.documentId === documentId),
           concatMap(documentId => this.entityCacheService.findDocumentInCache(this.documentId)),
-          tap(doc => this.documentData$ = of(doc))
+          tap(docWrapper => this.documentData$ = of((docWrapper.dmEntity as KimiosDocument)))
         ).subscribe();
     }
 
@@ -131,10 +132,11 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
-                tap(res => this.documentDetailService.currentVersionId.next(res.lastVersionId)),
-                tap(res => this.document = res),
-                tap(res => this.loading$ = of(false)),
-                tap(res => this.documentTags$.next(res.tags)),
+                tap(docWrapper => this.documentDetailService.currentVersionId.next((docWrapper.dmEntity as KimiosDocument).lastVersionId)),
+                tap(docWrapper => this.document = (docWrapper.dmEntity as KimiosDocument)),
+                tap(docWrapper => this.loading$ = of(false)),
+                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags)),
+                map(docWrapper => docWrapper.dmEntity)
             );
 
         this.documentVersions$ = this.initDocumentVersions();
@@ -345,8 +347,9 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
             .pipe(
                 // tap(res => this.allTags = res),
                 concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
-                tap(res => this.document = res),
-                tap(res => this.documentTags$.next(res.tags))
+                tap(docWrapper => this.document = docWrapper.dmEntity),
+                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags)),
+                map(docWrapper => docWrapper.dmEntity)
             );
 
         this.documentVersions$ = this.initDocumentVersions();

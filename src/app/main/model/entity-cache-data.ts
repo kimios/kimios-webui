@@ -2,17 +2,57 @@ import {DMEntity, Document as KimiosDocument, DocumentVersion, Folder, MetaValue
 
 export class EntityCacheData {
     entity: Folder | Workspace | KimiosDocument;
+    private _canRead: boolean;
+    private _canWrite: boolean;
+    private _hasFullAccess: boolean;
 
-    constructor(entity: Folder | Workspace | KimiosDocument) {
+    constructor(
+      entity: Folder | Workspace | KimiosDocument,
+      canRead: boolean,
+      canWrite: boolean,
+      hasFullAccess: boolean
+    ) {
         this.entity = entity;
+        this.canRead = canRead;
+        this.canWrite = canWrite;
+        this.hasFullAccess = hasFullAccess;
+    }
+
+    get canRead(): boolean {
+        return this._canRead;
+    }
+
+    set canRead(value: boolean) {
+        this._canRead = value;
+    }
+
+    get canWrite(): boolean {
+        return this._canWrite;
+    }
+
+    set canWrite(value: boolean) {
+        this._canWrite = value;
+    }
+
+    get hasFullAccess(): boolean {
+        return this._hasFullAccess;
+    }
+
+    set hasFullAccess(value: boolean) {
+        this._hasFullAccess = value;
     }
 }
 
 export class DocumentCacheData extends EntityCacheData {
     private _versions: Array<DocumentVersionWithMetaValues>;
 
-    constructor(entity: KimiosDocument) {
-        super(entity);
+    constructor(
+      entity: KimiosDocument,
+      canRead: boolean,
+      canWrite: boolean,
+      hasFullAccess: boolean
+    ) {
+        super(entity, canRead, canWrite, hasFullAccess);
         this._versions = null;
     }
 

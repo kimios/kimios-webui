@@ -4,6 +4,7 @@ import {DMEntity} from 'app/kimios-client-api';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {WorkspaceSessionService} from 'app/services/workspace-session.service';
 import {ListingType} from 'app/main/model/listing-type.enum';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'entity-listing',
@@ -12,7 +13,7 @@ import {ListingType} from 'app/main/model/listing-type.enum';
 })
 export class EntityListingComponent implements OnInit {
 
-  entities$: BehaviorSubject<Array<DMEntity>>;
+  entities$: BehaviorSubject<Array<DMEntityWrapper>>;
 
   isGrid: BehaviorSubject<boolean>;
 
@@ -24,7 +25,7 @@ export class EntityListingComponent implements OnInit {
       private cd: ChangeDetectorRef,
       private workspaceSessionService: WorkspaceSessionService
   ) {
-    this.entities$ = new BehaviorSubject<Array<DMEntity>>([]);
+    this.entities$ = new BehaviorSubject<Array<DMEntityWrapper>>([]);
     this.isGrid = new BehaviorSubject(this.workspaceSessionService.gridOrList === ListingType.GRID);
   }
 

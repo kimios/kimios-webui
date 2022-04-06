@@ -32,9 +32,9 @@ export class EntityListLockButtonComponent implements OnInit {
   ngOnInit(): void {
     this.cacheSecurityService.getLockPossibility(this.docId).pipe(
         concatMap(lockPossibility => combineLatest(of(lockPossibility), this.entityCacheService.findDocumentInCache(this.docId))),
-        map(([lockPossibility, kimiosDocument]) => {
+        map(([lockPossibility, kimiosDocumentWrapper]) => {
           this.lockPossibility = lockPossibility;
-          this.computeLockMessage(lockPossibility, kimiosDocument);
+          this.computeLockMessage(lockPossibility, kimiosDocumentWrapper as KimiosDocument);
         })
     ).subscribe();
   }
