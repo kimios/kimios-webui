@@ -12,6 +12,7 @@ import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {TreeNodeMoveUpdate} from 'app/main/model/tree-node-move-update';
 import {BrowseEntityService} from 'app/services/browse-entity.service';
+import {DMEntityWrapper} from 'app/kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'container-entity-data',
@@ -20,7 +21,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 })
 export class ContainerEntityDataComponent implements OnInit {
   @Input()
-  entity: DMEntity;
+  entityWrapper: DMEntityWrapper;
   @Input()
   entityType: string;
   entityEditForm: FormGroup;
@@ -52,12 +53,12 @@ export class ContainerEntityDataComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.precedingParentUid = DMEntityUtils.dmEntityIsFolder(this.entity) ?
-      (this.entity as Folder).parentUid :
+    this.precedingParentUid = DMEntityUtils.dmEntityIsFolder(this.entityWrapper.dmEntity) ?
+      (this.entityWrapper.dmEntity as Folder).parentUid :
       null;
 
     this.entityEditForm = this.fb.group({
-      'name': this.fb.control(this.entity.name),
+      'name': this.fb.control(this.entityWrapper.dmEntity.name),
       'owner': this.fb.control('')
     });
 
@@ -77,7 +78,7 @@ export class ContainerEntityDataComponent implements OnInit {
         }),
         tap(([searchTerm, users]) => {
           if (this.init === false) {
-            const owner = this.extractEntityOwnerFromAllUsers(users, this.entity);
+            const owner = this.extractEntityOwnerFromAllUsers(users, this.entityWrapper.dmEntity);
             if (owner != null) {
               this.entityOwner = owner;
               this.entityEditForm.get('owner').setValue(owner);
@@ -92,20 +93,17 @@ export class ContainerEntityDataComponent implements OnInit {
       tap(res => this.isAdmin = res)
     );
 
-    this.folderService.canBeMoved(this.sessionService.sessionToken, this.entity.uid).subscribe(
+    this.folderService.canBeMoved(this.sessionService.sessionToken, this.entityWrapper.dmEntity.uid).subscribe(
       res => this.canBeMoved = res,
       error => this.canBeMoved = false
     );
 
-    this.securityService.canWrite(this.sessionService.sessionToken, this.entity.uid).subscribe(
-      res => this.isWriteable = res,
-      error => this.isWriteable = false
-    );
+    this.isWriteable = this.entityWrapper.canWrite;
 
     of('').pipe(
-      concatMap(() => DMEntityUtils.dmEntityIsWorkspace(this.entity) ?
+      concatMap(() => DMEntityUtils.dmEntityIsWorkspace(this.entityWrapper.dmEntity) ?
         of(null) :
-        this.entityCacheService.findContainerEntityInCache((this.entity as Folder).parentUid)
+        this.entityCacheService.findContainerEntityInCache((this.entityWrapper.dmEntity as Folder).parentUid)
       ),
       tap(parentFolder => this.parentEntity = parentFolder),
       tap(parentFolder => this.location =
@@ -116,7 +114,7 @@ export class ContainerEntityDataComponent implements OnInit {
     ).subscribe();
 
     this.entityCacheService.chosenParentUid$.pipe(
-      startWith(DMEntityUtils.dmEntityIsWorkspace(this.entity) ? null : (this.entity as Folder).parentUid),
+      startWith(DMEntityUtils.dmEntityIsWorkspace(this.entityWrapper.dmEntity) ? null : (this.entityWrapper.dmEntity as Folder).parentUid),
       concatMap(uid => uid == null ? of(null) : this.entityCacheService.findEntityInCache(uid)),
       tap(parent => this.parentEntityWanted = parent)
     ).subscribe();
@@ -142,25 +140,25 @@ export class ContainerEntityDataComponent implements OnInit {
   submit(): void {
     if (this.entityEditForm.invalid
       || (! this.entityEditForm.dirty
-        && (DMEntityUtils.dmEntityIsFolder(this.entity)
+        && (DMEntityUtils.dmEntityIsFolder(this.entityWrapper.dmEntity)
           && (this.parentEntityWanted == null
-            || (this.entity as Folder).parentUid === this.parentEntityWanted.uid)))) {
+            || (this.entityWrapper.dmEntity as Folder).parentUid === this.parentEntityWanted.uid)))) {
       return;
     }
 
-    ((DMEntityUtils.dmEntityIsFolder(this.entity)
+    ((DMEntityUtils.dmEntityIsFolder(this.entityWrapper.dmEntity)
         && (this.entityEditForm.get('name').dirty
           || (this.parentEntityWanted != null
-            && (this.entity as Folder).parentUid !== this.parentEntityWanted.uid))) ?
+            && (this.entityWrapper.dmEntity as Folder).parentUid !== this.parentEntityWanted.uid))) ?
         this.entityCacheService.updateFolder(
-          this.entity.uid,
+          this.entityWrapper.dmEntity.uid,
           this.entityEditForm.get('name').value,
           this.parentEntityWanted.uid
         ) :
-      (DMEntityUtils.dmEntityIsWorkspace(this.entity)
+      (DMEntityUtils.dmEntityIsWorkspace(this.entityWrapper.dmEntity)
         && this.entityEditForm.get('name').dirty) ?
         this.entityCacheService.updateWorkspace(
-          this.entity.uid,
+          this.entityWrapper.dmEntity.uid,
           this.entityEditForm.get('name').value
         ) :
         of(null)
@@ -170,13 +168,13 @@ export class ContainerEntityDataComponent implements OnInit {
         && (this.entityEditForm.get('owner').dirty) ?
           this.administrationService.changeOwnership(
             this.sessionService.sessionToken,
-            this.entity.uid,
+            this.entityWrapper.dmEntity.uid,
             this.entityEditForm.get('owner').value.uid,
             this.entityEditForm.get('owner').value.source
           ) :
           of(null)
       ),
-      concatMap(res => this.entityCacheService.findEntityInCache(this.entity.uid)),
+      concatMap(res => this.entityCacheService.findEntityInCache(this.entityWrapper.dmEntity.uid)),
       tap(reloadedEntity => {
         if (this.precedingParentUid != null
           && this.precedingParentUid !== (reloadedEntity as Folder).parentUid) {
@@ -200,8 +198,8 @@ export class ContainerEntityDataComponent implements OnInit {
           of([])
       )),
       tap(([reloadedEntity, other]) => {
-        this.entity = reloadedEntity;
-        this.entityEditForm.get('name').setValue(this.entity.name);
+        this.entityWrapper.dmEntity = reloadedEntity;
+        this.entityEditForm.get('name').setValue(this.entityWrapper.dmEntity.name);
         this.init = false;
         this.entityEditForm.get('owner').setValue('');
         this.sessionService.dirtyForm$.next(false);
@@ -261,8 +259,8 @@ export class ContainerEntityDataComponent implements OnInit {
   }
 
   private resetEditForm(): void {
-    this.entityEditForm.get('name').setValue(this.entity.name);
-    this.entityEditForm.get('owner').setValue(this.extractEntityOwnerFromAllUsers(this.allUsers, this.entity));
+    this.entityEditForm.get('name').setValue(this.entityWrapper.dmEntity.name);
+    this.entityEditForm.get('owner').setValue(this.extractEntityOwnerFromAllUsers(this.allUsers, this.entityWrapper.dmEntity));
   }
 
   private extractEntityOwnerFromAllUsers(users: Array<User>, entity: DMEntity): User {

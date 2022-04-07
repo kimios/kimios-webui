@@ -1,8 +1,8 @@
 <!-- Container details -->
-<div *ngIf="entityData" fxLayout="column" fxLayoutAlign="start center"  class="content" fxLayoutGap="20px">
+<div *ngIf="entityWrapper" fxLayout="column" fxLayoutAlign="start center"  class="content" fxLayoutGap="20px">
 
   <div fxLayout="row" fxLayoutAlign="center">
-    <span id="entityTitle">{{entityType}}: {{entityData.name}}</span>
+    <span id="entityTitle">{{entityType}}: {{entityWrapper.dmEntity.name}}</span>
   </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between start">
@@ -13,12 +13,12 @@
         <mat-tab label="Data">
 
           <!-- file properties : name, type, size, author, creation date -->
-          <container-entity-data [entity]="entityData" [entityType]="entityType" ></container-entity-data>
+          <container-entity-data [entityWrapper]="entityWrapper" [entityType]="entityType" ></container-entity-data>
 
         </mat-tab>
 
         <mat-tab label="Security">
-          <file-security [documentId]="entityData.uid" [inDialogComponent]="true"></file-security>
+          <file-security [documentId]="entityWrapper.dmEntity.uid" [inDialogComponent]="true"></file-security>
         </mat-tab>
       </mat-tab-group>
       <!--    </div>-->

@@ -64,12 +64,12 @@
       <ng-container *ngIf="{value: isAdmin$ | async } as context">
         <tr *ngIf="context.value === false">
           <td class="talign-right data-title">Owner:</td>
-          <td>{{entity.owner + '@' + entity.ownerSource}}</td>
+          <td>{{entityWrapper.dmEntity.owner + '@' + entityWrapper.dmEntity.ownerSource}}</td>
         </tr>
       </ng-container>
       <tr>
         <td class="talign-right data-title">Id:</td>
-        <td>{{entity.uid}}</td>
+        <td>{{entityWrapper.dmEntity.uid}}</td>
       </tr>
       <tr>
         <td class="talign-right data-title">Location:</td>
@@ -87,7 +87,7 @@
       </tr>
       <tr>
         <td class="talign-right data-title">Creation date:</td>
-        <td>{{entity.creationDate | date}}</td>
+        <td>{{entityWrapper.dmEntity.creationDate | date}}</td>
       </tr>
 
     </table>

@@ -4,6 +4,7 @@ import {BrowseEntityService} from 'app/services/browse-entity.service';
 import {filter, tap} from 'rxjs/operators';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'container-entity',
@@ -15,7 +16,7 @@ export class ContainerEntityComponent implements OnInit {
   @Input()
   entityId: number;
 
-  entityData: DMEntity;
+  entityWrapper: DMEntityWrapper;
   entityType: 'folder' | 'workspace';
 
   constructor(
@@ -29,10 +30,10 @@ export class ContainerEntityComponent implements OnInit {
       return;
     }
 
-    this.entityCacheService.findContainerEntityInCache(this.entityId).pipe(
-      tap(next => this.entityData = next),
+    this.entityCacheService.findContainerEntityWrapperInCache(this.entityId).pipe(
+      tap(next => this.entityWrapper = next),
       tap(next =>
-        this.entityType = DMEntityUtils.dmEntityIsFolder(next) ?
+        this.entityType = DMEntityUtils.dmEntityIsFolder(next.dmEntity) ?
           'folder' :
           'workspace'
       )
@@ -40,7 +41,7 @@ export class ContainerEntityComponent implements OnInit {
 
     this.entityCacheService.reloadedEntity$.pipe(
       filter(entity => entity != null),
-      tap(entity => this.entityData = entity)
+      tap(entity => this.entityWrapper.dmEntity = entity)
     ).subscribe();
   }
 
