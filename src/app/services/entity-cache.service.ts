@@ -452,7 +452,7 @@ export class EntityCacheService {
   private retrieveEntity(uid: number): Observable<DMEntityWrapper> {
     return this.retrieveContainerEntity(uid).pipe(
       concatMap(res => res == null || res === undefined || res === '' ?
-        this.documentService.retrieveDocumentWrapper(this.sessionService.sessionToken, uid) :
+        this.documentService.getDocumentWrapper(this.sessionService.sessionToken, uid) :
         of(res)
       ));
   }
