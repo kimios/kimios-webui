@@ -279,6 +279,7 @@ export class BrowseTreeChooseLocationComponent implements OnInit, AfterViewInit,
 
     this.browseEntityService.onNewWorkspace.pipe(
       concatMap(workspaceId => this.browseEntityService.retrieveWorkspaceEntity(workspaceId)),
+      map(workspaceWrapper => workspaceWrapper.dmEntity),
       tap(entity => {
         const newNode = {
           name: entity.name,

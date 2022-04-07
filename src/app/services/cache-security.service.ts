@@ -44,7 +44,21 @@ export class CacheSecurityService {
   getSecurityEnt(uid: number): Observable<SecurityEnt> {
     return this._securitiesMap.get(uid) ?
         of(this._securitiesMap.get(uid)) :
-        this.loadSecurityEnt(uid);
+        this.loadSecurityFromCache(uid);
+  }
+
+  loadSecurityFromCache(uid: number): Observable<SecurityEnt> {
+    return this.entityCacheService.findEntityWrapperInCache(uid).pipe(
+      concatMap(entityWrapper => entityWrapper != null ?
+        of(<SecurityEnt>{
+          read: entityWrapper.canRead,
+          write: entityWrapper.canWrite,
+          fullAccess: entityWrapper.hasFullAccess
+        }) :
+        this.loadSecurityEnt(uid)
+      ),
+      tap(secEnt => this.addSecurityEnt(uid, secEnt))
+    );
   }
 
   loadSecurityEnt(uid: number): Observable<SecurityEnt> {
@@ -56,8 +70,7 @@ export class CacheSecurityService {
             of({ read: secEnt.read, write: write, fullAccess: null }),
             this.securityService.hasFullAccess(this.sessionService.sessionToken, uid)
         )),
-        concatMap(([secEnt, fullAccess]) => of({read: secEnt.read, write: secEnt.write, fullAccess: fullAccess})),
-        tap(secEnt => this.addSecurityEnt(uid, secEnt))
+        concatMap(([secEnt, fullAccess]) => of({read: secEnt.read, write: secEnt.write, fullAccess: fullAccess}))
     );
   }
 

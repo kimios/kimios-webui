@@ -294,7 +294,7 @@ export class BrowseEntityService implements OnInit, OnDestroy {
       return this.entityCacheService.findContainerEntityInCache(uid);
     }
 
-    retrieveWorkspaceEntity(uid: number): Observable<Workspace> {
+    retrieveWorkspaceEntity(uid: number): Observable<DMEntityWrapper> {
         return this.entityCacheService.findWorkspaceInCache(uid);
     }
 

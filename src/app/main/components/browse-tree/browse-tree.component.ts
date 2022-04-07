@@ -414,6 +414,7 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
     this.browseEntityService.onNewWorkspace.pipe(
       takeUntil(this.unsubscribeSubject$),
         concatMap(workspaceId => this.browseEntityService.retrieveWorkspaceEntity(workspaceId)),
+        map(workspaceWrapper => workspaceWrapper.dmEntity),
         tap(entity => {
           if (this.tree.treeModel.getNodeById(entity.uid) != null) {
             return;
