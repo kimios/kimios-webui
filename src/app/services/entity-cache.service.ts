@@ -238,14 +238,10 @@ export class EntityCacheService {
   }
 
   private initDocumentDataInCache(uid: number): Observable<DocumentCacheData> {
-    return this.documentService.getDocument(this.sessionService.sessionToken, uid).pipe(
-      concatMap(doc =>  doc != null ?
-        combineLatest(of(doc), this.retrievePermissions((doc as KimiosDocument).uid)) :
-        combineLatest(of(null), of(null))
-      ),
-      concatMap(([doc, permissions]) => doc == null ?
-        of(null) :
-        of(new DocumentCacheData(doc, permissions.canRead, permissions.canWrite, permissions.hasFullAccess))
+    return this.documentService.getDocumentWrapper(this.sessionService.sessionToken, uid).pipe(
+      map(doc =>  doc != null ?
+        null :
+        new DocumentCacheData(doc.dmEntity, doc.canRead, doc.canWrite, doc.hasFullAccess)
       ),
     );
   }
@@ -266,29 +262,16 @@ export class EntityCacheService {
 
   private initDocumentInCache(uid: number): Observable<DMEntityWrapper> {
     return this.initBookmarks().pipe(
-      concatMap(() => this.documentService.getDocument(this.sessionService.sessionToken, uid)),
-      map(entity => {
-        if (entity == null || entity === undefined) {
+      concatMap(() => this.documentService.getDocumentWrapper(this.sessionService.sessionToken, uid)),
+      map(entityWrapper => {
+        if (entityWrapper == null || entityWrapper === undefined) {
           return null;
         }
-        if (this.bookmarks.filter(element => element.entity.uid === entity.uid).length > 0) {
-          entity.bookmarked = true;
+        if (this.bookmarks.filter(element => element.entity.uid === entityWrapper.dmEntity.uid).length > 0) {
+          entityWrapper.dmEntity.bookmarked = true;
         }
-        return entity;
+        return entityWrapper;
       }),
-      concatMap(entity => entity != null ?
-        combineLatest(of(entity), this.retrievePermissions(entity.uid)) :
-        of(null)
-      ),
-      map(([entity, permissions]) => entity != null && entity !== undefined && entity !== '' ?
-        <DMEntityWrapper> {
-          dmEntity: entity,
-          canRead: permissions.canRead,
-          canWrite: permissions.canWrite,
-          hasFullAccess: permissions.hasFullAccess
-        } :
-        null
-      ),
       tap((entityWrapper) => {
         if (entityWrapper != null) {
           this.entitiesCache.set(
@@ -449,6 +432,12 @@ export class EntityCacheService {
       this.initContainerEntityInCache(entityUid).map(wrapper => wrapper.dmEntity);
   }
 
+  public findContainerEntityWrapperInCache(entityUid): Observable<DMEntityWrapper> {
+    return this.entitiesCache.get(entityUid) != null ?
+      of(this.entityCacheDataToDMEntityWrapper(this.entitiesCache.get(entityUid))) :
+      this.initContainerEntityInCache(entityUid);
+  }
+
   private retrieveEntity(uid: number): Observable<DMEntityWrapper> {
     return this.retrieveContainerEntity(uid).pipe(
       concatMap(res => res == null || res === undefined || res === '' ?
@@ -569,59 +558,56 @@ export class EntityCacheService {
 
   private updateEntityInCache(entity: DMEntity): Observable<DMEntity> {
     if (DMEntityUtils.dmEntityIsDocument(entity)) {
-      return this.documentService.getDocument(this.sessionService.sessionToken, entity.uid).pipe(
-        map(doc => {
-          if (this.bookmarks.filter(element => element.entity.uid === doc.uid).length > 0) {
-            doc.bookmarked = true;
+      return this.documentService.getDocumentWrapper(this.sessionService.sessionToken, entity.uid).pipe(
+        filter(docWrapper => docWrapper != null),
+        map(docWrapper => {
+          if (this.bookmarks.filter(element => element.entity.uid === docWrapper.dmEntity.uid).length > 0) {
+            docWrapper.dmEntity.bookmarked = true;
           }
-          return doc;
+          return docWrapper;
         }),
-        concatMap(doc => doc != null ?
-          combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
-          of(null)
+        tap(docWrapper =>
+            this.entitiesCache.set(
+              docWrapper.dmEntity.uid,
+              new EntityCacheData(docWrapper.dmEntity, docWrapper.canRead, docWrapper.canWrite, docWrapper.hasFullAccess)
+            )
         ),
-        tap(([doc, permissions]) => {
-          if (doc != null && doc !== undefined && doc !== '') {
-            this.entitiesCache.set(doc.uid, new EntityCacheData(doc, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
-          }
-        })
+        map(docWrapper => docWrapper.dmEntity)
       );
     } else {
       if (DMEntityUtils.dmEntityIsFolder(entity)) {
-        return this.folderService.getFolder(this.sessionService.sessionToken, entity.uid).pipe(
-          map(folder => {
-            if (this.bookmarks.filter(element => element.entity.uid === folder.uid).length > 0) {
-              folder.bookmarked = true;
+        return this.folderService.getFolderWrapper(this.sessionService.sessionToken, entity.uid).pipe(
+          filter(folderWrapper => folderWrapper != null),
+          map(folderWrapper => {
+            if (this.bookmarks.filter(element => element.entity.uid === folderWrapper.dmEntity.uid).length > 0) {
+              folderWrapper.dmEntity.bookmarked = true;
             }
-            return folder;
+            return folderWrapper;
           }),
-          concatMap(doc => doc != null ?
-            combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
-            of(null)
-          ),
-          tap(([folder, permissions]) => {
-            if (folder != null && folder !== undefined && folder !== '') {
-              this.entitiesCache.set(folder.uid, new EntityCacheData(folder, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
-            }
-          })
+          tap(folderWrapper =>
+              this.entitiesCache.set(
+                folderWrapper.dmEntity.uid,
+                new EntityCacheData(folderWrapper.dmEntity, folderWrapper.canRead, folderWrapper.canWrite, folderWrapper.hasFullAccess)
+              )
+            ),
+          map(folderWrapper => folderWrapper.dmEntity)
         );
       } else {
-        return this.workspaceService.getWorkspace(this.sessionService.sessionToken, entity.uid).pipe(
-          map(workspace => {
-            if (this.bookmarks.filter(element => element.entity.uid === workspace.uid).length > 0) {
-              workspace.bookmarked = true;
+        return this.workspaceService.getWorkspaceWrapper(this.sessionService.sessionToken, entity.uid).pipe(
+          filter(workspaceWrapper => workspaceWrapper != null),
+          map(workspaceWrapper => {
+            if (this.bookmarks.filter(element => element.entity.uid === workspaceWrapper.dmEntity.uid).length > 0) {
+              workspaceWrapper.dmEntity.bookmarked = true;
             }
-            return workspace;
+            return workspaceWrapper;
           }),
-          concatMap(doc => doc != null ?
-            combineLatest(of(doc), this.retrievePermissions(entity.uid)) :
-            of(null)
+          tap(workspaceWrapper =>
+            this.entitiesCache.set(
+              workspaceWrapper.dmEntity.uid,
+              new EntityCacheData(workspaceWrapper.dmEntity, workspaceWrapper.canRead, workspaceWrapper.canWrite, workspaceWrapper.hasFullAccess)
+            )
           ),
-          tap(([workspace, permissions]) => {
-            if (workspace != null && workspace !== undefined && workspace !== '') {
-              this.entitiesCache.set(workspace.uid, new EntityCacheData(workspace, permissions.canRead, permissions.canWrite, permissions.hasFullAccess));
-            }
-          })
+          map(workspaceWrapper => workspaceWrapper.dmEntity)
         );
       }
     }
@@ -810,20 +796,27 @@ export class EntityCacheService {
     }*/
   }
 
-  findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntity> {
-    return this.findContainerEntityInCache(uid).pipe(
+  findAllParentsRec(uid: number, includeEntity: boolean = false): Observable<DMEntityWrapper> {
+    return this.findContainerEntityWrapperInCache(uid).pipe(
       expand(
-        res => res !== undefined && (DMEntityUtils.dmEntityIsFolder(res) /*|| DMEntityUtils.dmEntityIsWorkspace(res)*/) ?
-          this.findContainerEntityInCache(res['parentUid']) :
+        res => res !== undefined && (DMEntityUtils.dmEntityIsFolder(res.dmEntity) /*|| DMEntityUtils.dmEntityIsWorkspace(res)*/) ?
+          this.findContainerEntityWrapperInCache(res.dmEntity['parentUid']) :
           of()
       ),
       map(res => res),
-      filter(res => includeEntity || res.uid !== uid)
+      filter(res => includeEntity || res.dmEntity.uid !== uid)
     );
   }
 
   findAllParents(uid: number, includeEntity: boolean = false): Observable<Array<DMEntity>> {
-    const parents = new Array<DMEntity>();
+    return this.findAllParentsRec(uid, includeEntity).pipe(
+      filter(elem => elem !== null && elem !== undefined && elem !== ''),
+      map(wrapper => wrapper.dmEntity),
+      toArray()
+    );
+  }
+
+  findAllParentWrappers(uid: number, includeEntity: boolean = false): Observable<Array<DMEntityWrapper>> {
     return this.findAllParentsRec(uid, includeEntity).pipe(
       filter(elem => elem !== null && elem !== undefined && elem !== ''),
       toArray()

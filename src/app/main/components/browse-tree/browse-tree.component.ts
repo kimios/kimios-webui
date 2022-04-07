@@ -529,20 +529,8 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
                         entity => this.browseEntityService.selectedEntityFromGridOrTree$.next(entity)
                     ),*/
                     concatMap(
-                        entity => this.entityCacheService.findAllParents(entity.uid, true)
+                        entity => this.entityCacheService.findAllParentWrappers(entity.uid, true)
                     ),
-                    concatMap(entities => entities),
-                    concatMap(entity => combineLatest(
-                      of(entity),
-                      this.entityCacheService.retrievePermissions(entity.uid)
-                    )),
-                    map(([entity, permissions]) => <DMEntityWrapper> {
-                      dmEntity: entity,
-                      canRead: permissions.canRead,
-                      canWrite: permissions.canWrite,
-                      hasFullAccess: permissions.hasFullAccess
-                    }),
-                    toArray(),
                     map(entities => entities.reverse())
                 )
         )
