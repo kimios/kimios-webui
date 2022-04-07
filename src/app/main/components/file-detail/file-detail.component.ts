@@ -29,8 +29,8 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     @Input()
     documentId: number;
-    document: KimiosDocument;
-    documentData$: Observable<KimiosDocument>;
+    documentWrapper: DMEntityWrapper;
+    documentWrapper$: Observable<DMEntityWrapper>;
     documentVersions$: Observable<Array<DocumentVersion>>;
     documentVersions: Array<DocumentVersion>;
     documentVersionIds: Array<number>;
@@ -119,24 +119,22 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.entityCacheService.documentUpdate$.pipe(
           filter(documentId => this.documentId === documentId),
           concatMap(documentId => this.entityCacheService.findDocumentInCache(this.documentId)),
-          tap(docWrapper => this.documentData$ = of((docWrapper.dmEntity as KimiosDocument)))
+          tap(docWrapper => this.documentWrapper$ = of(docWrapper))
         ).subscribe();
     }
 
     initDocumentDetail(): void {
-        this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.documentId);
-        this.hasFullAccess$ = this.securityService.hasFullAccess(this.sessionService.sessionToken, this.documentId);
-
-        this.documentData$ = this.allTagsKey$
+        this.documentWrapper$ = this.allTagsKey$
             .pipe(
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
                 tap(docWrapper => this.documentDetailService.currentVersionId.next((docWrapper.dmEntity as KimiosDocument).lastVersionId)),
-                tap(docWrapper => this.document = (docWrapper.dmEntity as KimiosDocument)),
+                tap(docWrapper => this.documentWrapper = docWrapper),
+                tap(docWrapper => this.canWrite$ = of(docWrapper.canWrite)),
+                tap(docWrapper => this.hasFullAccess$ = of(docWrapper.hasFullAccess)),
                 tap(docWrapper => this.loading$ = of(false)),
-                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags)),
-                map(docWrapper => docWrapper.dmEntity)
+                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags))
             );
 
         this.documentVersions$ = this.initDocumentVersions();
@@ -205,9 +203,9 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                     res => this.previewTitle =
                         (res instanceof Array) ?
                             (res.length === 0) ?
-                                'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale) :
+                                'Unique version, created on ' + formatDate(this.documentWrapper.dmEntity.creationDate, 'longDate', this.locale) :
                                 this.makePreviewTitle(this.documentDetailService.currentVersionId.getValue(), res) :
-                            'Unique version, created on ' + formatDate(this.document.creationDate, 'longDate', this.locale)
+                            'Unique version, created on ' + formatDate(this.documentWrapper.dmEntity.creationDate, 'longDate', this.locale)
                 ),
                 tap(
                     res => this.documentVersions = res
@@ -343,13 +341,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     private reloadDocument(): void {
-        this.documentData$ = this.allTagsKey$
+        this.documentWrapper$ = this.allTagsKey$
             .pipe(
                 // tap(res => this.allTags = res),
                 concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
-                tap(docWrapper => this.document = docWrapper.dmEntity),
-                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags)),
-                map(docWrapper => docWrapper.dmEntity)
+                tap(docWrapper => this.documentWrapper = docWrapper),
+                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags))
             );
 
         this.documentVersions$ = this.initDocumentVersions();

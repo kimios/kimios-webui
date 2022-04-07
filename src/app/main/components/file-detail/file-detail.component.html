@@ -1,16 +1,16 @@
 <div fxLayout="column" fxLayoutAlign="start stretch" fxFill>
 
-    <div fxLayout="row" fxLayoutAlign="start space-between" fxFlex *ngIf="documentData$ | async as document">
+    <div fxLayout="row" fxLayoutAlign="start space-between" fxFlex *ngIf="documentWrapper$ | async as documentWrapper">
         <div #browsePathRow id="browsePathRow" fxFlex>
-            <browse-path [document]="document"></browse-path>
+            <browse-path [document]="documentWrapper.dmEntity"></browse-path>
         </div>
-        <file-toolbar [document]="document" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+        <file-toolbar [document]="documentWrapper" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     </div>
 
     <div class="content" fxFill style="overflow: auto;">
 
 <!-- File details -->
-        <ng-container *ngIf="documentData$ | async as data">
+        <ng-container *ngIf="documentWrapper$ | async as data">
 
             <nav mat-tab-nav-bar>
                 <a mat-tab-link
