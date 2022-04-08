@@ -14,6 +14,7 @@ import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {Location} from '@angular/common';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'file-detail-tags',
@@ -23,7 +24,7 @@ import {Document as KimiosDocument} from 'app/kimios-client-api';
 export class FileDetailTagsComponent implements OnInit {
 
   @Input()
-  document: KimiosDocument;
+  documentWrapper: DMEntityWrapper;
   canWrite$: Observable<boolean>;
   documentTags$: BehaviorSubject<Array<string>>;
   selectable = true;
@@ -67,7 +68,7 @@ export class FileDetailTagsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canWrite$ = this.securityService.canWrite(this.sessionService.sessionToken, this.document.uid);
+    this.canWrite$ = of(this.documentWrapper.canWrite);
 
     this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
       .pipe(
@@ -80,9 +81,9 @@ export class FileDetailTagsComponent implements OnInit {
       .pipe(
         tap(res => this.loading$ = of(true)),
         // tap(res => this.allTags = res),
-        concatMap(res => this.entityCacheService.findDocumentInCache(this.document.uid)),
+        concatMap(res => this.entityCacheService.findDocumentInCache(this.documentWrapper.dmEntity.uid)),
         tap(res => this.documentDetailService.currentVersionId.next((res.dmEntity as KimiosDocument).lastVersionId)),
-        tap(res => this.document = res.dmEntity as KimiosDocument),
+        tap(res => this.documentWrapper.dmEntity = (res.dmEntity as KimiosDocument)),
         tap(res => this.loading$ = of(false)),
         tap(res => console.dir(res)),
         tap(res => this.documentTags$.next((res.dmEntity as KimiosDocument).tags)),
@@ -93,7 +94,7 @@ export class FileDetailTagsComponent implements OnInit {
         tap(next => this.selectedTag = next),
         concatMap(next => this.documentService.updateDocumentTag(
           this.sessionService.sessionToken,
-          this.document.uid,
+          this.documentWrapper.dmEntity.uid,
           next,
           true
           )
@@ -107,7 +108,7 @@ export class FileDetailTagsComponent implements OnInit {
       .pipe(
         concatMap(next => combineLatest(of(next), this.documentService.updateDocumentTag(
           this.sessionService.sessionToken,
-          this.document.uid,
+          this.documentWrapper.dmEntity.uid,
           next,
           false
           )

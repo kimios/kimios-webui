@@ -4,6 +4,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 import {Document as KimiosDocument} from 'app/kimios-client-api';
 import {DocumentDetailService} from 'app/services/document-detail.service';
+import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'file-detail-data-and-tags',
@@ -15,7 +16,7 @@ export class FileDetailDataAndTagsComponent implements OnInit {
   @Input()
   documentId: number;
   documentId$: BehaviorSubject<number>;
-  document$: Observable<KimiosDocument>;
+  documentWrapper$: Observable<DMEntityWrapper>;
 
   constructor(
     private entityCacheService: EntityCacheService,
@@ -25,10 +26,9 @@ export class FileDetailDataAndTagsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.document$ = this.documentId$.pipe(
+    this.documentWrapper$ = this.documentId$.pipe(
       filter(docId => docId != null),
-      concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
-      map(documentWrapper => documentWrapper.dmEntity as KimiosDocument)
+      concatMap(docId => this.entityCacheService.findDocumentInCache(docId))
     );
 
     if (this.documentId == null) {

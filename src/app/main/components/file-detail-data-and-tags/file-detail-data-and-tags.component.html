@@ -1,11 +1,11 @@
 <div class="file-tab-content-wrapper">
-  <div [ngClass]="'file-tab-content fit'" *ngIf="document$ | async as document">
+  <div [ngClass]="'file-tab-content fit'" *ngIf="documentWrapper$ | async as documentWrapper">
 
     <!-- file properties : name, type, size, author, creation date -->
-    <file-detail-data [document]="document"></file-detail-data>
+    <file-detail-data [document]="documentWrapper.dmEntity"></file-detail-data>
 
     <!-- tags -->
-    <file-detail-tags [document]="document"></file-detail-tags>
+    <file-detail-tags [documentWrapper]="documentWrapper"></file-detail-tags>
 
   </div>
 </div>
