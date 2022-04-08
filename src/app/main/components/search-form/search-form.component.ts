@@ -25,6 +25,7 @@ import {SessionService} from 'app/services/session.service';
 import {MetaWithValue} from 'app/main/model/meta-with-value';
 import {MetaValueRange, MetaValueRangeDate, MetaValueRangeNumber} from 'app/main/model/meta-value-range';
 import {UsersCacheService} from 'app/services/users-cache.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'search-form',
@@ -68,7 +69,8 @@ export class SearchFormComponent implements OnInit {
       private sessionService: SessionService,
       private studioService: StudioService,
       private documentVersionService: DocumentVersionService,
-      private usersCacheService: UsersCacheService
+      private usersCacheService: UsersCacheService,
+      private entityCacheService: EntityCacheService
   ) {
     this.filteredUsers$ = new Observable<Array<User>>(null);
     this.filteredTags$ = new Observable<Array<string>>(null);
@@ -98,7 +100,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.allTags$ = this.searchEntityService.retrieveAllTags()
+    this.allTags$ = this.entityCacheService.findAllTags()
         .pipe(
             map(res => Array.from(res.keys())),
             tap(res => this.allTags = res),

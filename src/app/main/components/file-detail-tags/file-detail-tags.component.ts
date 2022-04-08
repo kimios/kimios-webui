@@ -70,7 +70,7 @@ export class FileDetailTagsComponent implements OnInit {
   ngOnInit(): void {
     this.canWrite$ = of(this.documentWrapper.canWrite);
 
-    this.allTagsKey$ = this.searchEntityService.retrieveAllTags()
+    this.allTagsKey$ = this.entityCacheService.findAllTags()
       .pipe(
         tap(res => this.allTags = res),
         tap(() => this.filteredTags$ = this.initFilteredTags()),

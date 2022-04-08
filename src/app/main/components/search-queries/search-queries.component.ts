@@ -4,6 +4,7 @@ import {BehaviorSubject} from 'rxjs';
 import {PageEvent} from '@angular/material';
 import {isNumber} from 'util';
 import {ActivatedRoute} from '@angular/router';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'app-search-queries',
@@ -32,13 +33,14 @@ export class SearchQueriesComponent implements OnInit {
   constructor(
       private searchEntityService: SearchEntityService,
       private route: ActivatedRoute,
+      private entityCacheService: EntityCacheService
   ) {
     this.totalFilesFound$ = new BehaviorSubject<number>(undefined);
     this.pageSize = this.searchEntityService.pageSize;
   }
 
   ngOnInit(): void {
-    this.searchEntityService.retrieveAllTags().subscribe(
+    this.entityCacheService.findAllTags().subscribe(
         res => this.allTags = res
     );
 
