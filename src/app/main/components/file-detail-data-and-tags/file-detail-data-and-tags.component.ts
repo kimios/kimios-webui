@@ -16,20 +16,22 @@ export class FileDetailDataAndTagsComponent implements OnInit {
   @Input()
   documentId: number;
   documentId$: BehaviorSubject<number>;
-  documentWrapper$: Observable<DMEntityWrapper>;
+  documentWrapper$: BehaviorSubject<DMEntityWrapper>;
 
   constructor(
     private entityCacheService: EntityCacheService,
     private documentDetailService: DocumentDetailService
   ) {
     this.documentId$ = new BehaviorSubject<number>(null);
+    this.documentWrapper$ = new BehaviorSubject<DMEntityWrapper>(null);
   }
 
   ngOnInit(): void {
-    this.documentWrapper$ = this.documentId$.pipe(
+    this.documentId$.pipe(
       filter(docId => docId != null),
-      concatMap(docId => this.entityCacheService.findDocumentInCache(docId))
-    );
+      concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
+      tap(res => this.documentWrapper$.next(res))
+    ).subscribe();
 
     if (this.documentId == null) {
       this.documentDetailService.currentDocumentId$.pipe(
@@ -44,6 +46,12 @@ export class FileDetailDataAndTagsComponent implements OnInit {
     this.entityCacheService.documentUpdate$.pipe(
       filter(docId => this.documentId != null && this.documentId === docId),
       tap(docId => this.documentId$.next(docId))
+    ).subscribe();
+
+    this.entityCacheService.documentUpdate$.pipe(
+      filter(docId => docId === this.documentId),
+      concatMap(docId => this.entityCacheService.findDocumentInCache(docId)),
+      tap(res => this.documentWrapper$.next(res))
     ).subscribe();
   }
 

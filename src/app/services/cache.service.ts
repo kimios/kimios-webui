@@ -297,6 +297,12 @@ export class CacheService {
             this.cacheSubjectsService.documentShared$.next(o);
           }
           break;
+        case UpdateNoticeTypeEnum.NEWTAG:
+          if (messageParsedObj != null ) {
+            const o = Object.assign(obj, messageParsedObj);
+            this.cacheSubjectsService.newTag$.next(o);
+          }
+          break;
       }
     }
 

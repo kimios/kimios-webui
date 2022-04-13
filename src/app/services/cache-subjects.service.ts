@@ -40,6 +40,7 @@ export class CacheSubjectsService {
   public documentTrash$: Subject<UpdateNoticeParameters>;
   public documentUntrash$: Subject<UpdateNoticeParameters>;
   public documentShared$: Subject<UpdateNoticeParameters>;
+  public newTag$: Subject<UpdateNoticeParameters>;
 
   constructor() {
     this.userGroupAdd$ = new Subject<UpdateNoticeParameters>();
@@ -75,5 +76,6 @@ export class CacheSubjectsService {
     this.documentTrash$ = new Subject<UpdateNoticeParameters>();
     this.documentUntrash$ = new Subject<UpdateNoticeParameters>();
     this.documentShared$ = new Subject<UpdateNoticeParameters>();
+    this.newTag$ = new Subject<UpdateNoticeParameters>();
   }
 }

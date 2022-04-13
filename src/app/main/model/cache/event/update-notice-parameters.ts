@@ -3,4 +3,5 @@ export interface UpdateNoticeParameters {
   group?: string;
   user?: string;
   dmEntityId?: number;
+  tag?: string;
 }

@@ -2,7 +2,7 @@
   <mat-form-field *ngIf="canWrite$ | async; else elseBlockTags" fxFlexFill>
     <mat-chip-list #chipList>
       <mat-chip
-              *ngFor="let tag of documentTags$ | async"
+              *ngFor="let tag of documentWrapper.dmEntity['tags']"
               [selectable]="selectable"
               [removable]="removable"
               (removed)="remove(tag)">
@@ -29,7 +29,7 @@
   <ng-template #elseBlockTags>
     <mat-chip-list #chipList>
       <mat-chip
-              *ngFor="let tag of documentTags$ | async"
+              *ngFor="let tag of documentWrapper.dmEntity['tags']"
               [selectable]="false"
               [removable]="false"
               (removed)="remove(tag)">

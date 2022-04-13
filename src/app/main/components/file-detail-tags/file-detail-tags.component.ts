@@ -4,7 +4,7 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormBuilder, FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {concatMap, map, startWith, tap} from 'rxjs/operators';
-import {DocumentService, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
+import {Document as KimiosDocument, DocumentService, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {ActivatedRoute} from '@angular/router';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
@@ -13,8 +13,7 @@ import {SearchEntityService} from 'app/services/searchentity.service';
 import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {Location} from '@angular/common';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {Document as KimiosDocument} from 'app/kimios-client-api';
-import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
+import {DMEntityWrapper} from 'app/kimios-client-api/model/dMEntityWrapper';
 
 @Component({
   selector: 'file-detail-tags',
@@ -26,7 +25,6 @@ export class FileDetailTagsComponent implements OnInit {
   @Input()
   documentWrapper: DMEntityWrapper;
   canWrite$: Observable<boolean>;
-  documentTags$: BehaviorSubject<Array<string>>;
   selectable = true;
   removable = true;
   addOnBlur = true;
@@ -34,7 +32,7 @@ export class FileDetailTagsComponent implements OnInit {
   tagCtrl = new FormControl();
   allTagsKey$: Observable<Array<string>>;
   allTags: Map<string, number>;
-  filteredTags$: Observable<Array<string>>;
+  filteredTags$: BehaviorSubject<Array<string>>;
   selectedTag$: Subject<string>;
   removedTag$: Subject<string>;
   selectedTag: string;
@@ -60,7 +58,6 @@ export class FileDetailTagsComponent implements OnInit {
     @Inject(LOCALE_ID) private locale: string,
     private entityCacheService: EntityCacheService
   ) {
-    this.documentTags$ = new BehaviorSubject<Array<string>>([]);
     this.selectedTag$ = new Subject<string>();
     this.removedTag$ = new Subject<string>();
     this.canWrite$ = new Observable<boolean>();
@@ -70,23 +67,19 @@ export class FileDetailTagsComponent implements OnInit {
   ngOnInit(): void {
     this.canWrite$ = of(this.documentWrapper.canWrite);
 
-    this.allTagsKey$ = this.entityCacheService.findAllTags()
-      .pipe(
-        tap(res => this.allTags = res),
-        tap(() => this.filteredTags$ = this.initFilteredTags()),
-        map(res => Array.from(res.keys()))
-      );
+    this.filteredTags$ = new BehaviorSubject<Array<string>>([]);
 
-    this.allTagsKey$
+    this.entityCacheService.findAllTags()
       .pipe(
+        tap(tagsMap => this.allTags = tagsMap),
+        map(tagsMap => Array.from(tagsMap.keys())),
         tap(res => this.loading$ = of(true)),
         // tap(res => this.allTags = res),
-        concatMap(res => this.entityCacheService.findDocumentInCache(this.documentWrapper.dmEntity.uid)),
-        tap(res => this.documentDetailService.currentVersionId.next((res.dmEntity as KimiosDocument).lastVersionId)),
-        tap(res => this.documentWrapper.dmEntity = (res.dmEntity as KimiosDocument)),
-        tap(res => this.loading$ = of(false)),
-        tap(res => console.dir(res)),
-        tap(res => this.documentTags$.next((res.dmEntity as KimiosDocument).tags)),
+        concatMap(tags => combineLatest(of(tags), this.entityCacheService.findDocumentInCache(this.documentWrapper.dmEntity.uid))),
+        tap(([tags, entityWrapper]) => this.documentDetailService.currentVersionId.next((entityWrapper.dmEntity as KimiosDocument).lastVersionId)),
+        tap(([tags, entityWrapper]) => this.documentWrapper = entityWrapper),
+        tap(() => this.filteredTags$.next(this._filterTags(this.tagCtrl.value))),
+        tap(() => this.loading$ = of(false))
       ).subscribe();
 
     this.selectedTag$
@@ -100,9 +93,7 @@ export class FileDetailTagsComponent implements OnInit {
           )
         )
       )
-      .subscribe(
-        next => this.documentTags$.next(this.documentTags$.getValue().concat(this.selectedTag))
-      );
+      .subscribe();
 
     this.removedTag$
       .pipe(
@@ -114,16 +105,20 @@ export class FileDetailTagsComponent implements OnInit {
           )
         ))
       )
-      .subscribe(
-        ([removedTag, res]) => {
-          const tags = this.documentTags$.getValue();
-          const tagIndex = tags.indexOf(removedTag);
-          if (tagIndex !== -1) {
-            tags.splice(tagIndex, 1);
-            this.documentTags$.next(tags);
-          }
-        }
-      );
+      .subscribe();
+
+    this.entityCacheService.allTagsNeedRefresh$.pipe(
+      concatMap(() => this.entityCacheService.findAllTags()),
+      tap(res => this.allTags),
+      map(res => this._filterTags(this.tagCtrl.value)),
+      tap(res => this.filteredTags$.next(res.sort()))
+    ).subscribe();
+
+    this.tagCtrl.valueChanges.pipe(
+      startWith(null),
+      map((tag: string | null) => this._filterTags(tag)),
+      tap(res => this.filteredTags$.next(res.sort()))
+    ).subscribe();
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
@@ -188,12 +183,15 @@ export class FileDetailTagsComponent implements OnInit {
   }
 
   private isTagSetOnDocument(tag: string): boolean {
-    return this.documentTags$.getValue().includes(tag);
+    return this.documentWrapper.dmEntity['tags'].includes(tag);
   }
 
   private _filterTags(value: string): Array<string> {
-    const filterValue = value.toLowerCase();
+    const filterValue = value == null ? null : value.toLowerCase();
 
-    return Array.from(this.allTags.keys()).filter(tag => !this.isTagSetOnDocument(tag) && tag.toLowerCase().includes(filterValue));
+    return Array.from(this.allTags.keys()).filter(
+      tag => !this.isTagSetOnDocument(tag)
+        && (filterValue == null || filterValue === '' || tag.toLowerCase().includes(filterValue))
+    );
   }
 }

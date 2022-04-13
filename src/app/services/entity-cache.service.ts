@@ -48,6 +48,8 @@ export class EntityCacheService {
   public documentUpdate$: Subject<number>;
   public documentVersionCreated$: Subject<number>;
   public documentVersionUpdated$: Subject<DocumentVersionWithMetaValues>;
+  private updateAllTags = true;
+  public allTagsNeedRefresh$: Subject<boolean>;
   
   constructor(
       private sessionService: SessionService,
@@ -84,6 +86,7 @@ export class EntityCacheService {
     this.documentUpdate$ = new Subject<number>();
     this.documentVersionCreated$ = new Subject<number>();
     this.documentVersionUpdated$ = new Subject<DocumentVersionWithMetaValues>();
+    this.allTagsNeedRefresh$ = new Subject<boolean>();
 
     this.cacheSubjectsService.workspaceCreated$.pipe(
       tap(params => this.handleWorkspaceCreated(params.dmEntityId))
@@ -161,6 +164,9 @@ export class EntityCacheService {
     ).subscribe();
     this.cacheSubjectsService.documentShared$.pipe(
       tap(params => this.handleDocumentShared(params.dmEntityId))
+    ).subscribe();
+    this.cacheSubjectsService.newTag$.pipe(
+      tap(params => this.handleNewTag(params.tag))
     ).subscribe();
   }
 
@@ -300,14 +306,15 @@ export class EntityCacheService {
   }
 
   findAllTags(): Observable<Map<string, number>> {
-    return this.allTags == null ?
+    return this.allTags == null || this.updateAllTags === true ?
       this.initAllTags() :
       of(this.allTags);
   }
 
   private initAllTags(): Observable<Map<string, number>> {
     return this.searchEntityService.retrieveAllTags().pipe(
-      tap(allTags => this.allTags = allTags)
+      tap(allTags => this.allTags = allTags),
+      tap(() => this.updateAllTags = false)
     );
   }
 
@@ -1038,5 +1045,15 @@ export class EntityCacheService {
 
   private handleDocumentShared(dmEntityId: number): void {
     
+  }
+
+  private handleNewTag(newTag: string): void {
+    let tagNbDocs = this.allTags.get(newTag);
+    if (tagNbDocs == null) {
+      this.allTags.set(newTag, 1);
+    } else {
+      this.allTags.set(newTag, tagNbDocs++);
+    }
+    this.allTagsNeedRefresh$.next(true);
   }
 }
