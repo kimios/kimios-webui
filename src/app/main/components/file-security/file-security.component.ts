@@ -55,6 +55,8 @@ export class FileSecurityComponent implements OnInit {
   };
   @Input()
   inDialogComponent = false;
+  @Input()
+  containerEntity = false;
 
   constructor(
       private fb: FormBuilder,
@@ -121,6 +123,10 @@ export class FileSecurityComponent implements OnInit {
     } else {
       this.documentId$.next(this.documentId);
     }
+
+    if (this.containerEntity) {
+      this.dmEntitySecuritiesForm.addControl('applyToChildren', this.fb.control(false));
+    }
   }
 
     private addNewSecurityToDatasource(userOrGroup: UserOrGroup): void {
@@ -159,23 +165,18 @@ export class FileSecurityComponent implements OnInit {
     );
   }
 
-  deleteRow(rowIndex: number, event): void {
-      let newIndex = 0;
+  deleteRow(formControlName: string, event): void {
       const newFormGroup = this.fb.group({});
-      this.dataSource.data.slice().forEach((security, index) => {
-          if (index === rowIndex) {
-              this.dataSource.data.splice(rowIndex, 1);
-              const newData = this.dataSource.data.slice();
-              this.dataSource.data = newData;
-          } else {
-              newFormGroup.addControl(
-                  newIndex.toString(),
-                  (this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).get(index.toString())
-              );
-              newIndex++;
-          }
-      });
-      this.dmEntitySecuritiesForm.setControl('formGroupSecurities', newFormGroup);
+      (this.dmEntitySecuritiesForm.get('formGroupSecurities') as FormGroup).removeControl(formControlName);
+      const formControlNameSplitted = formControlName.split('_');
+      const data = this.dataSource.data;
+      const dmEntitySecurityIdx = data.findIndex(dmEntitySecurity =>
+        dmEntitySecurity.name === formControlNameSplitted[0]
+        && dmEntitySecurity.source === formControlNameSplitted[1]
+        && dmEntitySecurity.type.toString() === formControlNameSplitted[2]
+      );
+      data.splice(dmEntitySecurityIdx, 1);
+      this.dataSource.data = data;
   }
 
     cancel($event: MouseEvent): void {
@@ -277,7 +278,7 @@ export class FileSecurityComponent implements OnInit {
                   fullAccess: this.dmEntitySecuritiesForm.get('formGroupSecurities').get(control).get('fullAccess').value
               }
           ),
-          recursive: false
+          recursive: this.containerEntity ? this.dmEntitySecuritiesForm.get('applyToChildren').value : false
       };
   }
 

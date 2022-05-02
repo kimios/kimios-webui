@@ -14,7 +14,7 @@
 
         <form class="example-container" [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities')">
 
-            <div fxLayout="column" fxLayoutAlign="space-between center">
+            <div fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="20px">
 
             <mat-table #table [dataSource]="dataSource"
                        matSort class="w100pc"
@@ -45,7 +45,7 @@
                       [ngClass]="[col.class ? col.class : '']"
                       [formGroup]="dmEntitySecuritiesForm.get('formGroupSecurities').get(element.name + '_' + element.source + '_' + element.type)"
               >
-                  <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(i, $event)"> {{ col.cell }} </mat-icon>
+                  <mat-icon *ngIf="col.element === 'iconName'" class="cursor-pointer" (click)="deleteRow(element.name + '_' + element.source + '_' + element.type, $event)"> {{ col.cell }} </mat-icon>
                   <mat-icon *ngIf="col.element === 'iconFunction'" > {{ col.cell(element) }} </mat-icon>
                   <span *ngIf="col.element === 'span'">{{ col.cell ? col.cell(element) : element[col.matColumnDef]}}</span>
                   <mat-checkbox
@@ -64,7 +64,16 @@
 
           </mat-table>
 
-                <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px" [ngClass]="'button-box'">
+                <div *ngIf="containerEntity === true" fxLayout="row" fxLayoutAlign="center center" >
+                    <mat-checkbox
+                        name="applyToChildren"
+                        [formControl]="dmEntitySecuritiesForm.get('applyToChildren')"
+                    >
+                        Apply to children
+                    </mat-checkbox>
+                </div>
+
+                <div *ngIf="showFormButtons" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
                     <button [ngClass]="'kimios-button discreet'"
                             fxLayout="row"
                             fxLayoutAlign="center center"

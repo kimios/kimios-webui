@@ -18,7 +18,8 @@
         </mat-tab>
 
         <mat-tab label="Security">
-          <file-security [documentId]="entityWrapper.dmEntity.uid" [inDialogComponent]="true"></file-security>
+          <file-security [documentId]="entityWrapper.dmEntity.uid" [inDialogComponent]="true" [containerEntity]="true" >
+          </file-security>
         </mat-tab>
       </mat-tab-group>
       <!--    </div>-->
