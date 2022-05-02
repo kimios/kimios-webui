@@ -1,4 +1,5 @@
 <div fxLayout="column" fxLayoutAlign="start" style="width: 100%;" fxLayoutGap="20px">
+    <div [ngClass]="'kimios-content-area radius'" fxLayout="column" fxLayoutAlign="start stretch">
 
     <mat-tab-group #matTabGroup>
         <mat-tab label="With me" >
@@ -8,5 +9,7 @@
             <shares-list [mode]="'byMe'"></shares-list>
         </mat-tab>
     </mat-tab-group>
+
+    </div>
 
 </div>

@@ -19,6 +19,6 @@ export class SharesComponent implements OnInit, AfterViewChecked {
     const windowTotalScreen = window.innerHeight;
     const matTabGroupOffsetTop = this.matTabGroup._tabBodyWrapper.nativeElement.offsetTop;
     const secondHeaderHeight = 56;
-    this.matTabGroup._tabBodyWrapper.nativeElement.style.height = windowTotalScreen - matTabGroupOffsetTop - secondHeaderHeight - 15 + 'px';
+    this.matTabGroup._tabBodyWrapper.nativeElement.style.height = windowTotalScreen - matTabGroupOffsetTop - secondHeaderHeight - 15 - 10 + 'px';
   }
 }
