@@ -36,8 +36,8 @@ export class FilesDataSource extends DataSource<any>
     {
     }
 
-    loadDocuments(sortField: string, sortDir, page: number): void {
-        this._fileManagerService.changeSort(sortField, sortDir, page).subscribe();
+    loadDocuments(sortField: string, sortDir): void {
+        this._fileManagerService.changeSort(sortField, sortDir).subscribe();
     }
 
     static humanFileSize(bytes, si): string {

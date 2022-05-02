@@ -502,9 +502,9 @@ export class SearchEntityService implements Resolve<any> {
         return this.getFiles(this.sortField, this.sortDirection, page, pageSize, this.query, this._criterias);
     }
 
-    public changeSort(sortField, sortDirection, page): Observable<DMEntity[]> {
+    public changeSort(sortField, sortDirection): Observable<DMEntity[]> {
         this.onSortChanged.next(sortField + ' ' + sortDirection);
-        return this.getFiles(sortField, sortDirection, page, this._pageSize, this.query, this._criterias);
+        return this.getFiles(sortField, sortDirection, this.page, this._pageSize, this.query, this._criterias);
     }
 
     public getDocumentsInDir(sortField: string, sortDirection: string, page: number, parentDirUid: number): Observable<DMEntity[]> {
