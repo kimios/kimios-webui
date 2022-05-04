@@ -133,7 +133,7 @@ export class WorkspacesComponent implements OnInit, AfterViewChecked, OnDestroy 
       tap(entityWrapper => {
         const currentPath = this.browseEntityService.currentPath.getValue();
         const currentContainerEntity = currentPath[currentPath.length - 1];
-        if (this.currentContainerEntityIsEntityParent(currentContainerEntity, entityWrapper. dmEntity)) {
+        if (this.currentContainerEntityIsEntityParent(currentContainerEntity, entityWrapper.dmEntity)) {
           this.addEntityAndReloadPage(entityWrapper);
         }
       })
