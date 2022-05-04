@@ -173,7 +173,7 @@ export class FilePreviewWrapperComponent implements OnInit, AfterViewChecked {
   ngAfterViewChecked(): void {
     const windowTotalScreen = window.innerHeight;
     // toolbar and browse path are always visible
-    this.divWrapper.nativeElement.style.height = windowTotalScreen - 64 - 60  + 'px';
+    this.divWrapper.nativeElement.style.height = windowTotalScreen - 64 - 60 - 70 + 'px';
   }
 
   private handleNewVersion(): void {

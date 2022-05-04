@@ -1,7 +1,7 @@
-<div #divWrapper fxLayout="column" fxLayoutAlign="start start" style="width: 100%;"
-     [ngClass]="'file-preview-tab-content'"
+<div #divWrapper fxLayout="column" fxLayoutAlign="start stretch"
+     [ngClass]="'kimios-section-content kimios-content-area radius'"
 >
-  <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px; width: 100%">
+  <div fxLayout="row" fxLayoutAlign="center center" style="margin-right: 20px;">
     <div>
       <mat-icon
               [ngClass]="{'cursor-pointer': !currentVersionIsFirst(),
@@ -20,7 +20,7 @@
       </mat-icon>
     </div>
   </div>
-  <div #filePreviewDiv fxFill *ngIf="document$ | async as document">
+  <div *ngIf="document$ | async as document" style="height: inherit;">
     <file-preview
             #filePreview
             [documentId]="document.uid"
