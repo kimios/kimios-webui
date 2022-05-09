@@ -4,7 +4,7 @@
         <div #browsePathRow id="browsePathRow" fxFlex>
             <browse-path [document]="documentWrapper.dmEntity"></browse-path>
         </div>
-        <file-toolbar [document]="documentWrapper" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
+        <file-toolbar [documentWrapper]="documentWrapper" [canWrite$]="canWrite$" [hasFullAccess$]="hasFullAccess$"></file-toolbar>
     </div>
 
     <div class="content" fxFill style="overflow: auto;">

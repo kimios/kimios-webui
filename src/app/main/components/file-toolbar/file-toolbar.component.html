@@ -9,7 +9,7 @@
         </mat-progress-spinner>
     </div>
     <ng-template #elseBlock>
-        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, document.uid)"
+        <input hidden type="file" #fileInput (change)="handleFileInput($event.target, documentWrapper.dmEntity.uid)"
                [disabled]="!(canWrite$ | async)" />
         <button mat-button mat-icon-button
                 (click)="fileInput.click()"
@@ -27,7 +27,7 @@
             label="Download file"
             title="Download file"
             style="margin: 10px 10px 10px 0px; "
-            (click)="handleFileDownload(document.lastVersionId)"
+            (click)="handleFileDownload(documentWrapper)"
             mat-button mat-icon-button
             [ngClass]="'kimios-green'"
     >

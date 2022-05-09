@@ -4,10 +4,15 @@
 <mat-dialog-content>
     <div fxLayout="column" fxLayoutAlign="center">
       <div fxLayout="row" style="align-items: center" fxLayoutGap="5px">
-          <fa-icon *ngIf="data.iconLine1 != null && data.iconLine1 !== undefined"
+          <fa-icon *ngIf="data.iconLine1 != null && data.iconLine1 !== undefined && data.iconLine1 !== 'error' else materialIconTemplate"
                    [icon]="['far', data.iconLine1]"
                    size="lg">
           </fa-icon>
+          <ng-template #materialIconTemplate >
+              <span class="material-icons">
+                  error
+              </span>
+          </ng-template>
           <p>{{data.messageLine1}}</p>
       </div>
       <div *ngIf="data.messageLine2"><p>{{data.messageLine2}}</p></div>

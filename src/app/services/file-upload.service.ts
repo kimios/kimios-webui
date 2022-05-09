@@ -12,6 +12,7 @@ import {BrowseEntityService} from './browse-entity.service';
 import {NotificationService} from './notification.service';
 import {DocumentUploadStatus} from '../main/model/document-upload';
 import {EntityCacheService} from './entity-cache.service';
+import {ConfirmNewVersionParam} from '../kimios-client-api/model/confirmNewVersionParam';
 
 interface TagJob {
     docId: number;
@@ -322,8 +323,11 @@ export class FileUploadService {
             this.sessionService.sessionToken,
             documentId,
             document,
-            'events',
-            true
+            '',
+            '',
+            document.name,
+            false,
+          'events'
         ).pipe(
             switchMap(
                 response =>
@@ -331,7 +335,12 @@ export class FileUploadService {
                         .map(next => next)
                         .catch(error => of(error))
             ),
+            catchError(err => of(err)),
             map((event) => {
+              if (event.error) {
+                return event;
+              }
+
                 let res;
                 if (event.ok
                     && event.ok === false) {
@@ -359,7 +368,7 @@ export class FileUploadService {
                 next: (val) => {},
                 error: (error) => {},
                 complete: () => this.documentRefreshService.needRefresh.next(documentId)
-            })
+            }),
         );
     }
 
@@ -367,4 +376,19 @@ export class FileUploadService {
         return 'upload-' + Math.random().toString(36).substr(2, 16);
     }
 
+  confirmDataTransfer(code: number, dataTransferId: number): Observable<number> {
+    if (code === 19) {
+      return this.documentService.confirmNewVersion(<ConfirmNewVersionParam>{
+        sessionId: this.sessionService.sessionToken,
+        dataTransferId: dataTransferId
+      });
+    }
+  }
+
+  abortDataTransfer(code: number, dataTransferId: number): Observable<boolean> {
+    return this.documentService.abortNewVersion(<ConfirmNewVersionParam>{
+      sessionId: this.sessionService.sessionToken,
+      dataTransferId: dataTransferId
+    });
+  }
 }
