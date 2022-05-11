@@ -27,7 +27,9 @@
             <div fxLayout="row" fxFlexOffset="5px">
               <mat-icon
                       style="margin: auto"
-                      title="{{uploadUpdated.message}}">
+                      title="{{uploadUpdated.message}}"
+                      [ngClass]="'kimios-orange'"
+              >
                 error
               </mat-icon>
             </div>
@@ -35,6 +37,7 @@
         </div>
       </div>
       <mat-progress-bar
+              *ngIf="! uploadUpdated.isError()"
               [color]="color"
               [mode]="mode"
               value="{{uploadUpdated.percentage}}"

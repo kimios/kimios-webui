@@ -418,4 +418,8 @@
     .kimios-green {
         color: map-get($accent, 500);
     }
+
+    .kimios-orange {
+        color: map-get($warn, 400);
+    }
 }

@@ -155,6 +155,6 @@ export class FilesUploadDialogComponent implements OnInit {
     }
 
     private generateUniqueId(str: string): string {
-        return btoa(str);
+        return btoa(escape(str));
     }
 }

@@ -18,7 +18,7 @@ export class DocumentUploadProgressComponent implements OnInit {
 
   upload: DocumentUpload;
 
-  color = 'primary';
+  color = 'accent';
   mode = 'determinate';
   value = 0;
   bufferValue = 1;
