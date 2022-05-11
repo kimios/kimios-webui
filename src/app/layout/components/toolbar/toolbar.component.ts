@@ -39,7 +39,7 @@ export class ToolbarComponent implements OnInit, OnDestroy
     private _unsubscribeAll: Subject<any>;
     private searchTerms = new Subject<string>();
 
-    sideBarIcon = 'format_list_bulleted';
+    sideBarIcon = 'notifications';
     showSpinner = false;
     kimiosCurrentSection: string;
     urlSectionTitleMapping: Map<string, string>;
