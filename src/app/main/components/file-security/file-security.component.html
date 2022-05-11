@@ -34,7 +34,7 @@
                       [ngClass]="[col.class ? col.class : '', 'mat-header-cell-custom']"
               >
                   <mat-icon *ngIf="showButtonForSearchUsersAndGroups && col.cellHeaderIcon" (click)="add()"
-                            [ngClass]="'cursor-pointer'"
+                            [ngClass]="'cursor-pointer kimios-green'"
                             title="Add a user or group"
                   >
                       {{col.cellHeaderIcon}}
@@ -63,6 +63,12 @@
             </mat-row>
 
           </mat-table>
+
+                <div *ngIf="dataSource.data.length == 0" fxLayout="row" fxLayoutAlign="center center" >
+                    <p style="font-style: italic; opacity: 0.6;">
+                        no items
+                    </p>
+                </div>
 
                 <div *ngIf="containerEntity === true" fxLayout="row" fxLayoutAlign="center center" >
                     <mat-checkbox

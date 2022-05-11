@@ -414,4 +414,8 @@
         max-width: 400px;
         width: 400px;
     }
+
+    .kimios-green {
+        color: map-get($accent, 500);
+    }
 }
