@@ -247,7 +247,7 @@ export class SharesListComponent implements OnInit {
         'name': '',
         'share': element
       },
-      panelClass: 'kimios-dialog'
+      // panelClass: 'kimios-dialog'
     });
   }
 
