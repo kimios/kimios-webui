@@ -105,6 +105,45 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
       this.tree.treeModel.update();
     }
 
+    this.browseEntityService.onAddedChildToEntity$.pipe(
+      takeUntil(this.unsubscribeSubject$),
+      concatMap(entityUid => combineLatest(
+        of(entityUid),
+        this.entityCacheService.findEntityChildrenInCache(entityUid, true)
+      )),
+      tap(([entityUid, childrenEntities]) => {
+        const currentChildrenTmp = this.tree.treeModel.getNodeById(entityUid).data.children.slice();
+        const currentChildren = currentChildrenTmp === null || currentChildrenTmp === undefined ?
+          [] :
+          currentChildrenTmp;
+        const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
+        childrenEntities
+          .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+          .forEach(entityWrapper => {
+            currentChildren.push({
+              name: entityWrapper.dmEntity.name,
+              id: entityWrapper.dmEntity.uid.toString(),
+              children: null,
+              isLoading: false,
+              svgIcon: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', ''),
+              dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', 'document'),
+              documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
+                (entityWrapper.dmEntity as KimiosDocument).extension ?
+                  (entityWrapper.dmEntity as KimiosDocument).extension :
+                  '' :
+                '',
+              selected: false
+            });
+          });
+        this.tree.treeModel.getNodeById(entityUid).data.children = (currentChildren as Array<any>)
+          .sort((n1, n2) => n1.name.localeCompare(n2.name));
+        this.tree.treeModel.update();
+        childrenEntities
+          .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
+          .forEach(entityWrapper => this.loadChildren(entityWrapper.dmEntity.uid).subscribe());
+      })
+    ).subscribe();
+
       this.browseEntityService.updateMoveTreeNode$.pipe(
         takeUntil(this.unsubscribeSubject$),
         filter(next => next != null)
@@ -440,45 +479,6 @@ export class BrowseTreeComponent implements OnInit, AfterViewInit, AfterViewChec
             this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
         })
     ).subscribe();
-
-        this.browseEntityService.onAddedChildToEntity$.pipe(
-          takeUntil(this.unsubscribeSubject$),
-            concatMap(entityUid => combineLatest(
-              of(entityUid),
-              this.entityCacheService.findEntityChildrenInCache(entityUid, true)
-            )),
-            tap(([entityUid, childrenEntities]) => {
-                const currentChildrenTmp = this.tree.treeModel.getNodeById(entityUid).data.children.slice();
-                const currentChildren = currentChildrenTmp === null || currentChildrenTmp === undefined ?
-                    [] :
-                    currentChildrenTmp;
-                const currentChildrenIds = currentChildren.map(childNode => Number(childNode.id));
-                childrenEntities
-                    .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
-                    .forEach(entityWrapper => {
-                        currentChildren.push({
-                            name: entityWrapper.dmEntity.name,
-                            id: entityWrapper.dmEntity.uid.toString(),
-                            children: null,
-                            isLoading: false,
-                            svgIcon: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', ''),
-                            dmEntityType: DMEntityUtils.determinePropertyValue(entityWrapper.dmEntity, 'workspace', 'folder', 'document'),
-                            documentExtension: DMEntityUtils.dmEntityIsDocument(entityWrapper.dmEntity) ?
-                              (entityWrapper.dmEntity as KimiosDocument).extension ?
-                                (entityWrapper.dmEntity as KimiosDocument).extension :
-                                '' :
-                              '',
-                          selected: false
-                        });
-                    });
-                this.tree.treeModel.getNodeById(entityUid).data.children = (currentChildren as Array<any>)
-                  .sort((n1, n2) => n1.name.localeCompare(n2.name));
-                this.tree.treeModel.update();
-                childrenEntities
-                    .filter(entityWrapper => currentChildrenIds.indexOf(entityWrapper.dmEntity.uid) === -1)
-                    .forEach(entityWrapper => this.loadChildren(entityWrapper.dmEntity.uid).subscribe());
-            })
-        ).subscribe();
 
         this.browseEntityService.chosenContainerEntityUid$.pipe(
           takeUntil(this.unsubscribeSubject$),
