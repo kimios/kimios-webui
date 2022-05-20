@@ -1,13 +1,13 @@
-<div class="" style="overflow: auto; height: 100%;">
+<div *ngIf="mediaType$ | async as mediaType" class="" style="overflow: auto; height: 100%;" fxLayout="row"
+     fxLayoutAlign="center start"  >
 
-<ng-container *ngIf="docIsTextFormat(documentExtension); else docPdf">
+<ng-container *ngIf="docIsText(mediaType); else docPdf">
     <pre style="display:block; width: 100%; height:100%;">
         <ng-container *ngIf="fileCompleteContent$ | async as fileContent">{{fileContent}}</ng-container>
     </pre>
 </ng-container>
 <ng-template #docPdf>
-    <ng-container *ngIf="documentExtension != null
-    && (docNeedsConversionToPdf(documentExtension) || documentExtension.toLowerCase() === 'pdf'); else docImg">
+    <ng-container *ngIf="docNeedsConversionToPdf(mediaType) || docIsPDF(mediaType); else docImg">
         <ng-container *ngIf="link$ | async as link">
             <object  type="application/pdf"
                      [data]="link"
@@ -20,7 +20,7 @@
 </ng-template>
 <ng-template #docImg>
     <ng-container *ngIf="link$ | async as link">
-        <img [src]="link" >
+        <div><img [src]="link" ></div>
     </ng-container>
 </ng-template>
 

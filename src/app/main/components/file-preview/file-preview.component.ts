@@ -3,10 +3,11 @@ import {SessionService} from 'app/services/session.service';
 import {ConverterService, FiletransferService} from 'app/kimios-client-api';
 import {environment} from 'environments/environment';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {Observable, of} from 'rxjs';
-import {catchError, concatMap, map, switchMap, tap} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {catchError, concatMap, filter, map, switchMap, tap} from 'rxjs/operators';
 import {DocumentDetailService} from 'app/services/document-detail.service';
 import {DocumentUtils} from 'app/main/utils/document-utils';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'file-preview',
@@ -25,21 +26,24 @@ export class FilePreviewComponent implements OnInit, OnChanges {
   previewTitle: string;
 
   // link$: Observable<string>;
-  link$: Observable<SafeResourceUrl>;
+  link$: Subject<SafeResourceUrl>;
   fileContent$: Observable<string>;
-  fileCompleteContent$: Observable<string>;
+  fileCompleteContent$: Subject<string>;
+  mediaType$: BehaviorSubject<string>;
 
   constructor(
       private sessionService: SessionService,
       private converterService: ConverterService,
       private sanitizer: DomSanitizer,
       private fileTransferService: FiletransferService,
-      private documentDetailService: DocumentDetailService
+      private documentDetailService: DocumentDetailService,
+      private entityCacheService: EntityCacheService
   ) {
     // this.link$ = new Observable<string>();
     this.fileContent$ = new Observable<string>();
-    this.fileCompleteContent$ = new Observable<string>();
-    this.link$ = new Observable<SafeResourceUrl>();
+    this.fileCompleteContent$ = new Subject<string>();
+    this.link$ = new Subject<SafeResourceUrl>();
+    this.mediaType$ = new BehaviorSubject<string>('');
   }
 
   ngOnInit(): void {
@@ -50,46 +54,54 @@ export class FilePreviewComponent implements OnInit, OnChanges {
         'pdf'
     );*/
     // this.link = this.sanitizer.bypassSecurityTrustResourceUrl(this.makeApiCallForPreview(this.documentId));
-    this.fileContent$ = this.docIsTextFormat(this.documentExtension) ?
-        this.fileTransferService.startDownloadTransaction(
-            this.sessionService.sessionToken,
-            this.documentVersionId
-        ).pipe(
-            concatMap(
-                res => this.fileTransferService.downloadDocumentVersion(
-                    this.sessionService.sessionToken,
-                    res.uid,
-                    true,
-                )
-            ),
-            switchMap(
-                result => of(result).catch(error => of(error))
-            ),
-            catchError((error) => {
-              return (error.status
-                  && error.status === 200
-                  && error.error
-                  && error.error.text) ?
-                  error.error.text :
-                  null;
-            }),
-            map(
-                response => response
-            )
-        ) :
-        of();
-    let content = '';
-    this.fileContent$.subscribe(
-        (res) => content += res,
-        (error) => null,
-        () => this.fileCompleteContent$ = of(content)
+    this.entityCacheService.findDocumentVersionMediaType(this.documentVersionId).pipe(
+      tap(mediaType => this.mediaType$.next(mediaType)),
+      tap(mediaType => console.log(mediaType))
+    ).subscribe();
+
+    let textContent = '';
+    this.entityCacheService.findDocumentVersionMediaType(this.documentVersionId).pipe(
+      tap(mediaType => this.mediaType$.next(mediaType)),
+      tap(mediaType => console.log(mediaType)),
+      filter(mediaType => this.docIsText(mediaType)),
+      concatMap(() => this.fileTransferService.startDownloadTransaction(
+        this.sessionService.sessionToken,
+        this.documentVersionId
+      )),
+      concatMap(
+        res => this.fileTransferService.downloadDocumentVersion(
+          this.sessionService.sessionToken,
+          res.uid,
+          true,
+        )
+      ),
+      switchMap(
+        result => of(result).catch(error => of(error))
+      ),
+      catchError((error) => {
+        return (error.status
+          && error.status === 200
+          && error.error
+          && error.error.text) ?
+          error.error.text :
+          null;
+      }),
+      map(response => textContent += response)
+    ).subscribe(
+      null,
+      null,
+      () => this.fileCompleteContent$.next(textContent)
     );
 
-    this.link$ = this.docNeedsConversionToPdf(this.documentExtension) ?
+    this.mediaType$.pipe(
+      concatMap(mediaType => this.docNeedsConversionToPdf(mediaType) ?
         of(this.makeApiCallForPreview(this.documentId)) :
-        (this.documentExtension.toLowerCase() === 'pdf' || DocumentUtils.extensionIsImg(this.documentExtension.toLowerCase())) ?
-            this.documentDetailService.makeDownloadLink(this.documentVersionId) :
-            of('');
+        (this.docIsPDF(mediaType) || DocumentUtils.isImage(mediaType)) ?
+          this.documentDetailService.makeDownloadLink(this.documentVersionId) :
+          of('')
+      ),
+      tap(link => this.link$.next(link))
+    ).subscribe();
   }
 
   ngOnChanges(changes: {[propKey: string]: SimpleChange}): void {
@@ -115,15 +127,19 @@ export class FilePreviewComponent implements OnInit, OnChanges {
     return this.sanitizer.bypassSecurityTrustResourceUrl(link);
   }
 
-  public docIsTextFormat(docExtension: string): boolean {
-    return docExtension != null && DocumentUtils.extensionIsText(docExtension);
+  public docIsText(mediaType: string): boolean {
+    return mediaType != null && DocumentUtils.isText(mediaType);
   }
 
-  public docNeedsConversionToPdf(docExtension: string): boolean {
-      return docExtension != null && DocumentUtils.extensionHasToBeConvertedToPdf(docExtension.toLowerCase());
+  public docNeedsConversionToPdf(mediaType: string): boolean {
+      return mediaType != null && DocumentUtils.mediaTypeHasToBeConvertedToPdf(mediaType);
   }
 
-  private docIsImg(docExtension: string): boolean {
-      return DocumentUtils.extensionIsImg(docExtension.toLowerCase());
+  private docIsPDF(mediaType: string): boolean {
+      return DocumentUtils.isPDF(mediaType);
+  }
+
+  private docIsImg(mediaType: string): boolean {
+    return DocumentUtils.isImage(mediaType);
   }
 }

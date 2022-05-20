@@ -540,6 +540,12 @@ export class EntityCacheService {
     }
   }
 
+  public findDocumentVersionMediaType(documentVersionId: number): Observable<string> {
+    return this.documentVersionService.getMediaType(this.sessionService.sessionToken, documentVersionId).pipe(
+      map(stringResponse => stringResponse.response)
+    );
+  }
+
   public getEntity(uid: number): DMEntity {
     const entityCacheData = this.entitiesCache.get(uid);
     return entityCacheData != null ?
@@ -865,7 +871,7 @@ export class EntityCacheService {
       catchError(error => {
         return of(false);
       }),
-      filter(res => res != false),
+      filter(res => res !== false),
       concatMap(res => this.reloadEntity(folderUid)),
       tap(entity => this.reloadedEntity$.next(entity)),
       concatMap(() => this.reloadEntityChildren(folderParentUid))

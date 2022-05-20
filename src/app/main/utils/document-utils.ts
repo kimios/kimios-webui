@@ -34,4 +34,21 @@ export class DocumentUtils {
     public static navigateToFolderOrWorkspace(router: Router, folderUid: number): void {
         router.navigate(['/workspaces', folderUid]);
     }
+
+    static mediaTypeHasToBeConvertedToPdf(mediaType: string): boolean {
+        //  ['odt', 'odp', 'ods', 'xls', 'xlsx', 'docx', 'doc'];
+        return mediaType.startsWith('application/vnd.openxmlformats-officedocument');
+    }
+
+    static isPDF(mediaType: string): boolean {
+        return mediaType === 'application/pdf';
+    }
+
+    static isImage(mediaType: string): boolean {
+        return mediaType.startsWith('image/');
+    }
+
+    static isText(mediaType: string): boolean {
+        return mediaType.startsWith('text/');
+    }
 }
