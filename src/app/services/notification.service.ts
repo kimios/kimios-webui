@@ -11,11 +11,13 @@ export class NotificationService {
 
   uploadCreated: BehaviorSubject<string>;
   uploadUpdates: Map<string, BehaviorSubject<DocumentUpload>>;
+  uploadFinished: BehaviorSubject<DocumentUpload>;
 
   constructor() {
     this.uploadList = new Map<string, DocumentUpload>();
     this.uploadCreated = new BehaviorSubject<string>('');
     this.uploadUpdates = new Map<string, BehaviorSubject<DocumentUpload>>();
+    this.uploadFinished = new BehaviorSubject<DocumentUpload>(null);
   }
 
   createUpload(filePath: string): void {
@@ -46,5 +48,16 @@ export class NotificationService {
 
   publishUploadUpdate(upload: DocumentUpload): void {
     this.uploadUpdates.get(upload.id).next(upload);
+    if (upload.isSuccessful() || upload.isError()) {
+      this.uploadFinished.next(upload);
+    }
+  }
+
+  getNbUploadOnError(): number {
+    return Array.from(this.uploadUpdates.values()).filter(subject => subject.getValue().isError()).length;
+  }
+
+  getNbUploadOnSuccess(): number {
+    return Array.from(this.uploadUpdates.values()).filter(subject => subject.getValue().isSuccessful()).length;
   }
 }

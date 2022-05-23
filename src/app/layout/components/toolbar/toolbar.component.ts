@@ -14,6 +14,7 @@ import {NavigationEnd, Router} from '@angular/router';
 import {SearchEntityService} from 'app/services/searchentity.service';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {DocumentExportService} from 'app/services/document-export.service';
+import {NotificationService} from '../../../services/notification.service';
 
 @Component({
     selector     : 'toolbar',
@@ -43,6 +44,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
     showSpinner = false;
     kimiosCurrentSection: string;
     urlSectionTitleMapping: Map<string, string>;
+    uploadOnError: number;
+    uploadOnSuccess: number;
 
     /**
      * Constructor
@@ -59,7 +62,8 @@ export class ToolbarComponent implements OnInit, OnDestroy
         private searchEntityService: SearchEntityService,
         private fileUploadService: FileUploadService,
         private router: Router,
-        private documentExportService: DocumentExportService
+        private documentExportService: DocumentExportService,
+        private notificationService: NotificationService
     )
     {
         // Set the defaults
@@ -189,6 +193,13 @@ export class ToolbarComponent implements OnInit, OnDestroy
         this.router.events.pipe(
           filter(event => event instanceof NavigationEnd),
           tap((event: NavigationEnd) => this.kimiosCurrentSection = this.initTitle(event.urlAfterRedirects))
+        ).subscribe();
+
+        this.notificationService.uploadFinished.pipe(
+          takeUntil(this._unsubscribeAll),
+          tap(() => this.uploadOnSuccess = this.notificationService.getNbUploadOnSuccess()),
+          tap(() => this.uploadOnError = this.notificationService.getNbUploadOnError()),
+          tap(() => console.log('upload success error : ' + this.uploadOnSuccess + ' ' + this.uploadOnError))
         ).subscribe();
     }
 

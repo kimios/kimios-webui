@@ -98,8 +98,27 @@
                     class="quick-panel-toggle-button"
                     (click)="toggleSidebarOpen('quickPanel')"
                     aria-label="Toggle quick panel">
-                <mat-icon class="secondary-text" *ngIf="! showSpinner">{{sideBarIcon}}</mat-icon>
-                <mat-spinner *ngIf="showSpinner" mode="indeterminate" diameter="24" style="margin: auto"></mat-spinner>
+
+                    <mat-icon *ngIf="! showSpinner" matBadge="{{uploadOnSuccess}}" matBadgeColor="accent"
+                              [matBadgeHidden]="(uploadOnSuccess == null || uploadOnSuccess === 0)
+                              && (uploadOnError == null || uploadOnError === 0)">
+                        {{sideBarIcon}}
+                        <div matBadge="{{uploadOnError}}" matBadgeColor="warn" matBadgePosition="below after"
+                             [matBadgeHidden]="uploadOnError == null || uploadOnError === 0"
+                        >
+                        </div>
+                    </mat-icon>
+
+                <div *ngIf="showSpinner" matBadge="{{uploadOnSuccess}}" matBadgeColor="accent"
+                     [matBadgeHidden]="uploadOnSuccess == null || uploadOnSuccess === 0
+&& (uploadOnError == null || uploadOnError === 0)">
+                    <mat-spinner  mode="indeterminate" diameter="24" style="margin: auto">
+                    </mat-spinner>
+                    <div matBadge="{{uploadOnError}}" matBadgeColor="warn" matBadgePosition="below after"
+                         [matBadgeHidden]="uploadOnError == null || uploadOnError === 0"
+                    >
+                    </div>
+                </div>
             </button>
 
             <div class="toolbar-separator" *ngIf="!hiddenNavbar && rightNavbar" fxHide fxShow.gt-xs></div>
