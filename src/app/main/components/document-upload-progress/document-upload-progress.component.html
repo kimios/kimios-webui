@@ -20,11 +20,11 @@
         <div>
           <ng-container *ngIf="uploadUpdated.isSuccessful() else error">
             <div fxLayout="row" fxFlexOffset="5px">
-              <mat-icon style="margin: auto">done</mat-icon>
+              <mat-icon style="margin: auto" [ngClass]="'kimios-green'">done</mat-icon>
             </div>
           </ng-container>
           <ng-template #error>
-            <div fxLayout="row" fxFlexOffset="5px">
+            <div *ngIf="uploadUpdated.isError()" fxLayout="row" fxFlexOffset="5px">
               <mat-icon
                       style="margin: auto"
                       title="{{uploadUpdated.message}}"
@@ -37,7 +37,7 @@
         </div>
       </div>
       <mat-progress-bar
-              *ngIf="! uploadUpdated.isError()"
+              *ngIf="! uploadUpdated.isError() && ! uploadUpdated.isSuccessful()"
               [color]="color"
               [mode]="mode"
               value="{{uploadUpdated.percentage}}"
@@ -47,3 +47,4 @@
     </ng-container>
   </ng-container>
 </div>
+<mat-divider></mat-divider>

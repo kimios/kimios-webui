@@ -203,19 +203,20 @@ export class FileUploadService {
                         .catch(error => of(error))
             ),
             catchError(error => {
+              const message =
+                error['error'] ?
+                  error['error']['message'] ?
+                    error['error']['message'] :
+                    defaultUploadError :
+                  defaultUploadError;
                 const res = {
                     name: document.name,
                     status: 'error',
-                    message:
-                        error['error'] ?
-                            error['error']['message'] ?
-                            error['error']['message'] :
-                                defaultUploadError :
-                            defaultUploadError
+                    message: message
 
                 };
                 this.filesProgress.get(uploadId).next(res);
-                this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR);
+                this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR, null, message);
                 return of(res);
             }),
             map(response => {
