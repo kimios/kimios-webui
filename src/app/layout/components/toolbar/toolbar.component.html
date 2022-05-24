@@ -111,8 +111,8 @@
 
                 <div *ngIf="showSpinner" matBadge="{{uploadOnSuccess}}" matBadgeColor="accent"
                      [matBadgeHidden]="uploadOnSuccess == null || uploadOnSuccess === 0
-&& (uploadOnError == null || uploadOnError === 0)">
-                    <mat-spinner  mode="indeterminate" diameter="24" style="margin: auto">
+&& (uploadOnError == null || uploadOnError === 0)" style="max-width: fit-content; width: fit-content; margin: auto;">
+                    <mat-spinner mode="indeterminate" diameter="24" style="margin: auto">
                     </mat-spinner>
                     <div matBadge="{{uploadOnError}}" matBadgeColor="warn" matBadgePosition="below after"
                          [matBadgeHidden]="uploadOnError == null || uploadOnError === 0"
