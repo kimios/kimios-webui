@@ -7,6 +7,7 @@
     $accent: map-get($theme, accent);
     $is-dark: map-get($theme, is-dark);
     $warn: map-get($theme, warn);
+    $primary: map-get($theme, primary);
 
     file-list {
 
@@ -56,6 +57,10 @@
 
     #kimios_site_link {
         color: map-get($accent, 500);
+    }
+
+    .darkText {
+        color: map-get($primary, 500);
     }
 
     .external_link {
@@ -421,5 +426,10 @@
 
     .kimios-orange {
         color: map-get($warn, 400);
+    }
+
+    .marginTopBottomAuto {
+        margin-top: auto;
+        margin-bottom: auto;
     }
 }
