@@ -140,6 +140,7 @@ import {DocumentVersionDataComponent} from 'app/main/components/document-version
 import {AdminSpecialTasksDefaultTaskComponent} from 'app/main/components/admin-special-tasks-default-task/admin-special-tasks-default-task.component';
 import {BrowseTreeChooseLocationComponent} from 'app/main/components/browse-tree-choose-location/browse-tree-choose-location.component';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
+import {BrowseTreeBaseComponent} from 'app/main/components/browse-tree-base/browse-tree-base.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -176,6 +177,7 @@ library.add(far, fas);
         EntityMoveDialogComponent,
         BrowseTreeMenuComponent,
         ContainerEntityCreationDialogComponent,
+        BrowseTreeBaseComponent,
         BrowseTreeComponent,
         DocumentMenuComponent,
         DocumentLinkComponent,
