@@ -1,6 +1,6 @@
 <h3 mat-dialog-title>{{dialogTitle}}</h3>
 <mat-dialog-content>
-    <browse-tree [mode]="browseTreeMode"></browse-tree>
+    <browse-tree-simple [mode]="browseTreeMode" [entityId]="entityId" ></browse-tree-simple>
 </mat-dialog-content>
 <mat-dialog-actions>
     <div  fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px" [ngClass]="'button-box'">

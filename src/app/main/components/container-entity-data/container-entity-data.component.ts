@@ -273,7 +273,8 @@ export class ContainerEntityDataComponent implements OnInit {
   openChooseFolderDialog(): void {
     const dialog = this.dialog.open(BrowseTreeDialogComponent, {
       data: {
-        browseTreeMode: BROWSE_TREE_MODE.CHOOSE_PARENT
+        browseTreeMode: BROWSE_TREE_MODE.CHOOSE_PARENT,
+        entityId: this.entityWrapper.dmEntity.uid
       }
     });
 

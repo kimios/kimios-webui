@@ -56,15 +56,12 @@ export class BrowseTreeComponent extends BrowseTreeBaseComponent implements OnIn
       cdRef,
       sessionService
     );
-    this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
-    this.initDataDone$ = new BehaviorSubject(false);
-    this.nodeUidsToExpand = new Array<number>();
-    this.entitiesLoaded = new Map<number, DMEntity>();
-    this.selectedEntityIdList = new Array<number>();
-    this.toBeInsertedInTree = new Array<Folder | KimiosDocument | Array<Folder | KimiosDocument>>();
+
   }
 
   ngOnInit(): void {
+    super.ngOnInit();
+
       this.browseEntityService.browseMode$.next(this.mode);
 
     if (this.treeNodesService.getTreeNodes(this.mode) != null) {
@@ -191,45 +188,6 @@ export class BrowseTreeComponent extends BrowseTreeBaseComponent implements OnIn
     this.entityCacheService.folderRemoved$.pipe(
       takeUntil(this.unsubscribeSubject$),
       tap(folderId => this.removeNode(this.tree.treeModel, this.nodes, folderId)),
-    ).subscribe();
-
-    this.entityCacheService.folderWithChildren$.pipe(
-      takeUntil(this.unsubscribeSubject$),
-      concatMap(entity => combineLatest(
-        of(entity),
-        this.entityCacheService.findEntityChildrenInCache(entity.uid, true)
-      )),
-      tap(([entity, childrenWrapperList]) => {
-        const parentNode = this.tree.treeModel.getNodeById(entity.uid);
-        if (parentNode == null) {
-          this.toBeInsertedInTree.push(childrenWrapperList.map(wrapper => wrapper.dmEntity));
-        } else {
-          if (childrenWrapperList.length === 0) {
-            parentNode.data.isLoading = false;
-            this.tree.treeModel.update();
-          } else {
-            const existingChildrenIdList = parentNode.data.children == null ?
-              [] :
-              parentNode.data.children.map(child => child.id);
-            this.toBeInsertedInTree.push(
-              childrenWrapperList
-                .filter(wrapper => !existingChildrenIdList.includes(wrapper.dmEntity.uid))
-                .map(wrapper => wrapper.dmEntity)
-            );
-          }
-          this.tryToInsertEntitiesInTree();
-
-          /*parentNode.data.children = [];
-          children
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .forEach(child => {
-              const node = this.createNodeFromEntity(child);
-              parentNode.data.children.push(node);
-              this.entitiesLoaded.set(child.uid, child);
-            });*/
-          // this.cdRef.detectChanges();
-        }
-      })
     ).subscribe();
   }
 
@@ -413,7 +371,7 @@ export class BrowseTreeComponent extends BrowseTreeBaseComponent implements OnIn
           }
           this.tree.treeModel.getNodeById(parentUid).data.children = children;
           this.tree.treeModel.update();
-          this.entitiesLoaded.delete(next.uid);
+          // this.entitiesLoaded.delete(next.uid);
         }
     );
 
@@ -442,7 +400,7 @@ export class BrowseTreeComponent extends BrowseTreeBaseComponent implements OnIn
             this.addNode(newNode, this.nodes);
             this.nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
             this.tree.treeModel.update();
-            this.entitiesLoaded.set(entity.uid, entity);
+            // this.entitiesLoaded.set(entity.uid, entity);
             this.treeNodesService.setTreeNodes(this.tree.treeModel.nodes, this.mode);
         })
     ).subscribe();

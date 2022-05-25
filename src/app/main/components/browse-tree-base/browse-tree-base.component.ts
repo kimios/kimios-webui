@@ -37,7 +37,6 @@ export class BrowseTreeBaseComponent implements OnInit {
   entitiesToExpand$: BehaviorSubject<Array<DMEntity>>;
   nodeUidsToExpand: Array<number>;
   initDataDone$: BehaviorSubject<boolean>;
-  entitiesLoaded: Map<number, DMEntity>;
   selectedEntityIdList: Array<number>;
 
   toBeInsertedInTree: Array<Folder | KimiosDocument | Array<Folder | KimiosDocument>>;
@@ -88,9 +87,54 @@ export class BrowseTreeBaseComponent implements OnInit {
     private documentDetailService: DocumentDetailService,
     private cdRef: ChangeDetectorRef,
     private sessionService: SessionService
-  ) { }
+  ) {
+    this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
+    this.initDataDone$ = new BehaviorSubject(false);
+    this.nodeUidsToExpand = new Array<number>();
+    // this.entitiesLoaded = new Map<number, DMEntity>();
+    this.selectedEntityIdList = new Array<number>();
+    this.toBeInsertedInTree = new Array<Folder | KimiosDocument | Array<Folder | KimiosDocument>>();
+  }
 
   ngOnInit(): void {
+    this.entityCacheService.folderWithChildren$.pipe(
+      takeUntil(this.unsubscribeSubject$),
+      concatMap(entity => combineLatest(
+        of(entity),
+        this.entityCacheService.findEntityChildrenInCache(entity.uid, true)
+      )),
+      tap(([entity, childrenWrapperList]) => {
+        const parentNode = this.tree.treeModel.getNodeById(entity.uid);
+        if (parentNode == null) {
+          this.toBeInsertedInTree.push(childrenWrapperList.map(wrapper => wrapper.dmEntity));
+        } else {
+          if (childrenWrapperList.length === 0) {
+            parentNode.data.isLoading = false;
+            this.tree.treeModel.update();
+          } else {
+            const existingChildrenIdList = parentNode.data.children == null ?
+              [] :
+              parentNode.data.children.map(child => child.id);
+            this.toBeInsertedInTree.push(
+              childrenWrapperList
+                .filter(wrapper => !existingChildrenIdList.includes(wrapper.dmEntity.uid))
+                .map(wrapper => wrapper.dmEntity)
+            );
+          }
+          this.tryToInsertEntitiesInTree();
+
+          /*parentNode.data.children = [];
+          children
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach(child => {
+              const node = this.createNodeFromEntity(child);
+              parentNode.data.children.push(node);
+              this.entitiesLoaded.set(child.uid, child);
+            });*/
+          // this.cdRef.detectChanges();
+        }
+      })
+    ).subscribe();
   }
 
   retrieveFoldersAndInsertInTree(entities: Array<DMEntityWrapper>): Observable<any> {
@@ -226,9 +270,9 @@ export class BrowseTreeBaseComponent implements OnInit {
       tap(
         ([entityUidRet, entities]) => this.tree.treeModel.update()
       ),
-      tap(
+      /*tap(
         ([entityUidRet, entities]) => entities.forEach(entWrapper => this.entitiesLoaded.set(entWrapper.dmEntity.uid, entWrapper.dmEntity))
-      ),
+      ),*/
       map(
         ([entityUidRet, entities]) => entityUidRet
       )
@@ -494,11 +538,13 @@ export class BrowseTreeBaseComponent implements OnInit {
                 (entity[0] as KimiosDocument).folderUid :
                 (entity[0] as Folder).parentUid
             );
-            entity.forEach(ent => this.insertEntityInTree(ent as DMEntity, this.tree.treeModel, this.nodes, false));
-            parentNode.data.isLoading = false;
-            parentNode.data.children.sort((a, b) => a.name.localeCompare(b.name));
-            this.tree.treeModel.update();
-            inserted++;
+            if (parentNode != null) {
+              entity.forEach(ent => this.insertEntityInTree(ent as DMEntity, this.tree.treeModel, this.nodes, false));
+              parentNode.data.isLoading = false;
+              parentNode.data.children.sort((a, b) => a.name.localeCompare(b.name));
+              this.tree.treeModel.update();
+              inserted++;
+            }
           }
           this.toBeInsertedInTree.splice(idx, 1);
         } else {
@@ -659,9 +705,9 @@ export class BrowseTreeBaseComponent implements OnInit {
           const newNode = this.createNodeFromEntity(workspaceWrapper.dmEntity);
           if (this.tree.treeModel.getNodeById(newNode.id) == null) {
             this.addNode(newNode, this.nodes);
-            // this.cdRef.detectChanges();
+            this.cdRef.detectChanges();
             this.tree.treeModel.update();
-            this.entitiesLoaded.set(workspaceWrapper.dmEntity.uid, workspaceWrapper.dmEntity);
+            this.cdRef.detectChanges();
           }
         });
         return ([entities, workspaces]);
@@ -681,6 +727,7 @@ export class BrowseTreeBaseComponent implements OnInit {
       tap(([entities, workspaces]) => entities.forEach(entity => {
         if (! DMEntityUtils.dmEntityIsDocument(entity.dmEntity)
           && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.dmEntity.uid.toString()).length === 0
+          && this.tree.treeModel.getNodeById(entity.dmEntity.uid) != null
         ) {
           this.tree.treeModel.getNodeById(entity.dmEntity.uid).expand();
         }
