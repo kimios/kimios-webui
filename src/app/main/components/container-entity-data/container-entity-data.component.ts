@@ -281,8 +281,7 @@ export class ContainerEntityDataComponent implements OnInit {
 
     dialog.afterClosed().pipe(
       tap(() => this.browseEntityService.browseMode$.next(BROWSE_TREE_MODE.BROWSE)),
-      tap(() => this.sessionService.dirtyForm$.next(false)),
-      tap(() => this.precedingParentUid = this.entityCacheService.chosenParentUid$.getValue())
+      tap(() => this.sessionService.dirtyForm$.next(false))
     ).subscribe();
   }
 }
