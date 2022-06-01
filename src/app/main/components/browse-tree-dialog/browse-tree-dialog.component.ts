@@ -29,7 +29,9 @@ export class BrowseTreeDialogComponent implements OnInit {
   ngOnInit(): void {
     this.dialogTitle = this.browseTreeMode === BROWSE_TREE_MODE.CHOOSE_PARENT ?
       'Choose location' :
-      'Add related documents';
+      this.browseTreeMode === BROWSE_TREE_MODE.WITH_DOCUMENTS ?
+        'Add related documents' :
+        'Choose a workspace or folder';
   }
 
 }
