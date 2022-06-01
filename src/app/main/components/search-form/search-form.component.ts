@@ -26,6 +26,7 @@ import {MetaWithValue} from 'app/main/model/meta-with-value';
 import {MetaValueRange, MetaValueRangeDate, MetaValueRangeNumber} from 'app/main/model/meta-value-range';
 import {UsersCacheService} from 'app/services/users-cache.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 
 @Component({
   selector: 'search-form',
@@ -271,7 +272,11 @@ export class SearchFormComponent implements OnInit {
   }
 
   openFolderTree(): void {
-    const dialog = this.dialog.open(BrowseTreeDialogComponent);
+    const dialog = this.dialog.open(BrowseTreeDialogComponent, {
+      data: {
+        browseTreeMode: BROWSE_TREE_MODE.SEARCH_FORM_DIALOG
+      }
+    });
 
     dialog.afterClosed().pipe(
         filter(res => res === true),

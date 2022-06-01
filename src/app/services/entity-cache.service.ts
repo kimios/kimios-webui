@@ -398,10 +398,16 @@ export class EntityCacheService {
     );
   }
 
-  public askFoldersInFolders(uids: Array<number>): Observable<any> {
+  public askFoldersInFolders(uids: Array<number>, force = false): Observable<any> {
+    const filteredUids = force ?
+      uids :
+      // load just not loaded folders
+      uids.filter(uid => this.entitiesHierarchyCache.get(uid) == null
+        || this.entitiesHierarchyCache.get(uid) === undefined);
+
     return this.folderService.getFoldersFolders(<FolderUidListParam> {
       sessionId: this.sessionService.sessionToken,
-      folderUidList: uids
+      folderUidList: filteredUids
     });
   }
 

@@ -105,6 +105,20 @@ export class BrowseTreeSimpleComponent extends BrowseTreeBaseComponent implement
             }
           })
         ).subscribe();
+      } else {
+        this.entityCacheService.findEntityChildrenInCache(null, true).pipe(
+          takeUntil(this.unsubscribeSubject$),
+          tap(workspaces => workspaces.forEach(workspaceWrapper => {
+            const newNode = this.createNodeFromEntity(workspaceWrapper.dmEntity);
+            if (this.tree.treeModel.getNodeById(newNode.id) == null) {
+              this.addNode(newNode, this.nodes);
+              this.cdRef.detectChanges();
+              this.tree.treeModel.update();
+              this.cdRef.detectChanges();
+            }
+          })),
+          concatMap(workspaces => this.entityCacheService.askFoldersInFolders(workspaces.map(w => w.dmEntity.uid)))
+        ).subscribe();
       }
     }
   }

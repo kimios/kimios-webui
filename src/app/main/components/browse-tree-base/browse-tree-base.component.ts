@@ -86,7 +86,7 @@ export class BrowseTreeBaseComponent implements OnInit {
     private iconService: IconService,
     protected entityCacheService: EntityCacheService,
     private documentDetailService: DocumentDetailService,
-    private cdRef: ChangeDetectorRef,
+    protected cdRef: ChangeDetectorRef,
     private sessionService: SessionService
   ) {
     this.entitiesToExpand$ = new BehaviorSubject<Array<DMEntity>>([]);
@@ -306,6 +306,7 @@ export class BrowseTreeBaseComponent implements OnInit {
     } else {
       if (this.mode === BROWSE_TREE_MODE.SEARCH_FORM_DIALOG) {
         this.browseEntityService.chosenContainerEntityUid$.next(Number(node.id.toString()));
+        this.tree.treeModel.setFocusedNode(node);
       } else {
         if (this.mode === BROWSE_TREE_MODE.CHOOSE_PARENT) {
           this.entityCacheService.chosenParentUid$.next(Number(node.id.toString()));
@@ -632,7 +633,7 @@ export class BrowseTreeBaseComponent implements OnInit {
     treeModel.update();
   }
 
-  private createNodeFromEntity(entity: DMEntity, loading = true): any {
+  protected createNodeFromEntity(entity: DMEntity, loading = true): any {
     const newNode = {
       name: entity.name,
       id: entity.uid.toString(),
