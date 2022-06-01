@@ -251,7 +251,7 @@ export class SearchFormComponent implements OnInit {
     formGroup.get('id').setValue(searchEntityQuery.id);
     formGroup.get('content').setValue(searchEntityQuery.content);
     formGroup.get('owner').setValue(searchEntityQuery.owner);
-    formGroup.get('folder').setValue(searchEntityQuery.folder);
+    formGroup.get('folder').setValue(searchEntityQuery.folder.path);
     formGroup.get('dateMin').setValue(searchEntityQuery.dateMin);
     formGroup.get('dateMax').setValue(searchEntityQuery.dateMax);
 
