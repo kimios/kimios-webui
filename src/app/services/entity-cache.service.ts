@@ -36,7 +36,7 @@ export class EntityCacheService {
   public reloadedEntity$: BehaviorSubject<DMEntity>;
   public newEntity$: BehaviorSubject<DMEntityWrapper>;
   public folderWithChildren$: Subject<DMEntity>;
-  public chosenParentUid$: Subject<number>;
+  public chosenParentUid$: BehaviorSubject<number>;
   private _intervalId: number;
   private _checkingDataMessagesQueue = false;
   public workspaceCreated$: Subject<number>;
@@ -67,7 +67,7 @@ export class EntityCacheService {
     this.entitiesHierarchyCache = new Map<number, Array<number>>();
     this.reloadedEntity$ = new BehaviorSubject<DMEntity>(null);
     this.newEntity$ = new BehaviorSubject<DMEntityWrapper>(null);
-    this.chosenParentUid$ = new Subject<number>();
+    this.chosenParentUid$ = new BehaviorSubject<number>(null);
     this.folderWithChildren$ = new Subject<DMEntity>();
 
     this._intervalId = window.setInterval(

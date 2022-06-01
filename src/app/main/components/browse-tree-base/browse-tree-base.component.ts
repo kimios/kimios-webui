@@ -307,6 +307,7 @@ export class BrowseTreeBaseComponent implements OnInit {
       } else {
         if (this.mode === BROWSE_TREE_MODE.CHOOSE_PARENT) {
           this.entityCacheService.chosenParentUid$.next(Number(node.id.toString()));
+          this.tree.treeModel.setFocusedNode(node);
         }
       }
     }

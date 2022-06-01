@@ -114,9 +114,10 @@ export class ContainerEntityDataComponent implements OnInit {
     ).subscribe();
 
     this.entityCacheService.chosenParentUid$.pipe(
-      startWith(DMEntityUtils.dmEntityIsWorkspace(this.entityWrapper.dmEntity) ? null : (this.entityWrapper.dmEntity as Folder).parentUid),
+      filter(uid => uid != null),
       concatMap(uid => uid == null ? of(null) : this.entityCacheService.findEntityInCache(uid)),
-      tap(parent => this.parentEntityWanted = parent)
+      tap(parent => this.parentEntityWanted = parent),
+      tap(parent => this.location = this.parentEntityWanted.path)
     ).subscribe();
 
     this.entityEditForm.statusChanges.pipe(
@@ -130,7 +131,7 @@ export class ContainerEntityDataComponent implements OnInit {
 
   updateDirtyFormStatus(): void {
     if (this.entityEditForm.dirty
-      || (this.parentEntity != null && this.parentEntity.uid !== this.parentEntityWanted.uid)) {
+      || (this.parentEntity != null && this.parentEntityWanted != null && this.parentEntity.uid !== this.parentEntityWanted.uid)) {
       this.sessionService.dirtyForm$.next(true);
     } else {
       this.sessionService.dirtyForm$.next(false);
@@ -280,7 +281,8 @@ export class ContainerEntityDataComponent implements OnInit {
 
     dialog.afterClosed().pipe(
       tap(() => this.browseEntityService.browseMode$.next(BROWSE_TREE_MODE.BROWSE)),
-      tap(() => this.sessionService.dirtyForm$.next(false))
+      tap(() => this.sessionService.dirtyForm$.next(false)),
+      tap(() => this.precedingParentUid = this.entityCacheService.chosenParentUid$.getValue())
     ).subscribe();
   }
 }
