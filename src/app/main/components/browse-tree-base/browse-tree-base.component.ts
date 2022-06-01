@@ -45,6 +45,7 @@ export class BrowseTreeBaseComponent implements OnInit {
 
   showNodeMenuButton = undefined;
   initial = true;
+  onlyContainersInTree = true;
 
   @ViewChild('tree') tree;
   @ViewChild('tree') treeElement: ElementRef;
@@ -94,6 +95,7 @@ export class BrowseTreeBaseComponent implements OnInit {
     // this.entitiesLoaded = new Map<number, DMEntity>();
     this.selectedEntityIdList = new Array<number>();
     this.toBeInsertedInTree = new Array<Folder | KimiosDocument | Array<Folder | KimiosDocument>>();
+    this.onlyContainersInTree = (this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS);
   }
 
   ngOnInit(): void {
@@ -101,7 +103,7 @@ export class BrowseTreeBaseComponent implements OnInit {
       takeUntil(this.unsubscribeSubject$),
       concatMap(entity => combineLatest(
         of(entity),
-        this.entityCacheService.findEntityChildrenInCache(entity.uid, true)
+        this.entityCacheService.findEntityChildrenInCache(entity.uid, this.mode !== BROWSE_TREE_MODE.WITH_DOCUMENTS)
       )),
       tap(([entity, childrenWrapperList]) => {
         const parentNode = this.tree.treeModel.getNodeById(entity.uid);
@@ -318,7 +320,11 @@ export class BrowseTreeBaseComponent implements OnInit {
     if (node.data.children == null) {
       return;
     }
-    const notLoadedChildren = node.data.children.filter(child => child.data == null || child.data.children == null);
+    const notLoadedChildren = node.data.children
+      // only ask children for folders
+      .filter(child => child.dmEntityType && child.dmEntityType === 'folder')
+      // only if not loaded
+      .filter(child => child.data == null || child.data.children == null);
     if (notLoadedChildren.length === 0) {
       return;
     }
@@ -660,7 +666,12 @@ export class BrowseTreeBaseComponent implements OnInit {
       const workspaceNode = this.createNodeFromEntity(entity);
       this.addNode(workspaceNode, nodes);
     } else {
-      const parentNode = treeModel.getNodeById((entity as Folder).parentUid);
+      let parentNode = null;
+      if (DMEntityUtils.dmEntityIsFolder(entity)) {
+        parentNode = treeModel.getNodeById((entity as Folder).parentUid);
+      } else {
+        parentNode = treeModel.getNodeById((entity as KimiosDocument).folderUid);
+      }
       if (parentNode == null) {
         return;
       }

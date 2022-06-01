@@ -89,21 +89,23 @@ export class BrowseTreeSimpleComponent extends BrowseTreeBaseComponent implement
         ).subscribe();
       }
     } else {
-      this.entityCacheService.findAllParentWrappers(this.entityId).pipe(
-        takeUntil(this.unsubscribeSubject$),
-        concatMap(entities => combineLatest(of(entities), this.loadEntitiesToExpand(entities))),
-        tap(([entities]) => console.dir(entities)),
-        tap(() => console.dir(this.tree.treeModel)),
-        tap(([entities]) =>
-          this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[0].dmEntity.uid))
-        ),
-        tap(() => {
-          if (this.initial === true) {
-            this.initial = false;
-            this.scrollToFocusedNode();
-          }
-        })
-      ).subscribe();
+      if (this.entityId != null) {
+        this.entityCacheService.findAllParentWrappers(this.entityId).pipe(
+          takeUntil(this.unsubscribeSubject$),
+          concatMap(entities => combineLatest(of(entities), this.loadEntitiesToExpand(entities))),
+          tap(([entities]) => console.dir(entities)),
+          tap(() => console.dir(this.tree.treeModel)),
+          tap(([entities]) =>
+            this.tree.treeModel.setFocusedNode(this.tree.treeModel.getNodeById(entities[0].dmEntity.uid))
+          ),
+          tap(() => {
+            if (this.initial === true) {
+              this.initial = false;
+              this.scrollToFocusedNode();
+            }
+          })
+        ).subscribe();
+      }
     }
   }
 }

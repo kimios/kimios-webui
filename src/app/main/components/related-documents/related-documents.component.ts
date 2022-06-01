@@ -15,6 +15,7 @@ import {BROWSE_TREE_MODE} from 'app/main/model/browse-tree-mode.enum';
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {DMEntityUtils} from 'app/main/utils/dmentity-utils';
 import {IconService} from 'app/services/icon.service';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 const sortTypeMapping = {
   'name': 'string',
@@ -33,6 +34,7 @@ export class RelatedDocumentsComponent implements OnInit {
   @Input()
   documentId: number;
   documentId$: BehaviorSubject<number>;
+  kimiosDocument: KimiosDocument;
   relatedDocuments: Array<KimiosDocument>;
   dataSource: KimiosDocumentDataSource;
   columnsDescription = DEFAULT_DISPLAYED_COLUMNS;
@@ -49,7 +51,8 @@ export class RelatedDocumentsComponent implements OnInit {
       private router: Router,
       private documentDetailService: DocumentDetailService,
       public dialog: MatDialog,
-      private iconService: IconService
+      private iconService: IconService,
+      private entityCacheService: EntityCacheService
   ) {
     this.displayedColumns = this.columnsDescription.map(elem => elem.id);
     this.documentId$ = new BehaviorSubject<number>(null);
@@ -70,8 +73,12 @@ export class RelatedDocumentsComponent implements OnInit {
         tap(docId => this.documentId = docId),
         tap(docId => this.documentId$.next(docId))
       ).subscribe();
+      this.entityCacheService.findEntityInCache(this.documentId).pipe(
+        tap(doc => this.kimiosDocument = doc)
+      ).subscribe();
     } else {
       this.documentId$.next(this.documentId);
+      this.kimiosDocument = null;
     }
   }
 
@@ -97,7 +104,8 @@ export class RelatedDocumentsComponent implements OnInit {
   add(): void {
     const dialogAdd = this.dialog.open(BrowseTreeDialogComponent, {
       data: {
-        browseTreeMode: BROWSE_TREE_MODE.WITH_DOCUMENTS
+        browseTreeMode: BROWSE_TREE_MODE.WITH_DOCUMENTS,
+        entityId: this.kimiosDocument ? this.kimiosDocument.folderUid : null
       }
     });
 
