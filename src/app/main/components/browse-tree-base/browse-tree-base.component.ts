@@ -723,6 +723,7 @@ export class BrowseTreeBaseComponent implements OnInit {
             this.cdRef.detectChanges();
           }
         });
+        this.nodes.sort((n1, n2) => n1.name.localeCompare(n2.name));
         return ([entities, workspaces]);
       }),
       tap(([entities, workspaces]) => console.dir(entities)),
