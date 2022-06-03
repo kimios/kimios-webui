@@ -139,7 +139,7 @@ export class BrowseTreeBaseComponent implements OnInit {
     ).subscribe();
   }
 
-  retrieveFoldersAndInsertInTree(entities: Array<DMEntityWrapper>): Observable<any> {
+  retrieveFoldersAndInsertInTree(entities: Array<DMEntityWrapper>): Observable<DMEntityWrapper[][]> {
     return from(entities).pipe(
       concatMap(entityWrapper => this.entityCacheService.reloadEntityChildren(entityWrapper.dmEntity.uid)),
       map(children => children.filter(child => DMEntityUtils.dmEntityIsFolder(child.dmEntity))),
@@ -738,6 +738,11 @@ export class BrowseTreeBaseComponent implements OnInit {
         of(workspaces),
         this.retrieveFoldersAndInsertInTree(entities)
       )),
+      tap(([entities, workspaces, dmEntityWrappersListOfList]) => {
+        if (dmEntityWrappersListOfList[0].length === 0) {
+          this.tree.treeModel.getNodeById(entitiesParam[0].dmEntity.uid.toString()).data.isLoading = false;
+        }
+      }),
       tap(([entities, workspaces]) => entities.forEach(entity => {
         if (! DMEntityUtils.dmEntityIsDocument(entity.dmEntity)
           && this.tree.treeModel.expandedNodes.filter(node => node.data.id === entity.dmEntity.uid.toString()).length === 0
