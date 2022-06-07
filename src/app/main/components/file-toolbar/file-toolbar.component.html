@@ -1,4 +1,14 @@
 <div fxLayout="row" fxLayoutAlign="start center">
+    <button mat-button mat-icon-button
+            aria-label="Bookmarked"
+            label="Bookmarked"
+            title="Bookmarked"
+            style="margin: 10px 10px 10px 0px; "
+            (click)="handleBookmarkDocument(documentWrapper.dmEntity)"
+            [ngClass]="'kimios-green'" >
+        <mat-icon>{{entityStarIcon(documentWrapper.dmEntity)}}</mat-icon>
+    </button>
+
     <div *ngIf="versionUploading; else elseBlock" style="margin: 10px 10px 10px 0px;" >
         <mat-progress-spinner
                 class="example-margin"

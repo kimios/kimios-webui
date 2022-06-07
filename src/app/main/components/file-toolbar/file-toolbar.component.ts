@@ -1,13 +1,15 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FileUploadService} from 'app/services/file-upload.service';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {ShareDialogComponent} from 'app/main/components/share-dialog/share-dialog.component';
 import {MatDialog} from '@angular/material';
 import {DMEntityWrapper} from 'app/kimios-client-api/model/dMEntityWrapper';
 import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 import {ConfirmDialogComponent, ConfirmDialogData} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {concatMap, map} from 'rxjs/operators';
+import {DMEntity} from 'app/kimios-client-api';
+import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({
   selector: 'file-toolbar',
@@ -30,7 +32,8 @@ export class FileToolbarComponent implements OnInit {
   constructor(
       private fileUploadService: FileUploadService,
       private documentDetailService: DocumentDetailService,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private entityCacheService: EntityCacheService
   ) {
   }
 
@@ -109,6 +112,28 @@ export class FileToolbarComponent implements OnInit {
   private confirmNewVersion(errorCode: number, dataTransferId: number): Observable<boolean> {
     return this.fileUploadService.confirmDataTransfer(errorCode, dataTransferId).pipe(
       map(res => res != null ? true : false)
+    );
+  }
+
+  public entityStarIcon(entity: DMEntity): string {
+    return (entity.bookmarked != null
+      && entity.bookmarked === true) ?
+      'star' :
+      'star_border';
+  }
+
+  handleBookmarkDocument(entity: DMEntity): void {
+    of(entity.bookmarked === true).pipe(
+      concatMap(res => {
+        if (res) {
+          return this.documentDetailService.removeBookmark(entity.uid);
+        } else {
+          return this.documentDetailService.addBookmark(entity.uid);
+        }
+      }),
+      concatMap(() => this.entityCacheService.reloadEntity(entity.uid))
+    ).subscribe(
+      next => this.documentWrapper.dmEntity = next
     );
   }
 }
