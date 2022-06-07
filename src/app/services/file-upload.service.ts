@@ -121,6 +121,7 @@ export class FileUploadService {
 
     private uploadFile(
         uploadId: string,
+        notificationServiceUploadId: string,
         document: File,
 //        sessionId?: string,
         docPath?: string,
@@ -172,7 +173,7 @@ export class FileUploadService {
                                     case HttpEventType.UploadProgress:
                                         const progress = Math.round(100 * event.loaded / event.total);
                                         res = {name: document.name, status: 'progress', message: progress};
-                                        this.notificationService.updateUploadPercentage(docPath, progress);
+                                        this.notificationService.updateUploadPercentage(notificationServiceUploadId, progress);
                                         break;
 
                                     case HttpEventType.Response:
@@ -182,7 +183,7 @@ export class FileUploadService {
                                             message: event.body ? event.body : event.status
                                         };
                                         this.lastUploadedDocumentId = res;
-                                        this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.SUCCESSFUL, res.message);
+                                        this.notificationService.updateUploadStatus(notificationServiceUploadId, DocumentUploadStatus.SUCCESSFUL, res.message);
                                         break;
 
                                     default:
@@ -216,7 +217,7 @@ export class FileUploadService {
 
                 };
                 this.filesProgress.get(uploadId).next(res);
-                this.notificationService.updateUploadStatus(docPath, DocumentUploadStatus.ERROR, null, message);
+                this.notificationService.updateUploadStatus(notificationServiceUploadId, DocumentUploadStatus.ERROR, null, message);
                 return of(res);
             }),
             map(response => {
@@ -273,6 +274,8 @@ export class FileUploadService {
     }
 
     uploadFiles(array: Array<Array<any>>): Observable<{ name: string, status: string, message: number } | number | string > {
+      const mapIds = new Map<string, string>();
+
         array.forEach(
             elem => {
                 const uploadId = this.generateUploadId();
@@ -282,8 +285,9 @@ export class FileUploadService {
                 );
                 this.uploadQueue.set(uploadId, elem);
                 this.allUploads.set(uploadId, elem);
-                this.notificationService.createUpload(elem[1]);
-                this.notificationService.updateUploadStatus(elem[1], DocumentUploadStatus.ONGOING);
+                const notificationServiceUploadId = this.notificationService.createUpload(elem[1]);
+                this.notificationService.updateUploadStatus(notificationServiceUploadId, DocumentUploadStatus.ONGOING);
+                mapIds.set(uploadId, notificationServiceUploadId);
             }
         );
         this.uploadQueue$.next(Array.from(this.uploadQueue.keys()));
@@ -303,6 +307,7 @@ export class FileUploadService {
                     const fileArray = this.allUploads.get(uploadId);
                     return this.uploadFile(
                         uploadId,
+                        mapIds.get(uploadId),
                         fileArray[0],
 //        sessionId?: string,
                         fileArray[1],

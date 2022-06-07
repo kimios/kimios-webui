@@ -20,7 +20,7 @@ export class NotificationService {
     this.uploadFinished = new BehaviorSubject<DocumentUpload>(null);
   }
 
-  createUpload(filePath: string): void {
+  createUpload(filePath: string): string {
     const pathSplit = filePath.split('/');
     if (pathSplit.length < 2) {
       return;
@@ -32,6 +32,8 @@ export class NotificationService {
     this.uploadList.set(upload.id, upload);
     this.uploadCreated.next(upload.id);
     this.uploadUpdates.set(upload.id, new BehaviorSubject<DocumentUpload>(null));
+
+    return upload.id;
   }
 
   updateUploadPercentage(id: string, percentage: number): void {
@@ -54,10 +56,10 @@ export class NotificationService {
   }
 
   getNbUploadOnError(): number {
-    return Array.from(this.uploadUpdates.values()).filter(subject => subject.getValue().isError()).length;
+    return Array.from(this.uploadList.values()).filter(upload => upload.isError()).length;
   }
 
   getNbUploadOnSuccess(): number {
-    return Array.from(this.uploadUpdates.values()).filter(subject => subject.getValue().isSuccessful()).length;
+    return Array.from(this.uploadList.values()).filter(upload => upload.isSuccessful()).length;
   }
 }

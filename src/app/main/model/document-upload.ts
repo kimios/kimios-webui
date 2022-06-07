@@ -20,7 +20,7 @@ export class DocumentUpload {
         this._documentPath = documentPath;
         this._percentage = -1;
         this._status = DocumentUploadStatus.CREATED;
-        this._id = this._documentPath + '/' + this._documentName;
+        this._id = this._documentPath + '/' + this._documentName + new Date();
     }
 
     get percentage(): number {
