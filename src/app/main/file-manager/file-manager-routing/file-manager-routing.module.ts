@@ -20,6 +20,7 @@ import {DocumentVersionsComponent} from 'app/main/components/document-versions/d
 import {RelatedDocumentsComponent} from 'app/main/components/related-documents/related-documents.component';
 import {FileSecurityComponent} from 'app/main/components/file-security/file-security.component';
 import {FileHistoryComponent} from 'app/main/components/file-history/file-history.component';
+import {DocumentSharesComponent} from 'app/main/components/document-shares/document-shares.component';
 
 const fileManagerRoutes: Routes = [
     {
@@ -84,6 +85,10 @@ const fileManagerRoutes: Routes = [
       {
         path: 'history',
         component: FileHistoryComponent
+      },
+      {
+        path: 'shares',
+        component: DocumentSharesComponent
       }
     ]
   },

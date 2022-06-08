@@ -142,6 +142,7 @@ import {BrowseTreeChooseLocationComponent} from 'app/main/components/browse-tree
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {BrowseTreeSimpleComponent} from 'app/main/components/browse-tree-simple/browse-tree-simple.component';
 import {BrowseTreeBaseComponent} from 'app/main/components/browse-tree-base/browse-tree-base.component';
+import {DocumentSharesComponent} from 'app/main/components/document-shares/document-shares.component';
 
 // to add icons from fontawesome
 library.add(far, fas);
@@ -245,7 +246,8 @@ library.add(far, fas);
         DocumentVersionDataComponent,
         AdminSpecialTasksDefaultTaskComponent,
         BrowseTreeChooseLocationComponent,
-        BrowseTreeSimpleComponent
+        BrowseTreeSimpleComponent,
+        DocumentSharesComponent
     ],
     imports: [
         FileManagerRoutingModule,

@@ -3,7 +3,7 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {Document as KimiosDocument, DocumentService, DocumentVersion, DocumentVersionService, SecurityService} from 'app/kimios-client-api';
 import {SessionService} from 'app/services/session.service';
 import {TagService} from 'app/services/tag.service';
-import {concatMap, filter, map, startWith, switchMap, tap} from 'rxjs/operators';
+import {concatMap, filter, map, startWith, switchMap, takeWhile, tap} from 'rxjs/operators';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {FormBuilder, FormControl} from '@angular/forms';
 import {MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
@@ -13,7 +13,7 @@ import {DocumentRefreshService} from 'app/services/document-refresh.service';
 import {ActivatedRoute} from '@angular/router';
 import {formatDate, Location} from '@angular/common';
 import {EntityCacheService} from 'app/services/entity-cache.service';
-import {DMEntityWrapper} from '../../../kimios-client-api/model/dMEntityWrapper';
+import {DMEntityWrapper} from 'app/kimios-client-api/model/dMEntityWrapper';
 
 export enum Direction {
     NEXT = 1,
@@ -73,6 +73,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
       {path: 'history', label: 'History'}
     ];
     activePath = 'preview';
+    private subscriptionOk = true;
 
     constructor(
         private route: ActivatedRoute,
@@ -126,6 +127,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
     initDocumentDetail(): void {
         this.documentWrapper$ = this.allTagsKey$
             .pipe(
+                takeWhile(next => this.subscriptionOk),
                 tap(res => this.loading$ = of(true)),
                 // tap(res => this.allTags = res),
                 concatMap(res => this.entityCacheService.findDocumentInCache(this.documentId)),
@@ -134,7 +136,12 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
                 tap(docWrapper => this.canWrite$ = of(docWrapper.canWrite)),
                 tap(docWrapper => this.hasFullAccess$ = of(docWrapper.hasFullAccess)),
                 tap(docWrapper => this.loading$ = of(false)),
-                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags))
+                tap(docWrapper => this.documentTags$.next(((docWrapper as DMEntityWrapper).dmEntity as KimiosDocument).tags)),
+                tap(docWrapper => {
+                  if (docWrapper.dmEntity.owner === this.sessionService.currentUser.uid
+                    && docWrapper.dmEntity.ownerSource === this.sessionService.currentUser.source) {
+                      this.navLinks.push({path: 'shares', label: 'Shares'});
+                }})
             );
 
         this.documentVersions$ = this.initDocumentVersions();
@@ -253,7 +260,7 @@ export class FileDetailComponent implements OnInit, OnDestroy, AfterViewChecked 
         this.documentTags$.unsubscribe();
         this.selectedTag$.unsubscribe();
         this.removedTag$.unsubscribe();
-        // this.documentRefreshService.needRefresh.unsubscribe();
+        this.subscriptionOk = false;
     }
 
     private initFilteredTags(): Observable<Array<string>> {
