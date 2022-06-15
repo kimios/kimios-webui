@@ -22,6 +22,7 @@ import {ShareEditDialogComponent} from 'app/main/components/share-edit-dialog/sh
 import {ConfirmDialogComponent} from 'app/main/components/confirm-dialog/confirm-dialog.component';
 import {CacheService} from 'app/services/cache.service';
 import {EntityCacheService} from 'app/services/entity-cache.service';
+import {Document as KimiosDocument} from 'app/kimios-client-api/model/document';
 
 export enum SharesListMode {
   WITH_ME = 'withMe',
@@ -51,6 +52,8 @@ export class SharesListComponent implements OnInit {
 
   @Input()
   mode: SharesListMode = SharesListMode.WITH_ME;
+  @Input()
+  kimiosDocument: KimiosDocument = null;
 
   dataSource: ShareDataSource;
   sort: DMEntitySort;
@@ -155,6 +158,11 @@ export class SharesListComponent implements OnInit {
     } else {
       excludedColumns.push('by');
     }
+
+    if (this.kimiosDocument != null) {
+      excludedColumns.push('entity');
+    }
+
     return columnsDescription.filter(col => !excludedColumns.includes(col.id));
   }
 
@@ -162,6 +170,7 @@ export class SharesListComponent implements OnInit {
     this.dataSource.loadData(
         this.sort,
         this.makeFiltersFromFormGroup(this.formGroupFilters, this.propertyFilterString),
+        this.kimiosDocument != null ? this.kimiosDocument.uid : null,
         refreshCache
     );
 

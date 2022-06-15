@@ -8,7 +8,6 @@ import {DocumentTypeUtils} from 'app/main/utils/document-type-utils';
 import {MatAutocompleteTrigger} from '@angular/material';
 import {UpdateDocumentVersionMetaDataParam} from 'app/kimios-client-api/model/updateDocumentVersionMetaDataParam';
 import {DocumentDetailService} from 'app/services/document-detail.service';
-import {Moment} from 'moment';
 import {EntityCacheService} from 'app/services/entity-cache.service';
 
 @Component({

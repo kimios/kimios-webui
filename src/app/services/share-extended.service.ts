@@ -57,4 +57,10 @@ export class ShareExtendedService {
               tap(sharesWithTargetUser => this.sharesWithMe = sharesWithTargetUser)
           );
   }
+
+  retrieveDocumentShares(documentId: number): Observable<Array<ShareWithTargetUser>> {
+    return this.shareService.listDocumentShares(this.sessionService.sessionToken, documentId).pipe(
+      map(shares => shares.map(share => ShareUtils.makeShareWithTargetUser(share, null)))
+    );
+  }
 }

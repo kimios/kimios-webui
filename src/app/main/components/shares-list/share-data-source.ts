@@ -106,17 +106,24 @@ export class ShareDataSource extends MatTableDataSource<ShareWithTargetUser> {
         this.loadingSubject.complete();
     }
 
-    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>, refreshCache?: boolean): void {
-        if (this.mode === SharesListMode.WITH_ME) {
-            this.shareExtendedService.retrieveSharesWithMeWithTargetUser(refreshCache).pipe(
-                map(shares => this.filterData(shares, filters)),
-                tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
+    loadData(sort: DMEntitySort, filters: Array<PropertyFilter>, kimiosDocumentId: number, refreshCache?: boolean): void {
+        if (kimiosDocumentId != null) {
+            this.shareExtendedService.retrieveDocumentShares(kimiosDocumentId).pipe(
+              map(shares => this.filterData(shares, filters)),
+              tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
             ).subscribe();
         } else {
-            this.shareExtendedService.retrieveSharesByMeWithTargetUser(refreshCache).pipe(
-                map(shares => this.filterData(shares, filters)),
-                tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
-            ).subscribe();
+            if (this.mode === SharesListMode.WITH_ME) {
+                this.shareExtendedService.retrieveSharesWithMeWithTargetUser(refreshCache).pipe(
+                  map(shares => this.filterData(shares, filters)),
+                  tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
+                ).subscribe();
+            } else {
+                this.shareExtendedService.retrieveSharesByMeWithTargetUser(refreshCache).pipe(
+                  map(shares => this.filterData(shares, filters)),
+                  tap(shares => this.sharesSubject.next(this._sortData(shares, sort)))
+                ).subscribe();
+            }
         }
     }
 
