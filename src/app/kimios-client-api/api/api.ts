@@ -1,3 +1,5 @@
+import {PluginService} from './plugin.service';
+
 export * from './administration.service';
 import { AdministrationService } from './administration.service';
 export * from './converter.service';
@@ -40,4 +42,4 @@ export * from './zip.service';
 import { ZipService } from './zip.service';
 export * from './zipRestOnly.service';
 import { ZipRestOnlyService } from './zipRestOnly.service';
-export const APIS = [AdministrationService, ConverterService, DefaultService, DocumentService, DocumentVersionService, DocumentVersionRestOnlyService, EditorsService, FiletransferService, FolderService, InformationService, LogService, NotificationService, ReportingService, RuleService, SearchService, SecurityService, ShareService, StudioService, WorkspaceService, ZipService, ZipRestOnlyService];
+export const APIS = [AdministrationService, ConverterService, DefaultService, DocumentService, DocumentVersionService, DocumentVersionRestOnlyService, EditorsService, FiletransferService, FolderService, InformationService, LogService, NotificationService, PluginService, ReportingService, RuleService, SearchService, SecurityService, ShareService, StudioService, WorkspaceService, ZipService, ZipRestOnlyService];

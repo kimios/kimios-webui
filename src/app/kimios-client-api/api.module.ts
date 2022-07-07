@@ -24,6 +24,7 @@ import { StudioService } from './api/studio.service';
 import { WorkspaceService } from './api/workspace.service';
 import { ZipService } from './api/zip.service';
 import { ZipRestOnlyService } from './api/zipRestOnly.service';
+import {PluginService} from './api/plugin.service';
 
 @NgModule({
   imports:      [],
@@ -42,6 +43,7 @@ import { ZipRestOnlyService } from './api/zipRestOnly.service';
     InformationService,
     LogService,
     NotificationService,
+    PluginService,
     ReportingService,
     RuleService,
     SearchService,

@@ -1,0 +1,6 @@
+
+<ul *ngIf="pluginList$ | async as plugins">
+  <li *ngFor="let plugin of plugins">
+    {{plugin.codeName}} - {{plugin.name}} - {{plugin.version}} - {{plugin.pluginStatus}} - {{plugin.started ? 'STARTED' : 'NOT STARTED'}}
+  </li>
+</ul>
