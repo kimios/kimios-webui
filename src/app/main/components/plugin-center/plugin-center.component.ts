@@ -12,7 +12,7 @@ import {tap} from 'rxjs/operators';
 })
 export class PluginCenterComponent implements OnInit {
 
-  private pluginList$: BehaviorSubject<Array<KimiosPlugin>>;
+  public pluginList$: BehaviorSubject<Array<KimiosPlugin>>;
 
   constructor(
     private pluginService: PluginService,
